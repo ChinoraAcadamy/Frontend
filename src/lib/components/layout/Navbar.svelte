@@ -26,10 +26,10 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -->
 <div class="fixed top-6 right-0 left-0 z-50 flex w-full justify-center px-4 text-white">
 	<nav
-		class="flex w-full max-w-5xl items-center justify-between rounded-full border border-white/20 bg-black/20 px-6 py-3 shadow-lg backdrop-blur-md transition-all"
+		class="flex w-full max-w-5xl items-center justify-between rounded-full border border-white/20 bg-primary/20 px-6 py-3 shadow-lg backdrop-blur-md transition-all"
 	>
-		<div class="flex items-center gap-3">
-			<svg class="h-8 w-8" fill="white" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z" /></svg>
+		<div class="flex items-center gap-3 text-secondary/80">
+			<svg class="h-8 w-8" fill="bg-accent" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z" /></svg>
 			<div class="flex flex-col">
 				<span class="text-sm leading-tight font-bold tracking-widest uppercase">Chinora</span>
 				<span class="text-[10px] tracking-widest uppercase opacity-70">Academy</span>
@@ -39,13 +39,13 @@
 		<div class="hidden gap-8 md:flex">
 			<a
 				href="/courses"
-				class="border-b-2 border-transparent pb-0.5 text-sm font-medium text-white/80 transition-colors hover:border-white hover:text-white"
+				class="border-b-2 border-transparent pb-0.5 text-sm font-medium text-secondary/80 transition-colors hover:border-white hover:text-white"
 			>
 				{m.nav_courses()}
 			</a>
 			<a
 				href="/profile"
-				class="border-b-2 border-transparent pb-0.5 text-sm font-medium text-white/80 transition-colors hover:border-white hover:text-white"
+				class="border-b-2 border-transparent pb-0.5 text-sm font-medium text-secondary/80 transition-colors hover:border-white hover:text-white"
 			>
 				{m.nav_profile()}
 			</a>
@@ -53,7 +53,7 @@
 		<div class="flex items-center gap-6">
 			<div class="relative" role="button" tabindex="0" on:keydown|self={(e) => { if (e.key === 'Escape') openLang = false; }}>
 				<button
-					class="flex items-center gap-1 text-sm font-medium text-white/90 transition-colors hover:text-white"
+					class="flex items-center gap-1 text-sm font-medium text-secondary/90 transition-colors hover:text-secondary"
 					on:click={() => openLang = !openLang}
 					aria-haspopup="listbox"
 					aria-expanded={openLang}

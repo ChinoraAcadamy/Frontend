@@ -117,7 +117,7 @@
               {#each achievements as achievement (achievement.text)}
                 <div class="flex items-center gap-3 w-full sm:w-[48%] achievement-item">
                   <div class="text-primary bg-primary/10 p-2 rounded-lg">
-                    <svelte:component this={achievement.icon} class="w-5 h-5" />
+                    <achievement.icon class="w-5 h-5" />
                   </div>
                   <span class="text-foreground font-medium text-sm">
                     {achievement.text}

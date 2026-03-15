@@ -2,7 +2,7 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"nav_courses": "Kurslar",
 	"nav_profile": "Profil",
-	"nav_login": "Tizimga kirish",
+	"nav_login": "Kirish",
 
 	"login_title": "Tizimga kirish",
 	"login_subtitle": "Hisobingizga kirish uchun ma'lumotlarni kiriting",

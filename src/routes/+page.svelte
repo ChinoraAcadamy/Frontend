@@ -7,6 +7,10 @@
   // Komponentlarni import qilamiz
   import WhoIsThisFor from '@/lib/components/ui/home/WhoIsThisFor.svelte';
 	import AboutInstruction from "@/lib/components/ui/home/AboutInstruction.svelte";
+  import CourseContent from "@/lib/components/ui/home/CourseContent.svelte"
+  import PricingSection from "@/lib/components/ui/home/PricingSection.svelte";
+	import Faq from "@/lib/components/ui/home/Faq.svelte";
+  import Footer from "@/lib/components/ui/home/Footer.svelte";
 
 //   import AboutInstructor from '$lib/components/AboutInstructor.svelte';
 //   import CourseContent from '$lib/components/CourseContent.svelte';
@@ -33,9 +37,14 @@
   </div>
 
   <AboutInstruction />
-  <!-- <div class="overflow-hidden">
-    <CourseBenefits />
-  </div> -->
+
+  <CourseContent />
+
+  <PricingSection />
+
+  <Faq />
+
+  <Footer />
 
 
 </div>
