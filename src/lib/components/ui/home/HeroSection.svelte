@@ -91,10 +91,10 @@
 
     <button
       on:click={() => handleScroll('course-content')}
-      class="hero-btn mt-10 flex items-center gap-3 bg-primary hover:bg-primary-light transition-colors duration-300 text-primary-foreground font-semibold text-lg px-6 md:px-8 py-3 md:py-4 rounded-full group shadow-md"
+      class="hero-btn mt-10 flex items-center gap-3 bg-background hover:bg-primary-light transition-colors duration-300 text-primary-foreground font-semibold text-lg px-6 md:px-8 py-3 md:py-4 rounded-full group shadow-md"
     >
       <span
-        class="relative flex items-center justify-center w-6 h-6 rounded-full bg-primary-foreground text-primary transition-transform duration-300 group-hover:rotate-45"
+        class="relative flex items-center justify-center w-6 h-6 rounded-full bg-primary-foreground transition-transform duration-300 group-hover:rotate-45"
       >
         <Plus size={18} strokeWidth={2.5} />
       </span>

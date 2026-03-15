@@ -1,18 +1,25 @@
 <script>
+// @ts-nocheck
+
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import { resolve } from '$app/paths';
+	import ThemeCustomizer from '@/lib/components/ui/ThemeCustomizer.svelte';
 
 	let { children } = $props();
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-{@render children()}
+<main>
+	{@render children()}
+</main>
+
+<ThemeCustomizer />
 
 <div style="display:none">
-	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 	{#each locales as locale (locale)}
-		<a href={localizeHref(page.url.pathname, { locale })}>{locale}</a>
+		<a href={resolve(localizeHref(page.url.pathname, { locale }))}>{locale}</a>
 	{/each}
 </div>

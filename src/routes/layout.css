@@ -1,3 +1,26 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+@theme{
+    --color-primary: #1a202c;
+    --color-secondary: #2d3748;
+    --color-accent: #4a5568;
+    --color-muted: #718096;
+    --color-background: #f7fafc;
+    --color-foreground: #2d3748;
+}
+
+:root {
+    /* Rang o'zgarganda 300ms davomida silliq o'tishi uchun */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Sidebar ichidagi rang tanlagich (input color) uchun */
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
