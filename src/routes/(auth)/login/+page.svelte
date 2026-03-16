@@ -19,7 +19,7 @@
 	}
 </script>
 
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+<div class="min-h-screen flex items-center justify-center bg-linear-to-br from-background to-muted p-4">
 	<div
 		class="w-full max-w-md backdrop-blur-xl bg-card/30 border border-border/50 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-primary/20"
 	>
@@ -79,7 +79,7 @@
 			<!-- Divider -->
 			<div class="relative my-6">
 				<div class="absolute inset-0 flex items-center">
-					<div class="w-full border-t border-border/50" />
+					<div class="w-full border-t border-border/50"></div>
 				</div>
 				<div class="relative flex justify-center text-sm">
 					<span class="px-4 bg-card/30 text-muted-foreground backdrop-blur-sm rounded-full">
