@@ -1,6 +1,7 @@
 <script>
 	import { CheckCircle, Clock, Sparkles, ChevronDown } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
+	import DOMPurify from 'isomorphic-dompurify';
 	import * as m from '$lib/paraglide/messages.js';
 
 	const levels = [
@@ -90,7 +91,7 @@
   <div class="container mx-auto px-6">
     <div class="text-center mb-16">
       <h2 class="text-3xl md:text-5xl font-bold mb-6 text-foreground">
-        {@html m.course_title()}
+        {@html DOMPurify.sanitize(m.course_title())}
       </h2>
       <p class="text-base md:text-xl text-muted-foreground max-w-3xl mx-auto">
         {m.course_subtitle()}

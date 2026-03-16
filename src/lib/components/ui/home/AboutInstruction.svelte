@@ -5,7 +5,6 @@
 	import * as m from '$lib/paraglide/messages.js';
 
 	let section = $state(null);
-	let loaded = $state(false);
 
 	// Achievements (5 ta)
 	const achievements = [
@@ -73,15 +72,10 @@
 				<!-- Rasm tarafi -->
 				<div class="relative instructor-image">
 					<div class="relative rounded-2xl overflow-hidden group aspect-4/5 md:aspect-3/4 bg-muted/30">
-						{#if !loaded}
-							<div class="absolute inset-0 bg-linear-to-r from-muted via-muted/60 to-muted animate-[shimmer_2s_infinite] bg-size-[200%_100%] z-10"></div>
-						{/if}
-
 						<img
 							src={instructorImage}
 							alt="Ibodullayeva Chinora"
-							class="w-full h-full object-cover transition-all duration-700 ease-out {loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}"
-							fetchpriority="high"
+							class="w-full h-full object-cover transition-all duration-700 ease-out opacity-100 scale-100"
 							loading="lazy"
 						/>
 						<div class="absolute inset-0 bg-linear-to-t from-black/50 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
