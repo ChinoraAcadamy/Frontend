@@ -62,19 +62,42 @@
   ];
 
   const brandPalettes = [
-    // 1. CHINORA GOLD (Asosiy Brand - Signature)
+    // ✅ YANGI: Eski Chinora Brand ranglaridan qayta tiklangan
     {
-      name: 'Chinora Signature',
+      name: 'Chinora Brand',
       colors: { 
-        primary: '#D4AF37',   // Oltin (Luxe)
-        secondary: '#1A202C', // To'q Slate
-        accent: '#E2CB9C',    // Och oltin
-        muted: '#718096',     // Kulrang matn uchun
-        background: '#0F172A',// Tungi osmon (Dark UI)
-        foreground: '#F8FAFC' // Oqish matn
+        primary: '#9B1C48',   // Rich Raspberry Burgundy — asosiy brand
+        secondary: '#642443', // To'qroq burgundy — hover/secondary
+        accent: '#C7A27C',    // Champagne Gold — brand aksent
+        muted: '#F4ECE6',     // Warm beige muted
+        background: '#FCFAF7',// Sof ivory fon
+        foreground: '#1A0E13' // Plum-qora matn
       }
     },
-    // 2. CHINORA LIGHT (Brendning yorug' versiyasi)
+    // ✅ YANGI: Chinora Dark — xuddi shu brand, lekin dark mode
+    {
+      name: 'Chinora Dark',
+      colors: { 
+        primary: '#C43C66',   // Rose Red (dark modeda biroz yorug')
+        secondary: '#9B1C48', // Asosiy burgundy
+        accent: '#C7A27C',    // Champagne gold aksent saqlanadi
+        muted: '#2E1F26',     // To'q plum muted
+        background: '#120A0E',// Juda to'q plum-qora
+        foreground: '#FAF6F1' // Ivory matn
+      }
+    },
+    // existing — saqlab qolindi, lekin nomi aniqlashtirild
+    {
+      name: 'Chinora Gold',   // (avval: Chinora Signature)
+      colors: { 
+        primary: '#D4AF37',
+        secondary: '#1A202C',
+        accent: '#E2CB9C',
+        muted: '#718096',
+        background: '#0F172A',
+        foreground: '#F8FAFC'
+      }
+    },
     {
       name: 'Chinora Pristine',
       colors: { 
@@ -82,15 +105,14 @@
         secondary: '#2D3748', 
         accent: '#4A5568', 
         muted: '#718096', 
-        background: '#F7FAFC', // Toza oqish fon
+        background: '#F7FAFC',
         foreground: '#1A202C' 
       }
     },
-    // 3. MODERN ACADEMY (O'quv markazlari uchun professional ko'rinish)
     {
       name: 'Modern Academy',
       colors: { 
-        primary: '#2563EB',   // Intuitiv ko'k
+        primary: '#2563EB',
         secondary: '#1E293B', 
         accent: '#60A5FA', 
         muted: '#94A3B8', 
@@ -98,11 +120,10 @@
         foreground: '#0F172A' 
       }
     },
-    // 4. LUXE HADIYA (E-commerce uchun premium pushti/qizil)
     {
       name: 'Luxe Hadiya',
       colors: { 
-        primary: '#9F1239',   // To'q qizil (Crimson)
+        primary: '#9F1239',
         secondary: '#4C0519', 
         accent: '#FB7185', 
         muted: '#FDA4AF', 
@@ -110,11 +131,10 @@
         foreground: '#4C0519' 
       }
     },
-    // 5. SILK ROAD (Ipak yo'li - Milliy va hashamatli)
     {
       name: 'Silk Road',
       colors: { 
-        primary: '#B45309',   // Amber/Jigarrang
+        primary: '#B45309',
         secondary: '#78350F', 
         accent: '#F59E0B', 
         muted: '#FCD34D', 
@@ -122,11 +142,10 @@
         foreground: '#451A03' 
       }
     },
-    // 6. DEEP EMERALD (Vip Tikuvchilik/Fashion stili)
     {
       name: 'Deep Emerald',
       colors: { 
-        primary: '#064E3B',   // To'q yashil
+        primary: '#064E3B',
         secondary: '#065F46', 
         accent: '#10B981', 
         muted: '#6EE7B7', 
@@ -134,11 +153,10 @@
         foreground: '#064E3B' 
       }
     },
-    // 7. MIDNIGHT LUXE (Premium Dark Mode)
     {
       name: 'Midnight Luxe',
       colors: { 
-        primary: '#818CF8',   // Indigo
+        primary: '#818CF8',
         secondary: '#4F46E5', 
         accent: '#C7D2FE', 
         muted: '#6366F1', 
@@ -146,7 +164,6 @@
         foreground: '#F8FAFC' 
       }
     },
-    // 8. MINIMAL GRAPHITE (Juda jiddiy va minimal)
     {
       name: 'Minimal Graphite',
       colors: { 
