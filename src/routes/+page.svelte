@@ -12,19 +12,7 @@
 	import Faq from "@/lib/components/ui/home/Faq.svelte";
   import Footer from "@/lib/components/ui/home/Footer.svelte";
 
-//   import AboutInstructor from '$lib/components/AboutInstructor.svelte';
-//   import CourseContent from '$lib/components/CourseContent.svelte';
-//   import PricingSection from '$lib/components/PricingSection.svelte';
-  // import MatrixChoice from '$lib/components/MatrixChoice.svelte';
-//   import FAQ from '$lib/components/FAQ.svelte';
-//   import Footer from '$lib/components/Footer.svelte';
-
-  // Agar kerak bo'lsa, onMount yoki boshqa logika shu yerga keladi
-  // import { onMount } from 'svelte';
-
-  // onMount(() => {
-  //   // masalan analytics, scroll restoration va h.k.
-  // });
+  export let data; // +page.server.js dan keladi
 </script>
 
 <div class="min-h-screen">
@@ -40,7 +28,7 @@
 
   <CourseContent />
 
-  <PricingSection />
+  <PricingSection courses={data.courses} />
 
   <Faq />
 

@@ -1,59 +1,75 @@
+// @ts-nocheck
+// src/routes/(auth)/login/+page.server.js
 import { fail, redirect } from '@sveltejs/kit';
-
-// Bu yerga Python API manzilingizni yozasiz
-const PYTHON_API_URL = 'https://api.sizning-domeningiz.com'; 
+import { API_URL } from '$env/static/private';
 
 export const actions = {
-    login: async ({ request, cookies, fetch }) => {
+    login: async ({ request, cookies }) => {
         const formData = await request.formData();
         const username = formData.get('username');
         const password = formData.get('password');
 
         if (!username || !password) {
-            return fail(400, { error: "Username va parolni to'ldirish majburiy." });
+            return fail(400, { error: "Username va parolni to'ldiring." });
         }
 
+        let result;
         try {
-            // Python API'ga POST so'rov yuborish
-            const response = await fetch(`${PYTHON_API_URL}/api/login`, {
+            const response = await fetch(`${API_URL}/auth/login/`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    // ngrok warning page'ni o'tkazib yuborish uchun
+                    'ngrok-skip-browser-warning': 'true'
                 },
-                // Python odatda JSON qabul qiladi
-                body: JSON.stringify({ username, password }) 
+                body: JSON.stringify({ username, password })
             });
 
-            const result = await response.json();
+            result = await response.json();
 
-            // Agar API'dan xatolik qaytsa (masalan, parol xato bo'lsa)
             if (!response.ok) {
-                return fail(response.status, { 
-                    error: result.message || "Username yoki parol noto'g'ri!" 
+                return fail(response.status, {
+                    error: result?.detail || result?.message || "Username yoki parol noto'g'ri."
                 });
             }
-
-            // Agar login muvaffaqiyatli bo'lsa va API token qaytarsa:
-            // (result.token yoki result.access_token bo'lishi mumkin, APIdan kelayotganiga qaraysiz)
-            const token = result.access_token || result.token; 
-
-            if (token) {
-                // Tokenni xavfsiz HTTP-Only Cookie ga saqlaymiz
-                cookies.set('auth_token', token, {
-                    path: '/',
-                    httpOnly: true,             // Brauzer JS orqali o'qiy olmaydi (xavfsizlik uchun)
-                    sameSite: 'strict',
-                    secure: process.env.NODE_ENV === 'production', // Prod'da faqat HTTPS
-                    maxAge: 60 * 60 * 24 * 7    // 1 haftagacha yaroqli
-                });
-            }
-
         } catch (err) {
-            console.error('API bilan bog\'lanishda xatolik:', err);
-            return fail(500, { error: "Server bilan ulanishda xatolik yuz berdi." });
+            console.error('API xatosi:', err);
+            return fail(500, { error: "Server bilan ulanishda xatolik." });
         }
 
-        // Hamma narsa joyida bo'lsa, profile sahifasiga yo'naltiramiz
-        throw redirect(302, '/profile');
+        const cookieOptions = {
+            path: '/',
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production'
+        };
+
+        // Access token — qisqa muddatli (1 kun)
+        cookies.set('access_token', result.access, {
+            ...cookieOptions,
+            maxAge: 60 * 60 * 24
+        });
+
+        // Refresh token — uzun muddatli (7 kun)
+        cookies.set('refresh_token', result.refresh, {
+            ...cookieOptions,
+            maxAge: 60 * 60 * 24 * 7
+        });
+
+        // Session token
+        cookies.set('session_token', result.session_token, {
+            ...cookieOptions,
+            maxAge: 60 * 60 * 24 * 7
+        });
+
+        // User ma'lumotlari — httpOnly EMAS (frontend o'qishi kerak bo'lishi mumkin)
+        // Lekin sensitive emas, shuning uchun JSON sifatida saqlaymiz
+        cookies.set('user_data', JSON.stringify(result.user), {
+            ...cookieOptions,
+            httpOnly: false, // navbar va boshqa componentlar o'qishi uchun
+            maxAge: 60 * 60 * 24 * 7
+        });
+
+        redirect(302, '/courses');
     }
 };

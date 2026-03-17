@@ -1,6 +1,7 @@
 <!-- src/routes/login/+page.svelte -->
-<script lang="ts">
+<script>
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -8,51 +9,60 @@
 	let loading = false;
 </script>
 
-<div class="min-h-screen bg-linear-to-br from-[#F8F4F0] via-[#F1EAE3] to-[#EDE4D9] flex items-center justify-center p-6">
-	<div class="w-full max-w-md">
-		<!-- Logo / Brand -->
-		<!-- <div class="text-center mb-10">
-			<div class="inline-flex items-center gap-3 mb-4">
-				<div class="w-11 h-11 bg-primary rounded-2xl flex items-center justify-center">
-					<span class="text-white text-2xl font-bold font-tarsk">C</span>
+<div class="min-h-screen bg-linear-to-br from-[#FDFAF7] via-[#F9F5F0] to-[#F3EDE5] flex items-center justify-center px-5 py-10">
+	<div class="w-full max-w-105">
+		<!-- Brend / Logo -->
+		<div class="mb-10 text-center">
+			<div class="inline-flex items-center justify-center gap-3">
+				<div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-md">
+					<span class="text-2xl font-bold font-tarsk">C</span>
 				</div>
 				<h1 class="text-3xl font-bold font-tarsk tracking-tight text-primary">
 					CHINORA
 				</h1>
 			</div>
-			<p class="text-muted-foreground text-sm">Fashion Academy</p>
-		</div> -->
+			<p class="mt-1.5 text-sm font-medium text-muted-foreground/80">
+				Fashion Academy
+			</p>
+		</div>
 
-		<!-- Card -->
-		<div class="backdrop-blur-xl bg-white/80 border border-white/60 shadow-xl rounded-3xl overflow-hidden">
-			
-			<!-- Header -->
-			<div class="px-8 pt-10 pb-6 text-center">
-				<h2 class="text-2xl font-semibold text-foreground">
+		<!-- Asosiy card -->
+		<div
+			class="overflow-hidden rounded-3xl border border-white/70 bg-white/85 backdrop-blur-2xl shadow-2xl shadow-black/5 transition-all duration-500 hover:shadow-primary/10"
+		>
+			<!-- Sarlavha qismi -->
+			<div class="px-10 pt-12 pb-8 text-center">
+				<h2 class="text-2xl font-semibold tracking-tight text-foreground">
 					{m.login_title()}
 				</h2>
-				<p class="mt-2 text-muted-foreground text-[15px]">
+				<p class="mt-2.5 text-[15px] leading-relaxed text-muted-foreground">
 					{m.login_subtitle()}
 				</p>
 			</div>
 
-			<!-- Form -->
-			<form 
-				method="POST" 
+			<!-- Forma -->
+			<form
+				method="POST"
 				action="?/login"
 				use:enhance={() => {
 					loading = true;
-					return async ({ update }) => {
+					return async ({ result, update }) => {
 						loading = false;
+						if (result.type === 'redirect') {
+							await invalidateAll();
+						}
 						await update();
 					};
 				}}
-				class="px-8 pb-10 space-y-6"
+				class="px-10 pb-12 space-y-7"
 			>
-				<div class="space-y-5">
+				<div class="space-y-6">
 					<!-- Username -->
 					<div>
-						<label for="username" class="block text-sm font-medium text-foreground/70 mb-1.5">
+						<label
+							for="username"
+							class="mb-2 block text-sm font-medium text-foreground/80"
+						>
 							Username
 						</label>
 						<input
@@ -60,14 +70,18 @@
 							name="username"
 							type="text"
 							required
-							class="w-full px-5 py-3.5 bg-white border border-border rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-all placeholder:text-muted-foreground"
+							autocomplete="username"
+							class="w-full rounded-2xl border border-border/70 bg-white/70 px-6 py-4 text-base transition-all placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
 							placeholder="Username kiriting"
 						/>
 					</div>
 
-					<!-- Password -->
+					<!-- Parol -->
 					<div>
-						<label for="password" class="block text-sm font-medium text-foreground/70 mb-1.5">
+						<label
+							for="password"
+							class="mb-2 block text-sm font-medium text-foreground/80"
+						>
 							{m.login_password_label()}
 						</label>
 						<input
@@ -75,37 +89,47 @@
 							name="password"
 							type="password"
 							required
-							class="w-full px-5 py-3.5 bg-white border border-border rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-all placeholder:text-muted-foreground"
+							autocomplete="current-password"
+							class="w-full rounded-2xl border border-border/70 bg-white/70 px-6 py-4 text-base transition-all placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
 							placeholder={m.login_password_placeholder()}
 						/>
 					</div>
 				</div>
 
+				<!-- Xato xabari -->
 				{#if form?.error}
-					<div class="text-destructive text-sm text-center bg-destructive/10 py-3 px-4 rounded-2xl">
+					<div
+						class="rounded-2xl bg-destructive/10 px-5 py-3.5 text-center text-sm font-medium text-destructive"
+					>
 						{form.error}
 					</div>
 				{/if}
 
+				<!-- Kirish tugmasi -->
 				<button
 					type="submit"
 					disabled={loading}
-					class="w-full py-4 bg-primary hover:bg-primary/90 text-secondary font-semibold rounded-2xl shadow-lg shadow-primary/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.985]"
+					class="w-full rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-300 hover:bg-primary/95 hover:shadow-primary/35 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
 				>
-					{loading ? 'Kutib turing...' : m.login_button()}
+					{loading ? 'Kuting...' : m.login_button()}
 				</button>
 
-				<!-- Qo'shimcha havolalar (kelajakda kerak bo'lsa) -->
-				<div class="text-center text-xs text-muted-foreground pt-2">
-					Parolni unutdingizmi? 
-					<a href={resolve("/register")} class="text-primary hover:underline font-medium">Qayta tiklash</a>
+				<!-- Qo‘shimcha havola -->
+				<div class="pt-3 text-center text-sm text-muted-foreground">
+					Parolni unutdingizmi?  
+					<a
+						href={resolve('/register')}
+						class="font-medium text-primary hover:underline transition-colors"
+					>
+						Qayta tiklash
+					</a>
 				</div>
 			</form>
 		</div>
 
-		<!-- Footer text -->
-		<p class="text-center text-xs text-muted-foreground mt-8">
-			© {new Date().getFullYear()} CHINORA FASHION ACADEMY
+		<!-- Pastki matn -->
+		<p class="mt-10 text-center text-xs text-muted-foreground/80">
+			© {new Date().getFullYear()} CHINORA FASHION ACADEMY • Barcha huquqlar himoyalangan
 		</p>
 	</div>
 </div>

@@ -2,48 +2,75 @@ import { sequence } from '@sveltejs/kit/hooks';
 import { getTextDirection } from '$lib/paraglide/runtime';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 
-// src/hooks.server.js
-import { redirect } from '@sveltejs/kit';
+import { API_URL } from '$env/static/private';
 
 /** @type {import('@sveltejs/kit').Handle} */
 async function originalHandle({ event, resolve }) {
-	// 1. Cookiedan tokenni olamiz
-	const token = event.cookies.get('session_token');
+	// src/hooks.server.js
+	const accessToken = event.cookies.get('access_token');
 
-	// 2. Foydalanuvchi ma'lumotlarini (locals) barcha sahifalar uchun tayyorlaymiz
-	// Bu ma'lumotlarni keyin +page.server.js ichida ishlata olamiz
-	if (token) {
-		// Bu yerda Python backendga so'rov yuborib tokenni tekshirish mumkin
-		// Hozircha mockup:
-		event.locals.user = {
-			id: 1,
-			role: 'student', // yoki 'admin'
-			name: 'Ali Veliyev'
-		};
-	} else {
-		// @ts-ignore
+	if (!accessToken) {
+		event.locals.isAuthenticated = false;
 		event.locals.user = null;
+		return resolve(event);
 	}
 
-	// 3. Himoya (Route Protection)
-	// Agar foydalanuvchi (app) yoki (admin) guruhiga kirsa-yu, login qilmagan bo'lsa:
-	if (
-		!event.locals.user &&
-		(event.url.pathname.startsWith('/courses') || event.url.pathname.startsWith('/admin'))
-	) {
-		throw redirect(303, '/login');
+	// Token bor — foydalanuvchini tekshiramiz
+	// Oddiy decode (verify emas, server tomonida API ishonchli)
+	try {
+		// JWT payload'ni decode qilamiz (verify qilmaymiz, API o'zi hal qiladi)
+		const payload = JSON.parse(atob(accessToken.split('.')[1]));
+		const isExpired = payload.exp * 1000 < Date.now();
+
+		if (isExpired) {
+			// Access token muddati o'tgan — refresh qilamiz
+			const refreshToken = event.cookies.get('refresh_token');
+			if (!refreshToken) {
+				event.locals.isAuthenticated = false;
+				event.locals.user = null;
+				return resolve(event);
+			}
+
+			const res = await fetch(`${API_URL}/auth/token/refresh/`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ refresh: refreshToken })
+			});
+
+			if (!res.ok) {
+				// Refresh ham ishlamadi — cookielarni tozalaymiz
+				event.cookies.delete('access_token', { path: '/' });
+				event.cookies.delete('refresh_token', { path: '/' });
+				event.cookies.delete('session_token', { path: '/' });
+				event.locals.isAuthenticated = false;
+				event.locals.user = null;
+				return resolve(event);
+			}
+
+			const data = await res.json();
+			// Yangi access tokenni saqlaymiz
+			event.cookies.set('access_token', data.access, {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 // 1 kun
+			});
+		}
+
+		// User ma'lumotini locals'ga yuklaymiz
+		const savedUser = event.cookies.get('user_data');
+		event.locals.isAuthenticated = true;
+		event.locals.user = savedUser ? JSON.parse(savedUser) : null;
+
+	} catch (e) {
+		event.locals.isAuthenticated = false;
+		event.locals.user = null;
+		console.error('Tokenni tekshirishda xatolik:', e);
 	}
 
-	// 4. Admin sahifasiga student kirmoqchi bo'lsa:
-	if (event.locals.user?.role !== 'admin' && event.url.pathname.startsWith('/admin')) {
-		throw redirect(303, '/courses');
-	}
-
-	// So'rovni davom ettirish
-	const response = await resolve(event);
-
-	return response;
-}
+	return resolve(event);
+};
 
 /** @type {import('@sveltejs/kit').Handle} */ const handleParaglide = ({ event, resolve }) =>
 	paraglideMiddleware(event.request, ({ request, locale }) => {
@@ -58,14 +85,3 @@ async function originalHandle({ event, resolve }) {
 	});
 
 export const handle = sequence(originalHandle, handleParaglide);
-// 1. Cookiedan tokenni olamiz
-// 2. Foydalanuvchi ma'lumotlarini (locals) barcha sahifalar uchun tayyorlaymiz
-// Bu ma'lumotlarni keyin +page.server.js ichida ishlata olamiz
-// Bu yerda Python backendga so'rov yuborib tokenni tekshirish mumkin
-// Hozircha mockup:
-// yoki 'admin'
-// @ts-ignore
-// 3. Himoya (Route Protection)
-// Agar foydalanuvchi (app) yoki (admin) guruhiga kirsa-yu, login qilmagan bo'lsa:
-// 4. Admin sahifasiga student kirmoqchi bo'lsa:
-// So'rovni davom ettirish
