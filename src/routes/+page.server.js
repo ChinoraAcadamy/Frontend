@@ -1,11 +1,14 @@
 // src/routes/+page.server.js
 import { API_URL } from '$env/static/private';
+import { getLocale } from '$lib/paraglide/runtime.js';
+import { redirect } from '@sveltejs/kit';
 
 export const load = async () => {
     try {
         const response = await fetch(`${API_URL}/courses/`, {
             headers: {
-                'ngrok-skip-browser-warning': 'true'
+                'ngrok-skip-browser-warning': 'true',
+                'Accept-Language': getLocale()
             }
         });
 
