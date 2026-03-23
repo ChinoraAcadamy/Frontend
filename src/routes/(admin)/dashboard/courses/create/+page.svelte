@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Breadcrumb from '$lib/components/ui/Breadcrumb.svelte';
+    import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
     import { Play, Film, Image as ImageIcon, X, FileVideo } from 'lucide-svelte';
 
     // Svelte 5 State'lar

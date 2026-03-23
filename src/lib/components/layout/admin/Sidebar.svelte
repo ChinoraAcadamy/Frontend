@@ -19,17 +19,17 @@
 	let { user = null, collapsed = $bindable(false), mobileOpen = $bindable(false) } = $props();
 
 	const navItems = [
-		{ href: '/dashboard/admin', label: 'Dashboard', icon: LayoutDashboard },
-		{ href: '/dashboard/admin/students', label: 'Talabalar', icon: Users },
-		{ href: '/dashboard/admin/courses', label: 'Kurslar', icon: BookOpen },
-		{ href: '/dashboard/admin/submissions', label: 'Arizalar', icon: FileText },
-		{ href: '/dashboard/admin/settings', label: 'Sozlamalar', icon: Settings }
+		{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+		{ href: '/dashboard/students', label: 'Talabalar', icon: Users },
+		{ href: '/dashboard/courses', label: 'Kurslar', icon: BookOpen },
+		{ href: '/dashboard/submissions', label: 'Arizalar', icon: FileText },
+		{ href: '/dashboard/profile', label: 'Sozlamalar', icon: Settings }
 	];
 
 	let currentPath = $derived($page.url.pathname);
 
 	function isActive(href) {
-		if (href === '/dashboard/admin') return currentPath === '/dashboard/admin';
+		if (href === '/dashboard') return currentPath === '/dashboard';
 		return currentPath.startsWith(href);
 	}
 </script>
