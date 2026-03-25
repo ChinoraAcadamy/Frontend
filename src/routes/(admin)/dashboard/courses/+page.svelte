@@ -32,7 +32,7 @@
                 />
             </div>
 
-            <a href={resolve('/dashboard/courses/create/')} class="shrink-0 h-11 bg-linear-to-r from-[#ed4b72] to-[#de3c61] text-white px-5 rounded-xl font-bold flex items-center gap-2 transition-transform hover:scale-105 hover:shadow-lg hover:shadow-rose-200/50">
+            <a href={resolve('/dashboard/courses/create')} class="shrink-0 h-11 bg-linear-to-r from-[#ed4b72] to-[#de3c61] text-white px-5 rounded-xl font-bold flex items-center gap-2 transition-transform hover:scale-105 hover:shadow-lg hover:shadow-rose-200/50">
                 <Plus size={20} strokeWidth={2.5} /> 
                 <span class="hidden sm:inline">Add Course</span>
             </a>
