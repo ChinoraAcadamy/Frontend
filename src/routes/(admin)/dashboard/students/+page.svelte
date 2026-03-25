@@ -180,10 +180,16 @@
                                 <tr class="hover:bg-slate-50/80 transition-colors group">
                                     <td class="py-4 px-6">
                                         <div class="flex items-center gap-4">
-                                            <div class="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold shadow-sm {getAvatarColor(student.id)}">
-                                                {getInitials(student)}
-                                            </div>
-                                            <span class="font-bold text-slate-800 text-sm">{getFullName(student)}</span>
+                                            <a href={`/dashboard/students/${student.id}`} class="flex items-center gap-4">
+                                                <div class={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarColor(student.id)}`}>
+                                                    {getInitials(student)}
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-semibold text-slate-800">{getFullName(student)}</p>
+                                                    <p class="text-xs text-slate-500">{student.email}</p>
+                                                </div>
+                                            </a>
+
                                         </div>
                                     </td>
                                     <td class="py-4 px-6">
