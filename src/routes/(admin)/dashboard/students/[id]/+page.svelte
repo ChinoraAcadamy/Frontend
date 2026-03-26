@@ -60,20 +60,6 @@
             <button class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-blue-600 font-semibold text-sm hover:bg-blue-50 hover:border-blue-200 transition-all flex items-center gap-2 shadow-sm">
                 <UserCog size={16} /> Tahrirlash
             </button>
-
-            <button
-                onclick={() => student.is_active = !student.is_active}
-                class="px-5 py-2.5 rounded-2xl bg-white border font-semibold text-sm transition-all flex items-center gap-2 shadow-sm
-                    {student.is_active
-                        ? 'border-red-200 text-red-500 hover:bg-red-50'
-                        : 'border-emerald-200 text-emerald-500 hover:bg-emerald-50'}"
-            >
-                {#if student.is_active}
-                    <UserMinus size={16} /> Faolsizlashtirish
-                {:else}
-                    <UserCheck size={16} /> Faollashtirish
-                {/if}
-            </button>
         </div>
     </div>
 

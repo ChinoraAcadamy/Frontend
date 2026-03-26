@@ -70,6 +70,10 @@ export const actions = {
             maxAge: 60 * 60 * 24 * 7
         });
 
-        redirect(302, '/courses');
+        if (result.user.role === 'admin' || result.user.role === 'superadmin') {
+            throw redirect(302, '/dashboard/admin');
+        } else {
+            redirect(302, '/courses');
+        }
     }
 };

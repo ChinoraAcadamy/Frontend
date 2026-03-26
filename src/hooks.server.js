@@ -81,6 +81,7 @@ async function authHandle({ event, resolve }) {
 		const user = await profileRes.json();
 		event.locals.isAuthenticated = true;
 		event.locals.user = user;
+		// console.log(user)
 
 	} catch (e) {
 		// Network xato, JSON parse xato — foydalanuvchini chiqarmay, token bor deb qabul qilamiz

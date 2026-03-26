@@ -2,9 +2,9 @@
     import Sidebar from '$lib/components/layout/admin/Sidebar.svelte';
     import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
 
-    let { children } = $props();
-
-    // State'larni ota komponentda saqlaymiz
+    let { data, children } = $props();
+    console.log('layout data:', data);
+    console.log('layout data.user:', data?.user);
     let collapsed = $state(false);
     let mobileOpen = $state(false);
     // no scroll when menu is open on mobile, and enable it back when menu is closed
@@ -18,7 +18,7 @@
 </script>
 
 <div class="admin-shell {collapsed ? 'collapsed' : ''}">
-    <Sidebar bind:collapsed bind:mobileOpen />
+    <Sidebar bind:collapsed bind:mobileOpen user={data.user} />
 
     <div class="admin-body">
         <DashboardNavbar notificationCount={3} bind:mobileOpen />

@@ -1,7 +1,7 @@
 // src/routes/+page.server.js
 import { API_URL } from '$env/static/private';
 import { getLocale } from '$lib/paraglide/runtime.js';
-import { redirect } from '@sveltejs/kit';
+// import { redirect } from '@sveltejs/kit';
 
 export const load = async () => {
     try {

@@ -24,7 +24,7 @@
     );
 </script>
 
-<div class="relative bg-white rounded-[24px] p-5 border flex flex-col h-[280px] transition-all duration-300 shadow-sm
+<div class="relative bg-white rounded-3xl p-5 border flex flex-col h-70 transition-all duration-300 shadow-sm
     {isLocked 
         ? 'bg-slate-400/10 border-slate-200' 
         : 'border-slate-100 hover:-translate-y-1 hover:shadow-md'}">
