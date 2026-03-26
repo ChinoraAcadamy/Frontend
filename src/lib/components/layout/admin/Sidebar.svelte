@@ -16,19 +16,19 @@
     let isAdmin = $derived(user?.role === 'admin' || user?.role === 'superadmin');
 
     const adminNavItems = [
-        { href: '/dashboard/admin',		  label: 'Dashboard',  icon: LayoutDashboard },
-        { href: '/dashboard/students',    label: 'Talabalar',  icon: Users           },
-        { href: '/dashboard/courses',     label: 'Kurslar',    icon: BookOpen        },
-        { href: '/dashboard/submissions', label: 'Arizalar',   icon: FileText        },
-        { href: '/dashboard/settings',    label: 'Sozlamalar', icon: Settings        },
+        { href: '/admin/dashboard',		      label: 'Dashboard',  icon: LayoutDashboard },
+        { href: '/admin/students',    label: 'Talabalar',  icon: Users           },
+        { href: '/admin/courses',     label: 'Kurslar',    icon: BookOpen        },
+        { href: '/admin/submissions', label: 'Arizalar',   icon: FileText        },
+        { href: '/admin/profile',    label: 'Sozlamalar', icon: Settings        },
     ];
 
     const studentNavItems = [
         { href: '/dashboard',            label: 'Dashboard',        icon: LayoutDashboard },
-        { href: '/dashboard/my-courses', label: 'Mening kurslarim', icon: BookOpen        },
-        { href: '/dashboard/calendar',   label: 'Taqvim',           icon: Calendar        },
-        { href: '/dashboard/grades',     label: 'Baholar',          icon: GraduationCap   },
-        { href: '/dashboard/profile',    label: 'Profil',           icon: User            },
+        { href: '/dashboard',            label: 'Mening kurslarim', icon: BookOpen        },
+        { href: '/dashboard',            label: 'Taqvim',           icon: Calendar        },
+        { href: '/grades',     			 label: 'Baholar',          icon: GraduationCap   },
+        { href: '/profile', 		     label: 'Profil',           icon: User            },
     ];
 
     let navItems = $derived(isAdmin ? adminNavItems : studentNavItems);

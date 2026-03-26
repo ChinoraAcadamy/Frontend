@@ -71,7 +71,7 @@ export const actions = {
         });
 
         if (result.user.role === 'admin' || result.user.role === 'superadmin') {
-            throw redirect(302, '/dashboard/admin');
+            throw redirect(302, '/admin');
         } else {
             redirect(302, '/courses');
         }

@@ -2,7 +2,7 @@
     import Sidebar from '$lib/components/layout/admin/Sidebar.svelte';
     import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
 
-    let { children } = $props();
+    let { data, children } = $props();
 
     // State'larni ota komponentda saqlaymiz
     let collapsed = $state(false);
@@ -18,7 +18,7 @@
 </script>
 
 <div class="admin-shell {collapsed ? 'collapsed' : ''}">
-    <Sidebar bind:collapsed bind:mobileOpen />
+    <Sidebar bind:collapsed bind:mobileOpen user={data.user} />
 
     <div class="admin-body">
         <DashboardNavbar notificationCount={3} bind:mobileOpen />

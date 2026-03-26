@@ -55,7 +55,7 @@
 					/>
 				</div>
 
-				<a href={resolve("/dashboard/courses/create")} class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl hover:bg-primary/90 transition-all font-medium shadow-md">
+				<a href={resolve("/courses/create")} class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl hover:bg-primary/90 transition-all font-medium shadow-md">
 					<Plus class="w-5 h-5" />
 					Yangi kurs qo‘shish
 				</a>
@@ -84,7 +84,7 @@
 			<div class="xl:col-span-8 bg-white rounded-3xl shadow-sm border border-white/70 p-8">
 				<div class="flex justify-between items-center mb-6">
 					<h2 class="text-2xl font-semibold">So‘nggi ro‘yxatdan o‘tgan shogirdlar</h2>
-					<a href={resolve("/dashboard/students")} class="text-primary hover:underline text-sm font-medium">Barchasini ko‘rish →</a>
+					<a href={resolve("/admin/students")} class="text-primary hover:underline text-sm font-medium">Barchasini ko‘rish →</a>
 				</div>
 
 				<div class="overflow-x-auto">

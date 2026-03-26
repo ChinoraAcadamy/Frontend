@@ -3,8 +3,6 @@
     import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
 
     let { data, children } = $props();
-    console.log('layout data:', data);
-    console.log('layout data.user:', data?.user);
     let collapsed = $state(false);
     let mobileOpen = $state(false);
     // no scroll when menu is open on mobile, and enable it back when menu is closed
@@ -45,10 +43,10 @@
         min-width: 0; /* Overflow muammolarini oldini oladi */
     }
 
-    .admin-content { 
+    /* .admin-content { 
         flex: 1; 
         overflow-y: auto; 
-    }
+    } */
 
     /* Collapsed holati */
     .admin-shell.collapsed .admin-body {

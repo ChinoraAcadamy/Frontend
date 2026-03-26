@@ -33,7 +33,7 @@ export const actions = {
         if (new_password !== confirm_password) {
             return fail(400, { error: "Parollar mos tushmadi", incorrect: true });
         }
-        if (new_password.length < 8) {
+        if (new_password.toString().length < 8) {
             return fail(400, { error: "Parol kamida 8 ta belgidan iborat bo'lishi kerak", incorrect: true });
         }
 
