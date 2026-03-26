@@ -7,11 +7,13 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { resolve } from '$app/paths';
 	import ThemeCustomizer from '@/lib/components/ui/ThemeCustomizer.svelte';
+	import TopLoader from '@/lib/components/TopLoader.svelte';
 
 	let { children } = $props();
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<TopLoader />
 <main>
 	{@render children()}
 </main>
