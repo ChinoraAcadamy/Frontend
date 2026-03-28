@@ -28,8 +28,6 @@
         };
     }
 
-    const {data} = $props();
-    console.log(data)
 </script>
 
 <div class="page-container">

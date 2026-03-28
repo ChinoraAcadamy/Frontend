@@ -2,24 +2,11 @@ import { API_URL } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 
 // load course id from params and get course modules
-export const load = async ({ fetch, params, cookies }) => {
-    const accessToken = cookies.get('access_token');
-    if (!accessToken) throw redirect(303, '/login');
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`,
-        'ngrok-skip-browser-warning': 'true'
-    };
+export const load = async ({ parent }) => {
+    const { modules } = await parent();
 
-    try {
-        const response = await fetch(`${API_URL}/courses/${params.course_id}/`, { headers });
-        if (!response.ok) throw error(404, 'Kurs topilmadi');
-        const modules = await response.json();
-
-        return { modules };
-    } catch (err) {
-        console.log('Modulelarni olishda xatolik: ', err);
-    }
-}
+    return { modules };
+};
 
 export const actions = {
     createLesson: async ({ fetch, cookies, request, params }) => {

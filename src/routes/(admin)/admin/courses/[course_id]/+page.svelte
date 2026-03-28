@@ -12,41 +12,25 @@
         stats: { total: 25, watched: 10, remaining: 15 } // Mockupdagi 48 xatosini mantiqan 15 ga to'g'irladim :)
     };
 
-    const modules = [
-        {
-            title: "Module 1: Introduction",
-            lessons: [
-                { id: 1, title: "Yangi dars qo'shish", duration: "10B981", status: "completed" },
-                { id: 2, title: "Yangi dars qo'shish", duration: "0h 16m", status: "completed" },
-                { id: 3, title: "Yangi dars qo'shish", duration: "0h 16m", status: "active" },
-                { id: 4, title: "Yangi dars qo'shish", duration: "0h 16m", status: "completed" },
-                { id: 5, title: "Yangi Kamal qo'shish", duration: "0h 18m", status: "locked" },
-                { id: 6, title: "Yangi Kamal qo'shish", duration: "9CA3AF", status: "locked" },
-            ]
-        },
-        {
-            title: "Module 2: Basics",
-            lessons: [
-                { id: 1, title: "Svelte 5 asoslari", duration: "0h 25m", status: "locked" }
-            ]
-        }
-    ];
+    const {data} = $props();
+    console.log(data)
 </script>
 
 <div class="max-w-5xl mx-auto p-4 md:p-8 min-h-screen bg-[#f8fafc] font-sans">
     
     <div class="mb-6">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Course Detail</p>
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">{course.title}</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">{data.course.title}</h1>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         
-        <div class="lg:col-span-2 bg-white rounded-[24px] p-5 sm:p-6 shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-5 sm:gap-6 items-start sm:items-center">
+        <div class="lg:col-span-2 bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-5 sm:gap-6 items-start sm:items-center">
             
             <div class="w-full sm:w-36 h-48 sm:h-24 shrink-0 bg-slate-100 rounded-2xl overflow-hidden relative">
                 <img 
-                    src={course.image} 
+                    src={data.course.img ||
+					`https://placehold.co/600x400?text=${encodeURIComponent(data.course.title)}`} 
                     alt="Course cover" 
                     class="absolute inset-0 w-full h-full object-cover"
                     width="144" 
@@ -57,7 +41,7 @@
             <div class="flex-1 w-full">
                 <h2 class="text-xl font-bold text-slate-800 mb-2">{course.title}</h2>
                 <p class="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">
-                    {course.description}
+                    {data.course.description}
                 </p>
                 
                 <div class="flex items-center gap-4">
@@ -72,12 +56,12 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 flex flex-col justify-center">
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center">
             <h3 class="text-lg font-bold text-slate-800 mb-4">Progress</h3>
             <div class="space-y-3">
                 <div class="flex justify-between items-center text-sm">
                     <span class="text-slate-500 font-medium">Total lessons</span>
-                    <span class="font-bold text-slate-800">{course.stats.total}</span>
+                    <span class="font-bold text-slate-800">{data.course.lessons_count}</span>
                 </div>
                 <div class="flex justify-between items-center text-sm">
                     <span class="text-slate-500 font-medium">Watched</span>
@@ -93,7 +77,7 @@
     </div>
 
     <div class="space-y-2">
-        {#each modules as mod (mod.title)}
+        {#each data.modules as mod (mod.title)}
             <ModuleAccordion title={mod.title}>
                 {#each mod.lessons as lesson (lesson.id)}
                     <LessonsRow 

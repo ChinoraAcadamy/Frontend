@@ -3,7 +3,6 @@
 	import { CheckCircle2 } from 'lucide-svelte';
 
 	// Svelte 5 State'lar
-	let step = $state(3);
 	let modulePk = $state(null);
 	let isSubmitting = $state(false);
 	// Form submit qilinayotganda ushlab turish va keyingi bosqichga o'tkazish
@@ -12,14 +11,7 @@
 		return async ({ result, update }) => {
 			isSubmitting = false;
 
-			if (result.type === 'success') {
-				if (step === 1) {
-					step = 2;
-				} else if (step === 2) {
-					step = 3;
-				}
-				// Step 3 success bo'lsa, serverni o'zi redirect qiladi
-			} else if (result.type === 'failure') {
+			if (result.type === 'failure') {
 				alert(result.data?.error || 'Xatolik yuz berdi');
 				await update();
 			}
@@ -27,7 +19,7 @@
 	}
 
 	const { data } = $props();
-	// console.log(data);
+	console.log(data);
 </script>
 
 <div class="page-container">
@@ -37,27 +29,21 @@
 	</div>
 
 	<div class="progress-tracker">
-		<div class="step {step >= 1 ? 'active' : ''}">
+		<div class="step active">
 			<div class="step-circle">
-				{step > 1 ? '' : '1'}
-				{#if step > 1}
-					<CheckCircle2 size={18} />
-				{/if}
+				<CheckCircle2 size={18} />
 			</div>
 			<span class="step-label">Kurs</span>
 		</div>
-		<div class="step-line {step >= 2 ? 'active-line' : ''}"></div>
-		<div class="step {step >= 2 ? 'active' : ''}">
+		<div class="step-line active"></div>
+		<div class="step active">
 			<div class="step-circle">
-				{step > 2 ? '' : '2'}
-				{#if step > 2}
-					<CheckCircle2 size={18} />
-				{/if}
+				<CheckCircle2 size={18} />
 			</div>
 			<span class="step-label">Modul</span>
 		</div>
-		<div class="step-line {step === 3 ? 'active-line' : ''}"></div>
-		<div class="step {step === 3 ? 'active' : ''}">
+		<div class="step-line active-line"></div>
+		<div class="step">
 			<div class="step-circle">3</div>
 			<span class="step-label">Dars</span>
 		</div>
@@ -73,7 +59,7 @@
 					<select id="module_select" class="input" name="module_pk" bind:value={modulePk} required>
 						<option value="" disabled selected>Modul tanlang</option>
 
-						{#each data.modules.modules as module (module.id)}
+						{#each data.modules as module (module.id)}
 							<option value={module.id}>
 								{module.title} ({module.lessons_count} ta dars)
 							</option>

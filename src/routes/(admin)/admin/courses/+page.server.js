@@ -3,10 +3,7 @@ import { getLocale } from '@/lib/paraglide/runtime';
 import { error } from '@sveltejs/kit';
 
 
-export const load = async ({ fetch, cookies, setHeaders }) => {
-    setHeaders({
-        'cache-control': 'public, max-age=120'
-    });
+export const load = async ({ fetch, cookies}) => {
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw error(401, 'Avtorizatsiya talab qilinadi');
     const headers = {
