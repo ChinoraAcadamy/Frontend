@@ -60,7 +60,7 @@
 			</a>
 			{#if $page.data.isAuthenticated}
 				<a
-					href={resolve('/profile')}
+					href={resolve('/profil')}
 					// profil sahifasiga olib boradi
 					class="border-b-2 border-transparent pb-0.5 text-sm font-medium text-secondary/80 transition-colors hover:border-white hover:text-white"
 				>
@@ -122,7 +122,7 @@
 
 			{#if $page.data.isAuthenticated}
 				<a
-					href={resolve('/profile')}
+					href={resolve('/profil')}
 					class="rounded-full bg-white px-5 py-2.5 text-xs font-bold tracking-wider text-black transition-transform hover:scale-105 active:scale-95"
 				>
 					{m.nav_profile().toUpperCase()}

@@ -6,7 +6,7 @@ export const load = async ({ locals, parent }) => {
     if (!locals.isAuthenticated) redirect(302, '/login');
 
     if (locals.user?.role !== 'admin' && locals.user?.role !== 'superadmin') {
-        redirect(302, '/dashboard/grades'); // student sahifasiga
+        redirect(302, '/dashboard/baholar'); // student sahifasiga
     }
 
     return { user: locals.user };

@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { resolve } from "$app/paths";
+
     let { 
         title, 
         price, 
         modules, 
         status, 
-        image 
+        image,
+        link
     } = $props();
 
     // Statusga qarab ranglarni dinamik belgilash
@@ -29,7 +32,8 @@
         <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
     </div>
 
-    <div class="p-5 flex flex-col flex-1 justify-between">
+    <a href={resolve(`/admin/courses/create/${link}`)} class="flex-1 flex flex-col justify-between">
+        <div class="p-5 flex flex-col flex-1 justify-between">
         <div>
             <h3 class="text-lg font-bold text-slate-800 mb-1 line-clamp-2 leading-tight">
                 {title}
@@ -45,4 +49,5 @@
             </span>
         </div>
     </div>
+    </a>
 </div>

@@ -1,7 +1,10 @@
 import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
 
-export const load = async ({ fetch, params, cookies }) => {
+export const load = async ({ fetch, params, cookies, setHeaders }) => {
+    setHeaders({
+        'cache-control': 'public, max-age=60'
+    });
     const accessToken = cookies.get('access_token');
     
     const res = await fetch(`${API_URL}/auth/students/${Number(params.id)}/`, {

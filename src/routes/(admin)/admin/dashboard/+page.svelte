@@ -55,9 +55,9 @@
 					/>
 				</div>
 
-				<a href={resolve("/courses/create")} class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl hover:bg-primary/90 transition-all font-medium shadow-md">
+				<a href={resolve("/courses/lesson")} class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl hover:bg-primary/90 transition-all font-medium shadow-md">
 					<Plus class="w-5 h-5" />
-					Yangi kurs qo‘shish
+					Yangi dars qo‘shish
 				</a>
 			</div>
 		</div>

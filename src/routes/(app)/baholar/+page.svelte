@@ -31,14 +31,14 @@
         url.searchParams.set('status', newStatus);
         url.searchParams.set('page', '1');
         // @ts-ignore
-        goto(resolve(`/grades?${url.searchParams}`), { keepFocus: true, invalidateAll: true });
+        goto(resolve(`/baholar?${url.searchParams}`), { keepFocus: true, invalidateAll: true });
     }
 
     function goToPage(p) {
         const url = new URL($page.url);
         url.searchParams.set('page', String(p));
         // @ts-ignore
-        goto(resolve(`/grades?${url.searchParams}`), { keepFocus: true });
+        goto(resolve(`/baholar?${url.searchParams}`), { keepFocus: true });
     }
 
     const tabs = [

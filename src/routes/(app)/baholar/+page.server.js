@@ -1,4 +1,4 @@
-// src/routes/(app)/dashboard/grades/+page.server.js
+// src/routes/(app)/dashboard/baholar/+page.server.js
 import { API_URL } from '$env/static/private';
 
 export const load = async ({ cookies, fetch, url }) => {

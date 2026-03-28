@@ -11,20 +11,6 @@
 
 <div class="min-h-screen bg-linear-to-br from-[#FDFAF7] via-[#F9F5F0] to-[#F3EDE5] flex items-center justify-center px-5 py-10">
 	<div class="w-full max-w-105">
-		<!-- Brend / Logo -->
-		<div class="mb-10 text-center">
-			<div class="inline-flex items-center justify-center gap-3">
-				<div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-md">
-					<span class="text-2xl font-bold font-tarsk">C</span>
-				</div>
-				<h1 class="text-3xl font-bold font-tarsk tracking-tight text-primary">
-					CHINORA
-				</h1>
-			</div>
-			<p class="mt-1.5 text-sm font-medium text-muted-foreground/80">
-				Fashion Academy
-			</p>
-		</div>
 
 		<!-- Asosiy card -->
 		<div

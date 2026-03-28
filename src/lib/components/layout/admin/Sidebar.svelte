@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
     import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
     import { page } from '$app/stores';
@@ -16,25 +16,25 @@
     let isAdmin = $derived(user?.role === 'admin' || user?.role === 'superadmin');
 
     const adminNavItems = [
-        { href: '/admin/dashboard',		      label: 'Dashboard',  icon: LayoutDashboard },
+        { href: '/admin/dashboard',   label: 'Dashboard',  icon: LayoutDashboard },
         { href: '/admin/students',    label: 'Talabalar',  icon: Users           },
         { href: '/admin/courses',     label: 'Kurslar',    icon: BookOpen        },
         { href: '/admin/submissions', label: 'Arizalar',   icon: FileText        },
-        { href: '/admin/profile',    label: 'Sozlamalar', icon: Settings        },
+        { href: '/admin/profile',     label: 'Sozlamalar', icon: Settings        },
     ];
 
     const studentNavItems = [
-        { href: '/dashboard',            label: 'Dashboard',        icon: LayoutDashboard },
-        { href: '/dashboard',            label: 'Mening kurslarim', icon: BookOpen        },
-        { href: '/dashboard',            label: 'Taqvim',           icon: Calendar        },
-        { href: '/grades',     			 label: 'Baholar',          icon: GraduationCap   },
-        { href: '/profile', 		     label: 'Profil',           icon: User            },
+        { href: '/dashboard',           label: 'Dashboard',        icon: LayoutDashboard },
+        { href: '/kurslarim',           label: 'Mening kurslarim', icon: BookOpen        },
+        { href: '/taqvim',              label: 'Taqvim',           icon: Calendar        },
+        { href: '/baholar',     	    label: 'Baholar',          icon: GraduationCap   },
+        { href: '/profil', 		        label: 'Profil',           icon: User            },
     ];
 
     let navItems = $derived(isAdmin ? adminNavItems : studentNavItems);
 
     // Exact match kerak bo'lgan root routelar — boshqalar startsWith bilan tekshiriladi
-    const exactRoutes = new Set(['/dashboard', '/dashboard/admin']);
+    const exactRoutes = new Set(['/dashboard', '/admin/dashboard']);
 
     function isActive(href) {
         if (exactRoutes.has(href)) return currentPath === href;

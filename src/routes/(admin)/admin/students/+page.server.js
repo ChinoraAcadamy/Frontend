@@ -2,7 +2,10 @@
 import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
 
-export const load = async ({ cookies, fetch, url }) => {
+export const load = async ({ cookies, fetch, url, setHeaders }) => {
+    setHeaders({
+        'cache-control': 'public, max-age=120'
+    });
     const accessToken = cookies.get('access_token');
     const search   = url.searchParams.get('search')    ?? '';
     const isActive = url.searchParams.get('is_active') ?? '';

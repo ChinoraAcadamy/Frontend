@@ -1,3 +1,4 @@
+<!-- /routes/(app)/+layout.svelte -->
 <script lang="ts">
     import Sidebar from '$lib/components/layout/admin/Sidebar.svelte';
     import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
