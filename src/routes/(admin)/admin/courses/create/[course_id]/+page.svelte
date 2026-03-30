@@ -18,8 +18,8 @@
                 const currentPath = page.url.pathname;
                 
                 // Oxiriga /lesson qo'shamiz
-                const nextPath = `${currentPath}/lesson/`;
-                
+                const nextPath = currentPath + '/lesson/';
+                // @ts-ignore
                 goto(resolve(nextPath));
             } else if (result.type === 'failure') {
                 alert(result.data?.error || "Xatolik yuz berdi");

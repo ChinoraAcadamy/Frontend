@@ -1,5 +1,7 @@
+<!-- src/lib/components/ui/courses/CourseCard.svelte -->
 <script lang="ts">
     import { resolve } from "$app/paths";
+    import { Play } from 'lucide-svelte';
 
     let { 
         title, 
@@ -10,57 +12,61 @@
         link
     } = $props();
 
-    // Statusga qarab ranglarni dinamik belgilash
-    let statusStyles = $derived(
-        status === 'published' 
-            ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
-            : 'bg-amber-50 text-amber-600 border-amber-100'
-    );
+    const isPublished = $derived(status === 'published');
 </script>
 
-<div class="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg hover:border-slate-200 group flex flex-col h-full relative">
+<div class="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative">
     
-    <div class="w-full h-44 sm:h-40 bg-slate-100 relative shrink-0 overflow-hidden">
+    <!-- Image Section -->
+    <div class="relative w-full aspect-video overflow-hidden bg-slate-100">
         <img 
             src={image} 
             alt={title} 
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-            width="300" height="176" 
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            width="400" 
+            height="225"
             loading="lazy"
         />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        <!-- Subtle overlay + play icon on hover -->
+        <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+        
+        <a href={resolve(`/admin/courses/${link}`)}  class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md text-slate-700 rounded-2xl px-3 py-1 text-xs font-semibold flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <Play size={14} class="fill-current" />
+            Preview
+        </a>
+
+        <!-- Status badge on image -->
+        <div class="absolute top-4 left-4 px-3 py-1 text-xs font-semibold rounded-2xl shadow-sm
+            {isPublished 
+                ? 'bg-emerald-500 text-white' 
+                : 'bg-amber-500 text-white'}">
+            {status}
+        </div>
     </div>
 
-    <div class="p-5 flex flex-col flex-1 justify-between relative bg-white z-10">
-        <div>
-            <h3 class="text-lg font-bold text-slate-800 mb-1 line-clamp-2 leading-tight">
-                {title}
-            </h3>
-            <p class="text-[13px] font-medium text-slate-500 mb-4">{modules} modules</p>
-        </div>
-        
-        <div class="flex items-end justify-between mt-auto">
-            <p class="text-2xl font-black text-slate-900">${price}</p>
-            
-            <span class="px-3.5 py-1.5 rounded-full text-[13px] font-bold border {statusStyles} capitalize shadow-sm">
-                {status}
-            </span>
-        </div>
+    <!-- Content -->
+    <div class="flex-1 p-6 flex flex-col">
+        <h3 class="text-lg font-semibold text-slate-800 line-clamp-2 leading-tight mb-3 group-hover:text-[#ed4b72] transition-colors">
+            {title}
+        </h3>
 
-        <div class="pt-4 mt-4 border-t border-slate-100 flex items-center gap-3 opacity-100 translate-y-0 transition-all duration-300">
-            
-            <a 
-                href={resolve(`/admin/courses/create/${link}`)} 
-                class="flex-1 text-center py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors duration-200"
-            >
-                Edit Course
-            </a>
+        <p class="text-sm text-slate-500 mb-6 md:mb-0">
+            {modules} ta modul
+        </p>
+
+        <!-- Price + Button -->
+        <div class="mt-auto flex items-end flex-row md:flex-col justify-between">
+            <div>
+                <span class="text-3xl font-bold text-slate-900">${price}</span>
+            </div>
 
             <a 
                 href={resolve(`/admin/courses/${link}`)} 
-                class="flex-1 text-center py-2.5 px-4 bg-[#FA2E69] hover:bg-[#D81B53] text-white rounded-xl text-sm font-semibold shadow-[0_4px_12px_-4px_rgba(250,46,105,0.4)] transition-all duration-200"
+                class="inline-flex items-center gap-2 bg-[#ed4b72] hover:bg-[#d93a5f] text-white px-6 py-3 rounded-2xl text-sm font-semibold transition-all active:scale-95 shadow-md shadow-[#ed4b72]/30 md:w-full md:mt-4"
             >
-                View
+                Batafsil
+                <span class="text-lg leading-none">→</span>
             </a>
         </div>
     </div>

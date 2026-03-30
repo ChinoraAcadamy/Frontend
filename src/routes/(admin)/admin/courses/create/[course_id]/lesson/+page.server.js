@@ -2,9 +2,12 @@ import { API_URL } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 
 // load course id from params and get course modules
-export const load = async ({ parent }) => {
+export const load = async ({ parent, params }) => {
     const { modules } = await parent();
 
+    if (!modules || modules.length === 0) {
+        throw redirect(303, `/admin/courses/create/${params.course_id}`);
+    }
     return { modules };
 };
 

@@ -1,45 +1,48 @@
-<script lang="ts">
+<!-- src/routes/dashboard/admin/courses/lesson/+page.svelte -->
+<script>
 	import { enhance } from '$app/forms';
-	import { CheckCircle2 } from 'lucide-svelte';
+	import { CheckCircle2, Search, ChevronDown} from 'lucide-svelte';
 
-	// Svelte 5 State'lar
-	let modulePk = $state(null);
+	let { data } = $props();
+
 	let isSubmitting = $state(false);
-	// Form submit qilinayotganda ushlab turish va keyingi bosqichga o'tkazish
-	function submitStep() {
-		isSubmitting = true;
-		return async ({ result, update }) => {
-			isSubmitting = false;
+	let modulePk = $state(null);
 
-			if (result.type === 'failure') {
-				alert(result.data?.error || 'Xatolik yuz berdi');
-				await update();
-			}
-		};
+	// Searchable dropdown uchun
+	let searchQuery = $state('');
+	let isDropdownOpen = $state(false);
+
+	// Filtered modules
+	let filteredModules = $derived(
+		data.modules.filter((mod) =>
+			mod.title.toLowerCase().includes(searchQuery.toLowerCase())
+		)
+	);
+
+
+	function selectModule(id) {
+		modulePk = id;
+		isDropdownOpen = false;
+		searchQuery = '';
 	}
-
-	const { data } = $props();
-	console.log(data);
 </script>
 
 <div class="page-container">
 	<div class="header">
-		<h1 class="title">Yangi kurs qo'shish</h1>
+		<h1 class="title">
+			<b class="text-primary">{data.course.title}</b> kursi uchun yangi dars qo'shish
+		</h1>
 		<p class="subtitle">Platformaga yangi o'quv dasturini kiritish paneli</p>
 	</div>
 
 	<div class="progress-tracker">
 		<div class="step active">
-			<div class="step-circle">
-				<CheckCircle2 size={18} />
-			</div>
+			<div class="step-circle"><CheckCircle2 size={18} /></div>
 			<span class="step-label">Kurs</span>
 		</div>
-		<div class="step-line active"></div>
+		<div class="step-line active-line"></div>
 		<div class="step active">
-			<div class="step-circle">
-				<CheckCircle2 size={18} />
-			</div>
+			<div class="step-circle"><CheckCircle2 size={18} /></div>
 			<span class="step-label">Modul</span>
 		</div>
 		<div class="step-line active-line"></div>
@@ -50,60 +53,91 @@
 	</div>
 
 	<div class="form-card">
-		<form method="POST" action="?/createLesson" use:enhance={submitStep}>
-			<!-- <input type="hidden" name="module_pk" value={modulePk} /> -->
-
+		<form method="POST" action="?/createLesson" use:enhance>
 			<div class="grid-form">
-				<div class="form-group">
-					<label for="module_select">Modulni tanlang</label>
-					<select id="module_select" class="input" name="module_pk" bind:value={modulePk} required>
-						<option value="" disabled selected>Modul tanlang</option>
+				<!-- ==================== SEARCHABLE DROPDOWN ==================== -->
+				<div class="form-group relative">
+					<label for="module" class="text-sm font-semibold text-slate-700">Modulni tanlang</label>
 
-						{#each data.modules as module (module.id)}
-							<option value={module.id}>
-								{module.title} ({module.lessons_count} ta dars)
-							</option>
-						{/each}
-					</select>
+					<!-- Trigger button -->
+					<button
+						type="button"
+						onclick={() => (isDropdownOpen = !isDropdownOpen)}
+						class="input flex items-center justify-between cursor-pointer"
+					>
+						{#if modulePk}
+							{@const selected = data.modules.find((m) => m.id === modulePk)}
+							<span class="text-slate-800">{selected?.title}</span>
+						{:else}
+							<span class="text-slate-400">Modul tanlang...</span>
+						{/if}
+						<ChevronDown size={18} class="text-slate-400 transition-transform {isDropdownOpen ? 'rotate-180' : ''}" />
+					</button>
+
+					<!-- Dropdown -->
+					{#if isDropdownOpen}
+						<div class="absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-3xl shadow-xl py-2 max-h-64 overflow-auto">
+							
+							<!-- Search input inside dropdown -->
+							<div class="px-4 pb-2 sticky top-0 bg-white z-10">
+								<div class="relative">
+									<Search size={18} class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+									<input
+										bind:value={searchQuery}
+										id="module"
+										placeholder="Modul qidirish..."
+										class="w-full h-10 pl-10 pr-4 rounded-2xl border border-slate-200 focus:border-[#ed4b72] text-sm outline-none"
+										autocomplete="off"
+									/>
+								</div>
+							</div>
+
+							{#if filteredModules.length > 0}
+								{#each filteredModules as module (module.id)}
+									<button
+										type="button"
+										onclick={() => selectModule(module.id)}
+										class="w-full text-left px-4 py-3 hover:bg-slate-50 flex items-center gap-3 transition-colors"
+									>
+										<span class="text-sm">{module.title}</span>
+										<span class="text-xs text-slate-400 ml-auto">({module.lessons_count} ta dars)</span>
+									</button>
+								{/each}
+							{:else}
+								<div class="px-4 py-8 text-center text-slate-400 text-sm">
+									Hech qanday modul topilmadi
+								</div>
+							{/if}
+						</div>
+					{/if}
 				</div>
+
+				<!-- Qolgan inputlar (o'zgarmadi) -->
 				<div class="form-group">
 					<label for="les_title_uz">Dars nomi (UZ)</label>
-					<input
-						type="text"
-						id="les_title_uz"
-						name="title_uz"
-						class="input"
-						required
-						minlength="1"
-					/>
+					<input type="text" id="les_title_uz" name="title_uz" class="input" required minlength="1" />
 				</div>
+
 				<div class="form-group">
 					<label for="les_title_ru">Dars nomi (RU)</label>
-					<input
-						type="text"
-						id="les_title_ru"
-						name="title_ru"
-						class="input"
-						required
-						minlength="1"
-					/>
+					<input type="text" id="les_title_ru" name="title_ru" class="input" required minlength="1" />
 				</div>
 
 				<div class="form-group full-width">
 					<label for="les_desc_uz">Dars haqida (UZ)</label>
-					<textarea id="les_desc_uz" name="description_uz" class="input textarea" rows="2"
-					></textarea>
+					<textarea id="les_desc_uz" name="description_uz" class="input textarea" rows="2"></textarea>
 				</div>
+
 				<div class="form-group full-width">
 					<label for="les_desc_ru">Dars haqida (RU)</label>
-					<textarea id="les_desc_ru" name="description_ru" class="input textarea" rows="2"
-					></textarea>
+					<textarea id="les_desc_ru" name="description_ru" class="input textarea" rows="2"></textarea>
 				</div>
 
 				<div class="form-group">
 					<label for="les_duration">Davomiyligi (minut)</label>
 					<input type="number" id="les_duration" name="duration" class="input" />
 				</div>
+
 				<div class="form-group">
 					<label for="les_order">Tartib raqami</label>
 					<input type="number" id="les_order" name="order_index" class="input" value="1" />
@@ -120,6 +154,7 @@
 </div>
 
 <style>
+	@reference "tailwindcss";
 	/* Premium Aesthetic Variables */
 	:root {
 		--primary: #fa2e69;
@@ -135,6 +170,20 @@
 		--radius-md: 12px;
 		--radius-lg: 16px;
 		--font-poppins: 'Poppins', sans-serif;
+	}
+
+	.input {
+		@apply w-full h-12 px-5 rounded-2xl border border-slate-200 focus:border-[#ed4b72] focus:ring-4 focus:ring-[#ed4b72]/10 outline-none transition-all;
+	}
+
+	.textarea {
+		resize: vertical;
+		min-height: 80px;
+	}
+
+	/* Dropdown styling */
+	.form-group button.input {
+		text-align: left;
 	}
 
 	.page-container {

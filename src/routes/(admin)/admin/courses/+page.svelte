@@ -51,7 +51,7 @@
 				title={course.title}
 				price={course.price}
 				modules={course.modules_count}
-				status={course.is_published ? 'published' : 'draft'}
+				status={course.is_published ? 'published' : 'Qoralama'}
 				link={course.id}
 				image={course.img ||
 					`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
