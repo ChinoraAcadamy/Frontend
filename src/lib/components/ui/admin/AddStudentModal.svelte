@@ -16,11 +16,11 @@
 
 	let selectedCourseIds = $state([]);
 	function toggleCourse(id) {
-		console.log(id, selectedCourseIds);
 		selectedCourseIds = selectedCourseIds.includes(id)
 			? selectedCourseIds.filter((i) => i !== id)
 			: [...selectedCourseIds, id];
 	}
+
 	let filteredCourses = $derived(
 		availableCourses.filter((c) => c.title.toLowerCase().includes(courseSearchQuery.toLowerCase()))
 	);
@@ -42,7 +42,6 @@
 			class="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-3xl bg-white shadow-2xl"
 			transition:fly={{ y: 20, duration: 300 }}
 		>
-			<!-- Header -->
 			<div class="flex shrink-0 items-center justify-between border-b border-slate-100 p-6">
 				<h2 class="text-xl font-bold text-slate-800 sm:text-2xl">Yangi Student Qo'shish</h2>
 				<button
@@ -53,7 +52,6 @@
 				</button>
 			</div>
 
-			<!-- Form — action va enhance -->
 			<form
 				method="POST"
 				action="?/createStudent"
@@ -67,35 +65,34 @@
 							return;
 						}
 						if (result.type === 'success') {
-							console.log(result.data);
-							await invalidateAll(); // Studentlar ro'yxatini yangilash
+							await invalidateAll();
 							reset();
 							onClose();
 						}
 						await update();
 					};
 				}}
-				class="flex flex-1 flex-col overflow-hidden"
+				class="flex flex-1 flex-col overflow-visible"
 			>
-				<div class="flex-1 overflow-y-auto p-6">
+				<div class="flex-1 p-6">
 					<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-						<!-- Ism -->
 						<div class="space-y-1.5">
-							<label class="text-sm font-semibold text-slate-700">Ism *</label>
+							<label for="firstName" class="text-sm font-semibold text-slate-700">Ism *</label>
 							<input
 								name="firstName"
+								id="firstName"
 								type="text"
 								placeholder="Ism"
 								class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 transition-all outline-none focus:border-[#ed4b72] focus:ring-4 focus:ring-[#ed4b72]/10"
 							/>
 						</div>
 
-						<!-- Parol -->
 						<div class="space-y-1.5">
-							<label class="text-sm font-semibold text-slate-700">Parol</label>
+							<label for="password" class="text-sm font-semibold text-slate-700">Parol</label>
 							<div class="relative">
 								<input
 									name="password"
+									id="password"
 									type={showPassword ? 'text' : 'password'}
 									placeholder="Parol"
 									class="h-12 w-full rounded-xl border border-slate-200 bg-white pr-12 pl-4 transition-all outline-none focus:border-[#ed4b72] focus:ring-4 focus:ring-[#ed4b72]/10"
@@ -110,20 +107,21 @@
 							</div>
 						</div>
 
-						<!-- Familiya -->
 						<div class="space-y-1.5">
-							<label class="text-sm font-semibold text-slate-700">Familiya</label>
+							<label for="lastName" class="text-sm font-semibold text-slate-700">Familiya</label>
 							<input
 								name="lastName"
+								id="lastName"
 								type="text"
 								placeholder="Familiya"
 								class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 transition-all outline-none focus:border-[#ed4b72] focus:ring-4 focus:ring-[#ed4b72]/10"
 							/>
 						</div>
 
-						<!-- Telefon -->
 						<div class="space-y-1.5">
-							<label class="text-sm font-semibold text-slate-700">Telefon *</label>
+							<label for="phone_number" class="text-sm font-semibold text-slate-700"
+								>Telefon *</label
+							>
 							<div
 								class="flex h-12 items-center overflow-hidden rounded-xl border border-slate-200 bg-white transition-all focus-within:border-[#ed4b72] focus-within:ring-4 focus-within:ring-[#ed4b72]/10"
 							>
@@ -132,6 +130,7 @@
 								>
 								<input
 									name="phone_number"
+									id="phone_number"
 									type="text"
 									placeholder="901234567"
 									class="h-full flex-1 px-3 outline-none"
@@ -139,14 +138,14 @@
 							</div>
 						</div>
 
-						<!-- Username -->
 						<div class="space-y-1.5">
-							<label class="text-sm font-semibold text-slate-700">Username</label>
+							<label for="username" class="text-sm font-semibold text-slate-700">Username</label>
 							<div
 								class="flex h-12 items-center overflow-hidden rounded-xl border border-slate-200 bg-white transition-all focus-within:border-[#ed4b72] focus-within:ring-4 focus-within:ring-[#ed4b72]/10"
 							>
 								<span class="pr-1 pl-4 font-medium text-slate-400">@</span>
 								<input
+									id="username"
 									name="username"
 									type="text"
 									placeholder="login"
@@ -155,37 +154,47 @@
 							</div>
 						</div>
 
-						<!-- Kurslar -->
 						<div class="relative space-y-1.5">
-							<label class="text-sm font-semibold text-slate-700">Kurslarga biriktirish</label>
+							<label for="biriktirsh" class="text-sm font-semibold text-slate-700"
+								>Kurslarga biriktirish</label
+							>
 							<div class="relative">
 								<Search
 									size={18}
 									class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
 								/>
+
 								<input
+									id="biriktirsh"
 									type="text"
 									placeholder="Kurs qidirish..."
 									name="course_ids"
 									bind:value={courseSearchQuery}
 									onfocus={() => (showCourseDropdown = true)}
+									onblur={() => (showCourseDropdown = false)}
 									class="h-12 w-full rounded-xl border border-slate-200 bg-white pr-4 pl-10 transition-all outline-none focus:border-[#ed4b72]"
 								/>
 							</div>
 
 							{#if showCourseDropdown && filteredCourses.length > 0}
 								<div
-									class="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white py-2 shadow-lg"
+									class="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white py-2 shadow-lg"
+									tabindex="0"
+									role="button"
+									onkeydown={(e) => e.key === 'Escape'}
+									onmousedown={(e) => e.preventDefault()}
 								>
 									{#each filteredCourses as course (course.id)}
 										<label
-											class="flex cursor-pointer items-center gap-3 px-4 py-2 hover:bg-slate-50"
+											for={`course-${course.id}`}
+											class="flex cursor-pointer items-center gap-3 px-4 py-2 select-none hover:bg-slate-50"
 										>
 											<input
+												id={`course-${course.id}`}
 												type="checkbox"
 												checked={selectedCourseIds.includes(course.id)}
 												onchange={() => toggleCourse(course.id)}
-												class="h-4 w-4 rounded accent-[#ed4b72]"
+												class="h-4 w-4 cursor-pointer rounded accent-[#ed4b72]"
 											/>
 											<span class="text-sm text-slate-700">{course.title}</span>
 										</label>
@@ -193,8 +202,6 @@
 								</div>
 							{/if}
 
-							<!-- Hidden inputs — courseIds array ni formga yuborish -->
-							<!-- ✅ BU YERNI O‘ZGARTIRING -->
 							{#each selectedCourseIds as id (id)}
 								<input type="hidden" name="courseIds[]" value={id} />
 							{/each}
@@ -216,13 +223,11 @@
 						</div>
 					</div>
 
-					<!-- Server xatosi -->
 					{#if serverError}
 						<p class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-500">{serverError}</p>
 					{/if}
 				</div>
 
-				<!-- Footer -->
 				<div
 					class="flex shrink-0 justify-end gap-3 rounded-b-3xl border-t border-slate-100 bg-slate-50 p-6"
 				>
@@ -243,13 +248,6 @@
 				</div>
 			</form>
 		</div>
-
-		{#if showCourseDropdown}
-			<button
-				class="fixed inset-0 z-0 cursor-default"
-				onclick={() => (showCourseDropdown = false)}
-				aria-label="close"
-			></button>
-		{/if}
 	</div>
 {/if}
+```

@@ -1,9 +1,11 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
     import { CheckCircle2, ChevronRight } from 'lucide-svelte';
 
     // Svelte 5 State'lar
-    let step = $state(2);
     let coursePk = $state(null);
     let isSubmitting = $state(false);
 
@@ -12,15 +14,13 @@
         isSubmitting = true;
         return async ({ result, update }) => {
             isSubmitting = false;
-            
             if (result.type === 'success') {
-                if (step === 1) {
-                    coursePk = result.data.course_pk;
-                    step = 2;
-                } else if (step === 2) {
-                    step = 3;
-                }
-                // Step 3 success bo'lsa, serverni o'zi redirect qiladi
+                const currentPath = page.url.pathname;
+                
+                // Oxiriga /lesson qo'shamiz
+                const nextPath = `${currentPath}/lesson/`;
+                
+                goto(resolve(nextPath));
             } else if (result.type === 'failure') {
                 alert(result.data?.error || "Xatolik yuz berdi");
                 await update();
@@ -37,20 +37,24 @@
     </div>
 
     <div class="progress-tracker">
-        <div class="step {step >= 1 ? 'active' : ''}">
-            <div class="step-circle">{step > 1 ? '' : '1'} {#if step > 1} <CheckCircle2 size={18}/> {/if}</div>
-            <span class="step-label">Kurs</span>
-        </div>
-        <div class="step-line {step >= 2 ? 'active-line' : ''}"></div>
-        <div class="step {step >= 2 ? 'active' : ''}">
-            <div class="step-circle">{step > 2 ? '' : '2'} {#if step > 2} <CheckCircle2 size={18}/> {/if}</div>
-            <span class="step-label">Modul</span>
-        </div>
-        <div class="step-line {step === 3 ? 'active-line' : ''}"></div>
-        <div class="step {step === 3 ? 'active' : ''}">
-            <div class="step-circle">3</div>
-            <span class="step-label">Dars</span>
-        </div>
+        <div class="step active">
+			<div class="step-circle">
+				<CheckCircle2 size={18} />
+			</div>
+			<span class="step-label">Kurs</span>
+		</div>
+		<div class="step-line active-line"></div>
+		<div class="step">
+			<div class="step-circle">
+				2
+			</div>
+			<span class="step-label">Modul</span>
+		</div>
+		<div class="step-line"></div>
+		<div class="step">
+			<div class="step-circle">3</div>
+			<span class="step-label">Dars</span>
+		</div>
     </div>
 
     <div class="form-card">

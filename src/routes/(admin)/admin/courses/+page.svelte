@@ -53,7 +53,7 @@
 				modules={course.modules_count}
 				status={course.is_published ? 'published' : 'draft'}
 				link={course.id}
-				image={course.image_url ||
+				image={course.img ||
 					`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
 			/>
 		{/each}

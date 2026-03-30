@@ -1,5 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
     import { UploadCloud, CheckCircle2, ChevronRight } from 'lucide-svelte';
 
     // Svelte 5 State'lar
@@ -21,16 +23,23 @@
         return async ({ result, update }) => {
             isSubmitting = false;
             
-            if (result.type === 'success') {
+            // 1. Agar serverdan redirect (303) kelsa:
+            if (result.type === 'redirect') {
+                // SvelteKit'ning goto() funksiyasi orqali yangi sahifaga o'tamiz
+                return goto(resolve(result.location));
+            } 
+            // 2. Agar oddiy muvaffaqiyatli javob kelsa:
+            else if (result.type === 'success') {
                 if (step === 1) {
                     step = 2;
                 } else if (step === 2) {
                     step = 3;
                 }
-                // Step 3 success bo'lsa, serverni o'zi redirect qiladi
-            } else if (result.type === 'failure') {
-                console.log(result.data?.error || "Xatolik yuz berdi");
-                await update();
+            } 
+            // 3. Agar xatolik bo'lsa:
+            else if (result.type === 'failure') {
+                console.error(result.data?.error || "Xatolik yuz berdi");
+                await update(); // Xatoliklarni formaga chiqarish uchun
             }
         };
     }
