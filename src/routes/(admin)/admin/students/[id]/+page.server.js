@@ -1,68 +1,64 @@
+// src/routes/(admin)/admin/students/[id]/+page.server.js
 import { API_URL } from '$env/static/private';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
-export const load = async ({ fetch, params, cookies, setHeaders }) => {
-    setHeaders({
-        'cache-control': 'public, max-age=60'
-    });
+const HEADERS = (token) => ({
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true'   // ← barcha requestlarda bo'lishi kerak
+});
+
+export const load = async ({ fetch, params, cookies }) => {
     const accessToken = cookies.get('access_token');
-    
-    const res = await fetch(`${API_URL}/auth/students/${Number(params.id)}/`, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true'
-        }
+
+    const res = await fetch(`${API_URL}/auth/students/${params.id}/`, {
+        headers: HEADERS(accessToken)
     });
-    
+
     if (!res.ok) {
-        throw new Error("Student topilmadi");
+        // json() o'rniga text() — HTML kelsa ham crash bo'lmaydi
+        const body = await res.text();
+        console.error(`[student/${params.id}] ${res.status}:`, body.slice(0, 200));
+
+        if (res.status === 404) throw error(404, "Student topilmadi");
+        if (res.status === 401) throw error(401, "Unauthorized");
+        throw error(res.status, "Serverda xatolik");
     }
-    const student = await res.json();
-    return {
-        student
-    };
+
+    const data = await res.json();
+    return { student: data };
 };
 
-// Parolni o'zgartirish uchun Form Action
 export const actions = {
     changePassword: async ({ request, params, cookies, fetch }) => {
-        const data = await request.formData();
-        const new_password = data.get('new_password');
-        const confirm_password = data.get('confirm_password');
-        const accessToken = cookies.get('access_token');
+        const formData = await request.formData();
+        const new_password     = formData.get('new_password');
+        const confirm_password = formData.get('confirm_password');
+        const accessToken      = cookies.get('access_token');
 
-        // Formani server tomondan validatsiya qilish
         if (new_password !== confirm_password) {
-            return fail(400, { error: "Parollar mos tushmadi", incorrect: true });
+            return fail(400, { error: "Parollar mos tushmadi" });
         }
         if (new_password.toString().length < 8) {
-            return fail(400, { error: "Parol kamida 8 ta belgidan iborat bo'lishi kerak", incorrect: true });
+            return fail(400, { error: "Parol kamida 8 ta belgidan iborat bo'lishi kerak" });
         }
 
-        // API ga PATCH so'rovini yuborish
         const res = await fetch(`${API_URL}/auth/students/${params.id}/change-password/`, {
             method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                new_password,
-                confirm_password
-            })
+            headers: HEADERS(accessToken),
+            body: JSON.stringify({ new_password, confirm_password })
         });
 
         if (!res.ok) {
-            // Backend'dan kelgan xatolikni o'qish (agar mavjud bo'lsa)
-            const errorData = await res.json().catch(() => ({}));
-            return fail(res.status, { 
-                error: errorData.detail || errorData.message || "Parolni o'zgartirishda xatolik yuz berdi", 
-                incorrect: true 
-            });
+            const body = await res.text();
+            let message = "Parolni o'zgartirishda xatolik";
+            try {
+                const err = JSON.parse(body);
+                message = err.detail || err.message || Object.values(err).flat().join(' ') || message;
+            } catch {}
+            return fail(res.status, { error: message });
         }
 
-        // 200 OK: Muvaffaqiyatli
-        return { success: true, message: "Parol muvaffaqiyatli o'zgartirildi!" };
+        return { success: true };
     }
 };

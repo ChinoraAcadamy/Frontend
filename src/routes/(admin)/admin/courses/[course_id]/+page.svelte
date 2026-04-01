@@ -3,8 +3,10 @@
 	import { resolve } from '$app/paths';
 	import LessonsRow from '@/lib/components/ui/courses/LessonsRow.svelte';
 	import ModuleAccordion from '@/lib/components/ui/courses/ModuleAccordion.svelte';
-	import { BookPlus, Plus } from 'lucide-svelte';
+	import { AlertTriangle, BookPlus, Plus, Trash2 } from 'lucide-svelte';
 	import { page } from '$app/stores';
+	import { enhance } from '$app/forms';
+	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
 
 	const { data } = $props();
 
@@ -12,13 +14,38 @@
 	const isAdmin = $derived(data.user?.role === 'admin');
 
 	const checkNotEmptyModule = $derived(data.modules.length);
+
+	let isDeleting = $state(false);
+
+    // O'chirish formasi yuborilishidan oldin tasdiq so'rash
+    function handleDelete() {
+        return async ({ cancel }) => {
+            const confirmed = confirm("Rostdan ham bu kursni butunlay o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.");
+            
+            if (!confirmed) {
+                cancel(); // Formani yuborishni to'xtatish
+                return;
+            }
+
+            isDeleting = true;
+
+            return async ({ update, result }) => {
+                isDeleting = false;
+                if (result.type === 'failure') {
+                    alert(result.data?.error || "O'chirishda xatolik yuz berdi");
+                }
+                // Success holatida server o'zi redirect qiladi
+                await update();
+            };
+        };
+    }
 </script>
 
 <div class="mx-auto min-h-screen max-w-5xl bg-[#f8fafc] p-4 font-sans md:p-8">
 	<!-- Header -->
 	<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
 		<div>
-			<p class="mb-1 text-xs font-semibold tracking-wider text-slate-400 uppercase">Kurs haqida</p>
+			<p class="mb-1 text-xs font-semibold tracking-wider text-slate-400 uppercase"><Breadcrumb /></p>
 			<h1 class="text-2xl font-bold text-slate-800 sm:text-3xl">{data.course.title}</h1>
 		</div>
 
@@ -116,4 +143,30 @@
 			</ModuleAccordion>
 		{/each}
 	</div>
+
+	{#if isAdmin}
+        <div class="mt-12 rounded-3xl border border-dashed border-red-200 bg-red-50 p-6 sm:p-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h3 class="flex items-center gap-2 text-lg font-bold text-red-700">
+                        <AlertTriangle size={20} /> Danger Zone (Xavfli hudud)
+                    </h3>
+                    <p class="mt-1 text-sm text-red-600/80">
+                        Diqqat: Kursni o'chirish barcha modullar, darslar va o'quvchilar natijalarini butunlay yo'q qiladi.
+                    </p>
+                </div>
+                
+                <form method="POST" action="?/deleteCourse" use:enhance={handleDelete()}>
+                    <button
+                        type="submit"
+                        disabled={isDeleting}
+                        class="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-600 px-6 py-3 font-semibold text-white shadow-sm transition-all hover:bg-red-700 disabled:opacity-50 sm:w-auto"
+                    >
+                        <Trash2 size={18} />
+                        {isDeleting ? "O'chirilmoqda..." : "Kursni o'chirish"}
+                    </button>
+                </form>
+            </div>
+        </div>
+    {/if}
 </div>

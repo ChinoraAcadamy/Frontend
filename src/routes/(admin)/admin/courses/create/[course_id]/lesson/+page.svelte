@@ -1,7 +1,9 @@
 <!-- src/routes/dashboard/admin/courses/lesson/+page.svelte -->
 <script>
 	import { enhance } from '$app/forms';
+	import { form } from '$app/server';
 	import { CheckCircle2, Search, ChevronDown} from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
 
@@ -25,6 +27,13 @@
 		isDropdownOpen = false;
 		searchQuery = '';
 	}
+
+	// if lesson is created, make toast message and clear all inputs
+	$effect(() => {
+		if (data.seccuss) {
+			toast.success('Dars muvaffaqiyatli yaratildi!');
+		}
+	});
 </script>
 
 <div class="page-container">
@@ -68,6 +77,7 @@
 						{#if modulePk}
 							{@const selected = data.modules.find((m) => m.id === modulePk)}
 							<span class="text-slate-800">{selected?.title}</span>
+							<input type="hidden" name="module_pk" value={modulePk} />
 						{:else}
 							<span class="text-slate-400">Modul tanlang...</span>
 						{/if}

@@ -1,10 +1,10 @@
 import { API_URL } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 
-export const load = async ({ fetch, params, cookies, setHeaders }) => {
-    setHeaders({
-        'cache-control': 'public, max-age=120'
-    });
+export const load = async ({ fetch, params, cookies }) => {
+    // setHeaders({
+    //     'cache-control': 'public, max-age=120'
+    // });
 
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw redirect(303, '/login');

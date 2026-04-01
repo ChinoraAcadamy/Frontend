@@ -6,7 +6,6 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { resolve } from '$app/paths';
-	import ThemeCustomizer from '@/lib/components/ui/ThemeCustomizer.svelte';
 	import TopLoader from '@/lib/components/TopLoader.svelte';
 
 	let { children } = $props();
@@ -18,7 +17,7 @@
 	{@render children()}
 </main>
 
-<ThemeCustomizer />
+<!-- <ThemeCustomizer /> -->
 
 <div style="display:none">
 	{#each locales as locale (locale)}
