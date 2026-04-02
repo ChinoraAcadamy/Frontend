@@ -6,13 +6,16 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { resolve } from '$app/paths';
+
 	import TopLoader from '@/lib/components/TopLoader.svelte';
+	import ToastProvider from '@/lib/components/ui/ToastProvider.svelte';
 
 	let { children } = $props();
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <TopLoader />
+<ToastProvider />
 <main>
 	{@render children()}
 </main>

@@ -13,11 +13,13 @@
   import Footer from "@/lib/components/ui/home/Footer.svelte";
 
   export let data; // +page.server.js dan keladi
+
 </script>
 
 <div class="min-h-screen">
+  
   <Navbar />
-
+  
   <HeroSection />
 
   <div class="overflow-hidden">

@@ -21,7 +21,6 @@
 		)
 	);
 
-
 	function selectModule(id) {
 		modulePk = id;
 		isDropdownOpen = false;
@@ -30,7 +29,7 @@
 
 	// if lesson is created, make toast message and clear all inputs
 	$effect(() => {
-		if (data.seccuss) {
+		if (data.success) {
 			toast.success('Dars muvaffaqiyatli yaratildi!');
 		}
 	});
@@ -62,6 +61,7 @@
 	</div>
 
 	<div class="form-card">
+		<!-- svelte-ignore component_name_lowercase -->
 		<form method="POST" action="?/createLesson" use:enhance>
 			<div class="grid-form">
 				<!-- ==================== SEARCHABLE DROPDOWN ==================== -->
