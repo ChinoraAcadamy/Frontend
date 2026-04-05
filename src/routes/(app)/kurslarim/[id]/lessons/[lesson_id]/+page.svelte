@@ -4,4 +4,8 @@
     let { data } = $props();
 </script>
 
+<svelte:head>
+    <title>{data.lesson.title}</title>
+</svelte:head>
+
 <LessonDetailView lesson={data.lesson} />

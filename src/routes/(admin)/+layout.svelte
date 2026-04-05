@@ -1,10 +1,15 @@
 <script lang="ts">
     import Sidebar from '$lib/components/layout/admin/Sidebar.svelte';
     import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
+    import {
+        LayoutDashboard, Users, BookOpen, FileText,
+        Settings
+    } from 'lucide-svelte';
 
     let { data, children } = $props();
     let collapsed = $state(false);
     let mobileOpen = $state(false);
+    
     // no scroll when menu is open on mobile, and enable it back when menu is closed
     $effect(() => {
         if (mobileOpen) {
@@ -13,13 +18,21 @@
             document.body.style.overflow = 'auto';
         }
     });
+
+    const adminNavItems = [
+        { href: '/admin/dashboard',   label: 'Dashboard',  icon: LayoutDashboard, exact: true },
+        { href: '/admin/students',    label: 'Talabalar',  icon: Users, exact: false },
+        { href: '/admin/courses',     label: 'Kurslar',    icon: BookOpen, exact: false },
+        { href: '/admin/submissions', label: 'Arizalar',   icon: FileText, exact: false },
+        { href: '/admin/profile',     label: 'Sozlamalar', icon: Settings, exact: false },
+    ];
 </script>
 
 <div class="admin-shell {collapsed ? 'collapsed' : ''}">
-    <Sidebar bind:collapsed bind:mobileOpen user={data.user} />
+    <Sidebar bind:collapsed bind:mobileOpen user={data.user} navItems={adminNavItems} />
 
     <div class="admin-body">
-        <DashboardNavbar notificationCount={3} bind:mobileOpen />
+        <DashboardNavbar notificationCount={3} bind:mobileOpen user={data.user} />
         
         <main class="md:admin-content md:p-6">
             {@render children()}
@@ -42,11 +55,6 @@
         flex-direction: column;
         min-width: 0; /* Overflow muammolarini oldini oladi */
     }
-
-    /* .admin-content { 
-        flex: 1; 
-        overflow-y: auto; 
-    } */
 
     /* Collapsed holati */
     .admin-shell.collapsed .admin-body {
