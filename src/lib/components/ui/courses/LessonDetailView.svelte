@@ -4,6 +4,7 @@
 	import { Upload, File as FileIcon } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
+	import { toast } from 'svelte-sonner';
 	import 'plyr/dist/plyr.css';
 
 	/**
@@ -18,6 +19,7 @@
 	let selectedFile = $state(null);
 	let isDragging = $state(false);
 	let isSubmitting = $state(false);
+	let isSubmittingComplete = $state(false);
 
 	// Video player state
 	/** @type {HTMLVideoElement} */
@@ -60,6 +62,25 @@
 				hideControls: true,
 				keyboard: { focused: false, global: false } // Klaviaturadan videoni "otish" xavfi
 			});
+
+			if (lesson?.id) {
+				const storageKey = `chinora_video_progress_${lesson.id}`;
+
+				// Yuklash (resume)
+				player.once('canplay', () => {
+					const savedProgress = localStorage.getItem(storageKey);
+					if (savedProgress && !isNaN(Number(savedProgress))) {
+						player.currentTime = parseFloat(savedProgress);
+					}
+				});
+
+				// Saqlash
+				player.on('timeupdate', () => {
+					if (player.currentTime > 0 && player.duration > 0) {
+						localStorage.setItem(storageKey, player.currentTime.toString());
+					}
+				});
+			}
 		}
 	});
 
@@ -71,6 +92,33 @@
 			player.destroy();
 		}
 	});
+
+	// Darsni yakunlash
+	async function markComplete() {
+		if (!lesson || !lesson.id) return;
+		isSubmittingComplete = true;
+
+		const watched_seconds = player ? Math.floor(player.currentTime) : 0;
+
+		try {
+			const res = await fetch('/api/progress/complete', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ lesson_id: lesson.id, watched_seconds })
+			});
+			if (!res.ok) {
+				throw new Error('Xatolik yuz berdi');
+			}
+			toast.success('Dars muvaffaqiyatli yakunlandi!');
+			// Agar muvaffaqiyatli bo'lsa, dars saqlangan progressini faqatgina o'chirish / o'chirmaslikni hal qilish
+			// localStorage.removeItem(`chinora_video_progress_${lesson.id}`);
+		} catch (e) {
+			console.error(e);
+			toast.error('Darsni yakunlashda xatolik yuz berdi.');
+		} finally {
+			isSubmittingComplete = false;
+		}
+	}
 
 	// Fayl yuklash mantig'i
 	/** @param {DragEvent} e */
@@ -150,6 +198,7 @@
 
 					<!-- Qo'shimcha xavfsizlik: Videoning aniq ustidagi ko'rinmas qatlam (faqat plyr blocklaridan tashqari) -->
 					<div
+						role="application"
 						class="pointer-events-none absolute inset-0 z-5"
 						oncontextmenu={(e) => e.preventDefault()}
 					></div>
@@ -158,9 +207,18 @@
 
 			<!-- Student only or both? Both can mark as complete but admin doesn't need to -->
 			<button
-				class="flex w-full transform items-center justify-center gap-2 rounded-xl bg-[#FA2E69] px-6 py-4 font-semibold text-white shadow-[0_8px_20px_-6px_rgba(250,46,105,0.4)] transition-all duration-300 hover:bg-[#D81B53] active:scale-[0.98]"
+				onclick={markComplete}
+				disabled={isSubmittingComplete}
+				class="flex w-full transform items-center justify-center gap-2 rounded-xl bg-[#FA2E69] px-6 py-4 font-semibold text-white shadow-[0_8px_20px_-6px_rgba(250,46,105,0.4)] transition-all duration-300 hover:bg-[#D81B53] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
 			>
-				<span>Darsni yakunlash (Mark as complete)</span>
+				{#if isSubmittingComplete}
+					<span
+						class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+					></span>
+					<span>Yuborilmoqda...</span>
+				{:else}
+					<span>Darsni yakunlash (Mark as complete)</span>
+				{/if}
 			</button>
 
 			<div class="pt-2">

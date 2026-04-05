@@ -32,7 +32,7 @@
 		{/if}
 
 		{#if i !== items.length - 1}
-			<a href={resolve(item.href)} class="link">
+			<a href={resolve(/** @type {any} */ (item.href))} class="link">
 				{item.label}
 			</a>
 		{:else}

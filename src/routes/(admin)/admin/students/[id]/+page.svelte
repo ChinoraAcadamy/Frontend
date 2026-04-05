@@ -19,12 +19,10 @@
 
 	let { data } = $props();
 
-	let courses = $state([]);
+	let courses = $derived(data.student.courses ? [...data.student.courses] : []);
 	let loadingEnrollments = $state([]);
 
-	$effect(() => {
-		courses = data.student.courses ? [...data.student.courses] : [];
-	});
+	;
 
 	let isChangePasswordOpen = $state(false);
 

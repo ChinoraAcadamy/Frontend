@@ -3,7 +3,6 @@
 	import CourseDetailView from '@/lib/components/ui/courses/CourseDetailView.svelte';
 
 	let { data } = $props();
-	console.log(data);
 </script>
 
 <svelte:head>

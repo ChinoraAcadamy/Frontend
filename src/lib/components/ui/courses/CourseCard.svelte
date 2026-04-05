@@ -7,9 +7,9 @@
     } = $props();
 </script>
 
-<div class="min-w-[240px] flex-shrink-0 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between gap-4 transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer">
+<div class="min-w-[240px] shrink-0 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between gap-4 transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer">
     <div class="flex gap-3 items-center">
-        <div class="w-16 h-12 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden">
+        <div class="w-16 h-12 shrink-0 bg-slate-100 rounded-lg overflow-hidden">
             <img src={image} alt={title} class="w-full h-full object-cover" width="64" height="48" />
         </div>
         <h3 class="font-semibold text-slate-800 text-sm leading-tight line-clamp-2">{title}</h3>

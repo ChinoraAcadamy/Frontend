@@ -6,7 +6,6 @@
 	import { Search, BookOpen } from 'lucide-svelte';
 
 	let { data } = $props();
-	console.log(data);
 	let courses = $derived(data.courses || []);
 
 	// svelte-ignore state_referenced_locally

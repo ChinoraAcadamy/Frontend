@@ -1,10 +1,16 @@
 import { error } from '@sveltejs/kit';
 
-export async function GET({ request, url }) {
-    const videoUrl = url.searchParams.get('url');
+export async function GET({ request, url, fetch: eventFetch }) {
+    let videoUrl = url.searchParams.get('url');
 
-    if (!videoUrl) {
-        throw error(400, 'Video URL is required');
+    if (!videoUrl || videoUrl === 'null' || videoUrl === 'undefined') {
+        videoUrl = 'https://placeholdervideo.dev/1920x1080';
+    }
+
+    try {
+        new URL(videoUrl);
+    } catch {
+        videoUrl = 'https://placeholdervideo.dev/1920x1080';
     }
 
     // Forward the Range header to support video seeking (scrubbing)
@@ -15,7 +21,7 @@ export async function GET({ request, url }) {
     }
 
     try {
-        const response = await fetch(videoUrl, {
+        const response = await eventFetch(videoUrl, {
             headers,
             method: 'GET'
         });

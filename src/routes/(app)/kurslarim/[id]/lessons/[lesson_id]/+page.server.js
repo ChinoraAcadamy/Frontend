@@ -55,9 +55,9 @@ export async function load({ params, cookies, url }) {
 }
 
 export const actions = {
-    uploadAssignment: async ({ request }) => {
-        const formData = await request.formData();
-        const file = formData.get('file');
+    uploadAssignment: async () => {
+        // const formData = await request.formData();
+        // const file = formData.get('file');
 
         // Bu joyda faylni haqiqiy serveringizga yuborasiz
         return { success: true };
