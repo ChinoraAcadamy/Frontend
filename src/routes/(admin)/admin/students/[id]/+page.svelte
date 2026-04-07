@@ -16,6 +16,7 @@
 	import ChangePasswordModal from '@/lib/components/ui/admin/ChangePasswordModal.svelte';
 	import { enhance } from '$app/forms';
 	import EditStudentModal from '@/lib/components/ui/admin/EditStudentModal.svelte';
+	import AddEnrollmentModal from '@/lib/components/ui/admin/AddEnrollmentModal.svelte';
 	import { showToast } from '@/lib/utils/toast.js';
 
 	let { data, form } = $props();
@@ -24,6 +25,7 @@
 	let loadingEnrollments = $state([]);
 
 	let isChangePasswordOpen = $state(false);
+	let isAddEnrollmentOpen = $state(false);
 	let editTarget = $state(null);
 	let isDeleting = $state(false);
 	let isActive = $state(data.student.is_active);
@@ -185,7 +187,10 @@
 				<h2 class="text-xl font-bold text-slate-800">
 					Kurslar ({data.student.courses_count || 0})
 				</h2>
-				<button class="flex items-center gap-1 text-sm font-medium text-[#ed4b72] hover:underline">
+				<button 
+					class="flex items-center gap-1 text-sm font-medium text-[#ed4b72] hover:underline"
+					onclick={() => isAddEnrollmentOpen = true}
+				>
 					+ Kurs qo‘shish
 				</button>
 			</div>
@@ -355,3 +360,10 @@
 {#if editTarget}
 	<EditStudentModal isOpen={true} student={editTarget} onClose={() => (editTarget = null)} />
 {/if}
+
+<AddEnrollmentModal
+	isOpen={isAddEnrollmentOpen}
+	availableCourses={data.availableCourses}
+	studentName={`${data.student.first_name} ${data.student.last_name}`}
+	onClose={() => (isAddEnrollmentOpen = false)}
+/>

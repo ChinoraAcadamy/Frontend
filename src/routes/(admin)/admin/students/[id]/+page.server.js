@@ -11,20 +11,33 @@ const HEADERS = (token) => ({
 export const load = async ({ fetch, params, cookies }) => {
     const accessToken = cookies.get('access_token');
 
-    const res = await fetch(`${API_URL}/auth/students/${params.id}/`, {
-        headers: HEADERS(accessToken)
-    });
+    const headers = HEADERS(accessToken);
 
-    if (!res.ok) {
-        const body = await res.text();
-        console.error(`[student/${params.id}] ${res.status}:`, body.slice(0, 200));
-        if (res.status === 404) throw error(404, "Student topilmadi");
-        if (res.status === 401) throw error(401, "Unauthorized");
-        throw error(res.status, "Serverda xatolik");
+    const [studentRes, coursesRes] = await Promise.all([
+        fetch(`${API_URL}/auth/students/${params.id}/`, { headers }),
+        fetch(`${API_URL}/courses/`, { headers })
+    ]);
+
+    if (!studentRes.ok) {
+        const body = await studentRes.text();
+        console.error(`[student/${params.id}] ${studentRes.status}:`, body.slice(0, 200));
+        if (studentRes.status === 404) throw error(404, "Student topilmadi");
+        if (studentRes.status === 401) throw error(401, "Unauthorized");
+        throw error(studentRes.status, "Serverda xatolik");
     }
 
-    const data = await res.json();
-    return { student: data };
+    const studentData = await studentRes.json();
+    let coursesData = [];
+
+    if (coursesRes.ok) {
+        const cData = await coursesRes.json();
+        coursesData = cData.results ?? cData ?? [];
+    }
+
+    return { 
+        student: studentData,
+        availableCourses: coursesData 
+    };
 };
 
 export const actions = {
@@ -49,9 +62,7 @@ export const actions = {
         const res = await fetch(`${API_URL}/auth/students/${studentId}/`, {
             method: 'PATCH',
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
+                ...HEADERS(accessToken)
             },
             body: JSON.stringify(payload)
         });
@@ -63,6 +74,35 @@ export const actions = {
         }
 
         return { updateSuccess: true };
+    },
+
+    // Kurs biriktirish
+    createEnrollment: async ({ request, params, cookies, fetch }) => {
+        const accessToken = cookies.get('access_token');
+        const data = await request.formData();
+        
+        const courseIds = data.getAll('courseIds[]').map(Number);
+        const studentId = Number(params.id);
+
+        if (!courseIds || courseIds.length === 0) {
+            return fail(400, { createError: "Kamida bitta kurs tanlang." });
+        }
+
+        for (const courseId of courseIds) {
+            const res = await fetch(`${API_URL}/enrollments/create/`, {
+                method: 'POST',
+                headers: HEADERS(accessToken),
+                body: JSON.stringify({ user: studentId, course: courseId })
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                const errorMsg = Object.values(err).flat().join(' ') || "Kursga biriktirishda xatolik.";
+                return fail(res.status, { createError: errorMsg });
+            }
+        }
+
+        return { createSuccess: true };
     },
 
     // Parol o'zgartirish
