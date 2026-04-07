@@ -19,10 +19,8 @@
 
 	let { data } = $props();
 
-	let courses = $derived(data.student.courses ? [...data.student.courses] : []);
+	let courses = $state(data.student.courses ? [...data.student.courses] : []);
 	let loadingEnrollments = $state([]);
-
-	;
 
 	let isChangePasswordOpen = $state(false);
 
@@ -182,89 +180,88 @@
 
 							<div class="flex gap-2">
 								<!-- BLOKLASH tugmasi -->
-								 {#if !course.is_blocked}
-								<form
-									method="POST"
-									action="?/blockEnrollment"
-									use:enhance={() => {
-										const id = course.enrollment_id;
-										loadingEnrollments = [...loadingEnrollments, id];
+								{#if !course.is_blocked}
+									<form
+										method="POST"
+										action="?/blockEnrollment"
+										use:enhance={() => {
+											const id = course.enrollment_id;
+											loadingEnrollments = [...loadingEnrollments, id];
 
-										return async ({ result }) => {
-											if (result.type === 'success') {
-												const idx = courses.findIndex((c) => c.enrollment_id === id);
-												if (idx !== -1) {
-													courses[idx] = {
-														...courses[idx],
-														is_blocked: true
-													};
+											return async ({ result }) => {
+												if (result.type === 'success') {
+													const idx = courses.findIndex((c) => c.enrollment_id === id);
+													if (idx !== -1) {
+														courses[idx] = {
+															...courses[idx],
+															is_blocked: true
+														};
+													}
 												}
-											}
-											loadingEnrollments = loadingEnrollments.filter((x) => x !== id);
-										};
-									}}
-								>
-									<input type="hidden" name="enrollmentId" value={course.enrollment_id} />
-									<button
-										type="submit"
-										disabled={course.is_blocked ||
-											loadingEnrollments.includes(course.enrollment_id)}
-										class="rounded-xl border bg-white px-5 py-3 text-sm font-bold shadow-sm transition-all disabled:opacity-40
-								   {course.is_blocked ? 'display-none' : 'text-orange-500 hover:bg-orange-50'}"
+												loadingEnrollments = loadingEnrollments.filter((x) => x !== id);
+											};
+										}}
 									>
-										{#if loadingEnrollments.includes(course.enrollment_id)}
-											<Loader2 size={18} class="animate-spin" />
-										{:else}
-											<div class="flex items-center gap-2">
-												<Lock size={18} /> Bloklash
-											</div>
-										{/if}
-									</button>
-								</form>
+										<input type="hidden" name="enrollmentId" value={course.enrollment_id} />
+										<button
+											type="submit"
+											disabled={course.is_blocked ||
+												loadingEnrollments.includes(course.enrollment_id)}
+											class="rounded-xl border bg-white px-5 py-3 text-sm font-bold shadow-sm transition-all disabled:opacity-40
+								   {course.is_blocked ? 'display-none' : 'text-orange-500 hover:bg-orange-50'}"
+										>
+											{#if loadingEnrollments.includes(course.enrollment_id)}
+												<Loader2 size={18} class="animate-spin" />
+											{:else}
+												<div class="flex items-center gap-2">
+													<Lock size={18} /> Bloklash
+												</div>
+											{/if}
+										</button>
+									</form>
 								{/if}
 
 								<!-- OCHISH tugmasi -->
 
 								{#if course.is_blocked}
-								<form
-									method="POST"
-									action="?/unblockEnrollment"
-									use:enhance={() => {
-										const id = course.enrollment_id;
-										loadingEnrollments = [...loadingEnrollments, id];
+									<form
+										method="POST"
+										action="?/unblockEnrollment"
+										use:enhance={() => {
+											const id = course.enrollment_id;
+											loadingEnrollments = [...loadingEnrollments, id];
 
-										return async ({ result }) => {
-											if (result.type === 'success') {
-												const idx = courses.findIndex((c) => c.enrollment_id === id);
-												if (idx !== -1) {
-													courses[idx] = {
-														...courses[idx],
-														is_blocked: false
-													};
+											return async ({ result }) => {
+												if (result.type === 'success') {
+													const idx = courses.findIndex((c) => c.enrollment_id === id);
+													if (idx !== -1) {
+														courses[idx] = {
+															...courses[idx],
+															is_blocked: false
+														};
+													}
 												}
-											}
-											loadingEnrollments = loadingEnrollments.filter((x) => x !== id);
-										};
-									}}
-								>
-									<input type="hidden" name="enrollmentId" value={course.enrollment_id} />
-									<button
-										type="submit"
-										disabled={!course.is_blocked ||
-											loadingEnrollments.includes(course.enrollment_id)}
-										class="rounded-xl border bg-white px-5 py-3 text-sm font-bold shadow-sm transition-all disabled:opacity-40
-								   {!course.is_blocked ? 'display-none' : 'text-emerald-500 hover:bg-emerald-50'}"
+												loadingEnrollments = loadingEnrollments.filter((x) => x !== id);
+											};
+										}}
 									>
-										{#if loadingEnrollments.includes(course.enrollment_id)}
-											<Loader2 size={18} class="animate-spin" />
-										{:else}
-											<div class="flex items-center gap-2">
-												<Unlock size={18} /> Ochish
-											</div>
-										{/if}
-									</button>
-								</form>
-
+										<input type="hidden" name="enrollmentId" value={course.enrollment_id} />
+										<button
+											type="submit"
+											disabled={!course.is_blocked ||
+												loadingEnrollments.includes(course.enrollment_id)}
+											class="rounded-xl border bg-white px-5 py-3 text-sm font-bold shadow-sm transition-all disabled:opacity-40
+								   {!course.is_blocked ? 'display-none' : 'text-emerald-500 hover:bg-emerald-50'}"
+										>
+											{#if loadingEnrollments.includes(course.enrollment_id)}
+												<Loader2 size={18} class="animate-spin" />
+											{:else}
+												<div class="flex items-center gap-2">
+													<Unlock size={18} /> Ochish
+												</div>
+											{/if}
+										</button>
+									</form>
 								{/if}
 
 								<!-- O‘chirish tugmasi (o‘zgarmaydi) -->
