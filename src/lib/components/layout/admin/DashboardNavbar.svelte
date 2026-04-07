@@ -1,14 +1,5 @@
 <script>
-	import {
-		Search,
-		Bell,
-		Menu,
-		Accessibility,
-		Plus,
-		Minus,
-		Palette,
-		Contrast,
-	} from 'lucide-svelte';
+	import { Search, Bell, Menu, Accessibility, Plus, Minus, Palette, Contrast, Type, EyeOff } from 'lucide-svelte';
 	// import { onMount } from 'svelte';
 
 	let { user = null, notificationCount = 0, mobileOpen = $bindable(false) } = $props();
@@ -17,54 +8,106 @@
 
 	// --- A11y (Maxsus imkoniyatlar) Holatlari ---
 	let isA11yOpen = $state(false);
-	let zoomLevel = $state(1); // 1 = 100%
+
+	let zoomLevel = $state(1); // 0.8 - 1.5
 	let isGrayscale = $state(false);
 	let isHighContrast = $state(false);
+	let isReducedMotion = $state(false);
+	let lineHeight = $state(1.5); // 1.2 - 2.0
+	let isDyslexiaFont = $state(false);
+	let isDark = $state(false);
 
-	// let isDark = $state(false);
+	// Sahifa yuklanganda saqlangan sozlamalarni tiklash
+	$effect(() => {
+		zoomLevel = parseFloat(localStorage.getItem('a11y_zoom') || '1');
+		isGrayscale = localStorage.getItem('a11y_grayscale') === 'true';
+		isHighContrast = localStorage.getItem('a11y_highcontrast') === 'true';
+		isReducedMotion = localStorage.getItem('a11y_reducedmotion') === 'true';
+		lineHeight = parseFloat(localStorage.getItem('a11y_lineheight') || '1.5');
+		isDyslexiaFont = localStorage.getItem('a11y_dyslexia') === 'true';
+		isDark =
+			localStorage.getItem('theme') === 'dark' ||
+			(!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-	// Sahifa yuklanganda foydalanuvchi tanlovini tekshirish
-	// onMount(() => {
-	// 	isDark =
-	// 		localStorage.getItem('theme') === 'dark' ||
-	// 		(!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+		applyAllA11y();
+	});
 
-	// 	applyTheme();
-	// });
+	function applyAllA11y() {
+		const root = document.documentElement;
 
-	// function toggleTheme() {
-	// 	isDark = !isDark;
-	// 	localStorage.setItem('theme', isDark ? 'dark' : 'light');
-	// 	applyTheme();
-	// }
+		// Zoom
+		root.style.fontSize = `${zoomLevel * 100}%`;
 
-	// function applyTheme() {
-	// 	if (isDark) {
-	// 		document.documentElement.classList.add('dark');
-	// 	} else {
-	// 		document.documentElement.classList.remove('dark');
-	// 	}
-	// }
+		// Grayscale
+		isGrayscale ? root.classList.add('grayscale') : root.classList.remove('grayscale');
 
-	// Matn o'lchamini o'zgartirish (rem orqali ishlaydigan Tailwind klasslari avtomatik moslashadi)
-	function changeZoom(delta) {
-		// 0.8 (80%) dan 1.5 (150%) gacha cheklaymiz
-		zoomLevel = Math.max(0.8, Math.min(1.5, zoomLevel + delta));
-		document.documentElement.style.fontSize = `${zoomLevel * 100}%`;
+		// High Contrast
+		isHighContrast ? root.classList.add('contrast-125') : root.classList.remove('contrast-125');
+
+		// Reduced Motion
+		isReducedMotion ? root.classList.add('reduce-motion') : root.classList.remove('reduce-motion');
+
+		// Line Height
+		root.style.setProperty('--line-height', lineHeight);
+
+		// Dyslexia Font
+		isDyslexiaFont ? root.classList.add('dyslexia-font') : root.classList.remove('dyslexia-font');
+
+		// Dark mode
+		isDark ? root.classList.add('dark') : root.classList.remove('dark');
 	}
 
-	// Oq-qora rejimni yoqish/o'chirish
+	function saveA11y(key, value) {
+		localStorage.setItem(key, value);
+		applyAllA11y();
+	}
+
+	// Funksiyalar
+	function changeZoom(delta) {
+		zoomLevel = Math.max(0.8, Math.min(1.5, zoomLevel + delta));
+		saveA11y('a11y_zoom', zoomLevel);
+	}
+
 	function toggleGrayscale() {
 		isGrayscale = !isGrayscale;
-		if (isGrayscale) document.documentElement.classList.add('grayscale');
-		else document.documentElement.classList.remove('grayscale');
+		saveA11y('a11y_grayscale', isGrayscale);
 	}
 
-	// Yuqori kontrastni yoqish/o'chirish
-	function toggleContrast() {
+	function toggleHighContrast() {
 		isHighContrast = !isHighContrast;
-		if (isHighContrast) document.documentElement.classList.add('contrast-125');
-		else document.documentElement.classList.remove('contrast-125');
+		saveA11y('a11y_highcontrast', isHighContrast);
+	}
+
+	function toggleReducedMotion() {
+		isReducedMotion = !isReducedMotion;
+		saveA11y('a11y_reducedmotion', isReducedMotion);
+	}
+
+	function changeLineHeight(delta) {
+		lineHeight = Math.max(1.2, Math.min(2.0, lineHeight + delta));
+		saveA11y('a11y_lineheight', lineHeight);
+	}
+
+	function toggleDyslexiaFont() {
+		isDyslexiaFont = !isDyslexiaFont;
+		saveA11y('a11y_dyslexia', isDyslexiaFont);
+	}
+
+	function toggleDarkMode() {
+		isDark = !isDark;
+		localStorage.setItem('theme', isDark ? 'dark' : 'light');
+		applyAllA11y();
+	}
+
+	// Reset all
+	function resetA11y() {
+		localStorage.removeItem('a11y_zoom');
+		localStorage.removeItem('a11y_grayscale');
+		localStorage.removeItem('a11y_highcontrast');
+		localStorage.removeItem('a11y_reducedmotion');
+		localStorage.removeItem('a11y_lineheight');
+		localStorage.removeItem('a11y_dyslexia');
+		location.reload();
 	}
 </script>
 
@@ -122,6 +165,7 @@
 				<Accessibility size={18} />
 			</button>
 
+			<!-- Accessibility Panel -->
 			{#if isA11yOpen}
 				<div
 					class="fixed inset-0 z-40"
@@ -130,91 +174,108 @@
 				></div>
 
 				<div
-					class="absolute top-12 right-0 z-50 flex w-65 flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_10px_40px_rgba(0,0,0,0.08)]"
+					class="absolute top-12 right-0 z-50 w-72 rounded-3xl border border-gray-100 bg-white p-5 shadow-2xl"
 				>
-					<h3 class="border-b border-gray-100 pb-2 text-sm font-bold text-gray-800">
-						Maxsus imkoniyatlar
-					</h3>
-
-					<div class="flex flex-col gap-2">
-						<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
-							>Matn o'lchami</span
-						>
-						<div
-							class="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-1"
-						>
-							<button
-								onclick={() => changeZoom(-0.1)}
-								class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-600 transition-all hover:bg-white hover:shadow"
-							>
-								<Minus size={16} />
-							</button>
-							<span class="text-sm font-bold text-[#9B1C48]">{Math.round(zoomLevel * 100)}%</span>
-							<button
-								onclick={() => changeZoom(0.1)}
-								class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-600 transition-all hover:bg-white hover:shadow"
-							>
-								<Plus size={16} />
-							</button>
-						</div>
+					<div class="flex items-center justify-between border-b pb-3">
+						<h3 class="text-sm font-bold text-gray-800">Maxsus imkoniyatlar</h3>
+						<button onclick={resetA11y} class="text-xs text-red-500 hover:underline">Reset</button>
 					</div>
 
-					<div class="flex flex-col gap-2">
-						<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
-							>Ko'rinish</span
-						>
+					<div class="mt-4 space-y-5">
+						<!-- Matn o'lchami -->
+						<div>
+							<span class="text-xs font-semibold text-gray-500">Matn o'lchami</span>
+							<div class="mt-2 flex items-center justify-between rounded-2xl border bg-gray-50 p-1">
+								<button
+									onclick={() => changeZoom(-0.1)}
+									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
+								>
+									<Minus size={18} />
+								</button>
+								<span class="font-bold text-[#9B1C48]">{Math.round(zoomLevel * 100)}%</span>
+								<button
+									onclick={() => changeZoom(0.1)}
+									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
+								>
+									<Plus size={18} />
+								</button>
+							</div>
+						</div>
 
-						<button
-							onclick={toggleGrayscale}
-							class="flex w-full items-center justify-between rounded-xl border p-2.5 transition-all {isGrayscale
-								? 'border-[#9B1C48] bg-[#fdf2f6]'
-								: 'border-gray-100 bg-gray-50 hover:bg-gray-100'}"
-						>
-							<div
-								class="flex items-center gap-2 text-sm font-medium {isGrayscale
-									? 'text-[#9B1C48]'
-									: 'text-gray-700'}"
-							>
-								<Palette size={16} /> Oq-qora rejim
+						<!-- Qator orasidagi masofa -->
+						<div>
+							<span class="text-xs font-semibold text-gray-500">Qatorlar orasidagi masofa</span>
+							<div class="mt-2 flex items-center justify-between rounded-2xl border bg-gray-50 p-1">
+								<button
+									onclick={() => changeLineHeight(-0.1)}
+									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
+								>
+									<Minus size={18} />
+								</button>
+								<span class="font-bold text-[#9B1C48]">{lineHeight.toFixed(1)}</span>
+								<button
+									onclick={() => changeLineHeight(0.1)}
+									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
+								>
+									<Plus size={18} />
+								</button>
 							</div>
-							<div
-								class="relative h-5 w-8 rounded-full transition-colors {isGrayscale
-									? 'bg-[#9B1C48]'
-									: 'bg-gray-300'}"
-							>
-								<div
-									class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white transition-transform {isGrayscale
-										? 'translate-x-3'
-										: ''}"
-								></div>
-							</div>
-						</button>
+						</div>
 
-						<button
-							onclick={toggleContrast}
-							class="flex w-full items-center justify-between rounded-xl border p-2.5 transition-all {isHighContrast
-								? 'border-[#9B1C48] bg-[#fdf2f6]'
-								: 'border-gray-100 bg-gray-50 hover:bg-gray-100'}"
-						>
-							<div
-								class="flex items-center gap-2 text-sm font-medium {isHighContrast
-									? 'text-[#9B1C48]'
-									: 'text-gray-700'}"
+						<!-- Boshqa tugmalar -->
+						<div class="space-y-2">
+							<button
+								onclick={toggleGrayscale}
+								class="flex w-full items-center justify-between rounded-2xl border p-3 {isGrayscale
+									? 'border-[#9B1C48] bg-[#fdf2f6]'
+									: 'border-gray-100 hover:bg-gray-50'}"
 							>
-								<Contrast size={16} /> Yuqori kontrast
-							</div>
-							<div
-								class="relative h-5 w-8 rounded-full transition-colors {isHighContrast
-									? 'bg-[#9B1C48]'
-									: 'bg-gray-300'}"
+								<div class="flex items-center gap-3">
+									<Palette size={18} />
+									<span class="text-sm">Oq-qora rejim</span>
+								</div>
+								<div class="toggle-switch {isGrayscale ? 'active' : ''}"></div>
+							</button>
+
+							<button
+								onclick={toggleHighContrast}
+								class="flex w-full items-center justify-between rounded-2xl border p-3 {isHighContrast
+									? 'border-[#9B1C48] bg-[#fdf2f6]'
+									: 'border-gray-100 hover:bg-gray-50'}"
 							>
-								<div
-									class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white transition-transform {isHighContrast
-										? 'translate-x-3'
-										: ''}"
-								></div>
-							</div>
-						</button>
+								<div class="flex items-center gap-3">
+									<Contrast size={18} />
+									<span class="text-sm">Yuqori kontrast</span>
+								</div>
+								<div class="toggle-switch {isHighContrast ? 'active' : ''}"></div>
+							</button>
+
+							<button
+								onclick={toggleReducedMotion}
+								class="flex w-full items-center justify-between rounded-2xl border p-3 {isReducedMotion
+									? 'border-[#9B1C48] bg-[#fdf2f6]'
+									: 'border-gray-100 hover:bg-gray-50'}"
+							>
+								<div class="flex items-center gap-3">
+									<EyeOff size={18} />
+									<span class="text-sm">Animatsiyalarni o'chirish</span>
+								</div>
+								<div class="toggle-switch {isReducedMotion ? 'active' : ''}"></div>
+							</button>
+
+							<button
+								onclick={toggleDyslexiaFont}
+								class="flex w-full items-center justify-between rounded-2xl border p-3 {isDyslexiaFont
+									? 'border-[#9B1C48] bg-[#fdf2f6]'
+									: 'border-gray-100 hover:bg-gray-50'}"
+							>
+								<div class="flex items-center gap-3">
+									<Type size={18} />
+									<span class="text-sm">Dyslexia-friendly shrift</span>
+								</div>
+								<div class="toggle-switch {isDyslexiaFont ? 'active' : ''}"></div>
+							</button>
+						</div>
 					</div>
 				</div>
 			{/if}
@@ -249,3 +310,4 @@
 		{/if}
 	</div>
 </header>
+

@@ -11,11 +11,31 @@
 	--color-foreground: #2d3748;
 }
 
+.reduce-motion * {
+	animation-duration: 0.01ms !important;
+	animation-iteration-count: 1 !important;
+	transition-duration: 0.01ms !important;
+}
+
+.dyslexia-font {
+	font-family: 'Lexend', system-ui, sans-serif;
+}
+
+body,
+p,
+h1,
+h2,
+h3,
+div {
+	line-height: var(--line-height);
+}
+
 :root {
 	/* Rang o'zgarganda 300ms davomida silliq o'tishi uchun */
 	transition:
 		background-color 0.3s ease,
 		color 0.3s ease;
+	--line-height: 1.5;
 }
 
 /* Sidebar ichidagi rang tanlagich (input color) uchun */
