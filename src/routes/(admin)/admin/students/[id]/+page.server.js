@@ -28,6 +28,43 @@ export const load = async ({ fetch, params, cookies }) => {
 };
 
 export const actions = {
+    updateStudent: async ({ request, cookies, fetch }) => {
+        const accessToken = cookies.get('access_token');
+        const data = await request.formData();
+
+        const studentId = data.get('studentId');
+        if (!studentId) return fail(400, { updateError: "Student ID topilmadi." });
+
+        const payload = {};
+        const firstName   = data.get('firstName');
+        const lastName    = data.get('lastName');
+        const phoneNumber = data.get('phoneNumber');
+        const isActive    = data.get('isActive');
+
+        if (firstName   !== null) payload.first_name    = firstName;
+        if (lastName    !== null) payload.last_name     = lastName;
+        if (phoneNumber !== null) payload.phone_number  = phoneNumber;
+        if (isActive    !== null) payload.is_active     = isActive === 'true';
+
+        const res = await fetch(`${API_URL}/auth/students/${studentId}/`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            const errorMsg = Object.values(err).flat().join(' ') || "O'zgartirishda xatolik.";
+            return fail(res.status, { updateError: errorMsg });
+        }
+
+        return { updateSuccess: true };
+    },
+
     // Parol o'zgartirish
     changePassword: async ({ request, params, cookies, fetch }) => {
         const formData     = await request.formData();

@@ -16,13 +16,20 @@
 	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
 	import ChangePasswordModal from '@/lib/components/ui/admin/ChangePasswordModal.svelte';
 	import { enhance } from '$app/forms';
+	import EditStudentModal from '@/lib/components/ui/admin/EditStudentModal.svelte';
+	import { showToast } from '@/lib/utils/toast.js';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	let courses = $state(data.student.courses ? [...data.student.courses] : []);
 	let loadingEnrollments = $state([]);
 
 	let isChangePasswordOpen = $state(false);
+	let editTarget = $state(null);
+
+	function openEdit(student) {
+		editTarget = { ...student };
+	}
 
 	const formatDate = (date) =>
 		date
@@ -43,6 +50,12 @@
 			? 'bg-emerald-50 text-emerald-600 border-emerald-200'
 			: 'bg-red-50 text-red-600 border-red-200'
 	);
+
+	$effect(() => {
+		if (form?.updateSuccess) {
+			showToast('Talaba muvaffaqiyatli yangilandi!', 'success');
+		}
+	});
 </script>
 
 <div class="mx-auto min-h-screen max-w-7xl space-y-8 bg-[#f8fafc] p-4 font-sans md:p-8">
@@ -76,6 +89,7 @@
 
 			<button
 				class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50"
+				onclick={() => openEdit(data.student)}
 			>
 				<UserCog size={16} /> Tahrirlash
 			</button>
@@ -323,3 +337,7 @@
 	studentName={`${data.student.first_name} ${data.student.last_name}`}
 	onClose={() => (isChangePasswordOpen = false)}
 />
+
+{#if editTarget}
+	<EditStudentModal isOpen={true} student={editTarget} onClose={() => (editTarget = null)} />
+{/if}
