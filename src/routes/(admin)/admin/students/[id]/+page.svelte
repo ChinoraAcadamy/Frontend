@@ -4,7 +4,6 @@
 		Key,
 		UserCog,
 		UserMinus,
-		UserCheck,
 		Trophy,
 		BookOpen,
 		Lock,
@@ -26,6 +25,8 @@
 
 	let isChangePasswordOpen = $state(false);
 	let editTarget = $state(null);
+	let isDeleting = $state(false);
+	let isActive = $state(data.student.is_active);
 
 	function openEdit(student) {
 		editTarget = { ...student };
@@ -56,6 +57,27 @@
 			showToast('Talaba muvaffaqiyatli yangilandi!', 'success');
 		}
 	});
+
+	async function deleteStudent() {
+		isDeleting = true;
+		try {
+			const res = await fetch('/api/student', {
+				method: 'DELETE',
+				body: JSON.stringify({ id: data.student.id })
+			});
+
+			if (!res.ok) {
+				showToast('Talaba o‘chirilmadi!', 'error');
+			}
+
+			showToast('Talaba o‘chirildi!', 'success');
+		} catch (error) {
+			console.error(error);
+			showToast('Talaba o‘chirilmadi!', 'error');
+		} finally {
+			isDeleting = false;
+		}
+	}
 </script>
 
 <div class="mx-auto min-h-screen max-w-7xl space-y-8 bg-[#f8fafc] p-4 font-sans md:p-8">
@@ -86,27 +108,27 @@
 			>
 				<Key size={16} /> Parol
 			</button>
-
-			<button
-				class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50"
-				onclick={() => openEdit(data.student)}
-			>
-				<UserCog size={16} /> Tahrirlash
-			</button>
-
-			<button
-				onclick={() => (data.student.is_active = !data.student.is_active)}
-				class="flex items-center gap-2 rounded-2xl border px-5 py-2.5 text-sm font-semibold shadow-sm transition-all
-                    {data.student.is_active
-					? 'border-red-200 text-red-500 hover:bg-red-50'
-					: 'border-emerald-200 text-emerald-500 hover:bg-emerald-50'}"
-			>
-				{#if data.student.is_active}
-					<UserMinus size={16} /> Faolsizlashtirish
-				{:else}
-					<UserCheck size={16} /> Faollashtirish
-				{/if}
-			</button>
+			{#if isActive}
+				<button
+					class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50"
+					onclick={() => openEdit(data.student)}
+				>
+					<UserCog size={16} /> Tahrirlash
+				</button>
+				<button
+					onclick={() => {
+						isActive = !isActive;
+						deleteStudent();
+					}}
+					class="flex items-center gap-2 rounded-2xl border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-500 shadow-sm transition-all hover:bg-red-50"
+				>
+					{#if isDeleting}
+						<Loader2 size={16} class="animate-spin" />
+					{:else}
+						<UserMinus size={16} /> Faolsizlashtirish
+					{/if}
+				</button>
+			{/if}
 		</div>
 	</div>
 
@@ -117,15 +139,7 @@
 			<div
 				class="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#ed4b72] to-[#de3c61] text-4xl font-bold text-white shadow-lg"
 			>
-				{#if data.student.picture}
-					<img
-						src={data.student.picture}
-						alt="Avatar"
-						class="h-full w-full rounded-full object-cover"
-					/>
-				{:else}
-					{getInitials(data.student.first_name, data.student.last_name)}
-				{/if}
+				{getInitials(data.student.first_name, data.student.last_name)}
 			</div>
 
 			<div class="flex-1 space-y-3 text-center sm:text-left">

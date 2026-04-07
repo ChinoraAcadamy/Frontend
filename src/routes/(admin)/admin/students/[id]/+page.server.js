@@ -36,15 +36,15 @@ export const actions = {
         if (!studentId) return fail(400, { updateError: "Student ID topilmadi." });
 
         const payload = {};
-        const firstName   = data.get('firstName');
-        const lastName    = data.get('lastName');
+        const firstName = data.get('firstName');
+        const lastName = data.get('lastName');
         const phoneNumber = data.get('phoneNumber');
-        const isActive    = data.get('isActive');
+        const isActive = data.get('isActive');
 
-        if (firstName   !== null) payload.first_name    = firstName;
-        if (lastName    !== null) payload.last_name     = lastName;
-        if (phoneNumber !== null) payload.phone_number  = phoneNumber;
-        if (isActive    !== null) payload.is_active     = isActive === 'true';
+        if (firstName !== null) payload.first_name = firstName;
+        if (lastName !== null) payload.last_name = lastName;
+        if (phoneNumber !== null) payload.phone_number = phoneNumber;
+        if (isActive !== null) payload.is_active = isActive === 'true';
 
         const res = await fetch(`${API_URL}/auth/students/${studentId}/`, {
             method: 'PATCH',
@@ -67,10 +67,10 @@ export const actions = {
 
     // Parol o'zgartirish
     changePassword: async ({ request, params, cookies, fetch }) => {
-        const formData     = await request.formData();
-        const new_password     = formData.get('new_password');
+        const formData = await request.formData();
+        const new_password = formData.get('new_password');
         const confirm_password = formData.get('confirm_password');
-        const accessToken      = cookies.get('access_token');
+        const accessToken = cookies.get('access_token');
 
         if (new_password !== confirm_password)
             return fail(400, { passwordError: "Parollar mos tushmadi" });
@@ -89,7 +89,9 @@ export const actions = {
             try {
                 const err = JSON.parse(body);
                 message = err.detail || err.message || Object.values(err).flat().join(' ') || message;
-            } catch {}
+            } catch {
+                console.log(body)
+            }
             return fail(res.status, { passwordError: message });
         }
 
@@ -98,9 +100,9 @@ export const actions = {
 
     // Kursdan o'chirish: DELETE /enrollments/{enrollment_id}/
     removeEnrollment: async ({ request, cookies, fetch }) => {
-        const formData     = await request.formData();
+        const formData = await request.formData();
         const enrollmentId = formData.get('enrollmentId');
-        const accessToken  = cookies.get('access_token');
+        const accessToken = cookies.get('access_token');
 
         if (!enrollmentId) return fail(400, { enrollError: "Enrollment ID topilmadi" });
 
@@ -119,9 +121,9 @@ export const actions = {
 
     // Kursni bloklash: PATCH /enrollments/{enrollment_id}/block/
     blockEnrollment: async ({ request, cookies, fetch }) => {
-        const formData     = await request.formData();
+        const formData = await request.formData();
         const enrollmentId = formData.get('enrollmentId');
-        const accessToken  = cookies.get('access_token');
+        const accessToken = cookies.get('access_token');
 
         if (!enrollmentId) return fail(400, { enrollError: "Enrollment ID topilmadi" });
 
@@ -142,9 +144,9 @@ export const actions = {
 
     // Kursni blokdan chiqarish: PATCH /enrollments/{enrollment_id}/unblock/
     unblockEnrollment: async ({ request, cookies, fetch }) => {
-        const formData     = await request.formData();
+        const formData = await request.formData();
         const enrollmentId = formData.get('enrollmentId');
-        const accessToken  = cookies.get('access_token');
+        const accessToken = cookies.get('access_token');
 
         if (!enrollmentId) return fail(400, { enrollError: "Enrollment ID topilmadi" });
         console.log(enrollmentId)
