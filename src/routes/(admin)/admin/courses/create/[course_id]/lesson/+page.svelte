@@ -1,11 +1,10 @@
 <!-- src/routes/dashboard/admin/courses/lesson/+page.svelte -->
 <script>
 	import { enhance } from '$app/forms';
-	import { form } from '$app/server';
 	import { CheckCircle2, Search, ChevronDown} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	let isSubmitting = $state(false);
 	let modulePk = $state(null);
@@ -29,8 +28,14 @@
 
 	// if lesson is created, make toast message and clear all inputs
 	$effect(() => {
-		if (data.success) {
-			toast.success('Dars muvaffaqiyatli yaratildi!');
+		if (form?.success) {
+			toast.success(`${form.lesson.title_uz} darsi muvaffaqiyatli yaratildi!`, {
+				description: `Davomiyligi: ${form.lesson.duration} minut`
+			});
+			// Formani tozalash
+			modulePk = null;
+		} else if (form?.error) {
+			toast.error(form.error);
 		}
 	});
 </script>
@@ -61,8 +66,13 @@
 	</div>
 
 	<div class="form-card">
-		<!-- svelte-ignore component_name_lowercase -->
-		<form method="POST" action="?/createLesson" use:enhance>
+		<form method="POST" action="?/createLesson" use:enhance={() => {
+			isSubmitting = true;
+			return async ({ update }) => {
+				isSubmitting = false;
+				await update();
+			};
+		}}>
 			<div class="grid-form">
 				<!-- ==================== SEARCHABLE DROPDOWN ==================== -->
 				<div class="form-group relative">

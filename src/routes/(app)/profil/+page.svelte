@@ -212,6 +212,27 @@
 								</div>
 							</div>
 						</div>
+
+						<!-- Logout Button -->
+						<div class="mt-8">
+							<form
+								method="POST"
+								action="/logout"
+								use:enhance={() => {
+									return async ({ update }) => {
+										await update();
+									};
+								}}
+							>
+								<button
+									type="submit"
+									class="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-100 bg-red-50/50 py-3.5 text-sm font-bold text-red-600 transition-all hover:bg-red-600 hover:text-white active:scale-95"
+								>
+									<span class="rotate-180"><Settings2 size={18} /></span>
+									Chiqish
+								</button>
+							</form>
+						</div>
 					</div>
 
 					<!-- Side Stats -->

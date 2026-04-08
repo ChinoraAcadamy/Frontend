@@ -1,5 +1,5 @@
 import { API_URL } from '$env/static/private';
-import { error, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 // load course id from params and get course modules
 export const load = async ({ parent, params }) => {
@@ -40,9 +40,12 @@ export const actions = {
                 body: JSON.stringify(lessonPayload)
             });
 
-            console.log(response)
-
-            if (!response.ok) throw error(400, "Modulni saqlashda xatolik yuz berdi. Lessons");
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                return fail(400, { 
+                    error: errData.title_uz?.[0] || errData.detail || "Modulni saqlashda xatolik yuz berdi" 
+                });
+            }
 
             const result = await response.json();
             console.log('Yaratilgan lesson:', result);
@@ -50,7 +53,7 @@ export const actions = {
             return { success: true, lesson: result };
         } catch (err) {
             console.log(err);
-            throw error(400, err)
+            return fail(500, { error: "Server bilan bog'lanishda xatolik" });
         }
     }
 }

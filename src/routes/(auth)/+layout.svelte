@@ -1,7 +1,7 @@
 <script>
-	import Navbar from "@/lib/components/layout/Navbar.svelte";
-
+	let { children } = $props();
 </script>
-<Navbar />
 
-<slot />
+<!-- <Navbar /> -->
+
+{@render children()}

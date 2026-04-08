@@ -1,4 +1,5 @@
 <script lang="ts">
+    /* eslint-disable no-unused-vars */
 	import { resolve } from '$app/paths';
 	import { Users, BookOpen, TrendingUp, DollarSign, Award, Plus, Search } from 'lucide-svelte';
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+	/* eslint-disable no-unused-vars */
+
 	import { resolve } from '$app/paths';
 	import CourseAdminCard from '@/lib/components/ui/courses/CourseAdminCard.svelte';
 	import { Plus, Search } from 'lucide-svelte';
@@ -46,16 +48,44 @@
 	</div>
 
 	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-		{#each data.courses as course (course.id)}
-			<CourseAdminCard
-				title={course.title}
-				price={course.price}
-				modules={course.modules_count}
-				status={course.is_published ? 'published' : 'Qoralama'}
-				link={course.id}
-				image={course.img ||
-					`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
-			/>
-		{/each}
+		{#await data.lazy.courses}
+			<!-- Premium Skeleton Loaders -->
+			{#each Array(8) as _, i (i)}
+				<div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+					<div class="aspect-video w-full animate-pulse bg-slate-100"></div>
+					<div class="space-y-4 p-5">
+						<div class="h-5 w-3/4 animate-pulse rounded-lg bg-slate-100"></div>
+						<div class="flex items-center justify-between">
+							<div class="h-4 w-20 animate-pulse rounded-md bg-slate-50"></div>
+							<div class="h-4 w-16 animate-pulse rounded-md bg-slate-50"></div>
+						</div>
+						<div class="flex items-center gap-2 pt-2">
+							<div class="h-8 flex-1 animate-pulse rounded-xl bg-slate-50"></div>
+							<div class="h-8 w-8 animate-pulse rounded-xl bg-slate-50"></div>
+						</div>
+					</div>
+				</div>
+			{/each}
+		{:then courses}
+			{#each courses as course (course.id)}
+				<CourseAdminCard
+					title={course.title}
+					price={course.price}
+					modules={course.modules_count}
+					status={course.is_published ? 'published' : 'Qoralama'}
+					link={course.id}
+					image={course.img ||
+						`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
+				/>
+			{:else}
+				<div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
+					<div class="mb-4 rounded-full bg-slate-100 p-6">
+						<Search size={48} class="text-slate-300" />
+					</div>
+					<h3 class="text-xl font-bold text-slate-800">Kurslar topilmadi</h3>
+					<p class="mt-2 text-slate-500">Hozircha hech qanday kurs yaratilmagan.</p>
+				</div>
+			{/each}
+		{/await}
 	</div>
 </div>

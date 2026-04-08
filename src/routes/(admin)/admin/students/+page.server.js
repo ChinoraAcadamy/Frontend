@@ -2,7 +2,7 @@ import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ fetch, cookies, url }) => {
+export const load = async ({ fetch, cookies, url, setHeaders }) => {
     const accessToken = cookies.get('access_token');
     
     const search   = url.searchParams.get('search')    ?? '';
@@ -10,30 +10,60 @@ export const load = async ({ fetch, cookies, url }) => {
     const ordering = url.searchParams.get('ordering')  ?? '';
     const page     = url.searchParams.get('page')      ?? '1';
 
-    const params = new URLSearchParams();
-    if (search)   params.set('search',    search);
-    if (isActive) params.set('is_active', isActive);
-    if (ordering) params.set('ordering',  ordering);
-    if (page)     params.set('page',      page);
-
-    const res = await fetch(`${API_URL}/auth/students/?${params}`, {
-        headers: { 'Authorization': `Bearer ${accessToken}` }
+    // Optimizatsiya: 10 daqiqalik kesh
+    setHeaders({
+        'cache-control': 'private, max-age=600'
     });
 
-    let students = [], totalCount = 0, nextPage = null, prevPage = null;
-    if (res.ok) {
-        const data = await res.json();
-        students   = data.results  ?? data ?? [];
-        totalCount = data.count    ?? students.length;
-        nextPage   = data.next     ?? null;
-        prevPage   = data.previous ?? null;
-    }
+    const getStudentsData = async () => {
+        const params = new URLSearchParams();
+        if (search)   params.set('search',    search);
+        if (isActive) params.set('is_active', isActive);
+        if (ordering) params.set('ordering',  ordering);
+        if (page)     params.set('page',      page);
+
+        try {
+            const res = await fetch(`${API_URL}/auth/students/?${params}`, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                return {
+                    students: data.results  ?? data ?? [],
+                    totalCount: data.count    ?? (data.results?.length ?? 0),
+                    nextPage: data.next     ?? null,
+                    prevPage: data.previous ?? null
+                };
+            }
+            return { students: [], totalCount: 0, nextPage: null, prevPage: null };
+        } catch (err) {
+            console.error('[Admin Students] Fetch error:', err);
+            return { students: [], totalCount: 0, nextPage: null, prevPage: null };
+        }
+    };
+
+    const getCourses = async () => {
+        try {
+            const res = await fetch(`${API_URL}/courses/`, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                return data.results ?? data ?? [];
+            }
+            return [];
+        } catch (err) {
+            console.error('[Admin Students] Courses fetch error:', err);
+            return [];
+        }
+    };
 
     return { 
-        students, 
-        totalCount, 
-        nextPage, 
-        prevPage, 
+        lazy: {
+            studentsData: getStudentsData(),
+            courses: getCourses()
+        },
         currentPage: parseInt(page), 
         filters: { search, isActive, ordering } 
     };

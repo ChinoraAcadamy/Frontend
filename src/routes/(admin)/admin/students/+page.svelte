@@ -1,5 +1,5 @@
-<!-- src/routes/dashboard/admin/students/+page.svelte -->
 <script>
+    /* eslint-disable no-unused-vars */
 	import {
 		Search,
 		Plus,
@@ -8,217 +8,147 @@
 		CheckCircle2,
 		ChevronLeft,
 		ChevronRight,
-		AlertTriangle
+		AlertTriangle,
+		Users
 	} from 'lucide-svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { enhance } from '$app/forms';
-	// import { invalidateAll } from '$app/navigation';
 
 	import AddStudentModal from '@/lib/components/ui/admin/AddStudentModal.svelte';
 	import EditStudentModal from '@/lib/components/ui/admin/EditStudentModal.svelte';
-	import { resolve } from '$app/paths';
 
 	let { data, form } = $props();
 
-	// ==================== REACTIVE STATE ====================
+	// ==================== STATE ====================
 	let isAddModalOpen = $state(false);
 	let editTarget = $state(null);
 	let deleteTarget = $state(null);
 	let isDeleting = $state(false);
 
-	// Toast
+	let searchValue = $state('');
+	let statusFilter = $state('all');
+	let currentPage = $state(1);
+	const itemsPerPage = 10;
+
 	let toast = $state(null);
 	let toastTimer;
 
-	function showToast(message, type) {
+	// ==================== HELPERS ====================
+	function showToast(message, type = 'success') {
 		clearTimeout(toastTimer);
 		toast = { message, type };
 		toastTimer = setTimeout(() => (toast = null), 3500);
 	}
 
-	// ==================== FILTERS ====================
-	let searchValue = $state('');
-	let statusFilter = $state('all'); // 'all' | 'true' | 'false'
-	let currentPage = $state(1);
-	const itemsPerPage = 10;
+	const getFullName = (s) =>
+		[s.first_name, s.last_name].filter(Boolean).join(' ') || s.username || '';
+	const getInitials = (s) =>
+		((s.first_name?.[0] || '') + (s.last_name?.[0] || '')).toUpperCase() ||
+		s.username?.[0]?.toUpperCase() ||
+		'?';
 
-	// ==================== COMPUTED ====================
-	let filteredStudents = $derived.by(() => {
-		return data.students.filter((student) => {
-			const matchesSearch =
-				!searchValue ||
-				getFullName(student).toLowerCase().includes(searchValue.toLowerCase()) ||
-				student.username?.toLowerCase().includes(searchValue.toLowerCase());
-
-			const matchesStatus = statusFilter === 'all' || String(student.is_active) === statusFilter;
-
-			return matchesSearch && matchesStatus;
-		});
-	});
-
-	let totalPages = $derived(Math.ceil(filteredStudents.length / itemsPerPage));
-	let paginatedStudents = $derived(
-		filteredStudents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-	);
-
-	// ==================== HELPERS ====================
-	function getFullName(s) {
-		return [s.first_name, s.last_name].filter(Boolean).join(' ') || s.username || '';
-	}
-
-	function getInitials(s) {
-		const f = s.first_name?.[0] ?? '';
-		const l = s.last_name?.[0] ?? '';
-		return (f + l).toUpperCase() || s.username?.[0]?.toUpperCase() || '?';
-	}
-
+	// Soft, flat colors for avatars
 	const avatarColors = [
-		'bg-pink-500 text-white',
-		'bg-indigo-500 text-white',
-		'bg-emerald-500 text-white',
-		'bg-amber-500 text-white',
-		'bg-cyan-500 text-white',
-		'bg-rose-500 text-white'
+		'bg-pink-100 text-pink-700',
+		'bg-indigo-100 text-indigo-700',
+		'bg-emerald-100 text-emerald-700',
+		'bg-amber-100 text-amber-700',
+		'bg-cyan-100 text-cyan-700',
+		'bg-violet-100 text-violet-700'
 	];
+	const getAvatarColor = (id) => avatarColors[id % avatarColors.length];
 
-	function getAvatarColor(id) {
-		return avatarColors[id % avatarColors.length];
-	}
-
-	// ==================== MODALS ====================
-	function openEdit(student) {
-		editTarget = { ...student };
-	}
-
-	function openDelete(student) {
-		deleteTarget = { id: student.id, name: getFullName(student) };
-	}
-
-	// function saveEdit() {
-	// 	// Backend action orqali yangilanishi kerak
-	// 	editTarget = null;
-	// }
-
-	// function confirmDelete() {
-	// 	// Backend action orqali o'chiriladi
-	// 	deleteTarget = null;
-	// }
-
-	// Formdan keladigan natijalarni kuzatish
+	// ==================== EFFECTS ====================
 	$effect(() => {
 		if (form?.createSuccess) {
-			showToast('Student muvaffaqiyatli yaratildi!', 'success');
+			showToast('Student yaratildi!');
 			isAddModalOpen = false;
 		}
-		if (form?.createError) showToast(form.createError, 'error');
+		if (form?.createError) {
+			showToast(form.createError, 'error');
+		}
 		if (form?.updateSuccess) {
-			showToast("Student ma'lumotlari yangilandi!", 'success');
+			showToast("Ma'lumotlar yangilandi!");
 			editTarget = null;
 		}
-		if (form?.updateError) showToast(form.updateError, 'error');
+		if (form?.updateError) {
+			showToast(form.updateError, 'error');
+		}
 		if (form?.deleteSuccess) {
-			showToast("Student o'chirildi!", 'success');
+			showToast("Student o'chirildi!");
 			deleteTarget = null;
+			isDeleting = false;
 		}
 		if (form?.deleteError) {
 			showToast(form.deleteError, 'error');
-			deleteTarget = null;
+			isDeleting = false;
 		}
 	});
 </script>
 
-<div class="min-h-screen bg-slate-50/50 p-4 font-sans sm:p-6 lg:p-8">
+{#snippet toastNotification()}
+	{#if toast}
+		<div
+			class="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-sm font-medium shadow-sm transition-all
+            {toast.type === 'success'
+				? 'border-emerald-200 text-emerald-800'
+				: 'border-red-200 text-red-800'}"
+			transition:fly={{ x: 50, duration: 300 }}
+		>
+			<CheckCircle2
+				size={18}
+				class={toast.type === 'success' ? 'text-emerald-500' : 'text-red-500'}
+			/>
+			{toast.message}
+		</div>
+	{/if}
+{/snippet}
+
+{#snippet tableSkeleton()}
+	<div class="animate-pulse space-y-3 rounded-xl border border-gray-200 bg-white p-6">
+		<div class="h-10 w-full rounded-lg bg-gray-100"></div>
+		{#each Array(5) as _, i (i)}
+			<div class="mt-2 h-14 w-full rounded-lg bg-gray-50"></div>
+		{/each}
+	</div>
+{/snippet}
+
+<div class="min-h-screen bg-gray-50/50 p-4 font-sans sm:p-6 lg:p-8">
 	<div class="mx-auto max-w-7xl">
-		<!-- Toast -->
-		{#if toast}
-			<div
-				class="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border px-5 py-3.5 text-sm font-semibold shadow-xl backdrop-blur-md
-				{toast.type === 'success'
-					? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-					: 'border-rose-200 bg-rose-50 text-rose-700'}"
-				transition:fly={{ x: 50, duration: 400 }}
-			>
-				<CheckCircle2
-					size={20}
-					class={toast.type === 'success' ? 'text-emerald-500' : 'text-rose-500'}
-				/>
-				{toast.message}
-			</div>
-		{/if}
+		{@render toastNotification()}
 
-		<!-- Delete Confirmation -->
-		{#if deleteTarget}
-			<div
-				class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
-				transition:fade={{ duration: 200 }}
-			>
-				<div
-					class="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl"
-					transition:fly={{ y: 20, duration: 300 }}
-				>
-					<div class="mb-5 flex justify-center">
-						<div class="flex h-14 w-14 items-center justify-center rounded-full bg-rose-50">
-							<AlertTriangle size={28} class="text-rose-500" />
-						</div>
-					</div>
-					<h3 class="mb-2 text-center text-xl font-bold">Studentni o'chirish</h3>
-					<p class="mb-8 text-center text-slate-500">
-						Haqiqatan ham <strong>{deleteTarget.name}</strong> ni o‘chirib tashlamoqchimisiz?
-					</p>
-					<form method="POST" action="?/deleteStudent" use:enhance class="flex gap-3">
-						<input type="hidden" name="studentId" value={deleteTarget.id} />
-						<button
-							type="button"
-							onclick={() => (deleteTarget = null)}
-							class="flex-1 rounded-2xl bg-slate-100 py-3 font-semibold text-slate-600 hover:bg-slate-200"
-						>
-							Bekor qilish
-						</button>
-						<button
-							type="submit"
-							disabled={isDeleting}
-							class="flex-1 rounded-2xl bg-rose-500 py-3 font-semibold text-white hover:bg-rose-600"
-						>
-							{isDeleting ? 'O‘chirilmoqda...' : 'O‘chirish'}
-						</button>
-					</form>
-				</div>
-			</div>
-		{/if}
-
-		<!-- Header -->
-		<div class="mb-8 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
+		<div class="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
 			<div>
-				<h1 class="text-3xl font-black tracking-tight text-slate-800">STUDENTLAR</h1>
-				<p class="mt-1 text-sm font-medium text-slate-500">
-					Jami <span class="text-[#ed4b72]">{data.totalCount}</span> ta student
-				</p>
+				<h1 class="text-2xl font-semibold text-gray-900">Studentlar ro'yxati</h1>
+				{#await data.lazy.studentsData then resolvedData}
+					<p class="mt-1 text-sm text-gray-500">
+						Jami <span class="font-medium text-gray-900">{resolvedData.totalCount}</span> ta student
+					</p>
+				{/await}
 			</div>
 
 			<button
 				onclick={() => (isAddModalOpen = true)}
-				class="group flex h-12 items-center gap-2.5 rounded-2xl bg-slate-900 px-6 font-semibold text-white transition-all hover:bg-[#ed4b72] active:scale-95"
+				class="flex h-10 items-center gap-2 rounded-lg bg-emerald-600 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-600/20 active:scale-95"
 			>
-				<Plus size={20} strokeWidth={2.5} class="transition-transform group-hover:rotate-90" />
+				<Plus size={18} strokeWidth={2.5} />
 				Yangi qo‘shish
 			</button>
 		</div>
 
-		<!-- Filters -->
-		<div class="mb-6 flex flex-col gap-4 md:flex-row">
+		<div class="mb-6 flex flex-col gap-3 md:flex-row">
 			<div class="relative flex-1 md:max-w-md">
-				<Search size={18} class="absolute top-1/2 left-4 -translate-y-1/2 text-slate-400" />
+				<Search size={18} class="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
 				<input
 					type="text"
 					placeholder="Ism yoki username bo'yicha qidirish..."
 					bind:value={searchValue}
-					class="h-12 w-full rounded-2xl border border-slate-200 bg-white pr-4 pl-11 text-sm outline-none focus:border-[#ed4b72] focus:ring-4 focus:ring-[#ed4b72]/10"
+					class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-4 pl-10 text-sm text-gray-900 transition-colors outline-none placeholder:text-gray-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 				/>
 			</div>
-
 			<select
 				bind:value={statusFilter}
-				class="h-12 rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium outline-none focus:border-[#ed4b72]"
+				class="h-10 rounded-lg border border-gray-200 bg-white px-4 text-sm text-gray-700 transition-colors outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 			>
 				<option value="all">Barcha statuslar</option>
 				<option value="true">Faol</option>
@@ -226,126 +156,151 @@
 			</select>
 		</div>
 
-		<!-- Table -->
-		<div class="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
-			<div class="overflow-x-auto">
-				<table class="w-full min-w-225 text-left">
-					<thead class="border-b border-slate-100 bg-slate-50">
-						<tr>
-							<th class="admin-table">Ism Familiya</th>
-							<th class="admin-table">Username</th>
-							<th class="admin-table">Telefon</th>
-							<th class="admin-table">Kurslar</th>
-							<th class="admin-table">Score</th>
-							<th class="admin-table">Status</th>
-							<th class="admin-table text-right">Amallar</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-slate-100">
-						{#each paginatedStudents as student (student.id)}
-							<tr class="group transition-colors hover:bg-slate-50">
-								<td class="px-6 py-5">
-									<a href={resolve(`/admin/students/${student.id}`)} class="items flex">
-										<div class="flex items-center gap-4">
+		{#await data.lazy.studentsData}
+			{@render tableSkeleton()}
+		{:then resolvedData}
+			{@const filteredStudents = resolvedData.students.filter((student) => {
+				const matchesSearch =
+					!searchValue ||
+					getFullName(student).toLowerCase().includes(searchValue.toLowerCase()) ||
+					student.username?.toLowerCase().includes(searchValue.toLowerCase());
+				const matchesStatus = statusFilter === 'all' || String(student.is_active) === statusFilter;
+				return matchesSearch && matchesStatus;
+			})}
+			{@const totalPages = Math.ceil(filteredStudents.length / itemsPerPage)}
+			{@const paginatedStudents = filteredStudents.slice(
+				(currentPage - 1) * itemsPerPage,
+				currentPage * itemsPerPage
+			)}
+
+			<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+				<div class="overflow-x-auto">
+					<table class="w-full min-w-[900px] text-left text-sm">
+						<thead class="border-b border-gray-200 bg-gray-50/80">
+							<tr>
+								<th class="admin-table">Ism Familiya</th>
+								<th class="admin-table">Username</th>
+								<th class="admin-table">Telefon</th>
+								<th class="admin-table text-center">Kurslar</th>
+								<th class="admin-table">Status</th>
+								<th class="admin-table text-right">Amallar</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-100">
+							{#each paginatedStudents as student (student.id)}
+								<tr class="group transition-colors hover:bg-gray-50/50">
+									<td class="px-6 py-3.5">
+										<div class="flex items-center gap-3">
 											<div
-												class="flex h-10 w-10 items-center justify-center rounded-full font-bold text-white {getAvatarColor(
+												class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold {getAvatarColor(
 													student.id
 												)}"
 											>
 												{getInitials(student)}
 											</div>
-											<span class="font-semibold text-slate-800">{getFullName(student)}</span>
+											<span class="font-medium text-gray-900">{getFullName(student)}</span>
 										</div>
-									</a>
-								</td>
-								<td class="px-6 py-5">
-									<span class="rounded-lg bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600"
-										>@{student.username}</span
-									>
-								</td>
-								<td class="px-6 py-5 text-slate-600">{student.phone_number || '—'}</td>
-								<td class="px-6 py-5 font-semibold text-slate-700">{student.courses_count ?? 0}</td>
-								<td class="px-6 py-5 font-bold text-[#ed4b72]">{student.total_score ?? 0}</td>
-								<td class="px-6 py-5">
-									<span
-										class="rounded-full border px-4 py-1 text-xs font-bold
-										{student.is_active
-											? 'border-emerald-200 bg-emerald-50 text-emerald-600'
-											: 'border-rose-200 bg-rose-50 text-rose-600'}"
-									>
-										{student.is_active ? 'Faol' : 'Nofaol'}
-									</span>
-								</td>
-								<td class="px-6 py-5 text-right">
-									{#if student.is_active}
-                                        <div
-										class="flex justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100"
-									>
-										<button
-											onclick={() => openEdit(student)}
-											class="rounded-xl p-3 transition-colors hover:bg-blue-50"
+									</td>
+									<td class="px-6 py-3.5">
+										<span class="text-gray-500">@{student.username}</span>
+									</td>
+									<td class="px-6 py-3.5 text-gray-500">{student.phone_number || '—'}</td>
+									<td class="px-6 py-3.5 text-center font-medium text-gray-700">
+										{student.courses_count ?? 0}
+									</td>
+									<td class="px-6 py-3.5">
+										<span
+											class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium {student.is_active
+												? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 ring-inset'
+												: 'bg-gray-100 text-gray-600 ring-1 ring-gray-500/10 ring-inset'}"
 										>
-											<Edit2 size={18} />
-										</button>
-										<button
-											onclick={() => openDelete(student)}
-											class="rounded-xl p-3 transition-colors hover:bg-rose-50"
+											{student.is_active ? 'Faol' : 'Nofaol'}
+										</span>
+									</td>
+									<td class="px-6 py-3.5 text-right">
+										<div
+											class="flex justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100"
 										>
-											<Trash2 size={18} />
-										</button>
-									</div>
-                                    {/if}
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
-
-			<!-- Pagination -->
-			{#if totalPages > 1}
-				<div class="flex items-center justify-between border-t border-slate-100 px-6 py-5">
-					<button
-						onclick={() => currentPage > 1 && currentPage--}
-						disabled={currentPage === 1}
-						class="flex items-center gap-1 rounded-2xl px-5 py-2 transition-colors hover:bg-slate-100"
-					>
-						<ChevronLeft size={18} /> Ortga
-					</button>
-
-					<div class="flex gap-1">
-						{#each Array.from({ length: totalPages }, (_, i) => i + 1) as p (p)}
-							<button
-								onclick={() => (currentPage = p)}
-								class="flex h-9 w-9 items-center justify-center rounded-xl {p === currentPage
-									? 'bg-[#ed4b72] text-white'
-									: 'hover:bg-slate-100'}"
-							>
-								{p}
-							</button>
-						{/each}
-					</div>
-
-					<button
-						onclick={() => currentPage < totalPages && currentPage++}
-						disabled={currentPage === totalPages}
-						class="flex items-center gap-1 rounded-2xl px-5 py-2 transition-colors hover:bg-slate-100"
-					>
-						Keyingi <ChevronRight size={18} />
-					</button>
+											<button
+												onclick={() => (editTarget = { ...student })}
+												class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+												title="Tahrirlash"
+											>
+												<Edit2 size={16} />
+											</button>
+											<button
+												onclick={() =>
+													(deleteTarget = { id: student.id, name: getFullName(student) })}
+												class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+												title="O'chirish"
+											>
+												<Trash2 size={16} />
+											</button>
+										</div>
+									</td>
+								</tr>
+							{:else}
+								<tr>
+									<td colspan="6" class="py-12 text-center text-gray-500">
+										<Users class="mx-auto mb-3 h-10 w-10 text-gray-300" />
+										Hech qanday ma'lumot topilmadi.
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
 				</div>
-			{/if}
-		</div>
+
+				{#if totalPages > 1}
+					<div
+						class="flex items-center justify-between border-t border-gray-200 bg-white px-6 py-4"
+					>
+						<button
+							onclick={() => currentPage--}
+							disabled={currentPage === 1}
+							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent"
+						>
+							<ChevronLeft size={16} /> Ortga
+						</button>
+						<div class="flex gap-1">
+							{#each Array.from({ length: totalPages }, (_, i) => i + 1) as p (p)}
+								<button
+									onclick={() => (currentPage = p)}
+									class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium transition-colors {p ===
+									currentPage
+										? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20'
+										: 'text-gray-600 hover:bg-gray-100'}"
+								>
+									{p}
+								</button>
+							{/each}
+						</div>
+						<button
+							onclick={() => currentPage++}
+							disabled={currentPage === totalPages}
+							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent"
+						>
+							Keyingi <ChevronRight size={16} />
+						</button>
+					</div>
+				{/if}
+			</div>
+		{:catch error}
+			<div class="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
+				Ma'lumotlarni yuklashda xatolik yuz berdi. {error}
+			</div>
+		{/await}
 	</div>
 </div>
 
-<!-- Modals -->
 {#if isAddModalOpen}
-	<AddStudentModal
-		isOpen={isAddModalOpen}
-		availableCourses={data.courses}
-		onClose={() => (isAddModalOpen = false)}
-	/>
+	{#await data.lazy.courses then courses}
+		<AddStudentModal
+			isOpen={true}
+			availableCourses={courses}
+			onClose={() => (isAddModalOpen = false)}
+		/>
+	{/await}
 {/if}
 
 {#if editTarget}
@@ -353,13 +308,62 @@
 {/if}
 
 {#if deleteTarget}
-	<!-- Delete confirmation modal (oldin bergan kodingizni shu yerga qo‘ying) -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 p-4 backdrop-blur-sm"
+		transition:fade={{ duration: 150 }}
+	>
+		<div
+			class="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl"
+			transition:fly={{ y: 15, duration: 250 }}
+		>
+			<div class="mb-4 flex items-center gap-3">
+				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+					<AlertTriangle size={20} class="text-red-600" />
+				</div>
+				<h3 class="text-lg font-semibold text-gray-900">O'chirishni tasdiqlang</h3>
+			</div>
+
+			<p class="mb-6 text-sm text-gray-500">
+				Haqiqatan ham <strong class="font-medium text-gray-900">{deleteTarget.name}</strong> ni o‘chirib
+				tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.
+			</p>
+
+			<form
+				method="POST"
+				action="?/deleteStudent"
+				use:enhance={() => {
+					isDeleting = true;
+					return async ({ update }) => {
+						await update();
+						isDeleting = false;
+					};
+				}}
+				class="flex gap-3"
+			>
+				<input type="hidden" name="studentId" value={deleteTarget.id} />
+				<button
+					type="button"
+					onclick={() => (deleteTarget = null)}
+					class="flex-1 rounded-lg border border-gray-300 bg-white py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+				>
+					Bekor qilish
+				</button>
+				<button
+					type="submit"
+					disabled={isDeleting}
+					class="flex-1 rounded-lg bg-red-600 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+				>
+					{isDeleting ? 'O‘chirilmoqda...' : 'O‘chirish'}
+				</button>
+			</form>
+		</div>
+	</div>
 {/if}
 
 <style>
 	@reference "tailwindcss";
 
 	.admin-table {
-		@apply px-6 py-5 text-xs font-bold tracking-widest text-slate-500 uppercase;
+		@apply px-6 py-3 font-medium text-gray-500;
 	}
 </style>

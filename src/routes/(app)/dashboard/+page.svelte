@@ -1,4 +1,6 @@
 <script lang="ts">
+    /* eslint-disable no-unused-vars */
+
 	import { resolve } from '$app/paths';
 	import CourseCard from '@/lib/components/ui/courses/CourseCard.svelte';
 	import { BookOpen, Award, TrendingUp } from 'lucide-svelte';
@@ -7,36 +9,53 @@
 
 	// Student dashboard uchun statik config (keylar serverdan keladigan data'ga moslanadi)
 	const statConfig = [
-		{ title: 'Mening kurslarim', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50', key: 'courses_count' },
-		{ title: 'Umumiy ball', icon: Award, color: 'text-amber-600', bg: 'bg-amber-50', key: 'total_score' },
-		{ title: 'Reytingdagi o\'rnim', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50', key: 'rank' },
+		{
+			title: 'Mening kurslarim',
+			icon: BookOpen,
+			color: 'text-blue-600',
+			bg: 'bg-blue-50',
+			key: 'courses_count'
+		},
+		{
+			title: 'Umumiy ball',
+			icon: Award,
+			color: 'text-amber-600',
+			bg: 'bg-amber-50',
+			key: 'total_score'
+		},
+		{
+			title: "Reytingdagi o'rnim",
+			icon: TrendingUp,
+			color: 'text-emerald-600',
+			bg: 'bg-emerald-50',
+			key: 'rank'
+		}
 	];
 </script>
 
 <div class="mx-auto min-h-screen max-w-7xl space-y-8 bg-[#f8fafc] p-4 font-sans md:p-8">
-	
 	<!-- Stats Section -->
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 		{#await data.lazy.courses}
-			{#each statConfig as _ ( _.title )}
-				<div class="bg-white rounded-3xl p-7 shadow-sm border border-white/70 animate-pulse">
-					<div class="flex items-center justify-between mb-6">
-						<div class="w-12 h-12 rounded-2xl bg-slate-100"></div>
-						<div class="w-12 h-4 bg-slate-50 rounded"></div>
+			{#each statConfig as _ (_.title)}
+				<div class="animate-pulse rounded-3xl border border-white/70 bg-white p-7 shadow-sm">
+					<div class="mb-6 flex items-center justify-between">
+						<div class="h-12 w-12 rounded-2xl bg-slate-100"></div>
+						<div class="h-4 w-12 rounded bg-slate-50"></div>
 					</div>
-					<div class="h-10 bg-slate-100 rounded w-16 mb-2"></div>
-					<div class="h-4 bg-slate-50 rounded w-24"></div>
+					<div class="mb-2 h-10 w-16 rounded bg-slate-100"></div>
+					<div class="h-4 w-24 rounded bg-slate-50"></div>
 				</div>
 			{/each}
 		{:then courses}
 			{#each statConfig as config (config.title)}
-				<div class="bg-white rounded-3xl p-7 shadow-sm border border-white/70">
+				<div class="rounded-3xl border border-white/70 bg-white p-7 shadow-sm">
 					<div class="flex items-center justify-between">
-						<div class="{config.bg} w-12 h-12 rounded-2xl flex items-center justify-center">
-							<config.icon class="w-6 h-6 {config.color}" />
+						<div class="{config.bg} flex h-12 w-12 items-center justify-center rounded-2xl">
+							<config.icon class="h-6 w-6 {config.color}" />
 						</div>
 					</div>
-					<p class="text-4xl font-bold mt-6 text-slate-800">
+					<p class="mt-6 text-4xl font-bold text-slate-800">
 						{#if config.key === 'courses_count'}
 							{courses?.length ?? 0}
 						{:else if config.key === 'total_score'}
@@ -47,7 +66,7 @@
 							0
 						{/if}
 					</p>
-					<p class="text-slate-500 text-sm mt-1">{config.title}</p>
+					<p class="mt-1 text-sm text-slate-500">{config.title}</p>
 				</div>
 			{/each}
 		{/await}
@@ -65,7 +84,7 @@
 		<div class="scrollbar-hide flex snap-x gap-4 overflow-x-auto pb-4">
 			{#await data.lazy.courses}
 				{#each Array(2) as _, i (i)}
-					<div class="w-72 h-48 bg-slate-100 rounded-3xl animate-pulse shrink-0"></div>
+					<div class="h-48 w-72 shrink-0 animate-pulse rounded-3xl bg-slate-100"></div>
 				{/each}
 			{:then courses}
 				{#if courses && courses.length > 0}
@@ -81,7 +100,7 @@
 						</div>
 					{/each}
 				{:else}
-					<p class="text-slate-400 p-4">Hozircha kurslar yo‘q...</p>
+					<p class="p-4 text-slate-400">Hozircha kurslar yo‘q...</p>
 				{/if}
 			{/await}
 		</div>
@@ -91,11 +110,11 @@
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 		<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
 			<h2 class="mb-6 text-xl font-bold text-slate-800">Ranking Leaderboard</h2>
-			
+
 			<div class="overflow-x-auto">
 				{#await data.lazy.ranking}
-					<div class="animate-pulse space-y-4">
-						{#each Array(5) as _, i (i)}
+					<div class="scrollbar-hide flex snap-x gap-4 overflow-x-auto pb-4">
+						{#each Array(2) as _, i (i)}
 							<div class="h-10 rounded-lg bg-slate-50"></div>
 						{/each}
 					</div>
@@ -147,7 +166,7 @@
 		<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
 			<h2 class="mb-6 text-xl font-bold text-slate-800">Recent Submissions</h2>
 			<div class="overflow-x-auto">
-				<p class="text-slate-400 p-4 text-center">Hozircha topshiriqlar yo‘q...</p>
+				<p class="p-4 text-center text-slate-400">Hozircha topshiriqlar yo‘q...</p>
 			</div>
 		</div>
 	</div>
