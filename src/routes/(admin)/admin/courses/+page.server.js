@@ -8,7 +8,6 @@ export const load = async ({ fetch, cookies}) => {
     if (!accessToken) throw error(401, 'Avtorizatsiya talab qilinadi');
     const headers = {
         'Authorization': `Bearer ${accessToken}`,
-        'ngrok-skip-browser-warning': 'true',
         'Accept-Language': getLocale()
     };
     try {

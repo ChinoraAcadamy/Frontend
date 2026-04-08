@@ -1,10 +1,42 @@
-// src/routes/(admin)/dashboard/admin/students/+page.server.js
 import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
 
-export const load = async ({ parent }) => {
-    const { students, totalCount, nextPage, prevPage, currentPage, filters } = await parent();
-    return { students, totalCount, nextPage, prevPage, currentPage, filters };
+/** @type {import('./$types').PageServerLoad} */
+export const load = async ({ fetch, cookies, url }) => {
+    const accessToken = cookies.get('access_token');
+    
+    const search   = url.searchParams.get('search')    ?? '';
+    const isActive = url.searchParams.get('is_active') ?? '';
+    const ordering = url.searchParams.get('ordering')  ?? '';
+    const page     = url.searchParams.get('page')      ?? '1';
+
+    const params = new URLSearchParams();
+    if (search)   params.set('search',    search);
+    if (isActive) params.set('is_active', isActive);
+    if (ordering) params.set('ordering',  ordering);
+    if (page)     params.set('page',      page);
+
+    const res = await fetch(`${API_URL}/auth/students/?${params}`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+
+    let students = [], totalCount = 0, nextPage = null, prevPage = null;
+    if (res.ok) {
+        const data = await res.json();
+        students   = data.results  ?? data ?? [];
+        totalCount = data.count    ?? students.length;
+        nextPage   = data.next     ?? null;
+        prevPage   = data.previous ?? null;
+    }
+
+    return { 
+        students, 
+        totalCount, 
+        nextPage, 
+        prevPage, 
+        currentPage: parseInt(page), 
+        filters: { search, isActive, ordering } 
+    };
 };
 
 export const actions = {
@@ -30,8 +62,7 @@ export const actions = {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
         });
@@ -68,8 +99,7 @@ export const actions = {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
         });
@@ -93,8 +123,7 @@ export const actions = {
         const res = await fetch(`${API_URL}/auth/students/${studentId}/`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'ngrok-skip-browser-warning': 'true'
+                'Authorization': `Bearer ${accessToken}`
             }
         });
 

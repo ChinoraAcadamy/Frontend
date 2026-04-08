@@ -26,8 +26,7 @@ export const load = async ({ cookies, fetch, url }) => {
     const res = await fetch(`${API_URL}/progress/submissions/?${params.toString()}`, {
         headers: {
             'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true'
+            'Content-Type': 'application/json'
         }
     });
 

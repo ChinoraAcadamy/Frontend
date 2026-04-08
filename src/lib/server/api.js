@@ -5,8 +5,7 @@ export async function getRanking({ cookies, fetch }) {
 
 	const res = await fetch(`${API_URL}/auth/students/ranking/`, {
 		headers: {
-			'Authorization': `Bearer ${accessToken}`,
-			'ngrok-skip-browser-warning': 'true'
+			'Authorization': `Bearer ${accessToken}`
 		}
 	});
 

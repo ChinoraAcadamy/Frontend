@@ -4,8 +4,7 @@ import { error, fail } from '@sveltejs/kit';
 
 const HEADERS = (token) => ({
     'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true'
+    'Content-Type': 'application/json'
 });
 
 export const load = async ({ fetch, params, cookies }) => {

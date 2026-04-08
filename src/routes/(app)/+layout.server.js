@@ -14,8 +14,7 @@ export async function load({ cookies, url, fetch }) {
     try {
         const res = await fetch(endpoint, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'ngrok-skip-browser-warning': 'true'
+                'Authorization': `Bearer ${accessToken}`
             }
         });
 

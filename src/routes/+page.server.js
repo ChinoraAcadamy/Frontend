@@ -7,7 +7,7 @@ export const load = async () => {
     try {
         const response = await fetch(`${API_URL}/courses/`, {
             headers: {
-                'ngrok-skip-browser-warning': 'true',
+                
                 'Accept-Language': getLocale()
             }
         });

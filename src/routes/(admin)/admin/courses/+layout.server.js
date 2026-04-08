@@ -9,8 +9,7 @@ export const load = async ({ fetch, params, cookies }) => {
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw redirect(303, '/login');
     const headers = {
-        'Authorization': `Bearer ${accessToken}`,
-        'ngrok-skip-browser-warning': 'true'
+        'Authorization': `Bearer ${accessToken}`
     };
 
     if (!params.course_id) return;

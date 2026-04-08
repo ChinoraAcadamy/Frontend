@@ -1,7 +1,6 @@
 <!-- src/routes/login/+page.svelte -->
 <script>
 	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -32,11 +31,8 @@
 				action="?/login"
 				use:enhance={() => {
 					loading = true;
-					return async ({ result, update }) => {
+					return async ({ update }) => {
 						loading = false;
-						if (result.type === 'redirect') {
-							await invalidateAll();
-						}
 						await update();
 					};
 				}}

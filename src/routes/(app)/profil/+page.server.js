@@ -10,8 +10,7 @@ export const load = async ({ fetch, locals, cookies }) => {
         const accessToken = cookies.get('access_token');
         const response = await fetch(`${API_URL}/auth/students/me/`, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'ngrok-skip-browser-warning': 'true'
+                'Authorization': `Bearer ${accessToken}`
             }
         });
 
@@ -50,8 +49,7 @@ export const actions = {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
-                    'ngrok-skip-browser-warning': 'true'
+                    'Authorization': `Bearer ${accessToken}`
                 },
                 body: JSON.stringify({
                     first_name: firstName,

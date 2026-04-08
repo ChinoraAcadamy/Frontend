@@ -7,8 +7,7 @@ export const load = async ({ fetch, params, cookies }) => {
     if (!accessToken) throw redirect(303, '/login');
 
     const headers = {
-        'Authorization': `Bearer ${accessToken}`,
-        'ngrok-skip-browser-warning': 'true'
+        'Authorization': `Bearer ${accessToken}`
     };
 
     try {

@@ -12,8 +12,7 @@ export const actions = {
         const formData = await request.formData();
         const headers = {
             'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true'
+            'Content-Type': 'application/json'
         };
         
         const modulePayload = {

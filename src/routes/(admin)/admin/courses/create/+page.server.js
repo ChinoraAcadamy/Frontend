@@ -22,8 +22,7 @@ export const actions = {
         // fetch() ga formData berilganda, u o'zi to'g'ri 'multipart/form-data' 
         // va kerakli 'boundary' larni qo'yib beradi.
         const headers = {
-            'Authorization': `Bearer ${accessToken}`,
-            'ngrok-skip-browser-warning': 'true'
+            'Authorization': `Bearer ${accessToken}`
         };
 
         let resultId; // Redirect uchun ID ni saqlab turamiz

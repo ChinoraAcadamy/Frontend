@@ -11,8 +11,7 @@ export async function DELETE({ cookies, request }) {
     const res = await fetch(`${API_URL}/auth/students/${studentId}/`, {
         method: 'DELETE',
         headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'ngrok-skip-browser-warning': 'true'
+            'Authorization': `Bearer ${accessToken}`
         }
     });
 
@@ -46,8 +45,7 @@ export async function POST({ cookies, request }) {
         method: 'PATCH',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
     });

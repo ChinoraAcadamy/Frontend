@@ -18,9 +18,7 @@ export const actions = {
             const response = await fetch(`${API_URL}/auth/login/`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    // ngrok warning page'ni o'tkazib yuborish uchun
-                    'ngrok-skip-browser-warning': 'true'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ username, password })
             });
@@ -62,18 +60,17 @@ export const actions = {
             maxAge: 60 * 60 * 24 * 7
         });
 
-        // User ma'lumotlari — httpOnly EMAS (frontend o'qishi kerak bo'lishi mumkin)
-        // Lekin sensitive emas, shuning uchun JSON sifatida saqlaymiz
+        // User ma'lumotlari — 20 minut kesh (freshness uchun)
         cookies.set('user_data', JSON.stringify(result.user), {
             ...cookieOptions,
             httpOnly: false, // navbar va boshqa componentlar o'qishi uchun
-            maxAge: 60 * 60 * 24 * 7
+            maxAge: 60 * 20 // 20 minut
         });
 
         if (result.user.role === 'admin' || result.user.role === 'superadmin') {
             throw redirect(302, '/admin/dashboard');
         } else {
-            redirect(302, '/dashboard');
+            throw redirect(302, '/dashboard');
         }
     }
 };

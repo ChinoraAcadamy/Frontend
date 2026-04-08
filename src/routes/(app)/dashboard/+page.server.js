@@ -1,15 +1,18 @@
-// src/routes/student/+page.server.js   (yoki qayerda bo'lsa)
 import { getRanking } from '@/lib/server/api.js';
 import { getMyCourses } from '@/lib/server/myCourses.js';
 
+/** @type {import('./$types').PageServerLoad} */
 export async function load(event) {
-    const [rankingData, coursesData] = await Promise.all([
-        getRanking(event),
-        getMyCourses(event)
-    ]);
+    // 10 daqiqa kesh
+    event.setHeaders({
+        'cache-control': 'private, max-age=600'
+    });
 
     return {
-        ranking: rankingData.ranking,
-        courses: coursesData.courses
+        // Hammasini lazy (streaming) qilamiz
+        lazy: {
+            courses: getMyCourses(event).then(data => data.courses),
+            ranking: getRanking(event).then(data => data.ranking)
+        }
     };
 }

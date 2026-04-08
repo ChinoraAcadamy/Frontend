@@ -114,7 +114,7 @@
 			use:enhance={() => {
 				loading = true;
 				return async ({ update }) => {
-					loading = false;
+					// Serverdan redirect keladi, shuning uchun loading true qolgani yaxshi
 					await update();
 				};
 			}}

@@ -15,10 +15,19 @@ async function authHandle({ event, resolve }) {
 	}
 
 	try {
-		// JWT payload decode (verify emas — API o'zi hal qiladi)
-		const payload = JSON.parse(atob(accessToken.split('.')[1]));
-		const isExpired = payload.exp * 1000 < Date.now();
+		// JWT payload decode safely
+		let payload;
+		try {
+			payload = JSON.parse(atob(accessToken.split('.')[1]));
+		} catch (e) {
+			console.error('[auth hook] Token decode xatosi:', e);
+			clearAuthCookies(event.cookies);
+			event.locals.isAuthenticated = false;
+			event.locals.user = null;
+			return resolve(event);
+		}
 
+		const isExpired = payload.exp * 1000 < Date.now();
 		let validToken = accessToken;
 
 		// Token muddati o'tgan — refresh qilamiz
@@ -34,10 +43,7 @@ async function authHandle({ event, resolve }) {
 
 			const refreshRes = await fetch(`${API_URL}/auth/token/refresh/`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'ngrok-skip-browser-warning': 'true'
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ refresh: refreshToken })
 			});
 
@@ -61,32 +67,48 @@ async function authHandle({ event, resolve }) {
 			});
 		}
 
-		// ✅ Har request'da /auth/profile/ dan user ma'lumotini olamiz
-		// Cookie'da saqlashdan yaxshiroq: har doim fresh, role o'zgarsa darhol aks etadi
-		const profileRes = await fetch(`${API_URL}/auth/profile/`, {
-			headers: {
-				'Authorization': `Bearer ${validToken}`,
-				'ngrok-skip-browser-warning': 'true'
-			}
-		});
+		// ✅ Optimallashtirilgan foydalanuvchi ma'lumotlarini olish
+		// Har request'da API'ga bormaymiz, kuki'dan olamiz
+		let user = null;
+		const userDataCookie = event.cookies.get('user_data');
 
-		if (!profileRes.ok) {
-			// Token invalid (masalan, server tomonida revoke qilingan)
-			clearAuthCookies(event.cookies);
-			event.locals.isAuthenticated = false;
-			event.locals.user = null;
-			return resolve(event);
+		if (userDataCookie) {
+			try {
+				user = JSON.parse(userDataCookie);
+			} catch {
+				user = null;
+			}
 		}
 
-		const user = await profileRes.json();
-		event.locals.isAuthenticated = true;
-		event.locals.user = user;
-		// console.log(user)
+		// Kuki yo'q bo'lsa yoki token yangilangan bo'lsa (yoki 20 minut o'tgan bo'lsa kuki o'zi o'chadi)
+		if (!user || isExpired) {
+			const profileRes = await fetch(`${API_URL}/auth/profile/`, {
+				headers: { 'Authorization': `Bearer ${validToken}` }
+			});
 
-	} catch (e) {
-		// Network xato, JSON parse xato — foydalanuvchini chiqarmay, token bor deb qabul qilamiz
-		// Lekin user null bo'ladi
-		console.error('[auth hook] Xatolik:', e);
+			if (profileRes.ok) {
+				user = await profileRes.json();
+				// Foydalanuvchi ma'lumotlarini 20 minutga saqlaymiz
+				event.cookies.set('user_data', JSON.stringify(user), {
+					path: '/',
+					httpOnly: false, // frontend o'qishi uchun
+					sameSite: 'strict',
+					secure: process.env.NODE_ENV === 'production',
+					maxAge: 60 * 20 // 20 minut
+				});
+			} else if (profileRes.status === 401) {
+				clearAuthCookies(event.cookies);
+				event.locals.isAuthenticated = false;
+				event.locals.user = null;
+				return resolve(event);
+			}
+		}
+
+		event.locals.isAuthenticated = !!user;
+		event.locals.user = user;
+
+	} catch {
+		console.error('[auth hook] Xatolik');
 		event.locals.isAuthenticated = !!event.cookies.get('access_token');
 		event.locals.user = null;
 	}
@@ -100,7 +122,7 @@ function clearAuthCookies(cookies) {
 	cookies.delete('access_token', opts);
 	cookies.delete('refresh_token', opts);
 	cookies.delete('session_token', opts);
-	cookies.delete('user_data', opts); // eski cookie bo'lsa tozalaymiz
+	cookies.delete('user_data', opts);
 }
 
 /** @type {import('@sveltejs/kit').Handle} */

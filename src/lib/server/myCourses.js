@@ -1,7 +1,7 @@
 // src/lib/server/myCourses.js
 import { API_URL } from '$env/static/private';
 
-export async function getMyCourses({ cookies, url, fetch, setHeaders }) {
+export async function getMyCourses({ cookies, url, fetch }) {
     const accessToken = cookies.get('access_token');
 
     const search = url.searchParams.get('search') || '';
@@ -15,8 +15,7 @@ export async function getMyCourses({ cookies, url, fetch, setHeaders }) {
     try {
         const res = await fetch(endpoint, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'ngrok-skip-browser-warning': 'true'
+                'Authorization': `Bearer ${accessToken}`
             }
         });
 
@@ -32,9 +31,7 @@ export async function getMyCourses({ cookies, url, fetch, setHeaders }) {
         }
 
         const data = await res.json();
-        setHeaders({
-            'cache-control': 'private, max-age=300'
-        });
+
         return {
             courses: data.results || [],
             totalCount: data.count || 0,

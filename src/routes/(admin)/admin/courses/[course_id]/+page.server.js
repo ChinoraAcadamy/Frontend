@@ -17,8 +17,7 @@ export const actions = {
             const response = await fetch(`${API_URL}/courses/${params.course_id}/`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'ngrok-skip-browser-warning': 'true'
+                    'Authorization': `Bearer ${accessToken}`
                 }
             });
 
