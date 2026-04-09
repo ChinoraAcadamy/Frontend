@@ -9,6 +9,8 @@
 		modules,
 		adminHeaderActions = undefined,
 		adminFooterActions = undefined,
+		adminModuleActions = undefined,
+		adminLessonActions = undefined,
 		getLessonHref = undefined,
 		isStudentView = false
 	} = $props();
@@ -115,6 +117,12 @@
 		<div class="space-y-4">
 			{#each modules as mod (mod.title)}
 				<ModuleAccordion title={mod.title}>
+					{#snippet adminActions()}
+						{#if adminModuleActions}
+							{@render adminModuleActions(mod)}
+						{/if}
+					{/snippet}
+
 					{#if mod.lessons && mod.lessons.length > 0}
 						<div class="flex flex-col gap-2">
 							{#each mod.lessons as lesson (lesson.id)}
@@ -125,7 +133,13 @@
 									href={getLessonHref && !isStudentBlocked
 										? getLessonHref(lesson.id, mod.id)
 										: undefined}
-								/>
+								>
+									{#snippet adminActions()}
+										{#if adminLessonActions}
+											{@render adminLessonActions(lesson, mod)}
+										{/if}
+									{/snippet}
+								</LessonsRow>
 							{/each}
 						</div>
 					{:else}

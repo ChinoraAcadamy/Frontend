@@ -1,10 +1,10 @@
 <!-- src/routes/dashboard/admin/courses/[id]/+page.svelte -->
 <script>
-	import { resolve } from '$app/paths';
-	import { Plus, BookPlus, AlertTriangle, Trash2 } from 'lucide-svelte';
+	import { Plus, BookPlus, AlertTriangle, Trash2, Edit, FileText } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import CourseDetailView from '@/lib/components/ui/courses/CourseDetailView.svelte';
+	import ModuleEditModal from '@/lib/components/ui/admin/ModuleEditModal.svelte';
 
 	const { data } = $props();
 
@@ -14,10 +14,18 @@
 
 	let isDeleting = $state(false);
 
+	let isEditModuleModalOpen = $state(false);
+	let editModuleTarget = $state(null);
+
+	function openModuleEdit(mod) {
+		editModuleTarget = { pk: mod.id, title_uz: mod.title, title_ru: mod.title, description_uz: mod.description_uz || '', description_ru: mod.description_ru || '', order_index: mod.order || 1 };
+		isEditModuleModalOpen = true;
+	}
+
     // O'chirish formasi yuborilishidan oldin tasdiq so'rash
-    function handleDelete() {
+    function handleDelete(msg) {
         return async ({ cancel }) => {
-            const confirmed = confirm("Rostdan ham bu kursni butunlay o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.");
+            const confirmed = confirm(msg || "Davom etishni xohlaysizmi?");
             
             if (!confirmed) {
                 cancel(); // Formani yuborishni to'xtatish
@@ -29,21 +37,54 @@
             return async ({ update, result }) => {
                 isDeleting = false;
                 if (result.type === 'failure') {
-                    alert(result.data?.error || "O'chirishda xatolik yuz berdi");
+                    alert(result.data?.error || "Xatolik yuz berdi");
                 }
-                // Success holatida server o'zi redirect qiladi
                 await update();
             };
         };
     }
 </script>
 
+<ModuleEditModal bind:isOpen={isEditModuleModalOpen} moduleTarget={editModuleTarget} coursePk={$page.params.course_id} />
+
 <CourseDetailView course={data.course} modules={data.modules}>
+	{#snippet adminModuleActions(mod)}
+		{#if isAdmin}
+			<button onclick={(e) => { e.stopPropagation(); openModuleEdit(mod); }} class="rounded p-2 text-slate-400 transition-colors hover:bg-emerald-50 hover:text-emerald-500">
+				<Edit size={18} />
+			</button>
+			<form method="POST" action="?/deleteModule" use:enhance={handleDelete("Rostdan ham bu modulni o'chirmoqchimisiz?")} onsubmit={(e) => e.stopPropagation()}>
+				<input type="hidden" name="module_id" value={mod.id}>
+				<button type="submit" class="rounded p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
+					<Trash2 size={18} />
+				</button>
+			</form>
+		{/if}
+	{/snippet}
+
+	{#snippet adminLessonActions(lesson, mod)}
+		{#if isAdmin}
+			<a href={`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/assignments/create?module_id=${mod.id}`} class="rounded p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-500" onclick={(e) => e.stopPropagation()} title="Topshiriq qo'shish">
+				<FileText size={18} />
+			</a>
+			<a href={`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/edit`} class="rounded p-2 text-slate-400 transition-colors hover:bg-emerald-50 hover:text-emerald-500" onclick={(e) => e.stopPropagation()} title="Darsni tahrirlash">
+				<Edit size={18} />
+			</a>
+			<form method="POST" action="?/deleteLesson" use:enhance={handleDelete("Rostdan ham bu darsni o'chirmoqchimisiz?")} onsubmit={(e) => e.stopPropagation()}>
+				<input type="hidden" name="module_id" value={mod.id}>
+				<input type="hidden" name="lesson_id" value={lesson.id}>
+				<button type="submit" class="rounded p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
+					<Trash2 size={18} />
+				</button>
+			</form>
+		{/if}
+	{/snippet}
+
 	{#snippet adminHeaderActions()}
 		{#if isAdmin}
-			<div class="flex gap-3">
+			<div class="flex flex-wrap gap-3">
 				<a
-					href={resolve(`/admin/courses/create/${$page.params.course_id}`)}
+					href={`/admin/courses/create/${$page.params.course_id}`}
 					class="flex items-center gap-2 rounded-2xl bg-[#ed4b72] px-5 py-2.5 font-semibold text-white shadow-sm transition-all hover:bg-[#d93a5f]"
 				>
 					<Plus size={18} />
@@ -51,7 +92,7 @@
 				</a>
 				{#if checkNotEmptyModule !== 0}
 					<a
-						href={resolve(`/admin/courses/create/${$page.params.course_id}/lesson`)}
+						href={`/admin/courses/create/${$page.params.course_id}/lesson`}
 						class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 font-semibold text-slate-700 shadow-sm transition-all hover:border-[#ed4b72] hover:text-[#ed4b72]"
 					>
 						<BookPlus size={18} />
@@ -75,7 +116,7 @@
 						</p>
 					</div>
 					
-					<form method="POST" action="?/deleteCourse" use:enhance={handleDelete()}>
+					<form method="POST" action="?/deleteCourse" use:enhance={handleDelete("Rostdan ham bu kursni butunlay o'chirmoqchimisiz? Bu amalni ortga qaytarib o'lmaydi.")}>
 						<button
 							type="submit"
 							disabled={isDeleting}

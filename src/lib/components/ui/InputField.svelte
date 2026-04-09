@@ -8,7 +8,8 @@
         value = $bindable(), 
         placeholder = "", 
         readonly = false,
-        prefix = "" 
+        prefix = "",
+        name=""
     } = $props();
 </script>
 
@@ -26,6 +27,7 @@
             {type}
             bind:value
             {placeholder}
+            {name}
             disabled={readonly}
             class="w-full h-11 rounded-xl border px-3 text-slate-800 transition-all duration-200 outline-none
                    {prefix ? 'pl-16' : ''}

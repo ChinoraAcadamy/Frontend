@@ -1,12 +1,13 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-    import { CheckCircle2, ChevronRight } from 'lucide-svelte';
+    import { CheckCircle2 } from 'lucide-svelte';
+
+	import ModuleForm from '@/lib/components/ui/admin/forms/ModuleForm.svelte';
 
     // Svelte 5 State'lar
-    let coursePk = $state(null);
+    let coursePk = $state(page.params.course_id);
     let isSubmitting = $state(false);
 
     // Form submit qilinayotganda ushlab turish va keyingi bosqichga o'tkazish
@@ -44,7 +45,7 @@
 			<span class="step-label">Kurs</span>
 		</div>
 		<div class="step-line active-line"></div>
-		<div class="step">
+		<div class="step active">
 			<div class="step-circle">
 				2
 			</div>
@@ -58,41 +59,12 @@
     </div>
 
     <div class="form-card">
-
-            <form method="POST" action="?/createModule" use:enhance={submitStep}>
-                <input type="hidden" name="course_pk" value={coursePk}>
-                <div class="grid-form">
-                    <div class="form-group">
-                        <label for="mod_title_uz">Modul nomi (UZ)</label>
-                        <input type="text" id="mod_title_uz" name="title_uz" class="input" required minlength="1">
-                    </div>
-                    <div class="form-group">
-                        <label for="mod_title_ru">Modul nomi (RU)</label>
-                        <input type="text" id="mod_title_ru" name="title_ru" class="input" required minlength="1">
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="mod_desc_uz">Modul ta'rifi (UZ)</label>
-                        <textarea id="mod_desc_uz" name="description_uz" class="input textarea" rows="2"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="mod_desc_ru">Modul ta'rifi (RU)</label>
-                        <textarea id="mod_desc_ru" name="description_ru" class="input textarea" rows="2"></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="mod_order">Tartib raqami</label>
-                        <input type="number" id="mod_order" name="order_index" class="input" value="1">
-                    </div>
-                </div>
-
-                <div class="actions">
-                    <button type="submit" class="btn btn-primary" disabled={isSubmitting}>
-                        {isSubmitting ? 'Saqlanmoqda...' : 'Keyingisi'}
-                        {#if !isSubmitting} <ChevronRight size={18} /> {/if}
-                    </button>
-                </div>
-            </form>
+        <ModuleForm 
+            action="?/createModule" 
+            {coursePk}
+            bind:isSubmitting={isSubmitting} 
+            onSubmit={submitStep} 
+        />
     </div>
 </div>
 
@@ -202,7 +174,7 @@
         background: var(--primary);
     }
 
-    /* Forms */
+    /* Form Container styles */
     .form-card {
         background: var(--card-bg);
         border-radius: var(--radius-lg);
@@ -211,94 +183,7 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 
-    .grid-form {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    label {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text-main);
-    }
-
-    .input {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1.5px solid var(--border-color);
-        border-radius: var(--radius-md);
-        font-size: 14px;
-        color: var(--text-main);
-        background: var(--bg-color);
-        font-family: inherit;
-        transition: all 0.2s ease;
-    }
-
-    .input:focus {
-        border-color: var(--primary);
-        background: var(--card-bg);
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(250, 46, 105, 0.1);
-    }
-
-    .textarea {
-        resize: vertical;
-        min-height: 80px;
-    }
-
-    /* Buttons */
-    .actions {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 32px;
-        padding-top: 24px;
-        border-top: 1px solid var(--border-color);
-    }
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 12px 28px;
-        border-radius: var(--radius-md);
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        border: none;
-        transition: 0.2s ease;
-        font-family: inherit;
-    }
-
-    .btn:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-
-    .btn-primary {
-        background: var(--primary);
-        color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-        background: var(--primary-hover);
-    }
-    
-    /* Desktop yondashuvi */
     @media (min-width: 640px) {
-        .grid-form {
-            grid-template-columns: 1fr 1fr;
-        }
-        .full-width {
-            grid-column: span 2;
-        }
         .form-card {
             padding: 32px;
         }

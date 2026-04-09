@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-    import { UploadCloud, CheckCircle2, ChevronRight } from 'lucide-svelte';
+	import CourseForm from '@/lib/components/ui/admin/forms/CourseForm.svelte';
+    import { CheckCircle2 } from 'lucide-svelte';
 
     // Svelte 5 State'lar
     let step = $state(1);
@@ -69,78 +69,11 @@
     </div>
 
     <div class="form-card">
-        <form method="POST" action="?/createCourse" use:enhance={submitStep} enctype="multipart/form-data">
-                <div class="grid-form">
-                    <div class="form-group">
-                        <label for="title_uz">Kurs nomi (UZ)</label>
-                        <input type="text" id="title_uz" name="title_uz" class="input" required minlength="1" placeholder="Masalan: Web Dasturlash">
-                    </div>
-                    <div class="form-group">
-                        <label for="title_ru">Kurs nomi (RU)</label>
-                        <input type="text" id="title_ru" name="title_ru" class="input" required minlength="1" placeholder="Например: Веб Программирование">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="level_uz">Daraja (UZ)</label>
-                        <input type="text" id="level_uz" name="level_uz" class="input" placeholder="Boshlang'ich">
-                    </div>
-                    <div class="form-group">
-                        <label for="level_ru">Daraja (RU)</label>
-                        <input type="text" id="level_ru" name="level_ru" class="input" placeholder="Начальный">
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="description_uz">Ta'rif (UZ)</label>
-                        <textarea id="description_uz" name="description_uz" class="input textarea" rows="3"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="description_ru">Ta'rif (RU)</label>
-                        <textarea id="description_ru" name="description_ru" class="input textarea" rows="3"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="duration">Davomiyligi (soat)</label>
-                        <input type="number" id="duration" name="duration" class="input">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="is_published">Holati</label>
-                        <select id="is_published" name="is_published" class="input select">
-                            <option value="true">Nashr qilish</option>
-                            <option value="false">Qoralama (Draft)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="price">Narxi</label>
-                        <input type="number" step="0.01" id="price" name="price" class="input" placeholder="0.00">
-                    </div>
-                    <div class="form-group">
-                        <label for="old_price">Eski narxi</label>
-                        <input type="number" step="0.01" id="old_price" name="old_price" class="input" placeholder="0.00">
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="img">Kurs muqovasi</label>
-                        <label class="file-upload {imgPreview ? 'has-image' : ''}">
-                            <input type="file" id="img" name="img" accept="image/*" class="hidden" onchange={handleImageChange}>
-                            {#if imgPreview}
-                                <img src={imgPreview} alt="Preview" class="preview-img">
-                            {:else}
-                                <UploadCloud size={32} class="upload-icon" />
-                                <span>Rasm yuklash yoki shu yerga tashlang</span>
-                            {/if}
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="actions">
-                    <button type="submit" class="btn btn-primary" disabled={isSubmitting}>
-                        {isSubmitting ? 'Saqlanmoqda...' : 'Keyingisi'}
-                        {#if !isSubmitting} <ChevronRight size={18} /> {/if}
-                    </button>
-                </div>
-            </form>
+        <CourseForm 
+            action="?/createCourse" 
+            bind:isSubmitting={isSubmitting} 
+            onSubmit={submitStep} 
+        />
     </div>
 </div>
 
@@ -160,5 +93,108 @@
         --radius-md: 12px;
         --radius-lg: 16px;
         --font-poppins: 'Poppins', sans-serif;
+    }
+
+    .page-container {
+        font-family: var(--font-poppins);
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 24px 16px;
+    }
+
+    .header {
+        margin-bottom: 32px;
+        text-align: center;
+    }
+
+    .title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0 0 8px 0;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    /* Progress Tracker (Wizard) */
+    .progress-tracker {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 32px;
+        padding: 0 20px;
+    }
+
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+    }
+
+    .step.active .step-circle {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(250, 46, 105, 0.25);
+    }
+
+    .step-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
+
+    .step.active .step-label {
+        color: var(--text-main);
+        font-weight: 600;
+    }
+
+    .step-line {
+        flex: 1;
+        height: 2px;
+        background: var(--border-color);
+        margin: 0 16px;
+        transform: translateY(-12px);
+        transition: all 0.3s ease;
+    }
+
+    .active-line {
+        background: var(--primary);
+    }
+
+    /* Form Container styles */
+    .form-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    @media (min-width: 640px) {
+        .form-card {
+            padding: 32px;
+        }
     }
 </style>
