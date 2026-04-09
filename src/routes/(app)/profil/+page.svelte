@@ -283,24 +283,26 @@
 								>
 									<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 										<div class="space-y-2">
-											<label class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
+											<label for="firstname" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
 												>Ism</label
 											>
 											<input
 												name="firstName"
 												type="text"
+												id="firstname"
 												bind:value={firstName}
 												class="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-6 text-sm font-bold text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/5"
 												placeholder="Ismingiz"
 											/>
 										</div>
 										<div class="space-y-2">
-											<label class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
+											<label for="lastname" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
 												>Familiya</label
 											>
 											<input
 												name="lastName"
 												type="text"
+												id="lastname"
 												bind:value={lastName}
 												class="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-6 text-sm font-bold text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/5"
 												placeholder="Familiyangiz"
@@ -309,7 +311,7 @@
 									</div>
 
 									<div class="space-y-2">
-										<label class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
+										<label for="phone_number" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
 											>Telefon raqam</label
 										>
 										<div class="relative">
@@ -319,6 +321,7 @@
 											<input
 												name="phoneNumber"
 												type="text"
+												id="phone_number"
 												bind:value={phoneNumber}
 												class="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 pr-6 pl-14 text-sm font-bold text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/5"
 												placeholder="+998 00 000 00 00"
