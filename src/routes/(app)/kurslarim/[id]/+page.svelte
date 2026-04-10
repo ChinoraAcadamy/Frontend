@@ -13,5 +13,6 @@
 	course={data.course}
 	modules={data.modules}
 	isStudentView={true}
-	getLessonHref={(lessonId, moduleId) => `/kurslarim/${$page.params.id}/lessons/${lessonId}?module_id=${moduleId}`}
+	getLessonHref={(lessonId, moduleId) =>
+		`/kurslarim/${$page.params.id}/lessons/${lessonId}?module_id=${moduleId}`}
 />

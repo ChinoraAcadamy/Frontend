@@ -13,6 +13,7 @@
 	} from 'lucide-svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 
 	import AddStudentModal from '@/lib/components/ui/admin/AddStudentModal.svelte';
 	import EditStudentModal from '@/lib/components/ui/admin/EditStudentModal.svelte';
@@ -190,7 +191,10 @@
 							{#each paginatedStudents as student (student.id)}
 								<tr class="group transition-colors hover:bg-gray-50/50">
 									<td class="px-6 py-3.5">
-										<div class="flex items-center gap-3">
+										<a
+											href={resolve(`/admin/students/${student.id}`)}
+											class="flex items-center gap-3"
+										>
 											<div
 												class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold {getAvatarColor(
 													student.id
@@ -199,7 +203,7 @@
 												{getInitials(student)}
 											</div>
 											<span class="font-medium text-gray-900">{getFullName(student)}</span>
-										</div>
+										</a>
 									</td>
 									<td class="px-6 py-3.5">
 										<span class="text-gray-500">@{student.username}</span>

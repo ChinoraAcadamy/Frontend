@@ -1,10 +1,11 @@
 <!-- src/routes/dashboard/admin/courses/[id]/+page.svelte -->
 <script>
-	import { Plus, BookPlus, AlertTriangle, Trash2, Edit, FileText } from 'lucide-svelte';
+	import { Plus, BookPlus, AlertTriangle, Trash2, Edit, FileText, Settings, Play } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
-	import CourseDetailView from '@/lib/components/ui/courses/CourseDetailView.svelte';
+	import AdminCourseDetailView from '@/lib/components/ui/admin/AdminCourseDetailView.svelte';
 	import ModuleEditModal from '@/lib/components/ui/admin/ModuleEditModal.svelte';
+	import ActionMenu from '@/lib/components/ui/admin/ActionMenu.svelte';
 
 	const { data } = $props();
 
@@ -47,56 +48,44 @@
 
 <ModuleEditModal bind:isOpen={isEditModuleModalOpen} moduleTarget={editModuleTarget} coursePk={$page.params.course_id} />
 
-<CourseDetailView course={data.course} modules={data.modules}>
+<AdminCourseDetailView course={data.course} modules={data.modules}>
 	{#snippet adminModuleActions(mod)}
 		{#if isAdmin}
-			<button onclick={(e) => { e.stopPropagation(); openModuleEdit(mod); }} class="rounded p-2 text-slate-400 transition-colors hover:bg-emerald-50 hover:text-emerald-500">
-				<Edit size={18} />
-			</button>
-			<form method="POST" action="?/deleteModule" use:enhance={handleDelete("Rostdan ham bu modulni o'chirmoqchimisiz?")} onsubmit={(e) => e.stopPropagation()}>
-				<input type="hidden" name="module_id" value={mod.id}>
-				<button type="submit" class="rounded p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
-					<Trash2 size={18} />
-				</button>
-			</form>
+            <ActionMenu label="Modul amallari">
+                {@render renderModuleEditAction(mod)}
+                {@render renderModuleDeleteAction(mod)}
+            </ActionMenu>
 		{/if}
 	{/snippet}
 
 	{#snippet adminLessonActions(lesson, mod)}
 		{#if isAdmin}
-			<a href={`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/assignments/create?module_id=${mod.id}`} class="rounded p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-500" onclick={(e) => e.stopPropagation()} title="Topshiriq qo'shish">
-				<FileText size={18} />
-			</a>
-			<a href={`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/edit`} class="rounded p-2 text-slate-400 transition-colors hover:bg-emerald-50 hover:text-emerald-500" onclick={(e) => e.stopPropagation()} title="Darsni tahrirlash">
-				<Edit size={18} />
-			</a>
-			<form method="POST" action="?/deleteLesson" use:enhance={handleDelete("Rostdan ham bu darsni o'chirmoqchimisiz?")} onsubmit={(e) => e.stopPropagation()}>
-				<input type="hidden" name="module_id" value={mod.id}>
-				<input type="hidden" name="lesson_id" value={lesson.id}>
-				<button type="submit" class="rounded p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
-					<Trash2 size={18} />
-				</button>
-			</form>
+            <ActionMenu label="Dars amallari">
+                {@render renderLessonViewAction(lesson, mod)}
+                {@render renderLessonAssignmentAction(lesson, mod)}
+                {@render renderLessonEditAction(lesson, mod)}
+                {@render renderLessonDeleteAction(lesson, mod)}
+            </ActionMenu>
 		{/if}
 	{/snippet}
 
 	{#snippet adminHeaderActions()}
 		{#if isAdmin}
-			<div class="flex flex-wrap gap-3">
+			<div class="flex items-center gap-2">
 				<a
 					href={`/admin/courses/create/${$page.params.course_id}`}
-					class="flex items-center gap-2 rounded-2xl bg-[#ed4b72] px-5 py-2.5 font-semibold text-white shadow-sm transition-all hover:bg-[#d93a5f]"
+					class="flex h-10 items-center gap-2 rounded-xl bg-[#ed4b72] px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#d93a5f] active:scale-95"
 				>
-					<Plus size={18} />
-					Yangi modul qo‘shish
+					<Plus size={18} strokeWidth={3} />
+					<span class="hidden sm:inline">Modul</span>
 				</a>
 				{#if checkNotEmptyModule !== 0}
 					<a
 						href={`/admin/courses/create/${$page.params.course_id}/lesson`}
-						class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 font-semibold text-slate-700 shadow-sm transition-all hover:border-[#ed4b72] hover:text-[#ed4b72]"
+						class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-[#ed4b72] hover:text-[#ed4b72] active:scale-95"
 					>
 						<BookPlus size={18} />
-						Yangi dars qo'shish
+						<span class="hidden sm:inline">Dars</span>
 					</a>
 				{/if}
 			</div>
@@ -105,29 +94,80 @@
 
 	{#snippet adminFooterActions()}
 		{#if isAdmin}
-			<div class="mt-12 rounded-3xl border border-dashed border-red-200 bg-red-50 p-6 sm:p-8">
-				<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-					<div>
-						<h3 class="flex items-center gap-2 text-lg font-bold text-red-700">
-							<AlertTriangle size={20} /> Danger Zone (Xavfli hudud)
-						</h3>
-						<p class="mt-1 text-sm text-red-600/80">
-							Diqqat: Kursni o'chirish barcha modullar, darslar va o'quvchilar natijalarini butunlay yo'q qiladi.
-						</p>
-					</div>
-					
-					<form method="POST" action="?/deleteCourse" use:enhance={handleDelete("Rostdan ham bu kursni butunlay o'chirmoqchimisiz? Bu amalni ortga qaytarib o'lmaydi.")}>
+			<div class="mt-4 overflow-hidden rounded-[32px] border border-red-100 bg-white shadow-sm">
+                <div class="bg-red-50/50 p-6 border-b border-red-50">
+                    <h3 class="flex items-center gap-2 text-lg font-black text-red-700">
+                        <AlertTriangle size={22} /> Danger Zone
+                    </h3>
+                    <p class="mt-2 text-sm font-medium text-red-600/70">
+                        Kursni o'chirish barcha ma'lumotlarni (modullar, darslar, natijalar) butunlay yo'q qiladi. Bu amalni ortga qaytarib bo'lmaydi.
+                    </p>
+                </div>
+				
+				<div class="p-6">
+					<form method="POST" action="?/deleteCourse" use:enhance={handleDelete("Rostdan ham bu kursni butunlay o'chirmoqchimisiz?")}>
 						<button
 							type="submit"
 							disabled={isDeleting}
-							class="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-600 px-6 py-3 font-semibold text-white shadow-sm transition-all hover:bg-red-700 disabled:opacity-50 sm:w-auto"
+							class="flex w-full items-center justify-center gap-3 rounded-2xl bg-red-600 py-4 text-base font-bold text-white shadow-lg shadow-red-200/50 transition-all hover:bg-red-700 active:scale-[0.98] disabled:opacity-50"
 						>
-							<Trash2 size={18} />
-							{isDeleting ? "O'chirilmoqda..." : "Kursni o'chirish"}
+							<Trash2 size={20} />
+							{isDeleting ? "O'chirilmoqda..." : "Kursni butunlay o'chirish"}
 						</button>
 					</form>
 				</div>
 			</div>
 		{/if}
 	{/snippet}
-</CourseDetailView>
+</AdminCourseDetailView>
+
+<!-- Inline action snippets for cleaner code -->
+{#snippet renderModuleEditAction(mod)}
+    <button onclick={() => openModuleEdit(mod)} class="action-menu-item">
+        <Edit size={18} />
+        <span>Tahrirlash</span>
+    </button>
+{/snippet}
+
+{#snippet renderModuleDeleteAction(mod)}
+    <form method="POST" action="?/deleteModule" use:enhance={handleDelete("Modulni o'chirish?")} class="w-full lg:w-auto">
+        <input type="hidden" name="module_id" value={mod.id}>
+        <button type="submit" class="action-menu-item">
+            <Trash2 size={18} />
+            <span>O'chirish</span>
+        </button>
+    </form>
+{/snippet}
+
+
+{#snippet renderLessonViewAction(lesson, mod)}
+    <a href={`/kurslarim/${$page.params.course_id}/lessons/${lesson.id}?module_id=${mod.id}`} class="action-menu-item">
+        <Play size={18} />
+        <span>Ko'rish</span>
+    </a>
+{/snippet}
+
+{#snippet renderLessonAssignmentAction(lesson, mod)}
+    <a href={`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/assignments/create?module_id=${mod.id}`} class="action-menu-item">
+        <FileText size={18} />
+        <span>Topshiriq</span>
+    </a>
+{/snippet}
+
+{#snippet renderLessonEditAction(lesson, mod)}
+    <a href={`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/edit`} class="action-menu-item">
+        <Edit size={18} />
+        <span>Tahrirlash</span>
+    </a>
+{/snippet}
+
+{#snippet renderLessonDeleteAction(lesson, mod)}
+    <form method="POST" action="?/deleteLesson" use:enhance={handleDelete("Darsni o'chirish?")} class="w-full lg:w-auto">
+        <input type="hidden" name="module_id" value={mod.id}>
+        <input type="hidden" name="lesson_id" value={lesson.id}>
+        <button type="submit" class="action-menu-item">
+            <Trash2 size={18} />
+            <span>O'chirish</span>
+        </button>
+    </form>
+{/snippet}

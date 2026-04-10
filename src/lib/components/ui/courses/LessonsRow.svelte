@@ -1,5 +1,6 @@
 <script>
 	import { CheckCircle2, Lock } from 'lucide-svelte';
+	import { resolve } from '$app/paths';
 
 	/** @type {{ index: string | number, title: string, duration?: string | number, status?: 'completed' | 'active' | 'locked' | 'available', href?: string, adminActions?: import('svelte').Snippet }} */
 	let { index, title, duration, status = 'available', href, adminActions = undefined } = $props();
@@ -11,11 +12,15 @@
 		? 'bg-linear-to-r scale-[1.01] from-[#ed4b72] to-[#de3c61] text-white shadow-lg shadow-rose-200/50'
 		: 'text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100'}"
 >
-	{#if href && status !== 'locked'}
-		<a {href} class="absolute inset-0 z-0 rounded-2xl" aria-label={title}></a>
+	{#if href}
+		<a
+			href={resolve(/** @type {any} */ (href))}
+			class="absolute inset-0 z-10 rounded-2xl"
+			aria-label={title}
+		></a>
 	{/if}
 
-	<div class="z-10 flex w-full items-center justify-between p-3 sm:px-5 sm:py-3.5">
+	<div class="pointer-events-none z-20 flex w-full items-center justify-between p-3 sm:px-5 sm:py-3.5">
 		<div class="flex items-center gap-4 sm:gap-6">
 			<span
 				class="text-sm font-medium {status === 'active' ? 'text-rose-100' : 'text-slate-500'}"
@@ -53,7 +58,7 @@
 			{/if}
 
 			{#if adminActions}
-				<div class="relative z-20 flex items-center gap-2 border-l border-slate-200 pl-4">
+				<div class="pointer-events-auto relative z-30 flex items-center gap-2 border-l border-slate-200 pl-4">
 					{@render adminActions()}
 				</div>
 			{/if}
