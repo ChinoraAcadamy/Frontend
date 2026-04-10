@@ -36,7 +36,7 @@
 		<div class="absolute inset-0" onclick={onClose}></div>
 
 		<div
-			class="relative z-10 flex h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-[24px] bg-white shadow-2xl"
+			class="relative z-10 flex h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-4xl bg-white shadow-2xl"
 			transition:fly={{ y: 20, duration: 300, opacity: 0 }}
 		>
 			<div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-6">
@@ -83,7 +83,7 @@
 							type="text"
 							bind:value={searchQuery}
 							placeholder="Kurslarni qidirish..."
-							class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pr-4 pl-11 text-sm font-medium text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
+							class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 pr-4 pl-11 text-sm font-medium text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
 						/>
 					</div>
 				</div>
@@ -99,10 +99,9 @@
 							{#each filteredCourses as course (course.id)}
 								{@const isEnrolled = enrolledCourseIds.includes(course.id)}
 								{@const isSelected = selectedCourseIds.includes(course.id)}
-								<!-- svelte-ignore a11y_click_events_have_key_events -->
-								<!-- svelte-ignore a11y_no_static_element_interactions -->
-								<div
-									class="flex items-center justify-between rounded-xl border p-4 transition-all
+								<button
+									type="button"
+									class="flex w-full items-center justify-between rounded-[20px] border p-4 transition-all text-left
 										{isEnrolled
 											? 'cursor-not-allowed border-slate-100 bg-slate-50 opacity-60'
 											: isSelected
@@ -112,9 +111,9 @@
 								>
 									<div class="flex items-center gap-3">
 										<div
-											class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors
+											class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors
 												{isEnrolled
-													? 'bg-emerald-100 text-emerald-600'
+													? 'bg-emerald-50 text-emerald-500'
 													: isSelected
 														? 'bg-[#ed4b72] text-white'
 														: 'bg-slate-100 text-slate-500'}"
@@ -128,8 +127,8 @@
 											{/if}
 										</div>
 										<div>
-											<h4 class="font-bold {isEnrolled ? 'text-slate-500' : 'text-slate-800'}">{course.title}</h4>
-											<p class="text-xs {isEnrolled ? 'text-emerald-600 font-semibold' : 'text-slate-500'}">
+											<h4 class="font-bold {isEnrolled ? 'text-slate-400' : 'text-slate-800'}">{course.title}</h4>
+											<p class="text-xs {isEnrolled ? 'text-emerald-500 font-semibold' : 'text-slate-500'}">
 												{#if isEnrolled}
 													Allaqachon biriktirilgan
 												{:else}
@@ -138,7 +137,7 @@
 											</p>
 										</div>
 									</div>
-								</div>
+								</button>
 							{/each}
 						</div>
 					{/if}
@@ -149,18 +148,18 @@
 					<input type="hidden" name="courseIds[]" value={id} />
 				{/each}
 
-				<div class="mt-6 flex gap-3 border-t border-slate-100 pt-4">
+				<div class="mt-6 flex gap-3 border-t border-slate-100 pt-5">
 					<button
 						type="button"
 						onclick={onClose}
-						class="flex-1 rounded-xl bg-slate-100 py-3.5 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
+						class="flex-1 rounded-2xl bg-slate-100 py-4 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
 					>
 						Bekor qilish
 					</button>
 					<button
 						type="submit"
 						disabled={isSubmitting || selectedCourseIds.length === 0}
-						class="flex-1 rounded-xl bg-slate-900 py-3.5 font-bold text-white shadow-lg shadow-slate-900/20 transition-all hover:bg-[#ed4b72] hover:shadow-[#ed4b72]/30 active:scale-95 disabled:opacity-60"
+						class="flex-1 rounded-2xl bg-[#ed4b72] py-4 font-bold text-white shadow-xl shadow-rose-200 transition-all hover:bg-[#de3c61] active:scale-95 disabled:opacity-60"
 					>
 						{isSubmitting ? 'Biriktirilmoqda...' : `Biriktirish (${selectedCourseIds.length})`}
 					</button>

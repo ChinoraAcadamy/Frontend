@@ -7,15 +7,15 @@
     // Svelte 5 State'lar
     let step = $state(1);
     let isSubmitting = $state(false);
-    let imgPreview = $state(null);
+    // let imgPreview = $state(null);
 
     // Rasm yuklash preview mantiqi
-    function handleImageChange(e) {
-        const file = (e.target).files?.[0];
-        if (file) {
-            imgPreview = URL.createObjectURL(file);
-        }
-    }
+    // function handleImageChange(e) {
+    //     const file = (e.target).files?.[0];
+    //     if (file) {
+    //         imgPreview = URL.createObjectURL(file);
+    //     }
+    // }
 
     // Form submit qilinayotganda ushlab turish va keyingi bosqichga o'tkazish
     function submitStep() {

@@ -1,8 +1,9 @@
 <!-- src/routes/dashboard/admin/courses/[id]/+page.svelte -->
 <script>
-	import { Plus, BookPlus, AlertTriangle, Trash2, Edit, FileText, Settings, Play } from 'lucide-svelte';
+	import { Plus, BookPlus, AlertTriangle, Trash2, Edit, FileText, Play } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import AdminCourseDetailView from '@/lib/components/ui/admin/AdminCourseDetailView.svelte';
 	import ModuleEditModal from '@/lib/components/ui/admin/ModuleEditModal.svelte';
 	import ActionMenu from '@/lib/components/ui/admin/ActionMenu.svelte';
@@ -73,7 +74,7 @@
 		{#if isAdmin}
 			<div class="flex items-center gap-2">
 				<a
-					href={`/admin/courses/create/${$page.params.course_id}`}
+					href={resolve(`/admin/courses/create/${$page.params.course_id}`)}
 					class="flex h-10 items-center gap-2 rounded-xl bg-[#ed4b72] px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#d93a5f] active:scale-95"
 				>
 					<Plus size={18} strokeWidth={3} />
@@ -81,7 +82,7 @@
 				</a>
 				{#if checkNotEmptyModule !== 0}
 					<a
-						href={`/admin/courses/create/${$page.params.course_id}/lesson`}
+						href={resolve(`/admin/courses/create/${$page.params.course_id}/lesson`)}
 						class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-[#ed4b72] hover:text-[#ed4b72] active:scale-95"
 					>
 						<BookPlus size={18} />
@@ -141,21 +142,21 @@
 
 
 {#snippet renderLessonViewAction(lesson, mod)}
-    <a href={`/kurslarim/${$page.params.course_id}/lessons/${lesson.id}?module_id=${mod.id}`} class="action-menu-item">
+    <a href={resolve(`/kurslarim/${$page.params.course_id}/lessons/${lesson.id}?module_id=${mod.id}`)} class="action-menu-item">
         <Play size={18} />
         <span>Ko'rish</span>
     </a>
 {/snippet}
 
 {#snippet renderLessonAssignmentAction(lesson, mod)}
-    <a href={`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/assignments/create?module_id=${mod.id}`} class="action-menu-item">
+    <a href={resolve(`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/assignments/create?module_id=${mod.id}`)} class="action-menu-item">
         <FileText size={18} />
         <span>Topshiriq</span>
     </a>
 {/snippet}
 
 {#snippet renderLessonEditAction(lesson, mod)}
-    <a href={`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/edit`} class="action-menu-item">
+    <a href={resolve(`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/edit?module_id=${mod.id}`)} class="action-menu-item">
         <Edit size={18} />
         <span>Tahrirlash</span>
     </a>

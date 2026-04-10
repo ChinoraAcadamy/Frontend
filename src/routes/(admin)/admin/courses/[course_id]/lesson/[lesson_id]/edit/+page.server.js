@@ -31,7 +31,7 @@ export const load = async ({ fetch, cookies, params }) => {
         
         const lessonTarget = await response.json();
         return { modules, lessonTarget, parentModulePk, course: courseData };
-    } catch (err) {
+    } catch {
         throw redirect(303, `/admin/courses/${params.course_id}`);
     }
 };

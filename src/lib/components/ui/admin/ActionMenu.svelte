@@ -5,7 +5,7 @@
 	let { children, label = 'Amallar' } = $props();
 	let isOpen = $state(false);
 
-	function toggleMenu(e: Event) {
+	function toggleMenu(e) {
 		e.stopPropagation();
 		isOpen = !isOpen;
 	}
@@ -14,7 +14,7 @@
 		isOpen = false;
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
+	function handleKeydown(e) {
 		if (e.key === 'Escape') closeMenu();
 	}
 </script>
@@ -35,13 +35,15 @@
 		{@render children()}
 	</div>
 	{#if isOpen}
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm lg:hidden"
 			transition:fade={{ duration: 200 }}
 			onclick={closeMenu}
 		></div>
 		<div
-			class="fixed right-0 bottom-0 left-0 z-[60] rounded-t-[32px] bg-white p-6 pb-12 shadow-2xl lg:hidden"
+			class="fixed right-0 bottom-0 left-0 z-60 rounded-t-[32px] bg-white p-6 pb-12 shadow-2xl lg:hidden"
 			transition:fly={{ y: 300, duration: 300, opacity: 1 }}
 		>
 			<div class="mb-6 flex items-center justify-between">
@@ -53,6 +55,8 @@
 					<X size={20} />
 				</button>
 			</div>
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div class="flex flex-col gap-3" onclick={closeMenu}>
 				{@render children()}
 			</div>

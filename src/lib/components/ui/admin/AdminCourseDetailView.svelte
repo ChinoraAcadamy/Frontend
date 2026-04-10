@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { ChevronLeft, Info, Layout, ListChecks, Users, BarChart3, Settings, ChevronDown, ChevronRight } from 'lucide-svelte';
-	import { fade, fly, slide } from 'svelte/transition';
+	import { ChevronLeft, Layout, ListChecks, Users, BarChart3, Settings, ChevronDown } from 'lucide-svelte';
+	import { fade, slide } from 'svelte/transition';
 	import { resolve } from '$app/paths';
 	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
 

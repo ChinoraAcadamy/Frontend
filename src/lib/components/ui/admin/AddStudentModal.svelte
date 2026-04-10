@@ -52,7 +52,7 @@
 		transition:fade={{ duration: 200 }}
 	>
 		<div
-			class="flex max-h-[95vh] w-full max-w-2xl flex-col rounded-[2rem] bg-white shadow-2xl sm:max-h-[90vh]"
+			class="flex max-h-[95vh] w-full max-w-2xl flex-col rounded-4xl bg-white shadow-2xl sm:max-h-[90vh]"
 			transition:fly={{ y: 50, duration: 300, opacity: 0 }}
 		>
 			<div class="flex shrink-0 items-center justify-between border-b border-slate-100 p-5 sm:p-6">
@@ -214,8 +214,9 @@
 									<div class="space-y-1">
 										{#each filteredCourses as course (course.id)}
 											{@const isSelected = selectedCourseIds.includes(course.id)}
-											<div
-												class="flex cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all
+											<button
+												type="button"
+												class="flex w-full cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all text-left
                                                     {isSelected
 													? 'border-[#ed4b72] bg-[#ed4b72]/5'
 													: 'border-transparent hover:bg-slate-50'}"
@@ -240,7 +241,7 @@
 														</p>
 													</div>
 												</div>
-											</div>
+											</button>
 										{/each}
 									</div>
 								</div>
@@ -276,7 +277,7 @@
 				</div>
 
 				<div
-					class="flex shrink-0 flex-col-reverse justify-end gap-3 rounded-b-[2rem] border-t border-slate-100 bg-slate-50/80 p-5 sm:flex-row sm:p-6"
+					class="flex shrink-0 flex-col-reverse justify-end gap-3 rounded-b-4xl border-t border-slate-100 bg-slate-50/80 p-5 sm:flex-row sm:p-6"
 				>
 					<button
 						type="button"
