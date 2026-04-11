@@ -11,9 +11,9 @@
     let modulePk = $state(data.moduleId);
 
     $effect(() => {
-        if (form.success) {
+        if (form?.success) {
             toast.success("Topshiriq muvaffaqiyatli qo'shildi!");
-            goto(resolve(`/admin/courses/${$page.params.course_id}/lesson/${$page.params.lesson_id}`));
+            goto(resolve(`/admin/courses/${$page.params.course_id}/lesson/${$page.params.lesson_id}?module_id=${modulePk}`));
         } else if (form?.error) {
             toast.error(form.error);
         }

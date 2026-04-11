@@ -16,40 +16,50 @@ export const actions = {
 
         const formData = await request.formData();
         const moduleId = formData.get('module_pk');
+        const type = formData.get('type')?.toString().toLowerCase() || 'file';
 
-        const payload = {
-            title_uz: formData.get('title_uz'),
-            title_ru: formData.get('title_ru'),
-            description_uz: formData.get('description_uz') || '',
-            description_ru: formData.get('description_ru') || '',
-            type: formData.get('type').toString().toLowerCase() || 'file',  // The enum from UI
-            max_attempts: Number(formData.get('max_attempts')) || 1
-        };
+        // Prepare FormData for the backend API to support file uploads
+        const apiFormData = new FormData();
+        apiFormData.append('title_uz', formData.get('title_uz') || '');
+        apiFormData.append('title_ru', formData.get('title_ru') || '');
+        apiFormData.append('description_uz', formData.get('description_uz') || '');
+        apiFormData.append('description_ru', formData.get('description_ru') || '');
+        apiFormData.append('type', type);
+        apiFormData.append('max_attempts', formData.get('max_attempts') || '1');
 
-        const headers = {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        };
+        // Add dynamic content based on type
+        if (type === 'file') {
+            const file = formData.get('file');
+            if (file && file instanceof File && file.size > 0) {
+                apiFormData.append('file', file);
+            }
+        } else if (type === 'text') {
+            apiFormData.append('content_text', formData.get('content_text') || '');
+        } else if (type === 'link') {
+            apiFormData.append('content_link', formData.get('content_link') || '');
+        }
 
         try {
             const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/lessons/${params.lesson_id}/assignments/`, {
                 method: 'POST',
-                headers,
-                body: JSON.stringify(payload)
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                    // Do NOT set Content-Type, fetch will set it with the correct boundary for FormData
+                },
+                body: apiFormData
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Server javobi:', errorText);
-                return fail(400, { error: "Topshiriqni saqlashda xatolik yuz berdi." });
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Server error response:', errorData);
+                const errorMessage = errorData.detail || Object.values(errorData).flat().join(' ') || "Topshiriqni saqlashda xatolik yuz berdi.";
+                return fail(400, { error: errorMessage });
             }
 
-            // await response.json();
+            return { success: true };
         } catch (err) {
-            console.error(err);
-            return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });
+            console.error('Fetch error:', err);
+            return fail(500, { error: "Server bilan ulanishda xatolik yuz berdi." });
         }
-
-        return { success: true };
     },
 };
