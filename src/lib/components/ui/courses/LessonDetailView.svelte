@@ -5,47 +5,58 @@
 	import { fade, slide } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { resolve } from '$app/paths';
 	import 'plyr/dist/plyr.css';
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {any} lesson
-	 */
+	let { lesson, nextLesson = null } = $props();
 
-	/** @type {Props} */
-	let { lesson } = $props();
-	// console.log(lesson);
-	// State'lar
+	// --- Helpers ---
+	const getProxiedUrl = (url) =>
+		url?.startsWith('http') ? `/api/video?url=${encodeURIComponent(url)}` : url || '';
+
+	const getProgressKey = (id) => `chinora_video_progress_${id}`;
+
+	// --- Derived State ---
+	const userIdent = $derived(
+		$page.data.user?.username || $page.data.user?.phone_number || 'Chinora Student'
+	);
+
+	const videoSources = $derived(() => {
+		if (lesson.video_qualities?.length > 0) {
+			return lesson.video_qualities.map((q) => ({
+				src: getProxiedUrl(q.url),
+				type: 'video/mp4',
+				size: q.size
+			}));
+		}
+		return [{ src: getProxiedUrl(lesson.video_url), type: 'video/mp4', size: 720 }];
+	});
+
+	// --- Video Player State ---
+	let videoElement = $state(null);
+	let player = $state(null);
+
+	// --- Security & UI State ---
+	let watermarkPos = $state({ top: 10, left: 10 });
+	let showWatermark = $state(true);
+	let watermarkInterval = $state(null);
+
+	// --- Assignment & Progress State ---
 	let selectedFile = $state(null);
 	let isDragging = $state(false);
 	let isSubmitting = $state(false);
 	let isSubmittingComplete = $state(false);
 
-	// Video player state
-	/** @type {HTMLVideoElement} */
-	let videoElement = $state(null);
-	/** @type {any} */
-	let player = $state(null);
-
-	// Security & UX State
-	let watermarkPos = $state({ top: 10, left: 10 });
-	let showWatermark = $state(true);
-	let watermarkInterval = $state(null);
-
-	import { page } from '$app/stores';
-	console.log($page.data);
-	const userIdent = $derived(
-		$page.data.user?.username || $page.data.user?.phone_number || 'Chinora Student'
-	);
-
+	// --- Security Handlers ---
 	function handleKeydown(e) {
-		// F12 (123), Ctrl+Shift+I (73), Ctrl+Shift+J (74), Ctrl+U (85), PrintScreen (44)
+		const forbidden = [123, 44]; // F12, PrintScreen
+		const ctrlCombinations = [73, 74, 85, 83]; // I, J, U, S
 		if (
-			e.keyCode === 123 ||
-			(e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
-			(e.ctrlKey && e.keyCode === 85) ||
-			(e.ctrlKey && e.keyCode === 83) ||
-			e.keyCode === 44
+			forbidden.includes(e.keyCode) ||
+			(e.ctrlKey && e.shiftKey && ctrlCombinations.slice(0, 2).includes(e.keyCode)) ||
+			(e.ctrlKey && ctrlCombinations.slice(2).includes(e.keyCode))
 		) {
 			e.preventDefault();
 			if (e.keyCode === 44) toast.error('Screenshot taqiqlangan!');
@@ -53,55 +64,32 @@
 		}
 	}
 
-	// Orientation handler for mobile auto-fullscreen
 	function handleOrientation() {
-		if (!player) return;
-		const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-		if (!isMobile) return;
-
-		const isLandscape = window.innerHeight < window.innerWidth;
-
-		if (isLandscape && !player.fullscreen.active) {
-			const enterPromise = player.fullscreen.enter();
-			if (enterPromise && typeof enterPromise.catch === 'function') {
-				enterPromise.catch(() => {
-					// Silent fail: browser blocked automatic fullscreen without user gesture
-					console.log('Browser blocked auto-fullscreen (User gesture required)');
-				});
-			}
-		} else if (!isLandscape && player.fullscreen.active) {
-			// player.fullscreen.exit();
+		if (!player || !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
+		if (window.innerHeight < window.innerWidth && !player.fullscreen.active) {
+			player.fullscreen.enter()?.catch?.(() => {});
 		}
 	}
 
-	// Tab visibility handler
 	function handleVisibility() {
-		if (document.hidden && player && player.playing) {
-			player.pause();
-		}
+		if (document.hidden && player?.playing) player.pause();
 	}
 
-	// Watermark mover
 	function moveWatermark() {
-		const top = Math.random() * 80 + 5; // 5% to 85%
-		const left = Math.random() * 80 + 5;
-		watermarkPos = { top, left };
+		watermarkPos = { top: Math.random() * 80 + 5, left: Math.random() * 80 + 5 };
 		showWatermark = false;
 		setTimeout(() => (showWatermark = true), 100);
 	}
 
+	// --- Lifecycle & Effects ---
 	onMount(async () => {
-		// Bloklash funksiyalari
 		document.addEventListener('keydown', handleKeydown);
 		document.addEventListener('visibilitychange', handleVisibility);
 		window.addEventListener('blur', () => player?.pause());
 		window.addEventListener('resize', handleOrientation);
 		window.addEventListener('orientationchange', handleOrientation);
-
-		// Watermark interval
 		watermarkInterval = setInterval(moveWatermark, 10000);
 
-		// Plyr initsializatsiya
 		if (videoElement) {
 			const Plyr = (await import('plyr')).default;
 			player = new Plyr(videoElement, {
@@ -118,48 +106,43 @@
 					'airplay',
 					'fullscreen'
 				],
-				settings:
-					lesson.video_qualities && lesson.video_qualities.length > 0
-						? ['quality', 'speed']
-						: ['speed'],
+				settings: lesson.video_qualities?.length > 0 ? ['quality', 'speed'] : ['speed'],
 				quality: {
 					default: 720,
 					options:
-						lesson.video_qualities && lesson.video_qualities.length > 0
-							? lesson.video_qualities.map((q) => q.size)
-							: [720],
-					forced: true,
-					onChange: (q) => console.log('Quality changed:', q)
+						lesson.video_qualities?.length > 0 ? lesson.video_qualities.map((q) => q.size) : [720],
+					forced: true
 				},
 				captions: { active: true, update: true, language: 'uz' },
 				speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] },
-				disableContextMenu: true,
-				hideControls: true,
 				keyboard: { focused: false, global: false }
 			});
-
-			// CSS orqali brend rangini majburiy o'rnatamiz
 			document.documentElement.style.setProperty('--plyr-color-main', '#ed4b72');
+		}
+	});
 
-			if (lesson?.id) {
-				const storageKey = `chinora_video_progress_${lesson.id}`;
+	$effect(() => {
+		if (player && lesson.id) {
+			player.source = {
+				type: 'video',
+				title: lesson.title,
+				sources: videoSources(),
+				poster: lesson.image
+			};
 
-				// Yuklash (resume)
+			const storageKey = getProgressKey(lesson.id);
+			const saved = localStorage.getItem(storageKey);
+			if (saved && !isNaN(Number(saved))) {
 				player.once('canplay', () => {
-					const savedProgress = localStorage.getItem(storageKey);
-					if (savedProgress && !isNaN(Number(savedProgress))) {
-						player.currentTime = parseFloat(savedProgress);
-					}
-					handleOrientation(); // Initial check
-				});
-
-				// Saqlash
-				player.on('timeupdate', () => {
-					if (player.currentTime > 0 && player.duration > 0) {
-						localStorage.setItem(storageKey, player.currentTime.toString());
-					}
+					player.currentTime = parseFloat(saved);
 				});
 			}
+
+			player.on('timeupdate', () => {
+				if (player.currentTime > 0 && player.duration > 0) {
+					localStorage.setItem(storageKey, player.currentTime.toString());
+				}
+			});
 		}
 	});
 
@@ -172,78 +155,62 @@
 			window.removeEventListener('orientationchange', handleOrientation);
 		}
 		if (watermarkInterval) clearInterval(watermarkInterval);
-		if (player) {
-			player.destroy();
-		}
+		player?.destroy();
 	});
 
-	// Darsni yakunlash
+	// --- Actions ---
 	async function markComplete() {
-		if (!lesson || !lesson.id) return;
+		if (!lesson?.id) return;
 		isSubmittingComplete = true;
-
-		const watched_seconds = player ? Math.floor(player.currentTime) : 0;
-
 		try {
 			const res = await fetch('/api/progress/complete', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ lesson_id: lesson.id, watched_seconds })
+				body: JSON.stringify({
+					lesson_id: lesson.id,
+					watched_seconds: Math.floor(player?.currentTime || 0)
+				})
 			});
-			if (!res.ok) {
-				console.log(await res.json());
-				throw new Error('Xatolik yuz berdi');
-			}
+			if (!res.ok) throw new Error('Xatolik');
 			toast.success('Dars muvaffaqiyatli yakunlandi!');
-			// Agar muvaffaqiyatli bo'lsa, dars saqlangan progressini faqatgina o'chirish / o'chirmaslikni hal qilish
-			// localStorage.removeItem(`chinora_video_progress_${lesson.id}`);
+			if (nextLesson) {
+				setTimeout(() => {
+					const url = `/kurslarim/${$page.params.id}/lessons/${nextLesson.id}?module_id=${nextLesson.moduleId || $page.url.searchParams.get('module_id')}`;
+					/** @type {any} */
+					const route = url;
+					goto(resolve(route));
+				}, 1000);
+			}
 		} catch (e) {
-			console.error(e);
-			toast.error('Darsni yakunlashda xatolik yuz berdi.');
+			toast.error(`Xatolik yuz berdi: ${e}`);
 		} finally {
 			isSubmittingComplete = false;
 		}
 	}
 
-	// Fayl yuklash mantig'i
-	/** @param {DragEvent} e */
-	function handleFileDrop(e) {
+	const handleFileSelect = (e) => {
+		selectedFile = e.target.files?.[0] || null;
+	};
+	const handleFileDrop = (e) => {
 		e.preventDefault();
 		isDragging = false;
-		if (e.dataTransfer?.files?.length) {
-			// @ts-ignore
-			selectedFile = e.dataTransfer.files[0];
-		}
-	}
-
-	/** @param {Event} e */
-	function handleFileSelect(e) {
-		const input = /** @type {HTMLInputElement} */ (e.target);
-		if (input.files?.length) {
-			// @ts-ignore
-			selectedFile = input.files[0];
-		}
-	}
-
-	/** @param {DragEvent} e */
-	function handleDragOver(e) {
+		selectedFile = e.dataTransfer.files?.[0] || null;
+	};
+	const handleDragOver = (e) => {
 		e.preventDefault();
 		isDragging = true;
-	}
-
-	function handleDragLeave() {
+	};
+	const handleDragLeave = () => {
 		isDragging = false;
-	}
-
-	// Topshiriqni yuborish
-	function submitAssignment() {
+	};
+	const submitAssignment = () => {
 		isSubmitting = true;
 		return async ({ update }) => {
 			isSubmitting = false;
-			selectedFile = null; // Muvaffaqiyatli bo'lsa tozalaymiz
+			selectedFile = null;
 			await update();
 		};
-	}
+	};
 </script>
 
 <svelte:window on:contextmenu={(e) => e.preventDefault()} />
@@ -279,23 +246,9 @@
 						playsinline
 						crossorigin="anonymous"
 					>
-						{#if lesson.video_qualities && lesson.video_qualities.length > 0}
-							{#each lesson.video_qualities as q (q)}
-								<source
-									src={q.url.startsWith('http')
-										? `/api/video?url=${encodeURIComponent(q.url)}`
-										: q.url}
-									type="video/mp4"
-									{...{ size: q.size }}
-								/>
-							{/each}
-						{:else}
-							<source
-								src={`/api/video?url=${encodeURIComponent(lesson.video_url)}`}
-								type="video/mp4"
-								{...{ size: 720 }}
-							/>
-						{/if}
+						{#each videoSources() as source (source)}
+							<source src={source.src} type={source.type} {...{ size: source.size }} />
+						{/each}
 
 						{#if lesson.subtitle_url}
 							<track
@@ -329,20 +282,22 @@
 			</div>
 
 			<!-- Student only or both? Both can mark as complete but admin doesn't need to -->
-			<button
-				onclick={markComplete}
-				disabled={isSubmittingComplete}
-				class="flex w-full transform items-center justify-center gap-2 rounded-xl bg-[#FA2E69] px-6 py-4 font-semibold text-white shadow-[0_8px_20px_-6px_rgba(250,46,105,0.4)] transition-all duration-300 hover:bg-[#D81B53] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
-			>
-				{#if isSubmittingComplete}
-					<span
-						class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-					></span>
-					<span>Yuborilmoqda...</span>
-				{:else}
-					<span>Darsni yakunlash (Mark as complete)</span>
-				{/if}
-			</button>
+			{#if $page.data.user?.role !== 'admin' && $page.data.user?.role !== 'superadmin'}
+				<button
+					onclick={markComplete}
+					disabled={isSubmittingComplete}
+					class="flex w-full transform items-center justify-center gap-2 rounded-xl bg-[#FA2E69] px-6 py-4 font-semibold text-white shadow-[0_8px_20px_-6px_rgba(250,46,105,0.4)] transition-all duration-300 hover:bg-[#D81B53] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+				>
+					{#if isSubmittingComplete}
+						<span
+							class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+						></span>
+						<span>Yuborilmoqda...</span>
+					{:else}
+						<span>Darsni yakunlash</span>
+					{/if}
+				</button>
+			{/if}
 
 			<div class="pt-2">
 				<span class="mb-1 block text-xs font-bold tracking-wider text-slate-400 uppercase"

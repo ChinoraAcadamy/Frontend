@@ -8,4 +8,4 @@
     <title>{data.lesson.title}</title>
 </svelte:head>
 
-<LessonDetailView lesson={data.lesson} />
+<LessonDetailView lesson={data.lesson} nextLesson={data.nextLesson} />

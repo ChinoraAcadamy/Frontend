@@ -19,29 +19,41 @@ export async function load({ params, cookies, url }) {
         if (!res.ok) throw error(res.status, 'Dars topilmadi');
         const lessonData = await res.json();
 
+        // Keyingi darsni aniqlash uchun kurs strukturasini yuklaymiz
+        let nextLesson = null;
+        try {
+            const courseRes = await fetch(`${API_URL}/courses/${params.id}/`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (courseRes.ok) {
+                const courseData = await courseRes.json();
+                const modules = courseData.modules || [];
+                
+                // Barcha darslarni bitta tekis ro'yxatga yig'amiz
+                const allLessons = [];
+                modules.forEach(m => {
+                    if (m.lessons) {
+                        m.lessons.forEach(l => {
+                            allLessons.push({ ...l, moduleId: m.id });
+                        });
+                    }
+                });
 
-        // Hozir API spec yo'qligi sababli, mock obyekt ishlatamiz.
-        // const lessonData = {
-        //     id: params.lesson_id || "123",
-        //     title: "Yangi dars",
-        //     description: "Ushbu darsda SvelteKit va zamonaviy interfeyslar yaratishni o'rganamiz.",
-        //     video_url: "https://www.w3schools.com/html/mov_bbb.mp4",
-        //     image: "https://images.unsplash.com/photo-1607706189992-eae578626c86?q=80&w=1000&auto=format&fit=crop",
-        //     duration: 15,
-        //     order_index: 1,
-        //     created_at: "2026-03-28T10:00:00Z",
-        //     assignments: [
-        //         {
-        //             id: 1,
-        //             title: "Birinchi vazifa: Fayl yuklash",
-        //             max_attempts: 3,
-        //             submissions: []
-        //         }
-        //     ]
-        // };
+                // Joriy darsning indeksini topamiz
+                const currentIndex = allLessons.findIndex(l => l.id.toString() === params.lesson_id.toString());
+                
+                // Agar keyingi dars bo'lsa, uni saqlaymiz
+                if (currentIndex !== -1 && currentIndex < allLessons.length - 1) {
+                    nextLesson = allLessons[currentIndex + 1];
+                }
+            }
+        } catch (err) {
+            console.error("Keyingi darsni aniqlashda xatolik:", err);
+        }
 
         return {
             lesson: lessonData,
+            nextLesson,
             breadcrumbs: {
                 course: "Mening kursim",
                 lesson: lessonData.title

@@ -30,13 +30,14 @@ export async function POST({ request, cookies }) {
             body: JSON.stringify({ watched_seconds: watched_seconds || 0 })
         });
 
-        if (!response.ok) {
-            throw error(response.status, await response.json());
-        }
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({}));
+			throw error(response.status, errorData.message || errorData.detail || 'Backend error');
+		}
 
-        return json({ success: true });
-    } catch (err) {
-        console.error('Error completing lesson:', err.body.detail);
-        throw error(500, err.body.detail || 'Server xatoligi');
-    }
+		return json({ success: true });
+	} catch (err) {
+		console.error('Error completing lesson:', err);
+		throw error(err.status || 500, err.body?.message || err.body?.detail || 'Server xatoligi');
+	}
 }
