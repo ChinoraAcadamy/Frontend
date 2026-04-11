@@ -14,7 +14,7 @@
 
 	/** @type {Props} */
 	let { lesson } = $props();
-
+	// console.log(lesson);
 	// State'lar
 	let selectedFile = $state(null);
 	let isDragging = $state(false);
@@ -27,23 +27,79 @@
 	/** @type {any} */
 	let player = $state(null);
 
-	// Xavfsizlik qoidalari
+	// Security & UX State
+	let watermarkPos = $state({ top: 10, left: 10 });
+	let showWatermark = $state(true);
+	let watermarkInterval = $state(null);
+
+	import { page } from '$app/stores';
+	console.log($page.data);
+	const userIdent = $derived(
+		$page.data.user?.username || $page.data.user?.phone_number || 'Chinora Student'
+	);
+
 	function handleKeydown(e) {
-		// F12 (123), Ctrl+Shift+I (73), Ctrl+Shift+J (74), Ctrl+U (85)
+		// F12 (123), Ctrl+Shift+I (73), Ctrl+Shift+J (74), Ctrl+U (85), PrintScreen (44)
 		if (
 			e.keyCode === 123 ||
 			(e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
 			(e.ctrlKey && e.keyCode === 85) ||
-			(e.ctrlKey && e.keyCode === 83) // Ctrl+S (Save page)
+			(e.ctrlKey && e.keyCode === 83) ||
+			e.keyCode === 44
 		) {
 			e.preventDefault();
+			if (e.keyCode === 44) toast.error('Screenshot taqiqlangan!');
 			return false;
 		}
+	}
+
+	// Orientation handler for mobile auto-fullscreen
+	function handleOrientation() {
+		if (!player) return;
+		const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+		if (!isMobile) return;
+
+		const isLandscape = window.innerHeight < window.innerWidth;
+
+		if (isLandscape && !player.fullscreen.active) {
+			const enterPromise = player.fullscreen.enter();
+			if (enterPromise && typeof enterPromise.catch === 'function') {
+				enterPromise.catch(() => {
+					// Silent fail: browser blocked automatic fullscreen without user gesture
+					console.log('Browser blocked auto-fullscreen (User gesture required)');
+				});
+			}
+		} else if (!isLandscape && player.fullscreen.active) {
+			// player.fullscreen.exit();
+		}
+	}
+
+	// Tab visibility handler
+	function handleVisibility() {
+		if (document.hidden && player && player.playing) {
+			player.pause();
+		}
+	}
+
+	// Watermark mover
+	function moveWatermark() {
+		const top = Math.random() * 80 + 5; // 5% to 85%
+		const left = Math.random() * 80 + 5;
+		watermarkPos = { top, left };
+		showWatermark = false;
+		setTimeout(() => (showWatermark = true), 100);
 	}
 
 	onMount(async () => {
 		// Bloklash funksiyalari
 		document.addEventListener('keydown', handleKeydown);
+		document.addEventListener('visibilitychange', handleVisibility);
+		window.addEventListener('blur', () => player?.pause());
+		window.addEventListener('resize', handleOrientation);
+		window.addEventListener('orientationchange', handleOrientation);
+
+		// Watermark interval
+		watermarkInterval = setInterval(moveWatermark, 10000);
 
 		// Plyr initsializatsiya
 		if (videoElement) {
@@ -56,12 +112,34 @@
 					'current-time',
 					'mute',
 					'volume',
+					'captions',
+					'settings',
+					'pip',
+					'airplay',
 					'fullscreen'
 				],
-				disableContextMenu: true, // Custom menyuni olib tashlash
+				settings:
+					lesson.video_qualities && lesson.video_qualities.length > 0
+						? ['quality', 'speed']
+						: ['speed'],
+				quality: {
+					default: 720,
+					options:
+						lesson.video_qualities && lesson.video_qualities.length > 0
+							? lesson.video_qualities.map((q) => q.size)
+							: [720],
+					forced: true,
+					onChange: (q) => console.log('Quality changed:', q)
+				},
+				captions: { active: true, update: true, language: 'uz' },
+				speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] },
+				disableContextMenu: true,
 				hideControls: true,
-				keyboard: { focused: false, global: false } // Klaviaturadan videoni "otish" xavfi
+				keyboard: { focused: false, global: false }
 			});
+
+			// CSS orqali brend rangini majburiy o'rnatamiz
+			document.documentElement.style.setProperty('--plyr-color-main', '#ed4b72');
 
 			if (lesson?.id) {
 				const storageKey = `chinora_video_progress_${lesson.id}`;
@@ -72,6 +150,7 @@
 					if (savedProgress && !isNaN(Number(savedProgress))) {
 						player.currentTime = parseFloat(savedProgress);
 					}
+					handleOrientation(); // Initial check
 				});
 
 				// Saqlash
@@ -87,7 +166,12 @@
 	onDestroy(() => {
 		if (typeof document !== 'undefined') {
 			document.removeEventListener('keydown', handleKeydown);
+			document.removeEventListener('visibilitychange', handleVisibility);
+			window.removeEventListener('blur', () => player?.pause());
+			window.removeEventListener('resize', handleOrientation);
+			window.removeEventListener('orientationchange', handleOrientation);
 		}
+		if (watermarkInterval) clearInterval(watermarkInterval);
 		if (player) {
 			player.destroy();
 		}
@@ -173,36 +257,74 @@
 		<div class="space-y-6">
 			<div class="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
 				<div
-					class="group relative aspect-video overflow-hidden rounded-xl bg-slate-900"
-					style="--plyr-color-main: #ed4b72;"
+					class="group relative aspect-video w-full overflow-hidden rounded-xl bg-slate-900 shadow-2xl transition-all duration-500"
 				>
-					<!-- Svelte ignore removed -> no warn needed now that plyr takes over or we just provide track -->
+					{#if !player}
+						<div
+							class="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
+							transition:fade
+						>
+							<div
+								class="h-10 w-10 animate-spin rounded-full border-4 border-[#ed4b72] border-t-transparent"
+							></div>
+						</div>
+					{/if}
+
 					<video
 						bind:this={videoElement}
-						class="plyr-video h-full w-full object-cover"
+						class="plyr-video h-full w-full opacity-0 transition-opacity duration-300 {player
+							? 'opacity-100'
+							: ''}"
 						poster={lesson.image}
-						controlsList="nodownload noplaybackrate"
-						disablePictureInPicture
-						oncontextmenu={(e) => e.preventDefault()}
-						ondragstart={(e) => e.preventDefault()}
+						playsinline
 						crossorigin="anonymous"
 					>
-						<!-- Agar lesson.video_url bo'lsa uni proxy orgali o'tkazamiz, yo'qsa shunchaki ko'rsatamiz -->
-						<source
-							src={`/api/video?url=${encodeURIComponent(lesson.video_url)}`}
-							type="video/mp4"
-						/>
-						<!-- Accessibility uchun empty track -->
-						<track kind="captions" />
+						{#if lesson.video_qualities && lesson.video_qualities.length > 0}
+							{#each lesson.video_qualities as q (q)}
+								<source
+									src={q.url.startsWith('http')
+										? `/api/video?url=${encodeURIComponent(q.url)}`
+										: q.url}
+									type="video/mp4"
+									{...{ size: q.size }}
+								/>
+							{/each}
+						{:else}
+							<source
+								src={`/api/video?url=${encodeURIComponent(lesson.video_url)}`}
+								type="video/mp4"
+								{...{ size: 720 }}
+							/>
+						{/if}
+
+						{#if lesson.subtitle_url}
+							<track
+								kind="captions"
+								label="O'zbekcha"
+								srclang="uz"
+								src={lesson.subtitle_url}
+								default
+							/>
+						{/if}
 						Brauzeringiz videoni qo'llab-quvvatlamaydi.
 					</video>
 
-					<!-- Qo'shimcha xavfsizlik: Videoning aniq ustidagi ko'rinmas qatlam (faqat plyr blocklaridan tashqari) -->
+					<!-- Qo'shimcha xavfsizlik: Videoning aniq ustidagi ko'rinmas qatlam -->
 					<div
 						role="application"
 						class="pointer-events-none absolute inset-0 z-5"
 						oncontextmenu={(e) => e.preventDefault()}
 					></div>
+
+					<!-- Watermark -->
+					{#if showWatermark}
+						<div
+							class="pointer-events-none absolute z-10 text-[10px] font-bold text-white/20 transition-all duration-1000 select-none"
+							style="top: {watermarkPos.top}%; left: {watermarkPos.left}%;"
+						>
+							{userIdent}
+						</div>
+					{/if}
 				</div>
 			</div>
 
@@ -354,3 +476,42 @@
 		{/if}
 	</div>
 </div>
+
+<style>
+	/* Plyr Custom Styles */
+	:global(.plyr) {
+		--plyr-color-main: #ed4b72;
+		--plyr-video-background: #0f172a;
+		--plyr-font-family: inherit;
+		height: 100% !important;
+		width: 100% !important;
+		border-radius: 12px;
+	}
+
+	:global(.plyr--full-ui.plyr--video .plyr__control--overlaid) {
+		background: rgba(237, 75, 114, 0.9);
+		padding: 24px;
+	}
+
+	:global(.plyr--video .plyr__controls) {
+		background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
+		padding: 20px 15px 10px;
+	}
+
+	:global(.plyr__settings__menu) {
+		border-radius: 12px;
+		overflow: hidden;
+		background: rgba(15, 23, 42, 0.95);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	}
+
+	:global(.plyr__settings__menu [role='menuitem']:hover) {
+		background: rgba(237, 75, 114, 0.2);
+	}
+
+	/* Prevent native controls */
+	video::-webkit-media-controls-enclosure {
+		display: none !important;
+	}
+</style>
