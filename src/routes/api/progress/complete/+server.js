@@ -31,14 +31,12 @@ export async function POST({ request, cookies }) {
         });
 
         if (!response.ok) {
-            throw error(response.status, 'Xatolik yuz berdi');
+            throw error(response.status, await response.json());
         }
-
-        console.log(await response.json())
 
         return json({ success: true });
     } catch (err) {
-        console.error('Error completing lesson:', err);
-        throw error(500, 'Server xatoligi');
+        console.error('Error completing lesson:', err.body.detail);
+        throw error(500, err.body.detail || 'Server xatoligi');
     }
 }

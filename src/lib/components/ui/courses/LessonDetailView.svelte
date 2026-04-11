@@ -107,6 +107,7 @@
 				body: JSON.stringify({ lesson_id: lesson.id, watched_seconds })
 			});
 			if (!res.ok) {
+				console.log(await res.json());
 				throw new Error('Xatolik yuz berdi');
 			}
 			toast.success('Dars muvaffaqiyatli yakunlandi!');

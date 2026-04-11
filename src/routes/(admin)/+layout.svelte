@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Sidebar from '$lib/components/layout/admin/Sidebar.svelte';
 	import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
-	import { LayoutDashboard, Users, BookOpen, FileText, Settings } from 'lucide-svelte';
+	import { LayoutDashboard, Users, BookOpen, FileText, Settings, ShieldCheck } from 'lucide-svelte';
 
 	let { data, children } = $props();
 	let collapsed = $state(false);
@@ -19,6 +19,7 @@
 	const adminNavItems = [
 		{ href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
 		{ href: '/admin/students', label: 'Talabalar', icon: Users, exact: false },
+		{ href: '/admin/admins/create', label: 'Adminlar', icon: ShieldCheck, exact: false },
 		{ href: '/admin/courses', label: 'Kurslar', icon: BookOpen, exact: false },
 		{ href: '/admin/submissions', label: 'Arizalar', icon: FileText, exact: false },
 		{ href: '/admin/profile', label: 'Sozlamalar', icon: Settings, exact: false }
