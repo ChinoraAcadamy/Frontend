@@ -6,7 +6,6 @@
 	import { Search, BookOpen } from 'lucide-svelte';
 
 	let { data } = $props();
-	console.log(data);
 	let courses = $derived(data.courses || []);
 
 	// svelte-ignore state_referenced_locally
@@ -117,8 +116,6 @@
 					class="animate-in fade-in slide-in-from-bottom-4 duration-500"
 					style="animation-fill-mode: backwards;"
 				>
-					{console.log(course)}
-
 					<CourseGridCard
 						id={course.id}
 						title={course.title}

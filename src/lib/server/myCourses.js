@@ -1,7 +1,7 @@
 import { API_URL } from '$env/static/private';
 import { enrichCoursesList } from './courseService.js';
 
-export async function getMyCourses({ cookies, url, fetch }) {
+export async function getMyCourses({ cookies, url, fetch = globalThis.fetch }) {
     const accessToken = cookies.get('access_token');
 
     const search = url.searchParams.get('search') || '';
@@ -33,8 +33,9 @@ export async function getMyCourses({ cookies, url, fetch }) {
         const data = await res.json();
         let courses = data.results || [];
 
-        // Har bir kurs uchun progressni parallel ravishda (batch) yuklaymiz
-        courses = await enrichCoursesList(fetch, accessToken, courses);
+        // Progressni parallel yuklaymiz. 
+        // MUHIM: SvelteKit warning bermasligi uchun background qismida global fetch ishlatamiz.
+        courses = await enrichCoursesList(accessToken, courses, globalThis.fetch);
 
         return {
             courses,

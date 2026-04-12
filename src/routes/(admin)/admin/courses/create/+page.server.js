@@ -41,9 +41,7 @@ export const actions = {
             }
 
             const result = await response.json();
-            resultId = result.id; // Yaratilgan kurs ID sini olamiz
-            console.log(result)
-            
+            resultId = result.id; // Yaratilgan kurs ID sini olamiz            
         } catch (err) {
             console.error(err);
             return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });

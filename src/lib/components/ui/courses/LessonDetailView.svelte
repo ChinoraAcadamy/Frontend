@@ -271,9 +271,18 @@
 	};
 	const submitAssignment = () => {
 		isSubmitting = true;
-		return async ({ update }) => {
+		return async ({ result, update }) => {
 			isSubmitting = false;
-			selectedFile = null;
+			if (result.type === 'success') {
+				toast.success('Topshiriq muvaffaqiyatli yuborildi!');
+				selectedFile = null;
+				// Formani tozalash
+				const form = document.querySelector('form[action="?/uploadAssignment"]');
+				if (form) /** @type {HTMLFormElement} */ (form).reset();
+			} else if (result.type === 'failure' || (result.type === 'data' && result.data?.error)) {
+				const errorMsg = result.data?.error || 'Xatolik yuz berdi';
+				toast.error(errorMsg);
+			}
 			await update();
 		};
 	};
@@ -365,7 +374,6 @@
 		</div>
 
 		{#if lesson.assignments && lesson.assignments.length > 0}
-			{console.log(lesson.assignments)}
 			<div
 				class="sticky top-6 h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_4px_24px_rgba(0,0,0,0.02)]"
 			>
@@ -383,7 +391,10 @@
 					action="?/uploadAssignment"
 					use:enhance={submitAssignment}
 					enctype="multipart/form-data"
+					class="space-y-4"
 				>
+					<input type="hidden" name="assignment" value={lesson.assignments[0].id} />
+
 					<label
 						class="group relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 transition-all duration-200
                         {isDragging
@@ -422,10 +433,23 @@
 						{/if}
 					</label>
 
+					<div class="space-y-2">
+						<label for="text_answer" class="text-sm font-semibold text-slate-700"
+							>Qo'shimcha izoh (ixtiyoriy)</label
+						>
+						<textarea
+							id="text_answer"
+							name="text_answer"
+							rows="3"
+							placeholder="Topshiriq yuzasidan izoh qoldiring..."
+							class="w-full rounded-xl border border-slate-200 p-3 text-sm transition-all outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
+						></textarea>
+					</div>
+
 					<button
 						type="submit"
 						disabled={!selectedFile || isSubmitting}
-						class="mt-4 w-full rounded-[12px] bg-[#FA2E69] px-6 py-3 font-semibold text-white shadow-[0_6px_16px_-4px_rgba(250,46,105,0.3)] transition-all duration-200 hover:bg-[#D81B53] disabled:cursor-not-allowed disabled:opacity-50"
+						class="w-full rounded-[12px] bg-[#FA2E69] px-6 py-3 font-semibold text-white shadow-[0_6px_16px_-4px_rgba(250,46,105,0.3)] transition-all duration-200 hover:bg-[#D81B53] disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{isSubmitting ? 'Yuborilmoqda...' : 'Yuborish'}
 					</button>
@@ -444,7 +468,9 @@
 									<div class="mb-2 flex items-center justify-between text-[13px]">
 										<div class="flex items-center gap-4">
 											<span class="text-xs font-medium text-slate-800"
-												>{new Date().toLocaleDateString('uz-UZ')}</span
+												>{new Date(sub.submitted_at || Date.now()).toLocaleDateString(
+													'uz-UZ'
+												)}</span
 											>
 										</div>
 										<div class="flex items-center gap-4">

@@ -3,9 +3,6 @@
 	import SubmissionSkeleton from '@/lib/components/ui/submissions/SubmissionSkeleton.svelte';
 
 	let { data } = $props();
-	(async () => {
-		console.log(await data.streamed.submissionsData);
-	})();
 </script>
 
 <div class="mx-auto max-w-275 px-6 pt-8 pb-12 md:px-4 md:py-6 md:pb-10">

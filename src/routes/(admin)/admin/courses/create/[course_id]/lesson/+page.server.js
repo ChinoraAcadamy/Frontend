@@ -28,7 +28,6 @@ export const actions = {
         }
 
         try {
-            console.log("Creating lesson in module:", formData.get('module_pk'));
             const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/${formData.get('module_pk')}/lessons/`, {
                 method: 'POST',
                 headers,
@@ -43,7 +42,6 @@ export const actions = {
             }
 
             const result = await response.json();
-            console.log('Yaratilgan lesson:', result);
 
             return { success: true, lesson: result };
         } catch (err) {

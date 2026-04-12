@@ -2,7 +2,7 @@
 <script lang="ts">
 	import Sidebar from '$lib/components/layout/admin/Sidebar.svelte';
 	import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
-	import { LayoutDashboard, BookOpen, Calendar, GraduationCap, User } from 'lucide-svelte';
+	import { LayoutDashboard, BookOpen, GraduationCap, User } from 'lucide-svelte';
 
 	let { data, children } = $props();
 

@@ -67,11 +67,44 @@ export async function load({ params, cookies, url }) {
 }
 
 export const actions = {
-    uploadAssignment: async () => {
-        // const formData = await request.formData();
-        // const file = formData.get('file');
+    uploadAssignment: async ({ request, cookies, fetch }) => {
+        const token = cookies.get('access_token');
+        const formData = await request.formData();
+        
+        const assignmentId = formData.get('assignment');
+        const file = formData.get('file');
+        const textAnswer = formData.get('text_answer') || '';
 
-        // Bu joyda faylni haqiqiy serveringizga yuborasiz
-        return { success: true };
+        if (!assignmentId) {
+            return { success: false, error: 'Topshiriq ID topilmadi.' };
+        }
+
+        // Backendga formData sifatida yuboramiz
+        const apiFormData = new FormData();
+        apiFormData.append('assignment', assignmentId);
+        if (file) apiFormData.append('file', file);
+        if (textAnswer) apiFormData.append('text_answer', textAnswer);
+
+        try {
+            const res = await fetch(`${API_URL}/progress/submissions/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: apiFormData
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                console.error("[uploadAssignment] API error:", errorData);
+                return { success: false, error: errorData.detail || 'Faylni yuklashda xatolik yuz berdi.' };
+            }
+
+            const result = await res.json();
+            return { success: true, result };
+        } catch (err) {
+            console.error("[uploadAssignment] System error:", err);
+            return { success: false, error: 'Server bilan ulanishda xatolik.' };
+        }
     }
 };

@@ -170,7 +170,6 @@ export const actions = {
             method: 'PATCH',
             headers: HEADERS(accessToken)
         });
-        console.log(await res.json())
 
 
 
@@ -188,7 +187,6 @@ export const actions = {
         const accessToken = cookies.get('access_token');
 
         if (!enrollmentId) return fail(400, { enrollError: "Enrollment ID topilmadi" });
-        console.log(enrollmentId)
 
         const res = await fetch(`${API_URL}/enrollments/${enrollmentId}/unblock/`, {
             method: 'PATCH',

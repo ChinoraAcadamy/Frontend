@@ -21,7 +21,7 @@ export const load = async ({ fetch, params, cookies }) => {
         let course = await res.json();
         
         // Markazlashgan servis orqali progressni biriktiramiz
-        course = await enrichCourseWithProgress(fetch, accessToken, course);
+        course = await enrichCourseWithProgress(accessToken, course, fetch);
 
         return { course, modules: course.modules || [] };
     } catch (err) {
