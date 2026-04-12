@@ -1,23 +1,21 @@
-// src/routes/(app)/dashboard/baholar/+page.server.js
+// src/routes/(admin)/admin/submissions/+page.server.js
 import { API_URL } from '$env/static/private';
 
 export const load = async ({ cookies, fetch, url }) => {
     const accessToken = cookies.get('access_token');
 
-    // URL'dan parametrlarni o'qiymiz
+    // URL parametrlarini o'qish
     const search = url.searchParams.get('search') ?? '';
     const ordering = url.searchParams.get('ordering') ?? '';
     const status = url.searchParams.get('status') ?? 'all';
     const page = url.searchParams.get('page') ?? '1';
 
-    // API uchun parametrlarni tayyorlaymiz
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (ordering) params.set('ordering', ordering);
     if (page) params.set('page', page);
 
-    // Agar status 'all' bo'lmasa, uni ham backendga filter uchun jo'natamiz
-    // Backend qabul qilishiga ishonch hosil qiling (masalan: ?status=pending)
+    // Status filtri
     if (status !== 'all') {
         params.set('status', status);
     }
@@ -28,7 +26,7 @@ export const load = async ({ cookies, fetch, url }) => {
         apiUrl.search = params.toString();
     }
 
-    // Streaming (Lazy Loading) uchun promise ni await qilinmasdan qaytaramiz
+    // Lazy Loading (Streaming) uchun Promise 
     const getSubmissions = async () => {
         try {
             const res = await fetch(apiUrl.toString(), {
@@ -39,7 +37,7 @@ export const load = async ({ cookies, fetch, url }) => {
             });
 
             if (!res.ok) {
-                console.error(`[baholar] Backend error: ${res.status}`, await res.text());
+                console.error(`[admin-submissions] Backend error: ${res.status}`, await res.text());
                 return { results: [], count: 0, next: null, previous: null };
             }
 
@@ -47,13 +45,13 @@ export const load = async ({ cookies, fetch, url }) => {
 
             // Diagnostika uchun loglar (faqat results bo'sh bo'lganda yoki muammo bo'lganda)
             if (!data.results || data.results.length === 0) {
-                console.log(`[baholar] Ma'lumot topilmadi. URL: ${apiUrl.toString()}`);
-                console.log(`[baholar] Javob strukturasi:`, Object.keys(data));
+                console.log(`[admin-submissions] Ma'lumot topilmadi. URL: ${apiUrl.toString()}`);
+                console.log(`[admin-submissions] Javob strukturasi:`, Object.keys(data));
             }
 
             return data;
         } catch (err) {
-            console.error('[baholar] Fetch error:', err);
+            console.error('[admin-submissions] Fetch error:', err);
             return { results: [], count: 0, next: null, previous: null };
         }
     };

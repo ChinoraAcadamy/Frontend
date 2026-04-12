@@ -1,5 +1,5 @@
-// src/lib/server/myCourses.js
 import { API_URL } from '$env/static/private';
+import { enrichCoursesList } from './courseService.js';
 
 export async function getMyCourses({ cookies, url, fetch }) {
     const accessToken = cookies.get('access_token');
@@ -31,9 +31,13 @@ export async function getMyCourses({ cookies, url, fetch }) {
         }
 
         const data = await res.json();
+        let courses = data.results || [];
+
+        // Har bir kurs uchun progressni parallel ravishda (batch) yuklaymiz
+        courses = await enrichCoursesList(fetch, accessToken, courses);
 
         return {
-            courses: data.results || [],
+            courses,
             totalCount: data.count || 0,
             next: data.next,
             previous: data.previous,

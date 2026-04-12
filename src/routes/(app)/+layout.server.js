@@ -1,8 +1,14 @@
 import { API_URL } from '$env/static/private';
+import { redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, url, fetch }) {
+export async function load({ locals, cookies, url, fetch, parent }) {
+    await parent();
+    if (!locals.isAuthenticated) {
+        throw redirect(302, '/login');
+    }
+
     const accessToken = cookies.get('access_token');
-    
+
     const search = url.searchParams.get('search') || '';
     const page = url.searchParams.get('page') || 1;
     const ordering = url.searchParams.get('ordering') || '';

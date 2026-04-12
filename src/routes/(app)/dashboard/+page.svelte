@@ -1,5 +1,5 @@
 <script lang="ts">
-    /* eslint-disable no-unused-vars */
+	/* eslint-disable no-unused-vars */
 
 	import { resolve } from '$app/paths';
 	import CourseCard from '@/lib/components/ui/courses/CourseCard.svelte';
@@ -95,6 +95,7 @@
 									title={course.title}
 									progress={course.progress}
 									lessons={course.lessons}
+									image={course.img}
 								/>
 							</a>
 						</div>

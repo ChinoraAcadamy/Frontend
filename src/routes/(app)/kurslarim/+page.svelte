@@ -6,6 +6,7 @@
 	import { Search, BookOpen } from 'lucide-svelte';
 
 	let { data } = $props();
+	console.log(data);
 	let courses = $derived(data.courses || []);
 
 	// svelte-ignore state_referenced_locally
@@ -116,15 +117,17 @@
 					class="animate-in fade-in slide-in-from-bottom-4 duration-500"
 					style="animation-fill-mode: backwards;"
 				>
+					{console.log(course)}
+
 					<CourseGridCard
 						id={course.id}
 						title={course.title}
 						subtitle={course.price ? `${course.price} UZS` : 'Bepul'}
 						image={course.img ||
-							'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop'}
-						progress={0}
+							`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
+						progress={course.progress}
 						modules={0}
-						lessons={0}
+						lessons={course.total_lessons}
 						status={course.is_blocked ? 'locked' : 'active'}
 						onContinue={handleContinueCourse}
 					/>

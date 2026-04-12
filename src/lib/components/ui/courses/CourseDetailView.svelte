@@ -1,4 +1,6 @@
 <script>
+	// @ts-nocheck
+
 	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
 	import LessonsRow from '@/lib/components/ui/courses/LessonsRow.svelte';
 	import ModuleAccordion from '@/lib/components/ui/courses/ModuleAccordion.svelte';
@@ -71,6 +73,8 @@
 						class="absolute inset-0 h-full w-full object-cover"
 						width="144"
 						height="96"
+						onerror={(e) =>
+							(e.currentTarget.src = `https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`)}
 					/>
 				</div>
 
@@ -103,11 +107,13 @@
 					</div>
 					<div class="flex items-center justify-between text-sm">
 						<span class="font-medium text-slate-500">Ko'rilgan</span>
-						<span class="font-bold text-slate-800">0</span>
+						<span class="font-bold text-slate-800">{course.completed_lessons || 0}</span>
 					</div>
 					<div class="flex items-center justify-between text-sm">
 						<span class="font-medium text-slate-500">Qolgan</span>
-						<span class="font-bold text-slate-800">{course.lessons_count || 0}</span>
+						<span class="font-bold text-slate-800"
+							>{course.lessons_count - course.completed_lessons || 0}</span
+						>
 					</div>
 				</div>
 			</div>

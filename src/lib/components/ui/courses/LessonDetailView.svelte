@@ -365,6 +365,7 @@
 		</div>
 
 		{#if lesson.assignments && lesson.assignments.length > 0}
+			{console.log(lesson.assignments)}
 			<div
 				class="sticky top-6 h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_4px_24px_rgba(0,0,0,0.02)]"
 			>

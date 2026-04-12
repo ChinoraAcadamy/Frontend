@@ -3,6 +3,17 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
 
+export const load = async ({ locals }) => {
+    if (locals.isAuthenticated && locals.user) {
+        if (locals.user.role === 'admin' || locals.user.role === 'superadmin') {
+            throw redirect(302, '/admin/dashboard');
+        } else {
+            throw redirect(302, '/dashboard');
+        }
+    }
+    return {};
+};
+
 export const actions = {
     login: async ({ request, cookies }) => {
         const formData = await request.formData();
