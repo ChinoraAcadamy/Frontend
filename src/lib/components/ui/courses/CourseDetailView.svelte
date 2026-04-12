@@ -18,6 +18,10 @@
 	} = $props();
 
 	let isStudentBlocked = $derived(isStudentView && course.is_blocked);
+
+	function handleImageError(e) {
+		e.currentTarget.src = `https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`;
+	}
 </script>
 
 <div class="relative mx-auto min-h-[calc(100vh-80px)] max-w-5xl bg-[#f8fafc] p-4 font-sans md:p-8">
@@ -73,8 +77,7 @@
 						class="absolute inset-0 h-full w-full object-cover"
 						width="144"
 						height="96"
-						onerror={(e) =>
-							(e.currentTarget.src = `https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`)}
+						onerror={handleImageError}
 					/>
 				</div>
 

@@ -11,10 +11,17 @@
   import PricingSection from "@/lib/components/ui/home/PricingSection.svelte";
 	import Faq from "@/lib/components/ui/home/Faq.svelte";
   import Footer from "@/lib/components/ui/home/Footer.svelte";
+  import SeoMeta from "@/lib/components/ui/SeoMeta.svelte";
 
   export let data; // +page.server.js dan keladi
 
 </script>
+
+<SeoMeta 
+    title="Chinora Academy - Sifatli va zamonaviy ta'lim platformasi" 
+    description="Dasturlash, zamonaviy kasblar va tikuvchilik sirlarini Chinora Academy bilan birga o'rganing. Onlayn kurslar orqali mutaxassisga aylaning."
+    keywords="dasturlash, tikuvchilik, bichish, onlayn kurslar, ta'lim, chinora academy, modern kasblar"
+/>
 
 <div class="min-h-screen">
   

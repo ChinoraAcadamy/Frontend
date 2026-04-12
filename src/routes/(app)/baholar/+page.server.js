@@ -1,7 +1,12 @@
 // src/routes/(app)/dashboard/baholar/+page.server.js
 import { API_URL } from '$env/static/private';
 
-export const load = async ({ cookies, fetch, url }) => {
+export const load = async ({ cookies, fetch, url, setHeaders }) => {
+    // Optimizatsiya: 1 daqiqalik kesh
+    setHeaders({
+        'cache-control': 'private, max-age=60'
+    });
+
     const accessToken = cookies.get('access_token');
 
     // URL'dan parametrlarni o'qiymiz

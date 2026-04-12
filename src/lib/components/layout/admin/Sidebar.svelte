@@ -62,26 +62,36 @@
 
 	<!-- Navigation -->
 	<nav class="nav" aria-label="Asosiy menyu">
-		{#each navItems as item (item.href)}
-			{@const active = isActive(item)}
-			{@const Icon = item.icon}
-			<a
-				href={resolve(/** @type {any} */ (item.href))}
-				class="nav-item"
-				class:active
-				aria-current={active ? 'page' : undefined}
-				onclick={() => (mobileOpen = false)}
-			>
-				<span class="nav-icon">
-					<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				</span>
+		{#each navItems as item (item.href || item.label)}
+			{#if item.divider}
 				{#if !collapsed}
-					<span class="nav-label">{item.label}</span>
-					{#if active}
-						<ChevronRight size={14} class="nav-arrow" />
-					{/if}
+					<div class="nav-divider">
+						<span class="nav-divider-text">{item.label}</span>
+					</div>
+				{:else}
+					<div class="nav-divider collapsed"></div>
 				{/if}
-			</a>
+			{:else}
+				{@const active = isActive(item)}
+				{@const Icon = item.icon}
+				<a
+					href={resolve(/** @type {any} */ (item.href))}
+					class="nav-item"
+					class:active
+					aria-current={active ? 'page' : undefined}
+					onclick={() => (mobileOpen = false)}
+				>
+					<span class="nav-icon">
+						<Icon size={20} strokeWidth={active ? 2.5 : 2} />
+					</span>
+					{#if !collapsed}
+						<span class="nav-label">{item.label}</span>
+						{#if active}
+							<ChevronRight size={14} class="nav-arrow" />
+						{/if}
+					{/if}
+				</a>
+			{/if}
 		{/each}
 	</nav>
 
@@ -271,6 +281,26 @@
 		white-space: nowrap;
 		overflow: hidden;
 		position: relative;
+	}
+
+	.nav-divider {
+		margin: 16px 0 4px 0;
+		padding: 0 14px;
+		display: flex;
+		align-items: center;
+	}
+	.nav-divider-text {
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		color: #9ca3af;
+	}
+	.nav-divider.collapsed {
+		margin: 16px auto 8px auto;
+		width: 24px;
+		height: 1px;
+		background: #f3f4f6;
 	}
 
 	.nav-item:hover {

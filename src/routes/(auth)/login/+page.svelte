@@ -3,10 +3,16 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { Loader2, ArrowRight, User, LockKeyhole } from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
+	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
 
 	export let form;
 	let loading = false;
 </script>
+
+<SeoMeta 
+	title="Tizimga kirish - Chinora Academy" 
+	description="Chinora Academy platformasiga kirish. O'z hisobingizga kiring va o'qishni davom ettiring." 
+/>
 
 <div
 	class="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#FDFBF9] px-4 selection:bg-zinc-900 selection:text-white"

@@ -3,6 +3,7 @@
 	import Sidebar from '$lib/components/layout/admin/Sidebar.svelte';
 	import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
 	import { LayoutDashboard, BookOpen, GraduationCap, User } from 'lucide-svelte';
+	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
 
 	let { data, children } = $props();
 
@@ -26,6 +27,11 @@
 		{ href: '/profil', label: 'Profil', icon: User, exact: false }
 	];
 </script>
+
+<SeoMeta 
+	title="Student Dashboard - Chinora Academy"
+	robots="noindex, nofollow" 
+/>
 
 <div class="admin-shell {collapsed ? 'collapsed' : ''}">
 	<Sidebar bind:collapsed bind:mobileOpen user={data.user} navItems={studentNavItems} />

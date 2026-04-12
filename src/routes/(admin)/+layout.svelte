@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Sidebar from '$lib/components/layout/admin/Sidebar.svelte';
 	import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
-	import { LayoutDashboard, Users, BookOpen, FileText, Settings, ShieldCheck } from 'lucide-svelte';
+	import { LayoutDashboard, Users, BookOpen, FileText, Settings, ShieldCheck, Activity, KeyRound } from 'lucide-svelte';
+	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
 
 	let { data, children } = $props();
 	let collapsed = $state(false);
@@ -22,9 +23,18 @@
 		{ href: '/admin/admins/create', label: 'Adminlar', icon: ShieldCheck, exact: false },
 		{ href: '/admin/courses', label: 'Kurslar', icon: BookOpen, exact: false },
 		{ href: '/admin/submissions', label: 'Arizalar', icon: FileText, exact: false },
+		{ divider: true, label: 'System Logs' },
+		{ href: '/admin/logs/activity', label: 'Faoliyat', icon: Activity, exact: false },
+		{ href: '/admin/logs/login', label: 'Tizimga kirish', icon: KeyRound, exact: false },
+		{ divider: true, label: 'Settings' },
 		{ href: '/admin/profile', label: 'Sozlamalar', icon: Settings, exact: false }
 	];
 </script>
+
+<SeoMeta 
+	title="Admin Panel - Chinora Academy"
+	robots="noindex, nofollow" 
+/>
 
 <div class="admin-shell {collapsed ? 'collapsed' : ''}">
 	<Sidebar bind:collapsed bind:mobileOpen user={data.user} navItems={adminNavItems} />
