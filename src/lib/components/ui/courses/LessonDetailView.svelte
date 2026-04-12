@@ -34,6 +34,21 @@
 		return [{ src: getProxiedUrl(lesson.video_url), type: 'video/mp4', size: 720 }];
 	});
 
+	const videoTracks = $derived(() => {
+		if (lesson.subtitle_url) {
+			return [
+				{
+					kind: 'captions',
+					label: "O'zbekcha",
+					srclang: 'uz',
+					src: lesson.subtitle_url,
+					default: true
+				}
+			];
+		}
+		return [];
+	});
+
 	// --- Video Player State ---
 	let videoElement = $state(null);
 	let player = $state(null);
@@ -121,28 +136,79 @@
 		}
 	});
 
+	let lastLoadedLessonId = null;
+
 	$effect(() => {
-		if (player && lesson.id) {
+		if (player && lesson.id && lastLoadedLessonId !== lesson.id) {
+			lastLoadedLessonId = lesson.id;
+
+			const storageKey = getProgressKey(lesson.id);
+			const saved = localStorage.getItem(storageKey);
+
+			let isRestored = false;
+			let expectedTime = 0;
+
+			if (saved && !isNaN(Number(saved))) {
+				expectedTime = parseFloat(saved);
+			} else {
+				isRestored = true;
+			}
+
+			// Yagona manba (Single source of truth) qilib video manbasini belgilaymiz
 			player.source = {
 				type: 'video',
 				title: lesson.title,
 				sources: videoSources(),
-				poster: lesson.image
+				poster: lesson.image,
+				tracks: videoTracks()
 			};
 
-			const storageKey = getProgressKey(lesson.id);
-			const saved = localStorage.getItem(storageKey);
-			if (saved && !isNaN(Number(saved))) {
-				player.once('canplay', () => {
-					player.currentTime = parseFloat(saved);
-				});
-			}
+			const resumePlayback = () => {
+				if (!isRestored && expectedTime > 2) {
+					if (player.duration > 0 || player.media?.duration > 0) {
+						player.currentTime = expectedTime;
+						isRestored = true;
+					}
+				} else {
+					isRestored = true;
+				}
+			};
 
-			player.on('timeupdate', () => {
-				if (player.currentTime > 0 && player.duration > 0) {
+			player.on('loadedmetadata', resumePlayback);
+			player.on('canplay', resumePlayback);
+			player.on('playing', resumePlayback);
+
+			let saveInterval;
+
+			const startAutoSave = () => {
+				if (saveInterval) clearInterval(saveInterval);
+				saveInterval = setInterval(() => {
+					if (isRestored && player.currentTime > 0) {
+						localStorage.setItem(storageKey, player.currentTime.toString());
+					}
+				}, 3000); // Har 3 soniyada yoziladi
+			};
+
+			const stopAutoSave = () => {
+				if (saveInterval) clearInterval(saveInterval);
+				if (isRestored && player.currentTime > 0) {
 					localStorage.setItem(storageKey, player.currentTime.toString());
 				}
-			});
+			};
+
+			player.on('playing', startAutoSave);
+			player.on('pause', stopAutoSave);
+			player.on('ended', stopAutoSave);
+
+			return () => {
+				stopAutoSave();
+				player.off('loadedmetadata', resumePlayback);
+				player.off('canplay', resumePlayback);
+				player.off('playing', resumePlayback);
+				player.off('playing', startAutoSave);
+				player.off('pause', stopAutoSave);
+				player.off('ended', stopAutoSave);
+			};
 		}
 	});
 
@@ -246,19 +312,7 @@
 						playsinline
 						crossorigin="anonymous"
 					>
-						{#each videoSources() as source (source)}
-							<source src={source.src} type={source.type} {...{ size: source.size }} />
-						{/each}
-
-						{#if lesson.subtitle_url}
-							<track
-								kind="captions"
-								label="O'zbekcha"
-								srclang="uz"
-								src={lesson.subtitle_url}
-								default
-							/>
-						{/if}
+						<!-- Source va track ma'lumotlari to'liq Plyr (JS) orqali boshqariladi -->
 						Brauzeringiz videoni qo'llab-quvvatlamaydi.
 					</video>
 
