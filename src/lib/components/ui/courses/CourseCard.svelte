@@ -1,3 +1,4 @@
+<script>
 	import * as m from '$lib/paraglide/messages.js';
 	let { title, image, progress = 0, lessons = 0 } = $props();
 
