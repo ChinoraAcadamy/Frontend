@@ -8,7 +8,7 @@
 	// ==================== STATE ====================
 	let searchValue = $state(data.filters?.search || '');
 	let orderingValue = $state(data.filters?.ordering || '-created_at');
-	
+
 	$effect(() => {
 		searchValue = data.filters?.search || '';
 		orderingValue = data.filters?.ordering || '-created_at';
@@ -87,7 +87,7 @@
 			<select
 				name="ordering"
 				bind:value={orderingValue}
-				onchange={(e) => (/** @type {HTMLSelectElement} */ (e.target)).form?.submit()}
+				onchange={(e) => /** @type {HTMLSelectElement} */ (e.target).form?.submit()}
 				class="h-10 rounded-lg border border-gray-200 bg-white px-4 text-sm text-gray-700 transition-colors outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 			>
 				<option value="-created_at">Eng yangilari oldin</option>
@@ -110,8 +110,8 @@
 								<th class="admin-table">Foydalanuvchi</th>
 								<th class="admin-table">Harakat turi</th>
 								<th class="admin-table w-1/4">Maqsad (Target)</th>
-								<th class="admin-table hidden w-1/4 md:table-cell">Tafsilot</th>
-								<th class="admin-table hidden sm:table-cell">IP Manzil</th>
+								<th class="admin-table w-1/4 md:table-cell">Tafsilot</th>
+								<th class="admin-table sm:table-cell">IP Manzil</th>
 								<th class="admin-table text-right">Sana</th>
 							</tr>
 						</thead>
@@ -137,12 +137,12 @@
 									<td class="px-6 py-4 text-gray-700">
 										{log.target || 'Tizim'}
 									</td>
-									<td class="hidden px-6 py-4 text-gray-500 md:table-cell">
+									<td class="px-6 py-4 text-gray-500 md:table-cell">
 										<div class="max-w-[200px] truncate lg:max-w-xs" title={log.detail}>
 											{log.detail || '—'}
 										</div>
 									</td>
-									<td class="hidden px-6 py-4 font-mono text-xs text-gray-500 sm:table-cell">
+									<td class="px-6 py-4 font-mono text-xs text-gray-500 sm:table-cell">
 										{log.ip_address || '—'}
 									</td>
 									<td class="px-6 py-4 text-right whitespace-nowrap text-gray-600">
@@ -167,7 +167,8 @@
 						class="flex items-center justify-between border-t border-gray-200 bg-white px-6 py-4"
 					>
 						<a
-							href={resolve('/admin/logs/activity') + `?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`}
+							href={resolve('/admin/logs/activity') +
+								`?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 {currentPage ===
 							1
 								? 'pointer-events-none opacity-40'
@@ -181,7 +182,8 @@
 							>
 						</div>
 						<a
-							href={resolve('/admin/logs/activity') + `?page=${Math.min(totalPages, currentPage + 1)}&search=${searchValue}&ordering=${orderingValue}`}
+							href={resolve('/admin/logs/activity') +
+								`?page=${Math.min(totalPages, currentPage + 1)}&search=${searchValue}&ordering=${orderingValue}`}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 {currentPage ===
 							totalPages
 								? 'pointer-events-none opacity-40'

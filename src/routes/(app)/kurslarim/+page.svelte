@@ -6,6 +6,7 @@
 	import { resolve } from '$app/paths';
 	import CourseGridCard from '@/lib/components/ui/courses/CourseGridCard.svelte';
 	import { Search, BookOpen } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	/** @type {{ data: import('./$types').PageData }} */
 	let { data } = $props();
@@ -56,11 +57,10 @@
 	<div class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
 		<div>
 			<h1 class="text-[26px] font-black tracking-tight text-slate-800 uppercase md:text-3xl">
-				Mening kurslarim
+				{m.courses_title()}
 			</h1>
 			<p class="mt-1.5 max-w-xl text-sm font-medium text-slate-500 md:text-[15px]">
-				O'zingiz obuna bo'lgan barcha kurslarni shu yerdan kuzatib borishingiz va davom
-				ettirishingiz mumkin.
+				{m.courses_subtitle()}
 			</p>
 		</div>
 
@@ -68,7 +68,7 @@
 			<Search size={18} class="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400" />
 			<input
 				type="text"
-				placeholder="Kurslarni izlash..."
+				placeholder={m.courses_search_placeholder()}
 				value={searchQuery}
 				oninput={handleSearch}
 				class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm font-medium shadow-sm transition-all focus:border-[#9b1c48] focus:ring-2 focus:ring-[#9b1c48]/20 focus:outline-none"
@@ -117,27 +117,26 @@
 				</div>
 
 				{#if searchQuery}
-					<h3 class="mb-2 text-xl font-bold text-slate-800">Hech narsa topilmadi</h3>
+					<h3 class="mb-2 text-xl font-bold text-slate-800">{m.courses_not_found()}</h3>
 					<p class="mb-6 max-w-sm font-medium text-slate-500">
-						"{searchQuery}" bo'yicha hech qanday kurs topilmadi. Boshqa so'z bilan izlab ko'ring.
+						{m.courses_not_found_desc({ query: searchQuery })}
 					</p>
 					<button
 						onclick={clearSearch}
 						class="font-bold text-[#9b1c48] transition-all hover:underline"
 					>
-						Barcha kurslarni ko'rish
+						{m.courses_view_all()}
 					</button>
 				{:else}
-					<h3 class="mb-2 text-xl font-bold text-slate-800">Hozircha kurslar yo'q</h3>
+					<h3 class="mb-2 text-xl font-bold text-slate-800">{m.courses_empty()}</h3>
 					<p class="mb-8 max-w-md leading-relaxed font-medium text-slate-500">
-						Siz hali hech qanday kursga obuna bo'lmagansiz. Bilimingizni oshirish uchun yangi
-						kurslarga ulaning.
+						{m.courses_empty_desc()}
 					</p>
 					<button
 						onclick={() => goto(resolve(/** @type {any} */ ('/dashboard')))}
 						class="scale-100 rounded-xl bg-linear-to-r from-[#9b1c48] to-[#c43c66] px-7 py-3 font-bold text-white shadow-lg shadow-[#9b1c48]/25 transition-all hover:brightness-110 active:scale-95"
 					>
-						Yangi kurslarni kashf etish
+						{m.courses_discover()}
 					</button>
 				{/if}
 			</div>
@@ -151,7 +150,7 @@
 						<CourseGridCard
 							id={course.id}
 							title={course.title}
-							subtitle={course.price ? `${course.price} UZS` : 'Bepul'}
+							subtitle={course.price ? `${course.price} UZS` : m.course_free()}
 							image={course.img ||
 								`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
 							progress={course.progress}
@@ -166,7 +165,7 @@
 
 			{#if totalCount > courses.length}
 				<div class="mt-10 flex justify-center">
-					<p class="text-sm font-semibold text-slate-400">Jami topilgan kurslar: {totalCount}</p>
+					<p class="text-sm font-semibold text-slate-400">{m.courses_total({ total: totalCount })}</p>
 				</div>
 			{/if}
 		{/if}

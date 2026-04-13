@@ -1,5 +1,6 @@
 // src/routes/(admin)/admin/submissions/+page.server.js
 import { API_URL } from '$env/static/private';
+import { fail } from '@sveltejs/kit';
 
 export const load = async ({ cookies, fetch, url, setHeaders }) => {
     // Optimizatsiya: 1 daqiqalik kesh (submissonlar tez o'zgarishi mumkinligi uchun)
@@ -68,4 +69,45 @@ export const load = async ({ cookies, fetch, url, setHeaders }) => {
         currentPage: parseInt(page),
         filters: { search, status }
     };
+};
+
+export const actions = {
+    gradeSubmission: async ({ request, cookies, fetch }) => {
+        const accessToken = cookies.get('access_token');
+        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+
+        const formData = await request.formData();
+        const submissionId = formData.get('id');
+        const score = formData.get('score');
+        const feedback = formData.get('feedback');
+
+        if (!submissionId) return fail(400, { error: 'Topshiriq ID si ko\'rsatilmadi' });
+        if (score === null || score === undefined) return fail(400, { error: 'Baho kiritilmadi' });
+
+        try {
+            const response = await fetch(`${API_URL}/progress/submissions/${submissionId}/grade/`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    score: parseInt(score),
+                    feedback: feedback || ''
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                return fail(response.status, { 
+                    error: errorData.detail || 'Baholashda xatolik yuz berdi' 
+                });
+            }
+
+            return { success: true, updatedSubmission: await response.json() };
+        } catch (err) {
+            console.error('[gradeSubmission] Error:', err);
+            return fail(500, { error: 'Server bilan ulanishda xatolik' });
+        }
+    }
 };

@@ -4,6 +4,7 @@
 	import DashboardNavbar from '$lib/components/layout/admin/DashboardNavbar.svelte';
 	import { LayoutDashboard, BookOpen, GraduationCap, User } from 'lucide-svelte';
 	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data, children } = $props();
 
@@ -21,10 +22,10 @@
 	});
 
 	const studentNavItems = [
-		{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-		{ href: '/kurslarim', label: 'Mening kurslarim', icon: BookOpen, exact: false },
-		{ href: '/baholar', label: 'Baholar', icon: GraduationCap, exact: false },
-		{ href: '/profil', label: 'Profil', icon: User, exact: false }
+		{ href: '/dashboard', label: m.menu_dashboard(), icon: LayoutDashboard, exact: true },
+		{ href: '/kurslarim', label: m.menu_my_courses(), icon: BookOpen, exact: false },
+		{ href: '/baholar', label: m.menu_grades(), icon: GraduationCap, exact: false },
+		{ href: '/profil', label: m.menu_profile(), icon: User, exact: false }
 	];
 </script>
 

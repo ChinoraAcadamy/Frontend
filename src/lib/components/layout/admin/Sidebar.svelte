@@ -3,8 +3,10 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import { LogOut, ChevronRight, X } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	/** @type {{ user?: any, navItems?: { href: string, label: string, icon: any, exact?: boolean }[], collapsed?: boolean, mobileOpen?: boolean }} */
+
 	let {
 		user,
 		navItems = [],
@@ -27,7 +29,7 @@
 		class="mobile-overlay"
 		role="button"
 		tabindex="-1"
-		aria-label="Menyuni yopish"
+		aria-label={m.menu_close()}
 		onclick={() => (mobileOpen = false)}
 		onkeydown={(e) => e.key === 'Escape' && (mobileOpen = false)}
 	></div>
@@ -55,7 +57,7 @@
 			</div>
 		{/if}
 
-		<button class="mobile-close-btn" aria-label="Yopish" onclick={() => (mobileOpen = false)}>
+		<button class="mobile-close-btn" aria-label={m.menu_close()} onclick={() => (mobileOpen = false)}>
 			<X size={20} />
 		</button>
 	</div>
@@ -111,9 +113,9 @@
 					<span class="user-name">
 						{[user?.first_name, user?.last_name].filter(Boolean).join(' ') ||
 							user?.username ||
-							'Foydalanuvchi'}
+							m.rank_student()}
 					</span>
-					<span class="user-role">{user?.role ?? 'student'}</span>
+					<span class="user-role">{user?.role === 'student' ? m.role_student() : user?.role || 'student'}</span>
 				</div>
 			{/if}
 		</div>
@@ -133,8 +135,8 @@
 				type="submit"
 				disabled={loading}
 				class="logout-btn"
-				title="Chiqish"
-				aria-label="Tizimdan chiqish"
+				title={m.menu_logout()}
+				aria-label={m.menu_logout()}
 			>
 				{#if loading}
 					<span class="spinner" aria-hidden="true"></span>
@@ -149,7 +151,7 @@
 	<button
 		class="collapse-btn"
 		onclick={() => (collapsed = !collapsed)}
-		aria-label={collapsed ? 'Kengaytirish' : "Yig'ish"}
+		aria-label={collapsed ? m.sidebar_expand() : m.sidebar_collapse()}
 	>
 		<span class:rotate-180={!collapsed}>
 			<ChevronRight size={16} />

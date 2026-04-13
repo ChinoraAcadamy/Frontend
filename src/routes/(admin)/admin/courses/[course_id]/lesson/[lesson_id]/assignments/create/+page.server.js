@@ -18,41 +18,32 @@ export const actions = {
         const moduleId = formData.get('module_pk');
         const type = formData.get('type')?.toString().toLowerCase() || 'file';
 
-        // Prepare FormData for the backend API to support file uploads
-        const apiFormData = new FormData();
-        apiFormData.append('title_uz', formData.get('title_uz') || '');
-        apiFormData.append('title_ru', formData.get('title_ru') || '');
-        apiFormData.append('description_uz', formData.get('description_uz') || '');
-        apiFormData.append('description_ru', formData.get('description_ru') || '');
-        apiFormData.append('type', type);
-        apiFormData.append('max_attempts', formData.get('max_attempts') || '1');
-
-        // Add dynamic content based on type
-        if (type === 'file') {
-            const file = formData.get('file');
-            if (file && file instanceof File && file.size > 0) {
-                apiFormData.append('file', file);
-            }
-        } else if (type === 'text') {
-            apiFormData.append('content_text', formData.get('content_text') || '');
-        } else if (type === 'link') {
-            apiFormData.append('content_link', formData.get('content_link') || '');
-        }
+        // Prepare JSON payload for the backend API
+        const payload = {
+            title_uz: formData.get('title_uz') || '',
+            title_ru: formData.get('title_ru') || '',
+            description_uz: formData.get('description_uz') || '',
+            description_ru: formData.get('description_ru') || '',
+            type: type,
+            max_attempts: Number(formData.get('max_attempts') || 1),
+            max_score: Number(formData.get('max_score') || 10)
+        };
 
         try {
             const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/lessons/${params.lesson_id}/assignments/`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                    // Do NOT set Content-Type, fetch will set it with the correct boundary for FormData
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
                 },
-                body: apiFormData
+                body: JSON.stringify(payload)
             });
 
+            const data = await response.json().catch(() => ({}));
+
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error('Server error response:', errorData);
-                const errorMessage = errorData.detail || Object.values(errorData).flat().join(' ') || "Topshiriqni saqlashda xatolik yuz berdi.";
+                console.error('Server error response:', data);
+                const errorMessage = data.detail || Object.values(data).flat().join(' ') || "Topshiriqni saqlashda xatolik yuz berdi.";
                 return fail(400, { error: errorMessage });
             }
 

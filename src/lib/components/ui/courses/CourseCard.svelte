@@ -1,4 +1,4 @@
-<script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	let { title, image, progress = 0, lessons = 0 } = $props();
 
 	function handleImageError(e) {
@@ -34,7 +34,7 @@
 		</div>
 		<div class="flex justify-between text-[13px] font-medium text-slate-500">
 			<span>{progress}%</span>
-			<span>{lessons} lessons</span>
+			<span>{lessons} {m.lessons_label()}</span>
 		</div>
 	</div>
 </div>

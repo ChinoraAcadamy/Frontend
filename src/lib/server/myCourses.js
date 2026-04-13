@@ -1,4 +1,5 @@
 import { API_URL } from '$env/static/private';
+import { getLocale } from '@/lib/paraglide/runtime';
 import { enrichCoursesList } from './courseService.js';
 
 export async function getMyCourses({ cookies, url, fetch = globalThis.fetch }) {
@@ -15,7 +16,8 @@ export async function getMyCourses({ cookies, url, fetch = globalThis.fetch }) {
     try {
         const res = await fetch(endpoint, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`
+                'Authorization': `Bearer ${accessToken}`,
+                'Accept-Language': getLocale()
             }
         });
 

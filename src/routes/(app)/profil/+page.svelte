@@ -19,6 +19,8 @@
 	import { fade, fly } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getLocale } from '$lib/paraglide/runtime.js';
 
 	let { data, form } = $props();
 	let student = $derived(data.student);
@@ -41,7 +43,7 @@
 
 	$effect(() => {
 		if (form?.success) {
-			toast.success('Muvaffaqiyatli saqlandi!');
+			toast.success(m.success_saved());
 			isEditing = false;
 		} else if (form?.error) {
 			toast.error(form.error);
@@ -61,7 +63,7 @@
 	function formatDate(dateStr) {
 		if (!dateStr) return "Noma'lum";
 		const date = new Date(dateStr);
-		return new Intl.DateTimeFormat('uz-UZ', {
+		return new Intl.DateTimeFormat(getLocale() === 'uz' ? 'uz-UZ' : 'ru-RU', {
 			year: 'numeric',
 			month: 'long',
 			day: 'numeric'
@@ -76,13 +78,13 @@
 				<div class="mb-4 rounded-full bg-red-100 p-4 text-red-600">
 					<X size={40} />
 				</div>
-				<h2 class="text-2xl font-bold text-slate-800">Xatolik yuz berdi</h2>
+				<h2 class="text-2xl font-bold text-slate-800">{m.error_occurred()}</h2>
 				<p class="mt-2 text-slate-500">{data.error}</p>
 				<button
 					onclick={() => window.location.reload()}
 					class="mt-6 rounded-xl bg-slate-900 px-6 py-2.5 font-semibold text-white transition-all hover:bg-slate-800"
 				>
-					Qayta urinish
+					{m.retry()}
 				</button>
 			</div>
 		{:else if student}
@@ -96,10 +98,10 @@
 						>
 							<LayoutDashboard size={22} />
 						</div>
-						<h1 class="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">Profil</h1>
+						<h1 class="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">{m.profile_title()}</h1>
 					</div>
 					<p class="text-sm font-medium text-slate-500">
-						O'quv rejangiz va shaxsiy ma'lumotlaringiz boshqaruvi
+						{m.profile_subtitle()}
 					</p>
 				</div>
 
@@ -109,10 +111,10 @@
 				>
 					{#if isEditing}
 						<X size={18} />
-						<span>Bekor qilish</span>
+						<span>{m.profile_cancel()}</span>
 					{:else}
 						<Settings2 size={18} class="transition-transform group-hover:rotate-12" />
-						<span>Tahrirlash</span>
+						<span>{m.profile_edit()}</span>
 					{/if}
 				</button>
 			</header>
@@ -163,7 +165,7 @@
 
 							<div class="mt-8 grid w-full grid-cols-2 gap-3">
 								<div class="rounded-3xl border border-slate-100 bg-slate-50 p-4">
-									<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Reyting</p>
+									<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">{m.profile_rank()}</p>
 									<div class="mt-1 flex items-center justify-center gap-1.5">
 										<Trophy size={16} class="text-amber-500" />
 										<span class="text-lg font-black text-slate-800">{student.total_score || 0}</span
@@ -171,7 +173,7 @@
 									</div>
 								</div>
 								<div class="rounded-3xl border border-slate-100 bg-slate-50 p-4">
-									<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Kurslar</p>
+									<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">{m.profile_courses()}</p>
 									<div class="mt-1 flex items-center justify-center gap-1.5">
 										<GraduationCap size={16} class="text-indigo-500" />
 										<span class="text-lg font-black text-slate-800"
@@ -191,7 +193,7 @@
 								</div>
 								<div class="overflow-hidden">
 									<p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-										Email
+										{m.profile_email()}
 									</p>
 									<p class="truncate text-sm font-semibold text-slate-700">
 										{student.username}@academy.uz
@@ -205,7 +207,7 @@
 									<Calendar size={18} />
 								</div>
 								<div>
-									<p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Sana</p>
+									<p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">{m.profile_date()}</p>
 									<p class="text-sm font-semibold text-slate-700">
 										{formatDate(student.created_at)}
 									</p>
@@ -229,7 +231,7 @@
 									class="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-100 bg-red-50/50 py-3.5 text-sm font-bold text-red-600 transition-all hover:bg-red-600 hover:text-white active:scale-95"
 								>
 									<span class="rotate-180"><Settings2 size={18} /></span>
-									Chiqish
+									{m.menu_logout()}
 								</button>
 							</form>
 						</div>
@@ -242,7 +244,7 @@
 					>
 						<div class="flex items-center justify-between">
 							<h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase">
-								Jami topshiriqlar
+								{m.profile_total_submissions()}
 							</h3>
 							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
 								<Send size={16} class="text-white" />
@@ -250,7 +252,7 @@
 						</div>
 						<div class="mt-4 flex items-end gap-2 text-white">
 							<span class="text-4xl font-black">{student.submissions_count || 0}</span>
-							<span class="mb-1 text-sm font-medium text-slate-500">ta topshirilgan</span>
+							<span class="mb-1 text-sm font-medium text-slate-500">{m.profile_submitted_count({ count: "" }).replace(' ta topshirilgan', '')} {m.profile_submitted_count({ count: "" })}</span>
 						</div>
 						<div class="mt-6 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
 							<div class="h-full bg-[#ed4b72]" style="width: 65%"></div>
@@ -266,8 +268,8 @@
 					>
 						{#if isEditing}
 							<div in:fade={{ duration: 200 }}>
-								<h3 class="text-2xl font-black text-slate-900">Ma'lumotlarni tahrirlash</h3>
-								<p class="mt-1 text-sm font-medium text-slate-500">Profilingizni yangilab turing</p>
+								<h3 class="text-2xl font-black text-slate-900">{m.profile_edit()}</h3>
+								<p class="mt-1 text-sm font-medium text-slate-500">{m.profile_subtitle()}</p>
 
 								<form
 									method="POST"
@@ -284,7 +286,7 @@
 									<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 										<div class="space-y-2">
 											<label for="firstname" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
-												>Ism</label
+												>{m.profile_first_name()}</label
 											>
 											<input
 												name="firstName"
@@ -297,7 +299,7 @@
 										</div>
 										<div class="space-y-2">
 											<label for="lastname" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
-												>Familiya</label
+												>{m.profile_last_name()}</label
 											>
 											<input
 												name="lastName"
@@ -312,7 +314,7 @@
 
 									<div class="space-y-2">
 										<label for="phone_number" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
-											>Telefon raqam</label
+											>{m.profile_phone()}</label
 										>
 										<div class="relative">
 											<div class="absolute top-1/2 left-6 -translate-y-1/2 text-slate-400">
@@ -339,10 +341,10 @@
 												<div
 													class="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
 												></div>
-												<span>Saqlanmoqda...</span>
+												<span>{m.profile_saving()}</span>
 											{:else}
 												<Save size={20} />
-												<span>Saqlash</span>
+												<span>{m.profile_save()}</span>
 											{/if}
 										</button>
 										<button
@@ -350,7 +352,7 @@
 											onclick={toggleEdit}
 											class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-100 py-4 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
 										>
-											Bekor qilish
+											{m.profile_cancel()}
 										</button>
 									</div>
 								</form>
@@ -358,11 +360,11 @@
 						{:else}
 							<div in:fade={{ duration: 200 }}>
 								<div class="flex items-center justify-between">
-									<h3 class="text-2xl font-black text-slate-900">Asosiy ma'lumotlar</h3>
+									<h3 class="text-2xl font-black text-slate-900">{m.pricing_title().replace('<span class="text-primary">investitsiyangiz</span>', 'Asosiy ma\'lumotlar')}</h3>
 									<div
 										class="hidden rounded-full border border-emerald-100 bg-emerald-50 px-4 py-1.5 text-[10px] font-black tracking-widest text-emerald-600 uppercase sm:block"
 									>
-										O'quvchi tasdiqlangan
+										{m.profile_verified()}
 									</div>
 								</div>
 
@@ -371,7 +373,7 @@
 										<div class="flex items-center gap-2 text-[#ed4b72]">
 											<User size={16} strokeWidth={2.5} />
 											<span class="text-[10px] font-black tracking-[0.2em] uppercase"
-												>To'liq ism</span
+												>{m.profile_first_name()} {m.profile_last_name()}</span
 											>
 										</div>
 										<p class="text-xl font-black text-slate-800">
@@ -384,7 +386,7 @@
 										<div class="flex items-center gap-2 text-indigo-500">
 											<LayoutDashboard size={16} strokeWidth={2.5} />
 											<span class="text-[10px] font-black tracking-[0.2em] uppercase"
-												>Foydalanuvchi nomi</span
+												>{m.profile_username()}</span
 											>
 										</div>
 										<p class="text-xl font-black text-slate-800">@{student.username}</p>
@@ -393,7 +395,7 @@
 									<div class="space-y-1">
 										<div class="flex items-center gap-2 text-amber-500">
 											<Phone size={16} strokeWidth={2.5} />
-											<span class="text-[10px] font-black tracking-[0.2em] uppercase">Telefon</span>
+											<span class="text-[10px] font-black tracking-[0.2em] uppercase">{m.profile_phone()}</span>
 										</div>
 										<p class="text-xl font-black text-slate-800">
 											{student.phone_number || 'Kiritilmagan'}
@@ -406,7 +408,7 @@
 											<span class="text-[10px] font-black tracking-[0.2em] uppercase">Status</span>
 										</div>
 										<p class="text-xl font-black text-slate-800">
-											{student.is_active ? "Faol o'quvchi" : 'Nofaol'}
+											{student.is_active ? m.profile_active_student() : m.profile_inactive()}
 										</p>
 									</div>
 								</div>
@@ -415,10 +417,10 @@
 								<div class="mt-16">
 									<div class="mb-6 flex items-center justify-between">
 										<h4 class="text-lg font-black tracking-tight text-slate-900 uppercase">
-											Yutuqlar va Progress
+											{m.profile_achievements()}
 										</h4>
 										<button class="text-xs font-bold text-[#ed4b72] transition-all hover:underline"
-											>Barchasini ko'rish</button
+											>{m.dashboard_view_all()}</button
 										>
 									</div>
 									<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -432,8 +434,8 @@
 													<Award size={24} />
 												</div>
 												<div>
-													<h5 class="font-bold text-slate-800">Sertifikatlar</h5>
-													<p class="text-xs font-medium text-slate-400">0 ta sertifikat mavjud</p>
+													<h5 class="font-bold text-slate-800">{m.profile_certificates()}</h5>
+													<p class="text-xs font-medium text-slate-400">{m.profile_no_certificates()}</p>
 												</div>
 											</div>
 										</div>
@@ -447,8 +449,8 @@
 													<BookOpen size={24} />
 												</div>
 												<div>
-													<h5 class="font-bold text-slate-800">Kurs materiallari</h5>
-													<p class="text-xs font-medium text-slate-400">80% o'zlashtirildi</p>
+													<h5 class="font-bold text-slate-800">{m.profile_materials()}</h5>
+													<p class="text-xs font-medium text-slate-400">{m.profile_mastered({ percent: "80" })}</p>
 												</div>
 											</div>
 										</div>

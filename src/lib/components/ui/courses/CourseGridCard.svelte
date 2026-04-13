@@ -2,6 +2,7 @@
 	// @ts-nocheck
 
 	import { Lock } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Props: qatiy tiplar va default qiymatlar
 	let {
@@ -43,7 +44,7 @@
 		<div
 			class="absolute top-4 right-4 z-20 rounded-lg bg-slate-400/80 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-sm"
 		>
-			Bloklangan
+			{m.course_locked()}
 		</div>
 	{/if}
 
@@ -83,8 +84,8 @@
 		</div>
 
 		<div class="mb-5 flex items-center justify-between text-[13px] font-semibold text-slate-500">
-			<span>{modules} Modules</span>
-			<span>{lessons} Lessons</span>
+			<span>{modules} {m.modules_label()}</span>
+			<span>{lessons} {m.lessons_label()}</span>
 		</div>
 	</div>
 
@@ -96,6 +97,6 @@
 			? 'cursor-not-allowed bg-slate-300 text-slate-500'
 			: 'bg-[#ed4b72] text-white shadow-sm shadow-rose-200 hover:bg-[#de3c61]'}"
 	>
-		{isLocked ? 'Bloklangan' : 'Davom etish'}
+		{isLocked ? m.course_locked() : m.course_continue()}
 	</button>
 </div>

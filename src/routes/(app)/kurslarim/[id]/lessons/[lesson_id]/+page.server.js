@@ -1,5 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
+import { getLocale } from '@/lib/paraglide/runtime';
+
 
 export async function load({ params, cookies, url }) {
     // API URL ni o'zingizning .env yoki o'zgaruvchilaringizdan olasiz
@@ -13,7 +15,10 @@ export async function load({ params, cookies, url }) {
     try {
         // Haqiqiy API so'rovi shunday bo'ladi:
         const res = await fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/lessons/${params.lesson_id}/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Accept-Language': getLocale() 
+            }
         });
 
         if (!res.ok) throw error(res.status, 'Dars topilmadi');
@@ -89,7 +94,7 @@ export const actions = {
             const res = await fetch(`${API_URL}/progress/submissions/`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: apiFormData
             });

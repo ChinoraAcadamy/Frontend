@@ -1,6 +1,7 @@
 import { API_URL } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 import { enrichCourseWithProgress } from '@/lib/server/courseService.js';
+import { getLocale } from '@/lib/paraglide/runtime';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ fetch, params, cookies, setHeaders }) => {
@@ -13,7 +14,7 @@ export const load = async ({ fetch, params, cookies, setHeaders }) => {
     });
 
     const getCourseDetail = async () => {
-        const headers = { 'Authorization': `Bearer ${accessToken}` };
+        const headers = { 'Authorization': `Bearer ${accessToken}`, 'Accept-Language': getLocale() };
         try {
             const res = await fetch(`${API_URL}/courses/${params.id}/`, { headers });
 

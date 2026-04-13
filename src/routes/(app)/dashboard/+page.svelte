@@ -4,27 +4,28 @@
 	import { resolve } from '$app/paths';
 	import CourseCard from '@/lib/components/ui/courses/CourseCard.svelte';
 	import { BookOpen, Award, TrendingUp } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 
 	// Student dashboard uchun statik config (keylar serverdan keladigan data'ga moslanadi)
 	const statConfig = [
 		{
-			title: 'Mening kurslarim',
+			title: m.stat_courses(),
 			icon: BookOpen,
 			color: 'text-blue-600',
 			bg: 'bg-blue-50',
 			key: 'courses_count'
 		},
 		{
-			title: 'Umumiy ball',
+			title: m.stat_score(),
 			icon: Award,
 			color: 'text-amber-600',
 			bg: 'bg-amber-50',
 			key: 'total_score'
 		},
 		{
-			title: "Reytingdagi o'rnim",
+			title: m.stat_rank(),
 			icon: TrendingUp,
 			color: 'text-emerald-600',
 			bg: 'bg-emerald-50',
@@ -75,9 +76,9 @@
 	<!-- Mening kurslarim -->
 	<section>
 		<div class="mb-4 flex items-center justify-between">
-			<h2 class="text-xl font-bold text-slate-800">Mening kurslarim</h2>
+			<h2 class="text-xl font-bold text-slate-800">{m.menu_my_courses()}</h2>
 			<a href={resolve('/kurslarim')} class="text-sm font-medium text-[#ef4444] hover:underline"
-				>Barchasi</a
+				>{m.dashboard_view_all()}</a
 			>
 		</div>
 
@@ -101,7 +102,7 @@
 						</div>
 					{/each}
 				{:else}
-					<p class="p-4 text-slate-400">Hozircha kurslar yo‘q...</p>
+					<p class="p-4 text-slate-400">{m.dashboard_no_courses()}</p>
 				{/if}
 			{/await}
 		</div>
@@ -110,7 +111,7 @@
 	<!-- Ranking Leaderboard -->
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 		<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-			<h2 class="mb-6 text-xl font-bold text-slate-800">Ranking Leaderboard</h2>
+			<h2 class="mb-6 text-xl font-bold text-slate-800">{m.dashboard_leaderboard()}</h2>
 
 			<div class="overflow-x-auto">
 				{#await data.lazy.ranking}
@@ -123,11 +124,11 @@
 					<table class="w-full border-collapse text-left">
 						<thead>
 							<tr class="border-b border-slate-100 text-sm text-slate-400">
-								<th class="px-2 pb-3 font-medium">Pos.</th>
-								<th class="px-2 pb-3 font-medium">Student</th>
-								<th class="px-2 pb-3 font-medium">Score</th>
-								<th class="px-2 pb-3 font-medium">Course</th>
-								<th class="px-2 pb-3 font-medium">Score</th>
+								<th class="px-2 pb-3 font-medium">{m.rank_pos()}</th>
+								<th class="px-2 pb-3 font-medium">{m.rank_student()}</th>
+								<th class="px-2 pb-3 font-medium">{m.rank_score()}</th>
+								<th class="px-2 pb-3 font-medium">{m.rank_course()}</th>
+								<th class="px-2 pb-3 font-medium">{m.rank_score()}</th>
 							</tr>
 						</thead>
 						<tbody class="text-sm">
@@ -165,9 +166,9 @@
 
 		<!-- Recent Submissions (hozircha mock) -->
 		<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-			<h2 class="mb-6 text-xl font-bold text-slate-800">Recent Submissions</h2>
+			<h2 class="mb-6 text-xl font-bold text-slate-800">{m.dashboard_recent_submissions()}</h2>
 			<div class="overflow-x-auto">
-				<p class="p-4 text-center text-slate-400">Hozircha topshiriqlar yo‘q...</p>
+				<p class="p-4 text-center text-slate-400">{m.dashboard_no_submissions()}</p>
 			</div>
 		</div>
 	</div>

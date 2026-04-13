@@ -1,39 +1,9 @@
 <script>
 	import * as m from '$lib/paraglide/messages.js';
-	import { getLocale, locales, setLocale } from '$lib/paraglide/runtime.js';
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
+	import LanguageSwitcher from '@/lib/components/ui/LanguageSwitcher.svelte';
 
-	const languageNames = {
-		uz: "O'zbekcha",
-		ru: 'Русский'
-	};
-
-	let openLang = false;
-
-	// URL o'zgarmasligi uchun faqat state'ni yangilaymiz va LocalStorage'ga saqlaymiz
-	function switchLang(lang) {
-		setLocale(lang);
-		openLang = false;
-		if (browser) {
-			localStorage.setItem('preferred_lang', lang);
-		}
-	}
-
-	function isValidLocale(lang) {
-		return Array.isArray(locales) && locales.includes(lang);
-	}
-	onMount(() => {
-		// Sahifa yuklanganda LocalStorage'dan oxirgi tilni o'qib o'rnatish
-		if (browser) {
-			const savedLang = localStorage.getItem('preferred_lang');
-			if (savedLang && isValidLocale(savedLang)) {
-				setLocale(/** @type {"uz"|"ru"} */(savedLang));
-			}
-		}
-	});
 </script>
 
 <div class="fixed top-6 right-0 left-0 z-50 flex w-full justify-center px-4 text-white">
@@ -70,55 +40,7 @@
 		</div>
 
 		<div class="flex items-center gap-6">
-			<div
-				class="relative"
-				role="button"
-				tabindex="0"
-				on:keydown|self={(e) => {
-					if (e.key === 'Escape') openLang = false;
-				}}
-			>
-				<button
-					class="flex items-center gap-1 text-sm font-medium text-secondary/90 transition-colors hover:text-secondary"
-					on:click={() => (openLang = !openLang)}
-					aria-haspopup="listbox"
-					aria-expanded={openLang}
-				>
-					{languageNames[getLocale()] || getLocale().toUpperCase()}
-					<svg
-						class="h-4 w-4 opacity-70 transition-transform {openLang ? 'rotate-180' : ''}"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M19 9l-7 7-7-7"
-						/>
-					</svg>
-				</button>
-
-				{#if openLang}
-					<div
-						class="absolute right-0 z-50 mt-4 w-32 overflow-hidden rounded-xl border border-white/20 bg-black/80 shadow-2xl backdrop-blur-md"
-						tabindex="-1"
-					>
-						{#each locales as lang (lang)}
-							<button
-								on:click={() => switchLang(lang)}
-								class="block w-full px-4 py-2 text-left text-sm transition-colors hover:bg-white/20 {getLocale() ===
-								lang
-									? 'bg-white/10 font-bold text-white'
-									: 'text-white/70'}"
-							>
-								{languageNames[lang] || lang.toUpperCase()}
-							</button>
-						{/each}
-					</div>
-				{/if}
-			</div>
+			<LanguageSwitcher variant="glass" />
 
 			{#if $page.data.isAuthenticated}
 				<a

@@ -1,5 +1,6 @@
 <script>
 	import { Search, Bell, Menu, Accessibility, Plus, Minus, Palette, Contrast, Type, EyeOff } from 'lucide-svelte';
+	import LanguageSwitcher from '@/lib/components/ui/LanguageSwitcher.svelte';
 	// import { onMount } from 'svelte';
 
 	let { user = null, notificationCount = 0, mobileOpen = $bindable(false) } = $props();
@@ -135,6 +136,8 @@
 	</div>
 
 	<div class="relative flex items-center gap-3">
+		<LanguageSwitcher variant="minimal" />
+		
 		<button
 			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-[#9B1C48] lg:hidden"
 			aria-label="Qidirish"

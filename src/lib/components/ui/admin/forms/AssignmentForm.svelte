@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { Save, Plus, FileText, Type, Link, UploadCloud, File, X, Info } from 'lucide-svelte';
-	import { fly, fade, scale } from 'svelte/transition';
+	import { Save, Plus, FileText, Type, Link, UploadCloud, Info } from 'lucide-svelte';
 
 	let {
 		action = '?/createAssignment',
@@ -12,38 +11,15 @@
 	} = $props();
 
 	let selectedType = $state(assignmentTarget.type?.toLowerCase() || 'file');
-	let assignmentFile = $state(null);
-	let isDragging = $state(false);
-
-	function handleFileDrop(e) {
-		e.preventDefault();
-		isDragging = false;
-		const file = e.dataTransfer?.files?.[0];
-		if (file) {
-			assignmentFile = file;
-		}
-	}
-
-	function handleFileSelect(e) {
-		const file = e.target.files?.[0];
-		if (file) {
-			assignmentFile = file;
-		}
-	}
 
 	async function handleEnhancedSubmit(event) {
-		const { formData } = event;
-		if (assignmentFile && selectedType === 'file') {
-			formData.set('file', assignmentFile);
-		}
-
 		if (onSubmit) {
 			return onSubmit(event);
 		}
 	}
 </script>
 
-<form method="POST" {action} use:enhance={handleEnhancedSubmit} enctype="multipart/form-data">
+<form method="POST" {action} use:enhance={handleEnhancedSubmit}>
 	{#if modulePk}
 		<input type="hidden" name="module_pk" value={modulePk} />
 	{/if}
@@ -149,116 +125,36 @@
 			/>
 		</div>
 
-		<!-- Dynamic Content Section -->
-		<div class="form-group full-width pt-4" in:fade={{ duration: 200 }}>
-			<div class="mb-4 flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<div class="rounded-lg bg-slate-50 p-1.5 text-slate-500">
-						<Info size={16} />
-					</div>
-					<h3 class="text-sm font-bold tracking-wider text-slate-400 uppercase">
-						Topshiriq mazmuni
-					</h3>
+		<div class="form-group">
+			<label for="max_score">Maksimal ball *</label>
+			<input
+				type="number"
+				id="max_score"
+				name="max_score"
+				class="input"
+				value={assignmentTarget.max_score ?? 10}
+				required
+				min="1"
+				max="100"
+			/>
+		</div>
+
+		<!-- New Info Section -->
+		<div class="form-group full-width pt-2">
+			<div
+				class="flex items-start gap-3 rounded-2xl border border-blue-50 bg-blue-50/30 p-4 text-blue-700"
+			>
+				<div class="mt-0.5 rounded-lg bg-white p-1.5 text-blue-500 shadow-sm">
+					<Info size={16} />
 				</div>
-				<span
-					class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold tracking-widest text-slate-400 uppercase"
-					>Selected: {selectedType}</span
-				>
+				<div>
+					<h4 class="text-sm font-bold tracking-tight">Eslatma</h4>
+					<p class="mt-0.5 text-[13px] leading-relaxed font-medium opacity-80">
+						Tanlangan <strong>topshiriq turi</strong> studentlar qanday ko'rinishda javob yuborishi kerakligini
+						belgilaydi. Admin sifatida siz faqat topshiriq shartlarini belgilaysiz.
+					</p>
+				</div>
 			</div>
-
-			{#if selectedType === 'file'}
-				<div
-					class="file-upload-zone {isDragging ? 'dragging' : ''} {assignmentFile ? 'has-file' : ''}"
-					ondragenter={(e) => {
-						e.preventDefault();
-						isDragging = true;
-					}}
-					ondragleave={(e) => {
-						e.preventDefault();
-						isDragging = false;
-					}}
-					ondragover={(e) => e.preventDefault()}
-					ondrop={handleFileDrop}
-					role="button"
-					tabindex="0"
-				>
-					<input
-						type="file"
-						id="assignment_file"
-						name="file"
-						class="hidden"
-						onchange={handleFileSelect}
-					/>
-
-					{#if assignmentFile}
-						<div
-							class="file-info relative z-10 flex w-full flex-col items-center justify-center p-6"
-							in:scale={{ duration: 200 }}
-						>
-							<div class="mb-3 rounded-2xl bg-rose-50 p-4 text-[#ed4b72]">
-								<File size={40} />
-							</div>
-							<span class="w-full truncate px-4 text-center font-bold text-slate-800"
-								>{assignmentFile.name}</span
-							>
-							<span class="mt-1 text-xs text-slate-500"
-								>{(assignmentFile.size / (1024 * 1024)).toFixed(2)} MB</span
-							>
-							<button
-								type="button"
-								class="mt-4 flex items-center gap-2 text-xs font-bold text-slate-400 transition-colors hover:text-rose-500"
-								onclick={() => (assignmentFile = null)}
-							>
-								<X size={14} /> Olib tashlash
-							</button>
-						</div>
-					{:else}
-						<label
-							for="assignment_file"
-							class="upload-label group flex w-full cursor-pointer flex-col items-center justify-center p-12 text-center"
-						>
-							<div
-								class="mb-4 rounded-3xl bg-slate-50 p-5 text-slate-400 transition-colors group-hover:bg-rose-50 group-hover:text-[#ed4b72]"
-							>
-								<UploadCloud size={48} />
-							</div>
-							<span class="font-bold text-slate-600">Topshiriq faylini yuklang</span>
-							<span class="mt-1 text-xs text-slate-400">Har qanday format (Max: 50MB)</span>
-						</label>
-					{/if}
-				</div>
-			{:else if selectedType === 'text'}
-				<div class="space-y-4" in:fly={{ y: 20, duration: 300 }}>
-					<div class="space-y-1.5">
-						<label for="content_text">Topshiriq matni *</label>
-						<textarea
-							id="content_text"
-							name="content_text"
-							class="input textarea"
-							rows="5"
-							placeholder="Topshiriq matnini shu yerga yozing..."
-							required
-						></textarea>
-					</div>
-				</div>
-			{:else if selectedType === 'link'}
-				<div class="space-y-4" in:fly={{ y: 20, duration: 300 }}>
-					<div class="space-y-1.5">
-						<label for="content_link">Havola (URL) *</label>
-						<div class="relative">
-							<Link size={18} class="absolute top-1/2 left-4 -translate-y-1/2 text-slate-400" />
-							<input
-								type="url"
-								id="content_link"
-								name="content_link"
-								class="input pl-11"
-								placeholder="https://example.com/resource"
-								required
-							/>
-						</div>
-					</div>
-				</div>
-			{/if}
 		</div>
 	</div>
 
@@ -267,7 +163,7 @@
 			{#if isSubmitting}
 				Saqlanmoqda...
 			{:else}
-				Save Assignment
+				Topshiriqni saqlash
 				{#if action.includes('create')}
 					<Plus size={18} />
 				{:else}
