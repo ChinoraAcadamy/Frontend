@@ -3,8 +3,7 @@ import { API_URL } from '$env/static/private';
 import { getLocale } from '@/lib/paraglide/runtime';
 
 
-export async function load({ params, cookies, url }) {
-    // API URL ni o'zingizning .env yoki o'zgaruvchilaringizdan olasiz
+export async function load({ params, cookies, url, fetch }) {
     const token = cookies.get('access_token');
     const moduleId = url.searchParams.get('module_id');
 
@@ -12,53 +11,48 @@ export async function load({ params, cookies, url }) {
         throw error(400, 'Module ID kiritilmadi');
     }
 
+    const headers = { 
+        'Authorization': `Bearer ${token}`,
+        'Accept-Language': getLocale() 
+    };
+
     try {
-        // Haqiqiy API so'rovi shunday bo'ladi:
-        const res = await fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/lessons/${params.lesson_id}/`, {
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Accept-Language': getLocale() 
-            }
-        });
-
-        if (!res.ok) throw error(res.status, 'Dars topilmadi');
-        const lessonData = await res.json();
-
-        // Keyingi darsni aniqlash uchun kurs strukturasini yuklaymiz
-        let nextLesson = null;
-        try {
-            const courseRes = await fetch(`${API_URL}/courses/${params.id}/`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+        // Parallelizing the fetches
+        const lessonPromise = fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/lessons/${params.lesson_id}/`, { headers })
+            .then(async (res) => {
+                if (!res.ok) throw error(res.status, 'Dars topilmadi');
+                return res.json();
             });
-            if (courseRes.ok) {
-                const courseData = await courseRes.json();
-                const modules = courseData.modules || [];
-                
-                // Barcha darslarni bitta tekis ro'yxatga yig'amiz
-                const allLessons = [];
-                modules.forEach(m => {
-                    if (m.lessons) {
-                        m.lessons.forEach(l => {
-                            allLessons.push({ ...l, moduleId: m.id });
-                        });
-                    }
-                });
 
-                // Joriy darsning indeksini topamiz
-                const currentIndex = allLessons.findIndex(l => l.id.toString() === params.lesson_id.toString());
-                
-                // Agar keyingi dars bo'lsa, uni saqlaymiz
-                if (currentIndex !== -1 && currentIndex < allLessons.length - 1) {
-                    nextLesson = allLessons[currentIndex + 1];
+        const coursePromise = fetch(`${API_URL}/courses/${params.id}/`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(async (res) => (res.ok ? res.json() : null))
+            .catch(() => null);
+
+        // Await only the primary content (Lesson) to ensure it renders ASAP
+        const lessonData = await lessonPromise;
+
+        // Process nextLesson as a promise that SvelteKit will stream
+        const nextLessonPromise = coursePromise.then(courseData => {
+            if (!courseData) return null;
+            const modules = courseData.modules || [];
+            const allLessons = [];
+            modules.forEach(m => {
+                if (m.lessons) {
+                    m.lessons.forEach(l => {
+                        allLessons.push({ ...l, moduleId: m.id });
+                    });
                 }
-            }
-        } catch (err) {
-            console.error("Keyingi darsni aniqlashda xatolik:", err);
-        }
+            });
+
+            const currentIndex = allLessons.findIndex(l => l.id.toString() === params.lesson_id.toString());
+            return (currentIndex !== -1 && currentIndex < allLessons.length - 1) ? allLessons[currentIndex + 1] : null;
+        });
 
         return {
             lesson: lessonData,
-            nextLesson,
+            lazy: {
+                nextLesson: nextLessonPromise
+            },
             breadcrumbs: {
                 course: "Mening kursim",
                 lesson: lessonData.title
@@ -67,7 +61,7 @@ export async function load({ params, cookies, url }) {
 
     } catch (err) {
         console.error("Darsni yuklashda xatolik:", err);
-        throw error(404, 'Ma\'lumotni yuklash imkonsiz');
+        throw error(err.status || 500, err.body?.message || 'Ma\'lumotni yuklash imkonsiz');
     }
 }
 
