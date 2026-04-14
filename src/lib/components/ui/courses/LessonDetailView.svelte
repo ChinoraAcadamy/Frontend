@@ -1,7 +1,7 @@
 <script>
 	import { enhance } from '$app/forms';
 	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
-	import { Upload, File as FileIcon, ArrowRight } from 'lucide-svelte';
+	import { Upload, File as FileIcon, ArrowRight, Lock, CheckCircle2 } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
@@ -63,6 +63,8 @@
 	let isDragging = $state(false);
 	let isSubmitting = $state(false);
 	let isSubmittingComplete = $state(false);
+	let isVideoFinished = $state(false);
+	const completionThreshold = 0.95;
 
 	// --- Security Handlers ---
 	function handleKeydown(e) {
@@ -163,11 +165,21 @@
 				tracks: videoTracks()
 			};
 
+			const checkProgress = () => {
+				if (
+					player.duration > 0 &&
+					player.currentTime / player.duration >= completionThreshold
+				) {
+					isVideoFinished = true;
+				}
+			};
+
 			const resumePlayback = () => {
 				if (!isRestored && expectedTime > 2) {
 					if (player.duration > 0 || player.media?.duration > 0) {
 						player.currentTime = expectedTime;
 						isRestored = true;
+						checkProgress();
 					}
 				} else {
 					isRestored = true;
@@ -196,9 +208,15 @@
 				}
 			};
 
+			const onEnded = () => {
+				isVideoFinished = true;
+				stopAutoSave();
+			};
+
 			player.on('playing', startAutoSave);
 			player.on('pause', stopAutoSave);
-			player.on('ended', stopAutoSave);
+			player.on('ended', onEnded);
+			player.on('timeupdate', checkProgress);
 
 			return () => {
 				stopAutoSave();
@@ -207,7 +225,8 @@
 				player.off('playing', resumePlayback);
 				player.off('playing', startAutoSave);
 				player.off('pause', stopAutoSave);
-				player.off('ended', stopAutoSave);
+				player.off('ended', onEnded);
+				player.off('timeupdate', checkProgress);
 			};
 		}
 	});
@@ -359,20 +378,47 @@
 			</div>
 
 			{#if $page.data.user?.role !== 'admin' && $page.data.user?.role !== 'superadmin'}
-				<button
-					onclick={markComplete}
-					disabled={isSubmittingComplete}
-					class="flex w-full transform items-center justify-center gap-2 rounded-xl bg-[#FA2E69] px-6 py-4 font-semibold text-white shadow-[0_8px_20px_-6px_rgba(250,46,105,0.4)] transition-all duration-300 hover:bg-[#D81B53] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
-				>
-					{#if isSubmittingComplete}
-						<span
-							class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-						></span>
-						<span>Yuborilmoqda...</span>
+				<div class="flex flex-col gap-3">
+					{#if !isVideoFinished}
+						<div
+							class="flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-3 text-xs font-bold text-amber-700"
+							transition:slide
+						>
+							<Lock size={14} />
+							<span>Tugmachani ochish uchun videoni oxirigacha ko'ring</span>
+						</div>
 					{:else}
-						<span>Darsni yakunlash</span>
+						<div
+							class="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-xs font-bold text-emerald-700"
+							transition:slide
+						>
+							<CheckCircle2 size={14} />
+							<span>Video ko'rildi! Endi darsni yakunlashingiz mumkin</span>
+						</div>
 					{/if}
-				</button>
+
+					<button
+						onclick={markComplete}
+						disabled={isSubmittingComplete || !isVideoFinished}
+						class="flex w-full transform items-center justify-center gap-2 rounded-xl bg-[#FA2E69] px-6 py-4 font-black transition-all duration-300 hover:bg-[#D81B53] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none {isVideoFinished
+							? 'text-white shadow-[0_8px_20px_-6px_rgba(250,46,105,0.4)] hover:shadow-[0_12px_25px_-6px_rgba(250,46,105,0.5)]'
+							: 'text-slate-400'}"
+					>
+						{#if isSubmittingComplete}
+							<span
+								class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-transparent"
+							></span>
+							<span>Yuborilmoqda...</span>
+						{:else}
+							{#if !isVideoFinished}
+								<Lock size={18} />
+							{:else}
+								<CheckCircle2 size={18} />
+							{/if}
+							<span>Darsni yakunlash</span>
+						{/if}
+					</button>
+				</div>
 			{/if}
 
 			<div class="pt-2">
