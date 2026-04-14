@@ -1,78 +1,69 @@
-import { API_URL } from "$env/static/private";
-import { fail, redirect } from "@sveltejs/kit";
+import { error } from '@sveltejs/kit';
+import { API_URL } from '$env/static/private';
+import { getLocale } from '@/lib/paraglide/runtime';
 
-export const load = async ({ fetch, locals, cookies }) => {
-    if (!locals.isAuthenticated) {
-        throw redirect(302, '/login');
-    }
+/** @type {import('./$types').PageServerLoad} */
+export const load = async ({ cookies, fetch, setHeaders }) => {
+    // Cache the profile page securely for this user for 60 seconds
+    setHeaders({
+        'Cache-Control': 'private, max-age=60'
+    });
 
+    const token = cookies.get('access_token');
+    
     try {
-        const accessToken = cookies.get('access_token');
-        const response = await fetch(`${API_URL}/auth/students/me/`, {
+        const res = await fetch(`${API_URL}/auth/students/me/`, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`
+                'Authorization': `Bearer ${token}`,
+                'Accept-Language': getLocale()
             }
         });
 
-        if (!response.ok) {
-            return {
-                student: null,
-                error: "Profil ma'lumotlarini yuklashda xatolik yuz berdi."
-            };
+        if (!res.ok) {
+            throw error(res.status, 'Profil ma\'lumotlarini yuklab bo\'lmadi.');
         }
 
-        const student = await response.json();
-        return {
-            student
-        };
+        const profile = await res.json();
+        return { profile };
     } catch (err) {
-        console.error("Profile load error:", err);
-        return {
-            student: null,
-            error: "Server bilan ulanishda xatolik."
-        };
+        console.error("[Profile Load] Error:", err);
+        throw error(err.status || 500, err.body?.message || "Xatolik yuz berdi");
     }
 };
 
+/** @type {import('./$types').Actions} */
 export const actions = {
-    updateProfile: async ({ request, fetch, cookies }) => {
+    updateProfile: async ({ request, cookies, fetch }) => {
+        const token = cookies.get('access_token');
         const formData = await request.formData();
-        const firstName = formData.get('firstName');
-        const lastName = formData.get('lastName');
-        const phoneNumber = formData.get('phoneNumber');
-
-        const accessToken = cookies.get('access_token');
-        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+        
+        const data = {
+            first_name: formData.get('first_name') || '',
+            last_name: formData.get('last_name') || '',
+            phone_number: formData.get('phone_number') || '',
+        };
 
         try {
-            const response = await fetch(`${API_URL}/auth/students/me/`, {
-                method: 'PATCH',
+            const res = await fetch(`${API_URL}/auth/students/me/`, {
+                method: 'PUT',
                 headers: {
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
+                    'Accept-Language': getLocale()
                 },
-                body: JSON.stringify({
-                    first_name: firstName,
-                    last_name: lastName,
-                    phone_number: phoneNumber
-                })
+                body: JSON.stringify(data)
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                return fail(400, { 
-                    error: errorData.detail || "Ma'lumotlarni saqlashda xatolik yuz berdi.",
-                    success: false 
-                });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                return { success: false, error: errData.detail || 'Ma\'lumotlarni yangilashda xatolik yuz berdi.' };
             }
 
-            const updatedStudent = await response.json();
-            return {
-                success: true,
-                student: updatedStudent
-            };
+            const updatedProfile = await res.json();
+            return { success: true, profile: updatedProfile };
         } catch (err) {
-            return fail(500, { error: err, success: false });
+            console.error("[Profile Update] Error:", err);
+            return { success: false, error: 'Server bilan ulanishda xatolik.' };
         }
     }
 };

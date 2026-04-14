@@ -1,472 +1,249 @@
 <script>
-	import {
-		User,
-		Mail,
-		Phone,
-		Calendar,
-		Award,
-		Star,
-		BookOpen,
-		Send,
-		Save,
-		X,
-		Settings2,
-		CheckCircle2,
-		Trophy,
-		GraduationCap,
-		LayoutDashboard
-	} from 'lucide-svelte';
-	import { fade, fly } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
-	import * as m from '$lib/paraglide/messages.js';
-	import { getLocale } from '$lib/paraglide/runtime.js';
+	import { User, Phone, CheckCircle2, Copy, BookOpen, FileCheck, Star, Settings, ChevronRight, LogOut } from 'lucide-svelte';
+	import { fade, fly, slide } from 'svelte/transition';
 
 	let { data, form } = $props();
-	let student = $derived(data.student);
 
-	let isEditing = $state(false);
+	// Use updated profile from form success or default to loaded data
+	let profile = $derived(form?.profile || data.profile);
 	let isSubmitting = $state(false);
 
-	// Initial form state from student data
-	let firstName = $state('');
-	let lastName = $state('');
-	let phoneNumber = $state('');
-
 	$effect(() => {
-		if (student) {
-			firstName = student.first_name || '';
-			lastName = student.last_name || '';
-			phoneNumber = student.phone_number || '';
+		if (form) {
+			if (form.success) {
+				toast.success("Muvaffaqiyatli yangilandi");
+			} else if (form.error) {
+				toast.error(form.error);
+			}
+			isSubmitting = false;
 		}
 	});
 
-	$effect(() => {
-		if (form?.success) {
-			toast.success(m.success_saved());
-			isEditing = false;
-		} else if (form?.error) {
-			toast.error(form.error);
+	const getInitials = (p) => {
+		if (!p) return 'CH';
+		if (p.first_name || p.last_name) {
+			return `${p.first_name?.[0] || ''}${p.last_name?.[0] || ''}`.toUpperCase();
 		}
-	});
+		return p.username?.substring(0, 2).toUpperCase() || 'CH';
+	};
 
-	function toggleEdit() {
-		if (isEditing) {
-			// Restore local state if canceling
-			firstName = student?.first_name || '';
-			lastName = student?.last_name || '';
-			phoneNumber = student?.phone_number || '';
+	const copyUsername = async () => {
+		if (!profile?.username) return;
+		try {
+			await navigator.clipboard.writeText(profile.username);
+			toast.success('Username nusxalandi');
+		} catch (e) {
+			toast.error("Xatolik yuz berdi");
 		}
-		isEditing = !isEditing;
-	}
-
-	function formatDate(dateStr) {
-		if (!dateStr) return "Noma'lum";
-		const date = new Date(dateStr);
-		return new Intl.DateTimeFormat(getLocale() === 'uz' ? 'uz-UZ' : 'ru-RU', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		}).format(date);
-	}
+	};
 </script>
 
-<div class="min-h-screen bg-slate-50/50 py-20 lg:py-28">
-	<div class="mx-auto max-w-6xl px-4 sm:px-6">
-		{#if !student && data.error}
-			<div class="flex flex-col items-center justify-center py-20 text-center" in:fade>
-				<div class="mb-4 rounded-full bg-red-100 p-4 text-red-600">
-					<X size={40} />
+<svelte:head>
+	<title>Profil | Chinora Academy</title>
+</svelte:head>
+
+<div class="min-h-screen bg-white">
+	<!-- Hero Section: Brand Identity -->
+	<header class="relative h-64 w-full bg-[#FA2E69] sm:h-80 overflow-hidden">
+		<!-- Background Pattern -->
+		<div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+		
+		<!-- Floating Shapes for Aesthetic -->
+		<div class="absolute -top-12 -right-12 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+		<div class="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-black/5 blur-3xl"></div>
+
+		<div class="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white">
+			<div in:fly={{ y: 20, duration: 600 }} class="relative">
+				<div class="h-28 w-28 rounded-full border-4 border-white shadow-2xl bg-[#FA2E69] flex items-center justify-center text-3xl font-black tracking-tighter">
+					{getInitials(profile)}
 				</div>
-				<h2 class="text-2xl font-bold text-slate-800">{m.error_occurred()}</h2>
-				<p class="mt-2 text-slate-500">{data.error}</p>
-				<button
-					onclick={() => window.location.reload()}
-					class="mt-6 rounded-xl bg-slate-900 px-6 py-2.5 font-semibold text-white transition-all hover:bg-slate-800"
-				>
-					{m.retry()}
-				</button>
+				<div class="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-emerald-500 border-4 border-[#FA2E69] flex items-center justify-center shadow-lg">
+					<CheckCircle2 size={14} class="text-white" />
+				</div>
 			</div>
-		{:else if student}
-			<header
-				class="mb-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end"
+
+			<h1 in:fly={{ y: 10, delay: 100, duration: 600 }} class="mt-4 text-3xl font-black tracking-tight sm:text-4xl uppercase">
+				{profile?.first_name || ''} {profile?.last_name || ''}
+				{#if !profile?.first_name && !profile?.last_name}O'quvchi{/if}
+			</h1>
+
+			<button 
+				onclick={copyUsername}
+				class="mt-2 flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-white/20"
 			>
-				<div class="space-y-1">
-					<div class="flex items-center gap-3">
-						<div
-							class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ed4b72]/10 text-[#ed4b72]"
-						>
-							<LayoutDashboard size={22} />
-						</div>
-						<h1 class="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">{m.profile_title()}</h1>
-					</div>
-					<p class="text-sm font-medium text-slate-500">
-						{m.profile_subtitle()}
-					</p>
-				</div>
+				<span>@{profile?.username}</span>
+				<Copy size={12} />
+			</button>
+		</div>
+	</header>
 
-				<button
-					onclick={toggleEdit}
-					class="group flex items-center gap-2 rounded-2xl border border-slate-200/60 bg-white px-6 py-3.5 font-bold text-slate-700 shadow-sm transition-all hover:bg-[#ed4b72] hover:text-white hover:shadow-[#ed4b72]/20 active:scale-95"
-				>
-					{#if isEditing}
-						<X size={18} />
-						<span>{m.profile_cancel()}</span>
-					{:else}
-						<Settings2 size={18} class="transition-transform group-hover:rotate-12" />
-						<span>{m.profile_edit()}</span>
-					{/if}
-				</button>
-			</header>
-
-			<div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
-				<!-- Left: Profile Summary Card -->
-				<div class="space-y-6 lg:col-span-4">
-					<div
-						class="relative overflow-hidden rounded-[32px] border border-slate-200/60 bg-white p-8 shadow-sm"
-						in:fly={{ y: 20, duration: 600 }}
-					>
-						<!-- Background glow -->
-						<div
-							class="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[#ed4b72]/5 blur-3xl"
-						></div>
-
-						<div class="relative flex flex-col items-center text-center">
-							<div class="relative mb-6">
-								<div
-									class="h-32 w-32 overflow-hidden rounded-[2.5rem] bg-slate-100 shadow-xl ring-4 shadow-slate-200/50 ring-white"
-								>
-									{#if student.picture}
-										<img
-											src={student.picture}
-											alt={student.username}
-											class="h-full w-full object-cover"
-										/>
-									{:else}
-										<div
-											class="flex h-full w-full items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 text-slate-400"
-										>
-											<User size={48} strokeWidth={1.5} />
-										</div>
-									{/if}
-								</div>
-								<div
-									class="absolute -right-2 -bottom-2 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg ring-4 ring-white"
-								>
-									<CheckCircle2 size={20} />
-								</div>
-							</div>
-
-							<h2 class="text-2xl font-bold text-slate-900">
-								{student.first_name || student.username}
-								{student.last_name || ''}
-							</h2>
-							<p class="font-bold text-[#ed4b72]">@{student.username}</p>
-
-							<div class="mt-8 grid w-full grid-cols-2 gap-3">
-								<div class="rounded-3xl border border-slate-100 bg-slate-50 p-4">
-									<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">{m.profile_rank()}</p>
-									<div class="mt-1 flex items-center justify-center gap-1.5">
-										<Trophy size={16} class="text-amber-500" />
-										<span class="text-lg font-black text-slate-800">{student.total_score || 0}</span
-										>
-									</div>
-								</div>
-								<div class="rounded-3xl border border-slate-100 bg-slate-50 p-4">
-									<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">{m.profile_courses()}</p>
-									<div class="mt-1 flex items-center justify-center gap-1.5">
-										<GraduationCap size={16} class="text-indigo-500" />
-										<span class="text-lg font-black text-slate-800"
-											>{student.courses_count || 0}</span
-										>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="mt-8 space-y-4 border-t border-slate-100 pt-8">
-							<div class="group flex items-center gap-4">
-								<div
-									class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 transition-colors group-hover:bg-[#ed4b72]/10 group-hover:text-[#ed4b72]"
-								>
-									<Mail size={18} />
-								</div>
-								<div class="overflow-hidden">
-									<p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-										{m.profile_email()}
-									</p>
-									<p class="truncate text-sm font-semibold text-slate-700">
-										{student.username}@academy.uz
-									</p>
-								</div>
-							</div>
-							<div class="group flex items-center gap-4">
-								<div
-									class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 transition-colors group-hover:bg-[#ed4b72]/10 group-hover:text-[#ed4b72]"
-								>
-									<Calendar size={18} />
-								</div>
-								<div>
-									<p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">{m.profile_date()}</p>
-									<p class="text-sm font-semibold text-slate-700">
-										{formatDate(student.created_at)}
-									</p>
-								</div>
-							</div>
-						</div>
-
-						<!-- Logout Button -->
-						<div class="mt-8">
-							<form
-								method="POST"
-								action="/logout"
-								use:enhance={() => {
-									return async ({ update }) => {
-										await update();
-									};
-								}}
-							>
-								<button
-									type="submit"
-									class="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-100 bg-red-50/50 py-3.5 text-sm font-bold text-red-600 transition-all hover:bg-red-600 hover:text-white active:scale-95"
-								>
-									<span class="rotate-180"><Settings2 size={18} /></span>
-									{m.menu_logout()}
-								</button>
-							</form>
-						</div>
-					</div>
-
-					<!-- Side Stats -->
-					<div
-						class="rounded-[32px] bg-slate-900 p-8 text-white shadow-xl shadow-slate-900/10"
-						in:fly={{ y: 20, duration: 600, delay: 100 }}
-					>
-						<div class="flex items-center justify-between">
-							<h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase">
-								{m.profile_total_submissions()}
-							</h3>
-							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
-								<Send size={16} class="text-white" />
-							</div>
-						</div>
-						<div class="mt-4 flex items-end gap-2 text-white">
-							<span class="text-4xl font-black">{student.submissions_count || 0}</span>
-							<span class="mb-1 text-sm font-medium text-slate-500">{m.profile_submitted_count({ count: "" }).replace(' ta topshirilgan', '')} {m.profile_submitted_count({ count: "" })}</span>
-						</div>
-						<div class="mt-6 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-							<div class="h-full bg-[#ed4b72]" style="width: 65%"></div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Right: Content Area -->
-				<div class="lg:col-span-8">
-					<div
-						class="h-full rounded-[32px] border border-slate-200/60 bg-white p-8 shadow-sm"
-						in:fly={{ x: 20, duration: 600 }}
-					>
-						{#if isEditing}
-							<div in:fade={{ duration: 200 }}>
-								<h3 class="text-2xl font-black text-slate-900">{m.profile_edit()}</h3>
-								<p class="mt-1 text-sm font-medium text-slate-500">{m.profile_subtitle()}</p>
-
-								<form
-									method="POST"
-									action="?/updateProfile"
-									use:enhance={() => {
-										isSubmitting = true;
-										return async ({ update }) => {
-											isSubmitting = false;
-											await update();
-										};
-									}}
-									class="mt-10 space-y-6"
-								>
-									<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-										<div class="space-y-2">
-											<label for="firstname" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
-												>{m.profile_first_name()}</label
-											>
-											<input
-												name="firstName"
-												type="text"
-												id="firstname"
-												bind:value={firstName}
-												class="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-6 text-sm font-bold text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/5"
-												placeholder="Ismingiz"
-											/>
-										</div>
-										<div class="space-y-2">
-											<label for="lastname" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
-												>{m.profile_last_name()}</label
-											>
-											<input
-												name="lastName"
-												type="text"
-												id="lastname"
-												bind:value={lastName}
-												class="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-6 text-sm font-bold text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/5"
-												placeholder="Familiyangiz"
-											/>
-										</div>
-									</div>
-
-									<div class="space-y-2">
-										<label for="phone_number" class="ml-1 text-xs font-bold tracking-widest text-slate-400 uppercase"
-											>{m.profile_phone()}</label
-										>
-										<div class="relative">
-											<div class="absolute top-1/2 left-6 -translate-y-1/2 text-slate-400">
-												<Phone size={18} />
-											</div>
-											<input
-												name="phoneNumber"
-												type="text"
-												id="phone_number"
-												bind:value={phoneNumber}
-												class="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 pr-6 pl-14 text-sm font-bold text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/5"
-												placeholder="+998 00 000 00 00"
-											/>
-										</div>
-									</div>
-
-									<div class="flex flex-col gap-4 pt-8 sm:flex-row">
-										<button
-											type="submit"
-											disabled={isSubmitting}
-											class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-900 py-4 font-bold text-white shadow-xl shadow-slate-900/10 transition-all hover:bg-[#ed4b72] hover:shadow-[#ed4b72]/30 active:scale-95 disabled:opacity-50"
-										>
-											{#if isSubmitting}
-												<div
-													class="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
-												></div>
-												<span>{m.profile_saving()}</span>
-											{:else}
-												<Save size={20} />
-												<span>{m.profile_save()}</span>
-											{/if}
-										</button>
-										<button
-											type="button"
-											onclick={toggleEdit}
-											class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-100 py-4 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
-										>
-											{m.profile_cancel()}
-										</button>
-									</div>
-								</form>
-							</div>
-						{:else}
-							<div in:fade={{ duration: 200 }}>
-								<div class="flex items-center justify-between">
-									<h3 class="text-2xl font-black text-slate-900">{m.pricing_title().replace('<span class="text-primary">investitsiyangiz</span>', 'Asosiy ma\'lumotlar')}</h3>
-									<div
-										class="hidden rounded-full border border-emerald-100 bg-emerald-50 px-4 py-1.5 text-[10px] font-black tracking-widest text-emerald-600 uppercase sm:block"
-									>
-										{m.profile_verified()}
-									</div>
-								</div>
-
-								<div class="mt-12 grid grid-cols-1 gap-12 md:grid-cols-2">
-									<div class="space-y-1">
-										<div class="flex items-center gap-2 text-[#ed4b72]">
-											<User size={16} strokeWidth={2.5} />
-											<span class="text-[10px] font-black tracking-[0.2em] uppercase"
-												>{m.profile_first_name()} {m.profile_last_name()}</span
-											>
-										</div>
-										<p class="text-xl font-black text-slate-800">
-											{student.first_name || '—'}
-											{student.last_name || '—'}
-										</p>
-									</div>
-
-									<div class="space-y-1">
-										<div class="flex items-center gap-2 text-indigo-500">
-											<LayoutDashboard size={16} strokeWidth={2.5} />
-											<span class="text-[10px] font-black tracking-[0.2em] uppercase"
-												>{m.profile_username()}</span
-											>
-										</div>
-										<p class="text-xl font-black text-slate-800">@{student.username}</p>
-									</div>
-
-									<div class="space-y-1">
-										<div class="flex items-center gap-2 text-amber-500">
-											<Phone size={16} strokeWidth={2.5} />
-											<span class="text-[10px] font-black tracking-[0.2em] uppercase">{m.profile_phone()}</span>
-										</div>
-										<p class="text-xl font-black text-slate-800">
-											{student.phone_number || 'Kiritilmagan'}
-										</p>
-									</div>
-
-									<div class="space-y-1">
-										<div class="flex items-center gap-2 text-emerald-500">
-											<Star size={16} strokeWidth={2.5} />
-											<span class="text-[10px] font-black tracking-[0.2em] uppercase">Status</span>
-										</div>
-										<p class="text-xl font-black text-slate-800">
-											{student.is_active ? m.profile_active_student() : m.profile_inactive()}
-										</p>
-									</div>
-								</div>
-
-								<!-- Achievement Cards -->
-								<div class="mt-16">
-									<div class="mb-6 flex items-center justify-between">
-										<h4 class="text-lg font-black tracking-tight text-slate-900 uppercase">
-											{m.profile_achievements()}
-										</h4>
-										<button class="text-xs font-bold text-[#ed4b72] transition-all hover:underline"
-											>{m.dashboard_view_all()}</button
-										>
-									</div>
-									<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-										<div
-											class="group relative overflow-hidden rounded-3xl border border-slate-100 bg-slate-50 p-6 transition-all hover:border-[#ed4b72]/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/20"
-										>
-											<div class="flex items-center gap-4">
-												<div
-													class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition-colors group-hover:bg-[#ed4b72] group-hover:text-white"
-												>
-													<Award size={24} />
-												</div>
-												<div>
-													<h5 class="font-bold text-slate-800">{m.profile_certificates()}</h5>
-													<p class="text-xs font-medium text-slate-400">{m.profile_no_certificates()}</p>
-												</div>
-											</div>
-										</div>
-										<div
-											class="group relative overflow-hidden rounded-3xl border border-slate-100 bg-slate-50 p-6 transition-all hover:border-indigo-500/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/20"
-										>
-											<div class="flex items-center gap-4">
-												<div
-													class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition-colors group-hover:bg-indigo-500 group-hover:text-white"
-												>
-													<BookOpen size={24} />
-												</div>
-												<div>
-													<h5 class="font-bold text-slate-800">{m.profile_materials()}</h5>
-													<p class="text-xs font-medium text-slate-400">{m.profile_mastered({ percent: "80" })}</p>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						{/if}
-					</div>
-				</div>
+	<!-- Main Content: Full Width Sections -->
+	<main class="mx-auto w-full max-w-5xl">
+		
+		<!-- Stats Row: High Density Flat Design -->
+		<div class="grid grid-cols-1 border-b border-slate-100 sm:grid-cols-3">
+			<div class="flex flex-col items-center justify-center border-b border-slate-100 p-8 sm:border-b-0 sm:border-r">
+				<span class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+					<Star size={14} class="text-amber-400" /> Umumiy Ball
+				</span>
+				<span class="mt-2 text-4xl font-black text-slate-900 tracking-tighter">{profile?.total_score || '0'}</span>
 			</div>
-		{/if}
-	</div>
+			
+			<div class="flex flex-col items-center justify-center border-b border-slate-100 p-8 sm:border-b-0 sm:border-r">
+				<span class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+					<BookOpen size={14} class="text-sky-500" /> Kurslar soni
+				</span>
+				<span class="mt-2 text-4xl font-black text-slate-900 tracking-tighter">{profile?.courses_count || '0'}</span>
+			</div>
+
+			<div class="flex flex-col items-center justify-center p-8">
+				<span class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+					<FileCheck size={14} class="text-emerald-500" /> Topshiriqlar
+				</span>
+				<span class="mt-2 text-4xl font-black text-slate-900 tracking-tighter">{profile?.submissions_count || '0'}</span>
+			</div>
+		</div>
+
+		<!-- Settings Grid -->
+		<div class="grid grid-cols-1 lg:grid-cols-[1fr_2fr]">
+			
+			<!-- Left: Navigation / Quick Info -->
+			<div class="bg-slate-50/50 p-8 lg:border-r border-slate-100">
+				<h2 class="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#FA2E69]">
+					<Settings size={18} /> Sozlamalar
+				</h2>
+				<p class="mt-2 text-sm text-slate-500 leading-relaxed font-medium">Bu yerda siz o'zingizning shaxsiy ma'lumotlaringizni tahrirlashingiz mumkin.</p>
+
+				<nav class="mt-8 flex flex-col gap-2">
+					<div class="flex items-center justify-between rounded-lg bg-white p-4 border border-slate-200 shadow-sm cursor-pointer border-l-4 border-l-[#FA2E69]">
+						<div class="flex items-center gap-3">
+							<div class="rounded bg-rose-50 p-2 text-rose-500">
+								<User size={18} />
+							</div>
+							<span class="text-sm font-bold text-slate-900 uppercase tracking-wide">Asosiy ma'lumotlar</span>
+						</div>
+						<ChevronRight size={18} class="text-slate-300" />
+					</div>
+					
+					<div class="flex items-center justify-between rounded-lg bg-white/50 p-4 border border-slate-100 opacity-60">
+						<div class="flex items-center gap-3">
+							<div class="rounded bg-slate-100 p-2 text-slate-400">
+								<Settings size={18} />
+							</div>
+							<span class="text-sm font-bold text-slate-400 uppercase tracking-wide">Xavfsizlik (tez kunda)</span>
+						</div>
+					</div>
+
+					<form action="/auth/logout" method="POST" class="mt-4">
+						<button class="flex w-full items-center gap-3 rounded-lg p-4 text-rose-600 transition-colors hover:bg-rose-50 group">
+							<LogOut size={18} class="group-hover:translate-x-1 transition-transform" />
+							<span class="text-xs font-black uppercase tracking-widest">Tizimdan chiqish</span>
+						</button>
+					</form>
+				</nav>
+			</div>
+
+			<!-- Right: Form Content -->
+			<div class="p-8 sm:p-12">
+				<form 
+					action="?/updateProfile" 
+					method="POST" 
+					use:enhance={() => { 
+						isSubmitting = true; 
+						return async ({ update }) => { 
+							await update({ reset: false }); 
+							isSubmitting = false; 
+						} 
+					}} 
+					class="flex flex-col gap-8"
+				>
+					<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+						<!-- Input Field -->
+						<div class="flex flex-col gap-3">
+							<label for="first_name" class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">ISMINGIZ</label>
+							<div class="group relative">
+								<input 
+									type="text" 
+									id="first_name" 
+									name="first_name" 
+									value={profile?.first_name || ''} 
+									class="w-full border-b-2 border-slate-200 bg-transparent py-3 text-lg font-bold text-slate-900 outline-none transition-colors placeholder:text-slate-300 group-hover:border-slate-300 focus:border-[#FA2E69]" 
+									placeholder="Ali" 
+									required 
+								/>
+							</div>
+						</div>
+
+						<!-- Input Field -->
+						<div class="flex flex-col gap-3">
+							<label for="last_name" class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">FAMILIYANGIZ</label>
+							<div class="group relative">
+								<input 
+									type="text" 
+									id="last_name" 
+									name="last_name" 
+									value={profile?.last_name || ''} 
+									class="w-full border-b-2 border-slate-200 bg-transparent py-3 text-lg font-bold text-slate-900 outline-none transition-colors placeholder:text-slate-300 group-hover:border-slate-300 focus:border-[#FA2E69]" 
+									placeholder="Toirov" 
+									required 
+								/>
+							</div>
+						</div>
+					</div>
+
+					<!-- Phone Field -->
+					<div class="flex flex-col gap-3">
+						<label for="phone_number" class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">TELEFON RAQAMINGIZ</label>
+						<div class="group relative">
+							<div class="absolute left-0 top-1/2 -translate-y-1/2 text-slate-400">
+								<Phone size={18} />
+							</div>
+							<input 
+								type="tel" 
+								id="phone_number" 
+								name="phone_number" 
+								value={profile?.phone_number || ''} 
+								class="w-full border-b-2 border-slate-200 bg-transparent py-3 pl-8 text-lg font-bold text-slate-900 outline-none transition-colors placeholder:text-slate-300 group-hover:border-slate-300 focus:border-[#FA2E69]" 
+								placeholder="+998 90 123 45 67" 
+							/>
+						</div>
+					</div>
+
+					<div class="mt-6 flex flex-col items-center justify-between gap-6 border-t border-slate-100 pt-10 sm:flex-row">
+						<div class="flex flex-col">
+							<span class="text-[10px] font-black uppercase tracking-widest text-slate-300">A'zolik sanasi</span>
+							{#if profile?.created_at}
+								<span class="text-sm font-bold text-slate-500">{new Date(profile.created_at).toLocaleDateString('uz', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+							{/if}
+						</div>
+
+						<button 
+							type="submit" 
+							disabled={isSubmitting} 
+							class="w-full sm:w-auto px-12 py-4 bg-[#FA2E69] text-white text-xs font-black uppercase tracking-[0.2em] rounded-full transition-all hover:scale-105 active:scale-95 shadow-xl shadow-rose-600/20 disabled:opacity-50 disabled:scale-100"
+						>
+							{#if isSubmitting}
+								<span>Kutilmoqda...</span>
+							{:else}
+								<span>O'zgarishlarni saqlash</span>
+							{/if}
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
 </div>
 
 <style>
 	:global(body) {
-		background-color: #f8fafc;
+		background-color: white !important;
+	}
+	
+	/* Brand Typography Overrides */
+	:global(.admin-body) {
+		font-family: 'Lexend', 'Inter', system-ui, sans-serif !important;
 	}
 </style>

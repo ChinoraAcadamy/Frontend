@@ -5,6 +5,7 @@
 	import { LayoutDashboard, BookOpen, GraduationCap, User } from 'lucide-svelte';
 	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { page } from '$app/state';
 
 	let { data, children } = $props();
 
@@ -27,6 +28,8 @@
 		{ href: '/baholar', label: m.menu_grades(), icon: GraduationCap, exact: false },
 		{ href: '/profil', label: m.menu_profile(), icon: User, exact: false }
 	];
+
+	const isProfilePage = $derived(page.url.pathname.includes('/profil'));
 </script>
 
 <SeoMeta 
@@ -40,7 +43,7 @@
 	<div class="admin-body">
 		<DashboardNavbar notificationCount={3} bind:mobileOpen user={data.user} />
 
-		<main class="md:admin-content md:p-6">
+		<main class={isProfilePage ? '' : 'md:admin-content md:p-6'}>
 			{@render children()}
 		</main>
 	</div>
