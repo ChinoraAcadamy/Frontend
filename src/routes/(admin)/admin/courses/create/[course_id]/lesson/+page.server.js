@@ -24,7 +24,7 @@ export const actions = {
 
         const video = formData.get('video_url');
         if (video instanceof File && video.size === 0) {
-            formData.delete('video');
+            formData.delete('video_url');
         }
 
         try {
@@ -35,13 +35,30 @@ export const actions = {
             });
 
             if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                console.log(`Error: ${errData}`);
-                console.log(`Error: ${errData.title}`);
-                console.log(`Error: ${errData.detail}`);
-                console.log(`Response ${await response.text()}`)
+                let errData = {};
+                let responseText = '';
+
+                try {
+                    // Body ni FAQAT BIR marta o‘qiyapmiz
+                    responseText = await response.text();
+                    console.log('Raw error response:', responseText);
+
+                    errData = JSON.parse(responseText) || {};
+                } catch (parseErr) {
+                    // JSON bo‘lmasa ham xato bermaydi
+                    console.log('Response could not be parsed as JSON');
+                    console.log(parseErr)
+                }
+
+                // Endi xavfsiz log qilamiz
+                console.log('Error object:', errData);
+                console.log('Error title:', errData.title);
+                console.log('Error detail:', errData.detail);
+
                 return fail(400, {
-                    error: errData.title?.[0] || errData.detail || "Modulni saqlashda xatolik yuz berdi"
+                    error: errData.title?.[0]
+                        || errData.detail
+                        || "Modulni saqlashda xatolik yuz berdi"
                 });
             }
 
