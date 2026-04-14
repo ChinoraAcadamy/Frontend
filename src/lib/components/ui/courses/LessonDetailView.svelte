@@ -1,7 +1,16 @@
 <script>
+	/* eslint-disable no-unused-vars */
 	import { enhance } from '$app/forms';
 	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
-	import { Upload, File as FileIcon, ArrowRight, Lock, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import {
+		Upload,
+		File as FileIcon,
+		ArrowRight,
+		Lock,
+		CheckCircle2,
+		ChevronLeft,
+		ChevronRight
+	} from 'lucide-svelte';
 	import { fade, slide, fly } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
@@ -171,10 +180,7 @@
 			};
 
 			const checkProgress = () => {
-				if (
-					player.duration > 0 &&
-					player.currentTime / player.duration >= completionThreshold
-				) {
+				if (player.duration > 0 && player.currentTime / player.duration >= completionThreshold) {
 					isVideoFinished = true;
 				}
 			};
@@ -320,8 +326,6 @@
 		if (percentage >= 50) return 'text-amber-600 bg-amber-50 border-amber-100';
 		return 'text-rose-600 bg-rose-50 border-rose-100';
 	};
-
-
 </script>
 
 <svelte:window on:contextmenu={(e) => e.preventDefault()} />
@@ -335,21 +339,28 @@
 	<div
 		class="grid grid-cols-1 gap-6 {hasAssignments ? 'lg:grid-cols-[2fr_1fr]' : 'mx-auto max-w-4xl'}"
 	>
-		
 		<!-- Left Col: Video & Info -->
 		<div class="flex flex-col gap-6">
-			
 			<!-- Video Player -->
-			<div class="relative w-full aspect-video rounded-md border border-slate-200 bg-slate-900 overflow-hidden">
+			<div
+				class="relative aspect-video w-full overflow-hidden rounded-md border border-slate-200 bg-slate-900"
+			>
 				{#if !player}
-					<div class="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" transition:fade>
-						<div class="h-8 w-8 animate-spin rounded-full border-2 border-[#ed4b72] border-t-transparent"></div>
+					<div
+						class="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
+						transition:fade
+					>
+						<div
+							class="h-8 w-8 animate-spin rounded-full border-2 border-[#ed4b72] border-t-transparent"
+						></div>
 					</div>
 				{/if}
 
 				<video
 					bind:this={videoElement}
-					class="plyr-video h-full w-full opacity-0 transition-opacity duration-300 {player ? 'opacity-100' : ''}"
+					class="plyr-video h-full w-full opacity-0 transition-opacity duration-300 {player
+						? 'opacity-100'
+						: ''}"
 					poster={lesson.image}
 					playsinline
 					crossorigin="anonymous"
@@ -358,9 +369,16 @@
 				</video>
 
 				<!-- Security Overlays -->
-				<div role="application" class="pointer-events-none absolute inset-0 z-5" oncontextmenu={(e) => e.preventDefault()}></div>
+				<div
+					role="application"
+					class="pointer-events-none absolute inset-0 z-5"
+					oncontextmenu={(e) => e.preventDefault()}
+				></div>
 				{#if showWatermark}
-					<div class="pointer-events-none absolute z-10 text-xs font-bold text-white/20 select-none transition-all duration-1000" style="top: {watermarkPos.top}%; left: {watermarkPos.left}%;">
+					<div
+						class="pointer-events-none absolute z-10 text-xs font-bold text-white/20 transition-all duration-1000 select-none"
+						style="top: {watermarkPos.top}%; left: {watermarkPos.left}%;"
+					>
 						{userIdent}
 					</div>
 				{/if}
@@ -368,8 +386,12 @@
 
 			<!-- Lesson Metadata -->
 			<div class="flex flex-col gap-2">
-				<span class="text-xs font-bold tracking-wider text-slate-500 uppercase">Dars ma'lumotlari</span>
-				<h1 class="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">{lesson.title}</h1>
+				<span class="text-xs font-bold tracking-wider text-slate-500 uppercase"
+					>Dars ma'lumotlari</span
+				>
+				<h1 class="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
+					{lesson.title}
+				</h1>
 				<p class="text-sm leading-relaxed text-slate-600">{lesson.description}</p>
 			</div>
 
@@ -377,12 +399,18 @@
 			{#if $page.data.user?.role !== 'admin' && $page.data.user?.role !== 'superadmin'}
 				<div class="mt-4 flex flex-col gap-3">
 					{#if !isVideoFinished}
-						<div class="flex items-center gap-2 rounded-md bg-amber-50 p-3 text-xs font-bold text-amber-700 border border-amber-200" transition:slide>
+						<div
+							class="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs font-bold text-amber-700"
+							transition:slide
+						>
 							<Lock size={16} />
 							<span>Tugmachani ochish uchun videoni oxirigacha ko'ring</span>
 						</div>
 					{:else}
-						<div class="flex items-center gap-2 rounded-md bg-emerald-50 p-3 text-xs font-bold text-emerald-700 border border-emerald-200" transition:slide>
+						<div
+							class="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-xs font-bold text-emerald-700"
+							transition:slide
+						>
 							<CheckCircle2 size={16} />
 							<span>Video ko'rildi! Endi darsni yakunlashingiz mumkin</span>
 						</div>
@@ -391,10 +419,14 @@
 					<button
 						onclick={markComplete}
 						disabled={isSubmittingComplete || !isVideoFinished}
-						class="flex w-full items-center justify-center gap-2 rounded-md py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 border {isVideoFinished ? 'bg-[#FA2E69] text-white border-[#FA2E69] hover:bg-[#D81B53]' : 'bg-slate-50 text-slate-400 border-slate-200'}"
+						class="flex w-full items-center justify-center gap-2 rounded-md border py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 {isVideoFinished
+							? 'border-[#FA2E69] bg-[#FA2E69] text-white hover:bg-[#D81B53]'
+							: 'border-slate-200 bg-slate-50 text-slate-400'}"
 					>
 						{#if isSubmittingComplete}
-							<div class="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+							<div
+								class="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+							></div>
 							<span>Yuborilmoqda...</span>
 						{:else}
 							{#if !isVideoFinished}
@@ -417,14 +449,12 @@
 				{#key currentAssignmentIndex}
 					<div in:fly={{ x: 20, duration: 400 }} class="flex flex-col">
 						<!-- Assignment Header -->
-						<div class="bg-white p-5 sm:p-6 pb-2">
+						<div class="bg-white p-5 pb-2 sm:p-6">
 							<div class="mb-4 flex items-center justify-between">
 								<span
-									class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-600"
+									class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[11px] font-bold tracking-wider text-slate-600 uppercase"
 								>
-									{lesson.assignments.length > 1
-										? `${currentAssignmentIndex + 1}-topshiriq`
-										: ''}
+									{lesson.assignments.length > 1 ? `${currentAssignmentIndex + 1}-topshiriq` : ''}
 									{assignment.type === 'text'
 										? 'Matn'
 										: assignment.type === 'link'
@@ -440,19 +470,17 @@
 
 							<div class="mt-4 flex items-center gap-6 border-t border-slate-100 pt-4">
 								<div class="flex flex-col">
-									<span class="text-[10px] font-bold uppercase tracking-wider text-slate-400"
+									<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
 										>Maks Ball</span
 									>
 									<span class="text-base font-black text-slate-900">{assignment.max_score}</span>
 								</div>
 								<div class="h-8 w-px bg-slate-200"></div>
 								<div class="flex flex-col">
-									<span class="text-[10px] font-bold uppercase tracking-wider text-slate-400"
+									<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
 										>Urinishlar</span
 									>
-									<span class="text-base font-black text-slate-900"
-										>{assignment.max_attempts}</span
-									>
+									<span class="text-base font-black text-slate-900">{assignment.max_attempts}</span>
 								</div>
 							</div>
 						</div>
@@ -502,15 +530,14 @@
 								<div class="flex flex-col gap-1.5">
 									<label
 										for="text_answer"
-										class="text-xs font-bold uppercase tracking-wider text-slate-600"
-										>Javob</label
+										class="text-xs font-bold tracking-wider text-slate-600 uppercase">Javob</label
 									>
 									<textarea
 										id="text_answer"
 										name="text_answer"
 										rows="5"
 										placeholder="Topshiriq yuzasidan batafsilroq yozing..."
-										class="w-full rounded-md border border-slate-300 p-3 text-sm outline-none transition-colors focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
+										class="w-full rounded-md border border-slate-300 p-3 text-sm transition-colors outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
 										required
 									></textarea>
 								</div>
@@ -518,15 +545,14 @@
 								<div class="flex flex-col gap-1.5">
 									<label
 										for="text_answer"
-										class="text-xs font-bold uppercase tracking-wider text-slate-600"
-										>Havola</label
+										class="text-xs font-bold tracking-wider text-slate-600 uppercase">Havola</label
 									>
 									<input
 										type="url"
 										id="text_answer"
 										name="text_answer"
 										placeholder="https://example.com/your-work"
-										class="w-full rounded-md border border-slate-300 p-3 text-sm outline-none transition-colors focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
+										class="w-full rounded-md border border-slate-300 p-3 text-sm transition-colors outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
 										required
 									/>
 								</div>
@@ -536,7 +562,7 @@
 								<div class="flex flex-col gap-1.5">
 									<label
 										for="desc_answer"
-										class="text-xs font-bold uppercase tracking-wider text-slate-600"
+										class="text-xs font-bold tracking-wider text-slate-600 uppercase"
 										>Izoh (ixtiyoriy)</label
 									>
 									<textarea
@@ -544,7 +570,7 @@
 										name="desc_answer"
 										rows="2"
 										placeholder="Topshiriq yuzasidan izoh qoldiring..."
-										class="w-full rounded-md border border-slate-300 p-3 text-sm outline-none transition-colors focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
+										class="w-full rounded-md border border-slate-300 p-3 text-sm transition-colors outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
 									></textarea>
 								</div>
 							{/if}
@@ -578,20 +604,29 @@
 										>
 											<div class="flex items-center justify-between">
 												<div class="flex items-center gap-2 text-[11px] font-medium text-slate-500">
-													<span>{new Date(sub.submitted_at || Date.now()).toLocaleDateString('uz')}</span>
+													<span
+														>{new Date(sub.submitted_at || Date.now()).toLocaleDateString(
+															'uz'
+														)}</span
+													>
 													<span class="h-1 w-1 rounded-full bg-slate-300"></span>
-													<span>{new Date(sub.submitted_at || Date.now()).toLocaleTimeString('uz')}</span>
+													<span
+														>{new Date(sub.submitted_at || Date.now()).toLocaleTimeString(
+															'uz'
+														)}</span
+													>
 												</div>
 												{#if sub.status === 'Graded'}
 													<span
-														class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600"
+														class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[10px] font-bold tracking-wider text-slate-600 uppercase"
 														>Baholandi</span
 													>
 												{:else}
 													<div
 														class="flex items-center gap-1.5 rounded border border-sky-100 bg-sky-50 px-2 py-1"
 													>
-														<span class="text-[10px] font-bold uppercase tracking-wider text-sky-600"
+														<span
+															class="text-[10px] font-bold tracking-wider text-sky-600 uppercase"
 															>Kutilmoqda</span
 														>
 														<div class="flex gap-0.5">
@@ -618,10 +653,10 @@
 											{#if sub.feedback}
 												<div class="mt-1 border-l-2 border-[#FA2E69] bg-slate-50/80 p-3">
 													<span
-														class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-slate-400"
+														class="mb-1 block text-[10px] font-bold tracking-wider text-slate-400 uppercase"
 														>Mentor:</span
 													>
-													<p class="text-[13px] font-medium italic text-slate-700">
+													<p class="text-[13px] font-medium text-slate-700 italic">
 														"{sub.feedback}"
 													</p>
 												</div>
@@ -647,7 +682,7 @@
 						</button>
 
 						<div class="flex gap-1.5">
-							{#each lesson.assignments as _, i}
+							{#each lesson.assignments as _, i (i)}
 								<div
 									class="h-1.5 w-1.5 rounded-full transition-colors {i === currentAssignmentIndex
 										? 'bg-[#FA2E69]'

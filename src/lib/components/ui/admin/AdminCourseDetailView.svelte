@@ -13,9 +13,7 @@
 		Save,
 		Globe,
 		Tag,
-		Info,
 		CheckCircle2,
-		ShieldAlert
 	} from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
@@ -81,6 +79,7 @@
 
 	// --- Course Update Logic ---
 	let isSaving = $state(false);
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let isPublished = $state(course.is_published);
 
 	const onUpdateCourse = () => {

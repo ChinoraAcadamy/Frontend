@@ -71,25 +71,33 @@
 			<h1 class="text-[28px] font-black tracking-tighter text-slate-900 uppercase md:text-4xl">
 				{m.courses_title()}
 			</h1>
-			<p class="mt-2 max-w-xl text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] opacity-80">
+			<p
+				class="mt-2 max-w-xl text-[11px] font-black tracking-[0.2em] text-slate-400 uppercase opacity-80"
+			>
 				{m.courses_subtitle()}
 			</p>
 		</div>
 
-		<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+		<div class="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center md:w-auto">
 			<!-- View Toggle -->
-			<div class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm">
+			<div
+				class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm"
+			>
 				<button
 					onclick={() => toggleView('grid')}
 					class="flex h-9 w-10 items-center justify-center rounded-lg transition-all
-					{viewMode === 'grid' ? 'bg-[#9b1c48] text-white shadow-md shadow-[#9b1c48]/20' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}"
+					{viewMode === 'grid'
+						? 'bg-[#9b1c48] text-white shadow-md shadow-[#9b1c48]/20'
+						: 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}"
 				>
 					<LayoutGrid size={18} />
 				</button>
 				<button
 					onclick={() => toggleView('list')}
 					class="flex h-9 w-10 items-center justify-center rounded-lg transition-all
-					{viewMode === 'list' ? 'bg-[#9b1c48] text-white shadow-md shadow-[#9b1c48]/20' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}"
+					{viewMode === 'list'
+						? 'bg-[#9b1c48] text-white shadow-md shadow-[#9b1c48]/20'
+						: 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}"
 				>
 					<List size={18} />
 				</button>
@@ -102,20 +110,28 @@
 					placeholder={m.courses_search_placeholder()}
 					value={searchQuery}
 					oninput={handleSearch}
-					class="h-12 w-full rounded-xl border border-slate-200 bg-white pr-4 pl-11 text-[11px] font-black uppercase tracking-widest transition-all outline-none focus:border-[#9b1c48]/30 focus:ring-4 focus:ring-[#9b1c48]/5"
+					class="h-12 w-full rounded-xl border border-slate-200 bg-white pr-4 pl-11 text-[11px] font-black tracking-widest uppercase transition-all outline-none focus:border-[#9b1c48]/30 focus:ring-4 focus:ring-[#9b1c48]/5"
 				/>
 			</div>
 		</div>
 	</div>
 
 	{#await data.lazy.coursesData}
-		<div class={viewMode === 'grid' ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "flex flex-col gap-4"}>
+		<div
+			class={viewMode === 'grid'
+				? 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+				: 'flex flex-col gap-4'}
+		>
 			{#each Array(6) as _, i (i)}
-				<div class="animate-pulse border-2 border-slate-50 bg-white rounded-xl {viewMode === 'grid' ? 'p-5 h-76' : 'p-4 flex items-center gap-4 h-20'}">
+				<div
+					class="animate-pulse rounded-xl border-2 border-slate-50 bg-white {viewMode === 'grid'
+						? 'h-76 p-5'
+						: 'flex h-20 items-center gap-4 p-4'}"
+				>
 					{#if viewMode === 'grid'}
-						<div class="flex items-start gap-4 mb-4">
+						<div class="mb-4 flex items-start gap-4">
 							<div class="h-20 w-20 shrink-0 rounded-lg bg-slate-50"></div>
-							<div class="flex-1 space-y-2 mt-1">
+							<div class="mt-1 flex-1 space-y-2">
 								<div class="h-4 w-full rounded bg-slate-50"></div>
 								<div class="h-4 w-2/3 rounded bg-slate-50"></div>
 							</div>
@@ -140,37 +156,45 @@
 				class="flex min-h-[40vh] flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-100 bg-white p-12 text-center"
 			>
 				<div
-					class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50 border border-slate-100"
+					class="mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-slate-100 bg-slate-50"
 				>
 					<BookOpen size={32} class="text-slate-200" strokeWidth={2} />
 				</div>
 
 				{#if searchQuery}
-					<h3 class="mb-2 text-xl font-black text-slate-800 uppercase tracking-tighter">{m.courses_not_found()}</h3>
-					<p class="mb-6 max-w-sm font-black text-slate-400 uppercase tracking-[0.1em] text-[11px]">
+					<h3 class="mb-2 text-xl font-black tracking-tighter text-slate-800 uppercase">
+						{m.courses_not_found()}
+					</h3>
+					<p class="mb-6 max-w-sm text-[11px] font-black tracking-[0.1em] text-slate-400 uppercase">
 						{m.courses_not_found_desc({ query: searchQuery })}
 					</p>
 					<button
 						onclick={clearSearch}
-						class="font-black text-[#9b1c48] uppercase tracking-widest text-xs hover:underline"
+						class="text-xs font-black tracking-widest text-[#9b1c48] uppercase hover:underline"
 					>
 						{m.courses_view_all()}
 					</button>
 				{:else}
-					<h3 class="mb-2 text-xl font-black text-slate-800 uppercase tracking-tighter">{m.courses_empty()}</h3>
-					<p class="mb-8 max-w-md font-black text-slate-400 uppercase tracking-[0.1em] text-[11px]">
+					<h3 class="mb-2 text-xl font-black tracking-tighter text-slate-800 uppercase">
+						{m.courses_empty()}
+					</h3>
+					<p class="mb-8 max-w-md text-[11px] font-black tracking-[0.1em] text-slate-400 uppercase">
 						{m.courses_empty_desc()}
 					</p>
 					<button
 						onclick={() => goto(resolve(/** @type {any} */ ('/dashboard')))}
-						class="rounded-xl bg-[#9b1c48] px-10 py-4 font-black text-white uppercase tracking-widest text-[11px] transition-all hover:bg-[#80163a] shadow-lg shadow-[#9b1c48]/20 active:scale-95"
+						class="rounded-xl bg-[#9b1c48] px-10 py-4 text-[11px] font-black tracking-widest text-white uppercase shadow-lg shadow-[#9b1c48]/20 transition-all hover:bg-[#80163a] active:scale-95"
 					>
 						{m.courses_discover()}
 					</button>
 				{/if}
 			</div>
 		{:else}
-			<div class={viewMode === 'grid' ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "flex flex-col gap-4"}>
+			<div
+				class={viewMode === 'grid'
+					? 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+					: 'flex flex-col gap-4'}
+			>
 				{#each courses as course (course.id)}
 					<div class="animate-in fade-in slide-in-from-bottom-2 duration-300">
 						{#if viewMode === 'grid'}
@@ -189,7 +213,6 @@
 							<CourseListRow
 								id={course.id}
 								title={course.title}
-								subtitle={course.price ? `${course.price} UZS` : m.course_free()}
 								image={course.img}
 								progress={course.progress}
 								price={course.price}
@@ -204,7 +227,7 @@
 
 			{#if totalCount > courses.length}
 				<div class="mt-16 flex justify-center">
-					<p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">
+					<p class="text-[10px] font-black tracking-[0.3em] text-slate-300 uppercase">
 						{m.courses_total({ total: totalCount })}
 					</p>
 				</div>

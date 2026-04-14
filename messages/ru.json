@@ -311,5 +311,8 @@
 	"lessons_label": "Уроки",
 	"price_label": "Сум",
 	"course_locked": "Заблокировано",
-	"course_continue": "Продолжить"
+	"course_continue": "Продолжить",
+
+	"refresh_success": "Данные обновлены!",
+	"refresh_error": "Ошибка при обновлении данных"
 }

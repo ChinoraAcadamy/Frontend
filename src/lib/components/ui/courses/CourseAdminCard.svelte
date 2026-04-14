@@ -1,82 +1,88 @@
 <script lang="ts">
-    import { resolve } from "$app/paths";
-    import { Play } from 'lucide-svelte';
+	import { resolve } from '$app/paths';
+	import { m } from '@/lib/paraglide/messages';
+	import { Play } from 'lucide-svelte';
 
-    let { 
-        title, 
-        price, 
-        modules, 
-        status, 
-        image,
-        link
-    } = $props();
+	let { title, price, modules, status, image, link } = $props();
 
-    const isPublished = $derived(status === 'published' || status === 'active');
+	const isPublished = $derived(status === 'published' || status === 'active');
 
-    /** @param {Event} e */
-    function handleImageError(e: Event) {
-        const target = e.currentTarget as HTMLImageElement;
-        target.src = `https://placehold.co/600x400?text=${encodeURIComponent(title)}`;
-    }
+	/** @param {Event} e */
+	function handleImageError(e) {
+		const target = e.currentTarget;
+		target.src = `https://placehold.co/600x400?text=${encodeURIComponent(title)}`;
+	}
 
-    // Image source fallback
-    let displayImage = $derived(image || `https://placehold.co/600x400?text=${encodeURIComponent(title)}`);
+	// Image source fallback
+	let displayImage = $derived(
+		image || `https://placehold.co/600x400?text=${encodeURIComponent(title)}`
+	);
 </script>
 
-<div class="group bg-white rounded-xl overflow-hidden border-2 border-slate-100 transition-all duration-300 flex flex-col h-full relative hover:border-[#9b1c48]/20">
-    
-    <!-- Image Section -->
-    <div class="relative w-full aspect-video overflow-hidden bg-slate-50 border-b border-slate-100">
-        <img 
-            src={displayImage} 
-            alt={title} 
-            class="w-full h-full object-cover transition-transform duration-500"
-            width="400" 
-            height="225"
-            loading="lazy"
-            onerror={handleImageError}
-        />
-        
-        <!-- Subtle overlay + play icon on hover -->
-        <div class="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-        
-        <a href={resolve(`/admin/courses/${link}`)}  class="absolute bottom-3 right-3 bg-white text-[#9b1c48] rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-sm border border-slate-100">
-            <Play size={10} class="fill-current" />
-            Preview
-        </a>
+<div
+	class="group relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-slate-100 bg-white transition-all duration-300 hover:border-[#9b1c48]/20"
+>
+	<!-- Image Section -->
+	<div class="relative aspect-video w-full overflow-hidden border-b border-slate-100 bg-slate-50">
+		<img
+			src={displayImage}
+			alt={title}
+			class="h-full w-full object-cover transition-transform duration-500"
+			width="400"
+			height="225"
+			loading="lazy"
+			onerror={handleImageError}
+		/>
 
-        <!-- Status badge on image -->
-        <div class="absolute top-3 left-3 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded bg-white/90 backdrop-blur-sm shadow-sm
-            {isPublished 
-                ? 'text-emerald-600' 
-                : 'text-amber-600'}">
-            {status}
-        </div>
-    </div>
+		<!-- Subtle overlay + play icon on hover -->
+		<div
+			class="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent opacity-0 transition-all duration-300 group-hover:opacity-100"
+		></div>
 
-    <!-- Content -->
-    <div class="flex-1 p-5 flex flex-col">
-        <h3 class="text-[15px] font-black text-slate-800 line-clamp-2 leading-tight mb-1.5 group-hover:text-[#9b1c48] transition-colors uppercase tracking-tight">
-            {title}
-        </h3>
+		<a
+			href={resolve(`/admin/courses/${link}`)}
+			class="absolute right-3 bottom-3 flex items-center gap-1.5 rounded-lg border border-slate-100 bg-white px-3 py-1.5 text-[10px] font-black tracking-widest text-[#9b1c48] uppercase opacity-0 shadow-sm transition-all duration-300 group-hover:opacity-100"
+		>
+			<Play size={10} class="fill-current" />
+			Preview
+		</a>
 
-        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
-            {modules} Modules
-        </p>
+		<!-- Status badge on image -->
+		<div
+			class="absolute top-3 left-3 rounded bg-white/90 px-2 py-1 text-[9px] font-black tracking-widest uppercase shadow-sm backdrop-blur-sm
+            {isPublished ? 'text-emerald-600' : 'text-amber-600'}"
+		>
+			{status}
+		</div>
+	</div>
 
-        <!-- Price + Button -->
-        <div class="mt-auto flex items-end flex-row justify-between pt-3 border-t border-slate-50">
-            <div>
-                <span class="text-[18px] font-black text-slate-900">${price}</span>
-            </div>
+	<!-- Content -->
+	<div class="flex flex-1 flex-col p-5">
+		<h3
+			class="mb-1.5 line-clamp-2 text-[15px] leading-tight font-black tracking-tight text-slate-800 uppercase transition-colors group-hover:text-[#9b1c48]"
+		>
+			{title}
+		</h3>
 
-            <a 
-                href={resolve(`/admin/courses/${link}`)} 
-                class="inline-flex items-center gap-2 bg-[#9b1c48] hover:bg-[#80163a] text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm"
-            >
-                Edit
-                <span class="text-sm leading-none">→</span>
-            </a>
-        </div>
-    </div>
+		<p class="mb-4 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+			{modules} Modules
+		</p>
+
+		<!-- Price + Button -->
+		<div class="mt-auto flex flex-row items-end justify-between border-t border-slate-50 pt-3">
+			<div>
+				<span class="text-[18px] font-black text-slate-900"
+					>{price} {m.price_label().toLowerCase()}</span
+				>
+			</div>
+
+			<a
+				href={resolve(`/admin/courses/${link}`)}
+				class="inline-flex items-center gap-2 rounded-lg bg-[#9b1c48] px-4 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-sm transition-all hover:bg-[#80163a] active:scale-95"
+			>
+				Edit
+				<span class="text-sm leading-none">→</span>
+			</a>
+		</div>
+	</div>
 </div>

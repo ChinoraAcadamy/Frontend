@@ -303,5 +303,8 @@
 	"lessons_label": "Darslar",
 	"price_label": "So'm",
 	"course_locked": "Bloklangan",
-	"course_continue": "Davom etish"
+	"course_continue": "Davom etish",
+
+	"refresh_success": "Ma'lumotlar yangilandi!",
+	"refresh_error": "Ma'lumotlarni yangilashda xatolik yuz berdi"
 }

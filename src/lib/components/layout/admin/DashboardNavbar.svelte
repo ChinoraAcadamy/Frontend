@@ -49,7 +49,7 @@
 		isReducedMotion ? root.classList.add('reduce-motion') : root.classList.remove('reduce-motion');
 
 		// Line Height
-		root.style.setProperty('--line-height', lineHeight);
+		root.style.setProperty('--line-height', lineHeight.toString());
 
 		// Dyslexia Font
 		isDyslexiaFont ? root.classList.add('dyslexia-font') : root.classList.remove('dyslexia-font');
@@ -94,11 +94,11 @@
 		saveA11y('a11y_dyslexia', isDyslexiaFont);
 	}
 
-	function toggleDarkMode() {
-		isDark = !isDark;
-		localStorage.setItem('theme', isDark ? 'dark' : 'light');
-		applyAllA11y();
-	}
+	// function toggleDarkMode() {
+	// 	isDark = !isDark;
+	// 	localStorage.setItem('theme', isDark ? 'dark' : 'light');
+	// 	applyAllA11y();
+	// }
 
 	// Reset all
 	function resetA11y() {

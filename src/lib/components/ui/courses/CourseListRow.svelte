@@ -6,7 +6,6 @@
 	let {
 		id,
 		title,
-		subtitle,
 		image,
 		progress = 0,
 		price = 0,

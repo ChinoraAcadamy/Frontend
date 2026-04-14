@@ -5,7 +5,7 @@
 	import { LogOut, ChevronRight, X } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
-	/** @type {{ user?: any, navItems?: { href: string, label: string, icon: any, exact?: boolean }[], collapsed?: boolean, mobileOpen?: boolean }} */
+	/** @type {{ user?: any, navItems?: { href?: string, label: string, icon?: any, exact?: boolean, divider?: boolean }[], collapsed?: boolean, mobileOpen?: boolean }} */
 
 	let {
 		user,
@@ -17,8 +17,9 @@
 	let loading = $state(false);
 	let currentPath = $derived($page.url.pathname);
 
-	/** @param {{ exact?: boolean, href: string }} item */
+	/** @param {{ exact?: boolean, href?: string }} item */
 	function isActive(item) {
+		if (!item.href) return false;
 		if (item.exact) return currentPath === item.href;
 		return currentPath.startsWith(item.href);
 	}

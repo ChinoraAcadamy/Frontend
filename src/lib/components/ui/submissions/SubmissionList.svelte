@@ -103,6 +103,7 @@
 		
 		// SvelteKit's goto with invalidateAll triggers a fresh fetch
 		const { goto, invalidateAll } = await import('$app/navigation');
+		// @ts-ignore
 		await goto(resolve(`${basePath}?${url.searchParams}`), { 
 			keepFocus: true, 
 			noScroll: true 
@@ -131,6 +132,7 @@
 			window.history.replaceState({}, '', url.toString());
 		} else {
 			// Trigger standard navigation to fetch data
+			// @ts-ignore
 			goto(resolve(`${basePath}?${url.searchParams}`), { 
 				keepFocus: true, 
 				noScroll: true,

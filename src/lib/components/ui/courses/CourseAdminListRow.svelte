@@ -1,78 +1,84 @@
 <script lang="ts">
-    import { resolve } from "$app/paths";
-    import { Play, Edit2, LayoutList } from 'lucide-svelte';
+	import { resolve } from '$app/paths';
+	import { m } from '@/lib/paraglide/messages';
+	import { Play, Edit2, LayoutList } from 'lucide-svelte';
 
-    let { 
-        title, 
-        price, 
-        modules, 
-        status, 
-        image,
-        link
-    } = $props();
+	let { title, price, modules, status, image, link } = $props();
 
-    const isPublished = $derived(status === 'published' || status === 'active');
+	const isPublished = $derived(status === 'published' || status === 'active');
 
-    /** @param {Event} e */
-    function handleImageError(e) {
-        const target = e.currentTarget;
-        target.src = `https://placehold.co/600x400?text=${encodeURIComponent(title)}`;
-    }
+	/** @param {Event} e */
+	function handleImageError(e) {
+		const target = e.currentTarget;
+		target.src = `https://placehold.co/600x400?text=${encodeURIComponent(title)}`;
+	}
 
-    // Image source fallback
-    let displayImage = $derived(image || `https://placehold.co/600x400?text=${encodeURIComponent(title)}`);
+	// Image source fallback
+	let displayImage = $derived(
+		image || `https://placehold.co/600x400?text=${encodeURIComponent(title)}`
+	);
 </script>
 
-<div class="group bg-white rounded-xl overflow-hidden border-2 border-slate-100 transition-all duration-300 flex flex-col lg:flex-row items-center p-3 gap-4 hover:border-[#9b1c48]/20">
-    <!-- Image -->
-    <div class="relative h-16 w-full lg:w-28 shrink-0 overflow-hidden rounded-lg bg-slate-50 border border-slate-100">
-        <img 
-            src={displayImage} 
-            alt={title} 
-            class="w-full h-full object-cover"
-            loading="lazy"
-            onerror={handleImageError}
-        />
-        <div class="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest rounded bg-white/90 backdrop-blur-sm
-            {isPublished 
-                ? 'text-emerald-600' 
-                : 'text-amber-600'}">
-            {status}
-        </div>
-    </div>
+<div
+	class="group flex flex-col items-center gap-4 overflow-hidden rounded-xl border-2 border-slate-100 bg-white p-3 transition-all duration-300 hover:border-[#9b1c48]/20 lg:flex-row"
+>
+	<!-- Image -->
+	<div
+		class="relative h-16 w-full shrink-0 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 lg:w-28"
+	>
+		<img
+			src={displayImage}
+			alt={title}
+			class="h-full w-full object-cover"
+			loading="lazy"
+			onerror={handleImageError}
+		/>
+		<div
+			class="absolute top-1.5 left-1.5 rounded bg-white/90 px-1.5 py-0.5 text-[8px] font-black tracking-widest uppercase backdrop-blur-sm
+            {isPublished ? 'text-emerald-600' : 'text-amber-600'}"
+		>
+			{status}
+		</div>
+	</div>
 
-    <!-- Content -->
-    <div class="flex flex-1 flex-col lg:flex-row items-start lg:items-center gap-4 w-full">
-        <div class="flex-1 min-w-0 w-full">
-            <h3 class="line-clamp-1 text-[14px] font-black text-slate-800 uppercase tracking-tight group-hover:text-[#9b1c48] transition-colors">
-                {title}
-            </h3>
-            <div class="flex items-center gap-3 mt-1">
-                <span class="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                    <LayoutList size={10} />
-                    {modules} Modules
-                </span>
-                <span class="text-[10px] font-bold text-slate-200">|</span>
-                <span class="text-[14px] font-black text-slate-900">${price}</span>
-            </div>
-        </div>
+	<!-- Content -->
+	<div class="flex w-full flex-1 flex-col items-start gap-4 lg:flex-row lg:items-center">
+		<div class="w-full min-w-0 flex-1">
+			<h3
+				class="line-clamp-1 text-[14px] font-black tracking-tight text-slate-800 uppercase transition-colors group-hover:text-[#9b1c48]"
+			>
+				{title}
+			</h3>
+			<div class="mt-1 flex items-center gap-3">
+				<span
+					class="flex items-center gap-1 text-[9px] font-black tracking-widest text-slate-400 uppercase"
+				>
+					<LayoutList size={10} />
+					{modules} Modules
+				</span>
+				<span class="text-[10px] font-bold text-slate-200">|</span>
+				<span class="text-[14px] font-black text-slate-900"
+					>{price} {m.price_label().toLowerCase()}</span
+				>
+			</div>
+		</div>
 
-        <!-- Actions -->
-        <div class="flex items-center gap-2 w-full lg:w-auto shrink-0">
-            <a 
-                href={resolve(`/admin/courses/${link}`)} 
-                class="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-slate-100"
-            >
-                <Play size={10} class="fill-current" />
-                Preview
-            </a>
-            <a 
-                href={resolve(`/admin/courses/${link}`)} 
-                class="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 bg-[#9b1c48] hover:bg-[#80163a] text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm"
-            >
-                <Edit2 size={10} />
-                Edit
-            </a>
-        </div>
-    </div>
+		<!-- Actions -->
+		<div class="flex w-full shrink-0 items-center gap-2 lg:w-auto">
+			<a
+				href={resolve(`/admin/courses/${link}`)}
+				class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-100 bg-slate-50 px-4 py-2 text-[10px] font-black tracking-widest text-slate-600 uppercase transition-all hover:bg-slate-100 lg:flex-none"
+			>
+				<Play size={10} class="fill-current" />
+				Preview
+			</a>
+			<a
+				href={resolve(`/admin/courses/${link}`)}
+				class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#9b1c48] px-4 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-sm transition-all hover:bg-[#80163a] active:scale-95 lg:flex-none"
+			>
+				<Edit2 size={10} />
+				Edit
+			</a>
+		</div>
+	</div>
 </div>

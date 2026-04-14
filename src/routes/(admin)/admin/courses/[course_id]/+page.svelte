@@ -165,7 +165,7 @@
 {#snippet renderLessonViewAction(lesson, mod)}
 	<a
 		href={resolve(
-			`/${isAdmin ? 'admin/courses' : 'kurslarim'}/${$page.params.course_id}/lessons/${lesson.id}?module_id=${mod.id}`
+			`/${isAdmin ? 'admin/courses' : 'kurslarim'}/${$page.params.course_id}/lesson/${lesson.id}?module_id=${mod.id}`
 		)}
 		class="action-menu-item"
 	>

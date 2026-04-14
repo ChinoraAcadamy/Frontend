@@ -2,6 +2,7 @@
 	import { fade, fly } from 'svelte/transition';
 	import { X, Star, MessageSquare, Send, AlertCircle } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 
 	let {
 		isOpen = false,
@@ -101,7 +102,7 @@
 						<div class="flex flex-col gap-3">
 							<p class="text-sm font-bold text-slate-600">Talaba yuborgan havola:</p>
 							<a
-								href={submission?.text_answer}
+								href={resolve(submission?.text_answer)}
 								target="_blank"
 								class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 font-bold text-[#9b1c48] shadow-sm transition-all hover:border-[#9b1c48]/30 hover:shadow-md"
 							>
