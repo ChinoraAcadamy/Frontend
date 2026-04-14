@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { User, Phone, CheckCircle2, Copy, BookOpen, FileCheck, Star, Settings, ChevronRight, LogOut } from 'lucide-svelte';
-	import { fade, fly, slide } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 
 	let { data, form } = $props();
 
@@ -34,7 +34,7 @@
 		try {
 			await navigator.clipboard.writeText(profile.username);
 			toast.success('Username nusxalandi');
-		} catch (e) {
+		} catch {
 			toast.error("Xatolik yuz berdi");
 		}
 	};

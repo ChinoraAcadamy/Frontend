@@ -7,15 +7,27 @@
 
 	let { data, form: serverForm } = $props();
 
-	let user = $derived(data.user || {});
-
+	/** @type {any} */
+	let userData = $derived(data.user || {});
+	
 	// Svelte 5 state
 	let profileForm = $state({
-		firstName: user.first_name || '',
-		lastName: user.last_name || '',
-		phone: user.phone_number || '',
-		username: user.username || "Noma'lum",
-		role: user.role === 'admin' ? 'Administrator' : user.role || 'Foydalanuvchi'
+		firstName: '',
+		lastName: '',
+		phone: '',
+		username: '',
+		role: ''
+	});
+
+	// Sync data to form state safely to avoid 'state_referenced_locally' warning
+	$effect(() => {
+		if (userData) {
+			profileForm.firstName = userData['first_name'] || '';
+			profileForm.lastName = userData['last_name'] || '';
+			profileForm.phone = userData['phone_number'] || '';
+			profileForm.username = userData['username'] || "Noma'lum";
+			profileForm.role = userData['role'] === 'admin' ? 'Administrator' : userData['role'] || 'Foydalanuvchi';
+		}
 	});
 
 	let isSubmitting = $state(false);
