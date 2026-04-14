@@ -36,8 +36,12 @@ export const actions = {
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
-                return fail(400, { 
-                    error: errData.title_uz?.[0] || errData.detail || "Modulni saqlashda xatolik yuz berdi" 
+                console.log(`Error: ${errData}`);
+                console.log(`Error: ${errData.title}`);
+                console.log(`Error: ${errData.detail}`);
+                console.log(`Response ${await response.text()}`)
+                return fail(400, {
+                    error: errData.title?.[0] || errData.detail || "Modulni saqlashda xatolik yuz berdi"
                 });
             }
 
