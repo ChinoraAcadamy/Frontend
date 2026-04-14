@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
-	import { FileDown, ChevronLeft, ChevronRight, BookOpen, User } from 'lucide-svelte';
+	import { FileDown, ChevronLeft, ChevronRight, BookOpen, User, FileIcon } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
 	import { showToast } from '$lib/utils/toast';
 	import GradeSubmissionModal from './GradeSubmissionModal.svelte';
@@ -20,36 +20,68 @@
 		basePath = '/baholar'
 	} = $props();
 
+	// --- Client-side Caching Logic ---
+	let activeStatus = $state(filters.status);
+	let submissionCache = $state(new Map());
+	let isRefreshing = $state(false);
+
+	// Initialize cache with initial data from props
+	$effect(() => {
+		if (submissions.length > 0 && !submissionCache.has(filters.status)) {
+			submissionCache.set(filters.status, {
+				results: submissions,
+				count: totalCount,
+				next: nextPage,
+				prev: prevPage,
+				page: currentPage
+			});
+		}
+	});
+
 	let localUpdates = $state(new Map());
 
-	// Derived state merges original submissions with local grading updates
+	// Derived current data from cache or props
+	let activeData = $derived(submissionCache.get(activeStatus) || { 
+		results: activeStatus === filters.status ? submissions : [], 
+		count: activeStatus === filters.status ? totalCount : 0, 
+		next: activeStatus === filters.status ? nextPage : null, 
+		prev: activeStatus === filters.status ? prevPage : null,
+		page: activeStatus === filters.status ? currentPage : 1
+	});
+
 	let localSubmissions = $derived(
-		submissions.map((sub) =>
+		activeData.results.map((sub) =>
 			localUpdates.has(sub.id) ? { ...sub, ...localUpdates.get(sub.id) } : sub
 		)
 	);
 
-	// Clear local updates when the submissions list changes (e.g. pagination or filtering)
-	$effect(() => {
-		if (submissions) localUpdates.clear();
-	});
+	// Status config with professional grading colors
+	const getScoreColor = (score, maxScore = 10) => {
+		const percentage = (score / maxScore) * 100;
+		if (percentage >= 80) return { bg: '#ecfdf5', text: '#059669', border: '#a7f3d0' }; // Emerald
+		if (percentage >= 50) return { bg: '#fffbeb', text: '#d97706', border: '#fde68a' }; // Amber
+		return { bg: '#fff1f2', text: '#e11d48', border: '#fecdd3' }; // Rose
+	};
 
 	let isGradeModalOpen = $state(false);
 	let selectedSubmission = $state(null);
 	let isGrading = $state(false);
 
-	let activeTab = $derived(filters.status);
+	let activeTab = $derived(activeStatus);
 
 	const statusConfig = {
-		pending: { label: m.status_pending(), bg: '#FFF8E6', text: '#D97706', border: '#FDE68A' },
-		submitted: { label: m.status_submitted(), bg: '#FFF8E6', text: '#D97706', border: '#FDE68A' },
-		graded: { label: m.status_graded(), bg: '#ECFDF5', text: '#059669', border: '#A7F3D0' },
-		rejected: { label: m.status_rejected(), bg: '#FFF1F2', text: '#E11D48', border: '#FECDD3' }
+		pending: { label: m.status_pending(), bg: '#f8fafc', text: '#64748b', border: '#e2e8f0' },
+		submitted: { label: m.status_submitted(), bg: '#f1f5f9', text: '#475569', border: '#cbd5e1' },
+		graded: { label: m.status_graded(), bg: '#ecfdf5', text: '#059669', border: '#a7f3d0' },
+		rejected: { label: m.status_rejected(), bg: '#fff1f2', text: '#e11d48', border: '#fecdd3' }
 	};
 
-	function getStatus(status) {
+	function getStatusUI(sub) {
+		if (sub.status === 'graded' || sub.score !== null) {
+			return { ...getScoreColor(sub.score, sub.max_score || 10), label: m.status_graded() };
+		}
 		return (
-			statusConfig[status] ?? { label: status, bg: '#F3F4F6', text: '#6B7280', border: '#E5E7EB' }
+			statusConfig[sub.status] ?? { label: sub.status, bg: '#F3F4F6', text: '#6B7280', border: '#E5E7EB' }
 		);
 	}
 
@@ -62,19 +94,56 @@
 		});
 	}
 
+	async function refreshData() {
+		isRefreshing = true;
+		
+		const url = new URL($page.url);
+		url.searchParams.set('status', activeStatus);
+		url.searchParams.set('page', '1');
+		
+		// SvelteKit's goto with invalidateAll triggers a fresh fetch
+		const { goto, invalidateAll } = await import('$app/navigation');
+		await goto(resolve(`${basePath}?${url.searchParams}`), { 
+			keepFocus: true, 
+			noScroll: true 
+		});
+		await invalidateAll();
+		
+		// Cache will be updated by the $effect when new props arrive
+		submissionCache.clear();
+		
+		isRefreshing = false;
+		showToast(m.refresh_success?.() || 'Ma\'lumotlar yangilandi', { type: 'success' });
+	}
+
 	function changeTab(newStatus) {
+		if (newStatus === activeStatus) return;
+
+		activeStatus = newStatus;
+
 		const url = new URL($page.url);
 		url.searchParams.set('status', newStatus);
 		url.searchParams.set('page', '1');
-		// @ts-ignore
-		goto(resolve(`${basePath}?${url.searchParams}`), { keepFocus: true });
+		
+		// Check if we have this status in cache
+		if (submissionCache.has(newStatus)) {
+			// Update URL ONLY without full navigation/request
+			window.history.replaceState({}, '', url.toString());
+		} else {
+			// Trigger standard navigation to fetch data
+			goto(resolve(`${basePath}?${url.searchParams}`), { 
+				keepFocus: true, 
+				noScroll: true,
+				replaceState: true 
+			});
+		}
 	}
 
 	function goToPage(p) {
 		const url = new URL($page.url);
 		url.searchParams.set('page', String(p));
 		// @ts-ignore
-		goto(resolve(`${basePath}?${url.searchParams}`), { keepFocus: true });
+		goto(resolve(`${basePath}?${url.searchParams}`), { keepFocus: true, noScroll: true });
 	}
 
 	const tabs = [
@@ -93,7 +162,6 @@
 			isGrading = true;
 			if (result.type === 'success') {
 				const updated = result.data.updatedSubmission;
-				// Mahalliy "overlay" mapiga yangilanishni yozamiz
 				localUpdates.set(updated.id, {
 					...updated,
 					status: 'graded'
@@ -101,6 +169,9 @@
 
 				showToast(m.grade_success(), { type: 'success' });
 				isGradeModalOpen = false;
+				
+				// Optional: clear cache to ensure next full load is fresh
+				submissionCache.clear();
 			} else if (result.type === 'failure') {
 				showToast(result.data?.error || m.error_occurred(), { type: 'error' });
 			}
@@ -110,14 +181,25 @@
 </script>
 
 <div class="mb-8">
-	<div class="mb-1.5 text-[11px] font-bold tracking-[2px] text-[#9b1c48] uppercase">
-		{m.submissions_title()}
+	<div class="flex items-center justify-between mb-4">
+		<div>
+			<div class="mb-1.5 text-[11px] font-bold tracking-[2px] text-[#9b1c48] uppercase">
+				{m.submissions_title()}
+			</div>
+			<h1 class="text-[34px] leading-none font-extrabold tracking-tight text-[#1a0e13] max-md:text-[28px]">
+				{role === 'admin' ? m.submissions_all() : m.submissions_my()}
+			</h1>
+		</div>
+
+		<button 
+			onclick={refreshData}
+			disabled={isRefreshing}
+			class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 hover:text-[#9b1c48] active:scale-95 disabled:opacity-50"
+		>
+			<svg class="h-4 w-4 {isRefreshing ? 'animate-spin' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v9h-9"/></svg>
+			{isRefreshing ? 'Yuklanmoqda...' : 'Yangilash'}
+		</button>
 	</div>
-	<h1
-		class="mb-6 text-[34px] leading-none font-extrabold tracking-tight text-[#1a0e13] max-md:text-[28px]"
-	>
-		{role === 'admin' ? m.submissions_all() : m.submissions_my()}
-	</h1>
 
 	<div
 		class="no-scrollbar inline-flex gap-1 rounded-2xl border border-slate-100 bg-slate-50 p-1.5 max-md:flex max-md:w-full max-md:overflow-x-auto"
@@ -148,132 +230,129 @@
 {:else}
 	<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 		{#each localSubmissions as sub, i (sub.id)}
+			{@const st = getStatusUI(sub)}
 			<div
-				class="relative flex min-h-35 flex-col justify-between overflow-hidden rounded-[20px] border bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)]
-                    {sub.feedback || sub.score != null
-					? 'border-[#fce7f3] bg-linear-to-br from-white to-[#fdf2f6]'
-					: 'border-slate-100 hover:border-slate-200'}"
+				class="relative flex min-h-35 flex-col justify-between overflow-hidden rounded-[24px] border bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)]
+                    {sub.score != null
+					? 'border-slate-100 bg-linear-to-br from-white to-slate-50/50'
+					: 'border-slate-100'}"
 				transition:fly={{ y: 20, duration: 400, delay: Math.min(i * 40, 400) }}
 			>
-				{#if sub.feedback || sub.score != null}
-					<div
-						class="absolute top-0 right-0 left-0 h-1 bg-linear-to-r from-[#9b1c48] to-[#c43c66]"
-					></div>
-
-					<div class="mt-1 flex h-full flex-col">
-						<div class="mb-4 flex items-center justify-between">
-							<span class="text-sm font-bold tracking-[1px] text-slate-500 uppercase">{m.submission_result()}</span>
-							<div
-								class="rounded-xl border border-[#fce7f3] bg-white px-4 py-1 shadow-[0_2px_8px_rgba(155,28,72,0.1)]"
-							>
-								<span
-									class="bg-linear-to-br from-[#9b1c48] to-[#c43c66] bg-clip-text text-2xl font-extrabold text-transparent"
-								>
-									{sub.score ?? 0}
-								</span>
-							</div>
+				
+				<div class="mb-5 flex items-start justify-between gap-4">
+					<div class="flex-1">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+								{sub.assignment_type === 'text' ? 'Matn' : sub.assignment_type === 'link' ? 'Havola' : 'Fayl'}
+							</span>
+							<div class="h-1 w-1 rounded-full bg-slate-200"></div>
+							<span class="text-[11px] font-medium text-slate-400">{formatDate(sub.submitted_at)}</span>
 						</div>
+						
+						<h3 class="mb-1 line-clamp-2 text-[17px] leading-[1.4] font-bold text-[#1a0e13]">
+							{sub.course_title ?? 'Kurs'}
+							{#if sub.assignment_title}
+								<span class="font-medium text-slate-400">/ {sub.assignment_title}</span>
+							{/if}
+						</h3>
+						
+						<p class="line-clamp-1 text-[13px] font-medium text-slate-500">
+							{sub.lesson_title ?? ''}
+						</p>
 
 						{#if role === 'admin'}
 							<div
-								class="mb-3 flex items-center gap-2 rounded-lg bg-white/50 p-2 text-sm font-semibold text-slate-700"
+								class="mt-3 flex w-max items-center gap-2 rounded-xl bg-slate-50 px-3 py-1.5 text-[13px] font-bold text-slate-700 shadow-inner"
 							>
-								<User size={16} class="text-slate-400" />
-								{sub.student?.first_name || ''}
-								{sub.student?.last_name || 'Talaba'}
+								<div class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#9b1c48] shadow-sm">
+									<User size={12} />
+								</div>
+								{sub.student?.first_name || ''} {sub.student?.last_name || 'Talaba'}
 							</div>
 						{/if}
-
-						<div class="flex-1">
-							<div class="mb-1.5 text-[12px] font-bold text-[#9b1c48]">{m.submission_feedback()}</div>
-							{#if sub.feedback}
-								<blockquote
-									class="m-0 border-l-[3px] border-[#fbcfe8] pl-3 text-sm leading-relaxed text-slate-700 italic"
-								>
-									"{sub.feedback}"
-								</blockquote>
-							{:else}
-								<p class="text-[13px] text-slate-400 italic">{m.submission_no_feedback()}</p>
-							{/if}
-						</div>
-
-						<div class="mt-4 flex items-center justify-between border-t border-[#f43f5e1a] pt-4">
-							<span class="line-clamp-1 flex-1 text-[12px] font-semibold text-slate-400">
-								{sub.course_title ?? ''} — {sub.assignment_title ?? ''}
-							</span>
-						</div>
 					</div>
-				{:else}
-					{@const st = getStatus(sub.status)}
-					<div class="mb-5 flex items-start justify-between gap-4">
-						<div class="flex-1">
-							<h3 class="mb-1 line-clamp-2 text-[17px] leading-[1.4] font-bold text-[#1a0e13]">
-								{sub.course_title ?? 'Kurs'}
-								{#if sub.assignment_title}
-									<span class="font-medium text-slate-400">/ {sub.assignment_title}</span>
-								{/if}
-							</h3>
-							<p class="line-clamp-1 text-[13px] font-medium text-slate-500">
-								{sub.lesson_title ?? ''}
-							</p>
-
-							{#if role === 'admin'}
-								<div
-									class="mt-2.5 flex w-max items-center gap-1.5 rounded-md bg-slate-50 px-2.5 py-1 text-[13px] font-semibold text-slate-600"
-								>
-									<User size={14} class="text-slate-400" />
-									{sub.student?.first_name || ''}
-									{sub.student?.last_name || 'Talaba'}
-								</div>
-							{/if}
-						</div>
+					
+					<div class="flex flex-col items-end gap-2">
 						<span
-							class="rounded-full border px-3.5 py-1.5 text-[12px] font-bold tracking-[0.3px] whitespace-nowrap"
+							class="rounded-xl border px-3.5 py-1.5 text-[11px] font-black tracking-widest uppercase transition-colors"
 							style="background:{st.bg}; color:{st.text}; border-color:{st.border}"
 						>
 							{st.label}
 						</span>
+						
+						{#if sub.score != null}
+							<div class="flex items-center gap-1.5 rounded-2xl bg-white border border-slate-100 px-3 py-1 shadow-sm">
+								<span class="text-lg font-black text-slate-900">{sub.score}</span>
+								<span class="text-[10px] font-bold text-slate-300">/ {sub.max_score || 10}</span>
+							</div>
+						{/if}
 					</div>
+				</div>
 
-					<div
-						class="mt-auto flex items-center justify-between border-t border-dashed border-slate-200 pt-4"
-					>
-						<span class="text-[13px] font-medium text-slate-400">
-							{formatDate(sub.submitted_at)}
-						</span>
-
-						<div class="flex flex-row items-center gap-2">
-							{#if sub.file}
-								<a
-									href={resolve(sub.file)}
-									target="_blank"
-									rel="noopener noreferrer"
-									class="flex h-9.5 w-9.5 items-center justify-center rounded-[10px] bg-slate-50 text-slate-500 transition-all duration-200 hover:scale-105 hover:bg-[#9b1c48] hover:text-white"
-									title={m.submission_view_file()}
-								>
-									<FileDown size={18} />
-								</a>
-							{:else}
-								<span
-									class="flex h-9.5 w-9.5 cursor-not-allowed items-center justify-center rounded-[10px] bg-slate-50 text-slate-500 opacity-30"
-									title={m.submission_no_file()}
-								>
-									<FileDown size={18} />
-								</span>
-							{/if}
-
-							{#if role === 'admin'}
-								<!-- Admin Baholash tugmasi bu yerga joylashtiriladi -->
-								<button
-									class="flex h-9.5 items-center justify-center rounded-[10px] bg-blue-50 px-4 text-sm font-semibold text-blue-600 transition-all duration-200 hover:bg-blue-600 hover:text-white"
-									onclick={() => openGradeModal(sub)}
-								>
-									{m.submission_grade()}
-								</button>
-							{/if}
+				<!-- Submission Content Preview -->
+				<div class="mb-5 rounded-2xl bg-slate-50/80 p-4 border border-slate-100/50">
+					{#if sub.assignment_type === 'text' || (!sub.file && sub.text_answer)}
+						<p class="line-clamp-2 text-sm font-medium leading-relaxed text-slate-600 italic">
+							"{sub.text_answer}"
+						</p>
+					{:else if sub.assignment_type === 'link'}
+						<a href={resolve(sub.text_answer)} target="_blank" class="flex items-center gap-2 text-sm font-bold text-[#9b1c48] hover:underline underline-offset-4 decoration-2">
+							<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+							Havolani ochish
+						</a>
+					{:else}
+						<div class="flex items-center gap-3">
+							<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm">
+								<FileIcon size={20} />
+							</div>
+							<div>
+								<span class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Fayl yuklangan</span>
+								<span class="text-[12px] font-medium text-slate-600">{sub.file ? sub.file.split('/').pop() : 'Fayl nomi topilmadi'}</span>
+							</div>
 						</div>
+					{/if}
+				</div>
+
+				<div
+					class="flex items-center justify-between border-t border-dashed border-slate-200 pt-4"
+				>
+					{#if sub.feedback}
+						<div class="flex flex-1 items-center gap-2 mr-4">
+							<div class="h-1.5 w-1.5 rounded-full bg-slate-300"></div>
+							<p class="line-clamp-1 text-[12px] font-medium text-slate-400 italic">"{sub.feedback}"</p>
+						</div>
+					{:else}
+						<div class="flex-1"></div>
+					{/if}
+
+					<div class="flex flex-row items-center gap-2">
+						{#if sub.file}
+							<a
+								href={resolve(sub.file)}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 transition-all duration-300 hover:scale-110 hover:bg-[#9b1c48] hover:text-white hover:shadow-[0_8px_20px_-6px_rgba(155,28,72,0.4)]"
+								title={m.submission_view_file()}
+							>
+								<FileDown size={20} />
+							</a>
+						{/if}
+
+						{#if role === 'admin'}
+							<button
+								class="flex h-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-600 to-indigo-700 px-5 text-[13px] font-bold text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)] transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_20px_rgba(37,99,235,0.3)] active:scale-95"
+								onclick={() => openGradeModal(sub)}
+							>
+								{m.submission_grade()}
+							</button>
+						{/if}
 					</div>
-				{/if}
+				</div>
+                
+                <!-- Performance indicator line -->
+                {#if sub.score != null}
+                    <div class="absolute bottom-0 left-0 right-0 h-1 transition-all" style="background:{st.border}; opacity: 0.3"></div>
+                {/if}
 			</div>
 		{/each}
 	</div>

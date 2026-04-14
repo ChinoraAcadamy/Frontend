@@ -1,7 +1,7 @@
 <script>
 	import { enhance } from '$app/forms';
 	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
-	import { Upload, File as FileIcon } from 'lucide-svelte';
+	import { Upload, File as FileIcon, ArrowRight } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
@@ -286,6 +286,23 @@
 			await update();
 		};
 	};
+
+	// --- Multi-type Assignment UI Logic ---
+	const getScoreColor = (score, maxScore) => {
+		if (!maxScore) return 'text-slate-400';
+		const percentage = (score / maxScore) * 100;
+		if (percentage >= 80) return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+		if (percentage >= 50) return 'text-amber-600 bg-amber-50 border-amber-100';
+		return 'text-rose-600 bg-rose-50 border-rose-100';
+	};
+
+	const getScoreGradient = (score, maxScore) => {
+		if (!maxScore) return 'bg-slate-500';
+		const percentage = (score / maxScore) * 100;
+		if (percentage >= 80) return 'bg-linear-to-r from-emerald-500 to-teal-500';
+		if (percentage >= 50) return 'bg-linear-to-r from-amber-500 to-orange-500';
+		return 'bg-linear-to-r from-rose-500 to-red-500';
+	};
 </script>
 
 <svelte:window on:contextmenu={(e) => e.preventDefault()} />
@@ -321,18 +338,15 @@
 						playsinline
 						crossorigin="anonymous"
 					>
-						<!-- Source va track ma'lumotlari to'liq Plyr (JS) orqali boshqariladi -->
 						Brauzeringiz videoni qo'llab-quvvatlamaydi.
 					</video>
 
-					<!-- Qo'shimcha xavfsizlik: Videoning aniq ustidagi ko'rinmas qatlam -->
 					<div
 						role="application"
 						class="pointer-events-none absolute inset-0 z-5"
 						oncontextmenu={(e) => e.preventDefault()}
 					></div>
 
-					<!-- Watermark -->
 					{#if showWatermark}
 						<div
 							class="pointer-events-none absolute z-10 text-[10px] font-bold text-white/20 transition-all duration-1000 select-none"
@@ -344,7 +358,6 @@
 				</div>
 			</div>
 
-			<!-- Student only or both? Both can mark as complete but admin doesn't need to -->
 			{#if $page.data.user?.role !== 'admin' && $page.data.user?.role !== 'superadmin'}
 				<button
 					onclick={markComplete}
@@ -374,134 +387,279 @@
 		</div>
 
 		{#if lesson.assignments && lesson.assignments.length > 0}
+			{@const assignment = lesson.assignments[0]}
 			<div
-				class="sticky top-6 h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_4px_24px_rgba(0,0,0,0.02)]"
+				class="sticky top-6 h-fit rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-8"
 			>
-				<div class="mb-2 flex items-center justify-between">
-					<h2 class="text-xl font-bold text-slate-900">{lesson.assignments[0].title}</h2>
-					<span class="rounded-md bg-blue-50 px-3 py-1 text-xs font-bold text-blue-600">VASIFA</span
-					>
+				<div class="mb-6">
+					<div class="mb-4 flex items-center justify-between">
+						<span
+							class="rounded-full bg-slate-100 px-4 py-1.5 text-[11px] font-extrabold tracking-widest text-slate-500 uppercase"
+						>
+							{assignment.type === 'text'
+								? 'Matnli topshiriq'
+								: assignment.type === 'link'
+									? 'Havola yuborish'
+									: 'Fayl yuklash'}
+						</span>
+						<div
+							class="flex h-8 w-8 items-center justify-center rounded-full bg-[#FA2E69]/10 text-[#FA2E69]"
+						>
+							<Upload size={16} />
+						</div>
+					</div>
+					<h2 class="mb-2 text-2xl font-black tracking-tight text-slate-900">{assignment.title}</h2>
+					<p class="text-[14px] leading-relaxed text-slate-500">
+						{assignment.description}
+					</p>
 				</div>
-				<p class="mb-6 text-sm text-slate-500">
-					Urinishlar: {lesson.assignments[0].max_attempts} marta (fayl yuklash)
-				</p>
+
+				<div class="mb-6 grid grid-cols-2 gap-4">
+					<div class="rounded-2xl border border-slate-100 bg-slate-50/50 p-4">
+						<span class="mb-1 block text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+							>Maks. Ball</span
+						>
+						<span class="text-lg font-black text-slate-900">{assignment.max_score}</span>
+					</div>
+					<div class="rounded-2xl border border-slate-100 bg-slate-50/50 p-4">
+						<span class="mb-1 block text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+							>Urinishlar</span
+						>
+						<span class="text-lg font-black text-slate-900">{assignment.max_attempts}</span>
+					</div>
+				</div>
 
 				<form
 					method="POST"
 					action="?/uploadAssignment"
 					use:enhance={submitAssignment}
 					enctype="multipart/form-data"
-					class="space-y-4"
+					class="space-y-5"
 				>
-					<input type="hidden" name="assignment" value={lesson.assignments[0].id} />
+					<input type="hidden" name="assignment" value={assignment.id} />
 
-					<label
-						class="group relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 transition-all duration-200
-                        {isDragging
-							? 'border-[#FA2E69] bg-[#FA2E69]/5'
-							: 'border-slate-300 hover:border-[#FA2E69] hover:bg-slate-50'}"
-						ondragover={handleDragOver}
-						ondragleave={handleDragLeave}
-						ondrop={handleFileDrop}
-						role="presentation"
-					>
-						<input type="file" name="file" class="hidden" onchange={handleFileSelect} required />
-
-						{#if selectedFile}
-							<div class="flex flex-col items-center text-center" in:fade>
-								<div
-									class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-500"
-								>
-									<FileIcon size={24} />
-								</div>
-								<span class="line-clamp-1 text-sm font-semibold text-slate-800"
-									>{selectedFile.name}</span
-								>
-								<span class="mt-1 text-xs text-slate-500"
-									>{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</span
-								>
-							</div>
-						{:else}
-							<Upload
-								size={32}
-								strokeWidth={1.5}
-								class="mb-4 text-slate-400 transition-colors group-hover:text-[#FA2E69]"
-							/>
-							<span class="mb-1 text-[15px] font-medium text-slate-700">Faylni tortib tashlang</span
-							>
-							<span class="text-xs text-slate-400">yoki tanlash uchun bosing</span>
-						{/if}
-					</label>
-
-					<div class="space-y-2">
-						<label for="text_answer" class="text-sm font-semibold text-slate-700"
-							>Qo'shimcha izoh (ixtiyoriy)</label
+					{#if assignment.type === 'file'}
+						<label
+							class="group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 transition-all duration-300
+							{isDragging
+								? 'scale-[0.99] border-[#FA2E69] bg-[#FA2E69]/5'
+								: 'border-slate-200 bg-white hover:border-[#FA2E69]/50 hover:bg-slate-50/50'}"
+							ondragover={handleDragOver}
+							ondragleave={handleDragLeave}
+							ondrop={handleFileDrop}
+							role="presentation"
 						>
-						<textarea
-							id="text_answer"
-							name="text_answer"
-							rows="3"
-							placeholder="Topshiriq yuzasidan izoh qoldiring..."
-							class="w-full rounded-xl border border-slate-200 p-3 text-sm transition-all outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
-						></textarea>
-					</div>
+							<input type="file" name="file" class="hidden" onchange={handleFileSelect} required />
+
+							{#if selectedFile}
+								<div class="flex flex-col items-center text-center" in:fade>
+									<div
+										class="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FA2E69]/10 text-[#FA2E69] shadow-inner"
+									>
+										<FileIcon size={28} />
+									</div>
+									<span class="line-clamp-1 text-sm font-bold text-slate-800"
+										>{selectedFile.name}</span
+									>
+									<span class="mt-1 text-[11px] font-semibold text-slate-500"
+										>{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</span
+									>
+								</div>
+							{:else}
+								<div
+									class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 text-slate-400 transition-all duration-300 group-hover:bg-[#FA2E69]/10 group-hover:text-[#FA2E69] group-hover:shadow-[0_8px_20px_-6px_rgba(250,46,105,0.3)]"
+								>
+									<Upload size={28} strokeWidth={1.5} />
+								</div>
+								<span class="mb-1 text-[15px] font-bold text-slate-800">Faylni tanlang</span>
+								<span class="text-[12px] font-medium text-slate-400">PDF, JPG, PNG yoki ZIP</span>
+							{/if}
+						</label>
+					{:else if assignment.type === 'text'}
+						<div class="space-y-2">
+							<label
+								for="text_answer"
+								class="ml-1 text-[13px] font-bold tracking-wide text-slate-700 uppercase"
+								>Sizning javobingiz</label
+							>
+							<textarea
+								id="text_answer"
+								name="text_answer"
+								rows="6"
+								placeholder="Topshiriq yuzasidan batafsilroq yozing..."
+								class="min-h-[160px] w-full rounded-2xl border-2 border-slate-100 bg-white p-4 text-[15px] font-medium transition-all outline-none placeholder:text-slate-300 focus:border-[#FA2E69]/30 focus:ring-4 focus:ring-[#FA2E69]/5"
+								required
+							></textarea>
+						</div>
+					{:else if assignment.type === 'link'}
+						<div class="space-y-2">
+							<label
+								for="text_answer"
+								class="ml-1 text-[13px] font-bold tracking-wide text-slate-700 uppercase"
+								>Havola (Link)</label
+							>
+							<div class="relative">
+								<input
+									type="url"
+									id="text_answer"
+									name="text_answer"
+									placeholder="https://example.com/your-work"
+									class="w-full rounded-2xl border-2 border-slate-100 bg-white p-4 text-[15px] font-medium transition-all outline-none placeholder:text-slate-300 focus:border-[#FA2E69]/30 focus:ring-4 focus:ring-[#FA2E69]/5"
+									required
+								/>
+							</div>
+						</div>
+					{/if}
+
+					{#if assignment.type !== 'text'}
+						<div class="space-y-2">
+							<label
+								for="desc_answer"
+								class="ml-1 text-[13px] font-bold tracking-wide text-slate-700 uppercase"
+								>Qo'shimcha izoh (ixtiyoriy)</label
+							>
+							<textarea
+								id="desc_answer"
+								name="desc_answer"
+								rows="3"
+								placeholder="Topshiriq yuzasidan izoh qoldiring..."
+								class="w-full rounded-2xl border-2 border-slate-100 bg-white p-4 text-[14px] font-medium transition-all outline-none placeholder:text-slate-300 focus:border-[#FA2E69]/30 focus:ring-4 focus:ring-[#FA2E69]/5"
+							></textarea>
+						</div>
+					{/if}
 
 					<button
 						type="submit"
-						disabled={!selectedFile || isSubmitting}
-						class="w-full rounded-[12px] bg-[#FA2E69] px-6 py-3 font-semibold text-white shadow-[0_6px_16px_-4px_rgba(250,46,105,0.3)] transition-all duration-200 hover:bg-[#D81B53] disabled:cursor-not-allowed disabled:opacity-50"
+						disabled={isSubmitting || (assignment.type === 'file' && !selectedFile)}
+						class="group relative w-full overflow-hidden rounded-2xl bg-[#FA2E69] py-4.5 font-bold text-white shadow-[0_10px_25px_rgba(250,46,105,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#D81B53] hover:shadow-[0_15px_35px_rgba(250,46,105,0.4)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
 					>
-						{isSubmitting ? 'Yuborilmoqda...' : 'Yuborish'}
+						<div class="relative z-10 flex items-center justify-center gap-2.5">
+							{#if isSubmitting}
+								<div
+									class="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
+								></div>
+								<span>Yuborilmoqda...</span>
+							{:else}
+								<span>Topshiriqni yuborish</span>
+								<ArrowRight size={18} class="transition-transform group-hover:translate-x-1" />
+							{/if}
+						</div>
 					</button>
 				</form>
 
-				{#if lesson.assignments[0].submissions}
-					<div class="mt-8">
-						<h3 class="mb-4 text-[15px] font-bold text-slate-900">Oldingi urinishlar</h3>
+				{#if assignment.submissions && assignment.submissions.length > 0}
+					<div class="mt-10 border-t border-slate-100 pt-8">
+						<h3 class="mb-5 text-[16px] font-black tracking-tight text-slate-900">
+							Oldingi urinishlar
+						</h3>
 
 						<div class="space-y-4">
-							{#each lesson.assignments[0].submissions as sub (sub)}
+							{#each assignment.submissions as sub (sub.id)}
 								<div
-									class="border-b border-slate-100 pb-4 last:border-0 last:pb-0"
+									class="group relative overflow-hidden rounded-[24px] border border-slate-100 bg-white p-5 transition-all duration-300 hover:border-slate-200 hover:shadow-xl hover:shadow-slate-200/40"
 									transition:slide
 								>
-									<div class="mb-2 flex items-center justify-between text-[13px]">
-										<div class="flex items-center gap-4">
-											<span class="text-xs font-medium text-slate-800"
-												>{new Date(sub.submitted_at || Date.now()).toLocaleDateString(
-													'uz-UZ'
-												)}</span
-											>
-										</div>
-										<div class="flex items-center gap-4">
-											<span class="font-semibold text-slate-900">{sub.score} / 100</span>
-											{#if sub.status === 'Pending'}
-												<span
-													class="rounded-md bg-[#FFF9C4] px-2.5 py-1 text-xs font-bold text-[#F57F17]"
-													>Kutilmoqda</span
-												>
-											{:else if sub.status === 'Graded'}
-												<span
-													class="flex items-center gap-1 rounded-md bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700"
-												>
-													Baholandi
+									<div class="flex items-start justify-between">
+										<div class="space-y-1">
+											<div class="flex items-center gap-2">
+												<span class="text-[12px] font-bold text-slate-400">
+													{new Date(sub.submitted_at || Date.now()).toLocaleDateString('uz-UZ', {
+														day: 'numeric',
+														month: 'short'
+													})}
 												</span>
+												<div class="h-1 w-1 rounded-full bg-slate-200"></div>
+												<span class="text-[12px] font-bold text-slate-400">
+													{new Date(sub.submitted_at || Date.now()).toLocaleTimeString('uz-UZ', {
+														hour: '2-digit',
+														minute: '2-digit'
+													})}
+												</span>
+											</div>
+
+											{#if sub.status === 'Graded'}
+												<div class="flex items-center gap-3 pt-1">
+													<div class="flex items-center gap-1">
+														<span class="text-2xl font-black text-slate-900">{sub.score}</span>
+														<span class="text-sm font-bold text-slate-300"
+															>/ {assignment.max_score}</span
+														>
+													</div>
+													<div
+														class="flex h-1.5 w-1.5 rounded-full {sub.score >=
+														assignment.max_score * 0.8
+															? 'bg-emerald-500'
+															: sub.score >= assignment.max_score * 0.5
+																? 'bg-amber-500'
+																: 'bg-rose-500'}"
+													></div>
+												</div>
+											{:else}
+												<div class="flex items-center gap-2 pt-1">
+													<span class="text-sm font-black tracking-wider text-slate-400 uppercase"
+														>Tekshirilmoqda</span
+													>
+													<div class="flex gap-1">
+														<div
+															class="h-1 w-1 animate-bounce rounded-full bg-slate-300"
+															style="animation-delay: 0ms"
+														></div>
+														<div
+															class="h-1 w-1 animate-bounce rounded-full bg-slate-300"
+															style="animation-delay: 150ms"
+														></div>
+														<div
+															class="h-1 w-1 animate-bounce rounded-full bg-slate-300"
+															style="animation-delay: 300ms"
+														></div>
+													</div>
+												</div>
 											{/if}
 										</div>
+
+										{#if sub.status === 'Graded'}
+											<div
+												class="flex h-10 items-center justify-center rounded-2xl border px-4 text-[12px] font-black tracking-widest uppercase {getScoreColor(
+													sub.score,
+													assignment.max_score
+												)} shadow-inner"
+											>
+												Baholandi
+											</div>
+										{:else}
+											<div
+												class="flex h-10 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50 px-4 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+											>
+												Kutilmoqda
+											</div>
+										{/if}
 									</div>
 
 									{#if sub.feedback}
-										<div class="relative mt-3 rounded-lg bg-slate-50 p-3">
-											<span
-												class="mb-1 block text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-												>Fikr:</span
-											>
-											<div class="flex gap-2">
-												<p class="mt-1 text-xs font-medium text-slate-600 italic">
-													"{sub.feedback}"
-												</p>
+										<div
+											class="relative mt-4 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50/80 p-4"
+										>
+											<div class="mb-2 flex items-center gap-2">
+												<div class="h-1.5 w-1.5 rounded-full bg-[#FA2E69]"></div>
+												<span
+													class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+													>Mentor fikri</span
+												>
 											</div>
+											<p class="text-[13px] leading-relaxed font-medium text-slate-600 italic">
+												"{sub.feedback}"
+											</p>
 										</div>
+									{/if}
+
+									<!-- Score indicator line -->
+									{#if sub.status === 'Graded'}
+										<div
+											class="absolute right-0 bottom-0 left-0 h-1 {getScoreGradient(
+												sub.score,
+												assignment.max_score
+											)} opacity-20"
+										></div>
 									{/if}
 								</div>
 							{/each}
@@ -514,6 +672,7 @@
 </div>
 
 <style>
+	/* ... existing styles ... */
 	/* Plyr Custom Styles */
 	:global(.plyr) {
 		--plyr-color-main: #ed4b72;

@@ -20,53 +20,65 @@
 	let editModuleTarget = $state(null);
 
 	function openModuleEdit(mod) {
-		editModuleTarget = { pk: mod.id, title_uz: mod.title, title_ru: mod.title, description_uz: mod.description_uz || '', description_ru: mod.description_ru || '', order_index: mod.order || 1 };
+		editModuleTarget = {
+			pk: mod.id,
+			title_uz: mod.title,
+			title_ru: mod.title,
+			description_uz: mod.description_uz || '',
+			description_ru: mod.description_ru || '',
+			order_index: mod.order || 1
+		};
 		isEditModuleModalOpen = true;
 	}
 
-    // O'chirish formasi yuborilishidan oldin tasdiq so'rash
-    function handleDelete(msg) {
-        return async ({ cancel }) => {
-            const confirmed = confirm(msg || "Davom etishni xohlaysizmi?");
-            
-            if (!confirmed) {
-                cancel(); // Formani yuborishni to'xtatish
-                return;
-            }
+	// O'chirish formasi yuborilishidan oldin tasdiq so'rash
+	function handleDelete(msg) {
+		return async ({ cancel }) => {
+			const confirmed = confirm(msg || 'Davom etishni xohlaysizmi?');
 
-            isDeleting = true;
+			if (!confirmed) {
+				cancel(); // Formani yuborishni to'xtatish
+				return;
+			}
 
-            return async ({ update, result }) => {
-                isDeleting = false;
-                if (result.type === 'failure') {
-                    alert(result.data?.error || "Xatolik yuz berdi");
-                }
-                await update();
-            };
-        };
-    }
+			isDeleting = true;
+
+			return async ({ update, result }) => {
+				isDeleting = false;
+				if (result.type === 'failure') {
+					alert(result.data?.error || 'Xatolik yuz berdi');
+				}
+				await update();
+			};
+		};
+	}
 </script>
 
-<ModuleEditModal bind:isOpen={isEditModuleModalOpen} moduleTarget={editModuleTarget} coursePk={$page.params.course_id} />
+<ModuleEditModal
+	bind:isOpen={isEditModuleModalOpen}
+	moduleTarget={editModuleTarget}
+	coursePk={$page.params.course_id}
+/>
 
 <AdminCourseDetailView course={data.course} modules={data.modules}>
+
 	{#snippet adminModuleActions(mod)}
 		{#if isAdmin}
-            <ActionMenu label="Modul amallari">
-                {@render renderModuleEditAction(mod)}
-                {@render renderModuleDeleteAction(mod)}
-            </ActionMenu>
+			<ActionMenu label="Modul amallari">
+				{@render renderModuleEditAction(mod)}
+				{@render renderModuleDeleteAction(mod)}
+			</ActionMenu>
 		{/if}
 	{/snippet}
 
 	{#snippet adminLessonActions(lesson, mod)}
 		{#if isAdmin}
-            <ActionMenu label="Dars amallari">
-                {@render renderLessonViewAction(lesson, mod)}
-                {@render renderLessonAssignmentAction(lesson, mod)}
-                {@render renderLessonEditAction(lesson, mod)}
-                {@render renderLessonDeleteAction(lesson, mod)}
-            </ActionMenu>
+			<ActionMenu label="Dars amallari">
+				{@render renderLessonViewAction(lesson, mod)}
+				{@render renderLessonAssignmentAction(lesson, mod)}
+				{@render renderLessonEditAction(lesson, mod)}
+				{@render renderLessonDeleteAction(lesson, mod)}
+			</ActionMenu>
 		{/if}
 	{/snippet}
 
@@ -96,17 +108,22 @@
 	{#snippet adminFooterActions()}
 		{#if isAdmin}
 			<div class="mt-4 overflow-hidden rounded-[32px] border border-red-100 bg-white shadow-sm">
-                <div class="bg-red-50/50 p-6 border-b border-red-50">
-                    <h3 class="flex items-center gap-2 text-lg font-black text-red-700">
-                        <AlertTriangle size={22} /> Danger Zone
-                    </h3>
-                    <p class="mt-2 text-sm font-medium text-red-600/70">
-                        Kursni o'chirish barcha ma'lumotlarni (modullar, darslar, natijalar) butunlay yo'q qiladi. Bu amalni ortga qaytarib bo'lmaydi.
-                    </p>
-                </div>
-				
+				<div class="border-b border-red-50 bg-red-50/50 p-6">
+					<h3 class="flex items-center gap-2 text-lg font-black text-red-700">
+						<AlertTriangle size={22} /> Danger Zone
+					</h3>
+					<p class="mt-2 text-sm font-medium text-red-600/70">
+						Kursni o'chirish barcha ma'lumotlarni (modullar, darslar, natijalar) butunlay yo'q
+						qiladi. Bu amalni ortga qaytarib bo'lmaydi.
+					</p>
+				</div>
+
 				<div class="p-6">
-					<form method="POST" action="?/deleteCourse" use:enhance={handleDelete("Rostdan ham bu kursni butunlay o'chirmoqchimisiz?")}>
+					<form
+						method="POST"
+						action="?/deleteCourse"
+						use:enhance={handleDelete("Rostdan ham bu kursni butunlay o'chirmoqchimisiz?")}
+					>
 						<button
 							type="submit"
 							disabled={isDeleting}
@@ -124,51 +141,75 @@
 
 <!-- Inline action snippets for cleaner code -->
 {#snippet renderModuleEditAction(mod)}
-    <button onclick={() => openModuleEdit(mod)} class="action-menu-item">
-        <Edit size={18} />
-        <span>Tahrirlash</span>
-    </button>
+	<button onclick={() => openModuleEdit(mod)} class="action-menu-item">
+		<Edit size={18} />
+		<span>Tahrirlash</span>
+	</button>
 {/snippet}
 
 {#snippet renderModuleDeleteAction(mod)}
-    <form method="POST" action="?/deleteModule" use:enhance={handleDelete("Modulni o'chirish?")} class="w-full lg:w-auto">
-        <input type="hidden" name="module_id" value={mod.id}>
-        <button type="submit" class="action-menu-item">
-            <Trash2 size={18} />
-            <span>O'chirish</span>
-        </button>
-    </form>
+	<form
+		method="POST"
+		action="?/deleteModule"
+		use:enhance={handleDelete("Modulni o'chirish?")}
+		class="w-full lg:w-auto"
+	>
+		<input type="hidden" name="module_id" value={mod.id} />
+		<button type="submit" class="action-menu-item">
+			<Trash2 size={18} />
+			<span>O'chirish</span>
+		</button>
+	</form>
 {/snippet}
 
-
 {#snippet renderLessonViewAction(lesson, mod)}
-    <a href={resolve(`/kurslarim/${$page.params.course_id}/lessons/${lesson.id}?module_id=${mod.id}`)} class="action-menu-item">
-        <Play size={18} />
-        <span>Ko'rish</span>
-    </a>
+	<a
+		href={resolve(
+			`/${isAdmin ? 'admin/courses' : 'kurslarim'}/${$page.params.course_id}/lessons/${lesson.id}?module_id=${mod.id}`
+		)}
+		class="action-menu-item"
+	>
+		<Play size={18} />
+		<span>Ko'rish</span>
+	</a>
 {/snippet}
 
 {#snippet renderLessonAssignmentAction(lesson, mod)}
-    <a href={resolve(`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/assignments/create?module_id=${mod.id}`)} class="action-menu-item">
-        <FileText size={18} />
-        <span>Topshiriq</span>
-    </a>
+	<a
+		href={resolve(
+			`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/assignments/create?module_id=${mod.id}`
+		)}
+		class="action-menu-item"
+	>
+		<FileText size={18} />
+		<span>Topshiriq</span>
+	</a>
 {/snippet}
 
 {#snippet renderLessonEditAction(lesson, mod)}
-    <a href={resolve(`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/edit?module_id=${mod.id}`)} class="action-menu-item">
-        <Edit size={18} />
-        <span>Tahrirlash</span>
-    </a>
+	<a
+		href={resolve(
+			`/admin/courses/${$page.params.course_id}/lesson/${lesson.id}/edit?module_id=${mod.id}`
+		)}
+		class="action-menu-item"
+	>
+		<Edit size={18} />
+		<span>Tahrirlash</span>
+	</a>
 {/snippet}
 
 {#snippet renderLessonDeleteAction(lesson, mod)}
-    <form method="POST" action="?/deleteLesson" use:enhance={handleDelete("Darsni o'chirish?")} class="w-full lg:w-auto">
-        <input type="hidden" name="module_id" value={mod.id}>
-        <input type="hidden" name="lesson_id" value={lesson.id}>
-        <button type="submit" class="action-menu-item">
-            <Trash2 size={18} />
-            <span>O'chirish</span>
-        </button>
-    </form>
+	<form
+		method="POST"
+		action="?/deleteLesson"
+		use:enhance={handleDelete("Darsni o'chirish?")}
+		class="w-full lg:w-auto"
+	>
+		<input type="hidden" name="module_id" value={mod.id} />
+		<input type="hidden" name="lesson_id" value={lesson.id} />
+		<button type="submit" class="action-menu-item">
+			<Trash2 size={18} />
+			<span>O'chirish</span>
+		</button>
+	</form>
 {/snippet}
