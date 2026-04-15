@@ -1,14 +1,18 @@
 import { API_URL } from '$env/static/private';
 import { fail, redirect } from '@sveltejs/kit';
 
-// load course id from params and get course modules
-export const load = async ({ parent, params }) => {
+export const load = async ({ parent, params, cookies }) => {
     const { modules } = await parent();
 
     if (!modules || modules.length === 0) {
         throw redirect(303, `/admin/courses/create/${params.course_id}`);
     }
-    return { modules };
+    return { 
+        modules, 
+        accessToken: cookies.get('access_token'),
+        apiUrl: API_URL,
+        courseId: params.course_id 
+    };
 };
 
 export const actions = {

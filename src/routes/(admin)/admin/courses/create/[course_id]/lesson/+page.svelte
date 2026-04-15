@@ -61,6 +61,7 @@
 		<LessonForm 
 			action="?/createLesson" 
 			modules={data.modules} 
+			apiContext={{ apiUrl: data.apiUrl, accessToken: data.accessToken, courseId: data.courseId }}
 			bind:modulePk={modulePk} 
 			bind:isSubmitting={isSubmitting} 
 			onSubmit={handleSubmit} 

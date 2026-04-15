@@ -20,8 +20,8 @@
 		modules = [],
 		modulePk = $bindable(null),
 		isSubmitting = $bindable(false),
-		onSubmit
-	} = $props();
+		onSubmit,
+		apiContext = null // { apiUrl, accessToken, courseId }
 
 	// Dropdown and File Upload State
 	let searchQuery = $state('');
@@ -110,7 +110,26 @@
 		xhr.addEventListener('load', async () => {
 			setTimeout(() => (uploadProgress = 0), 1000); // clear after 1s
 			try {
-				const result = deserialize(xhr.responseText);
+				let result;
+				if (apiContext) {
+					if (xhr.status >= 200 && xhr.status < 300) {
+						const json = JSON.parse(xhr.responseText);
+						result = { type: 'success', status: xhr.status, data: { success: true, lesson: json } };
+					} else {
+						let errData = {};
+						try { errData = JSON.parse(xhr.responseText); } catch(e){}
+						result = { 
+							type: 'failure', 
+							status: xhr.status > 0 ? xhr.status : 400, 
+							data: { 
+								error: errData.title?.[0] || errData.detail || "Xatolik yuz berdi" 
+							} 
+						};
+					}
+				} else {
+					result = deserialize(xhr.responseText);
+				}
+				
 				await applyAction(result);
 				if (updateFn) await updateFn({ update: invalidateAll, result });
 			} catch (err) {
@@ -126,7 +145,17 @@
 			alert('Xatolik yuz berdi');
 		});
 
-		xhr.open('POST', form.action);
+		if (apiContext) {
+			const directUrl = `${apiContext.apiUrl}/courses/${apiContext.courseId}/modules/${formData.get('module_pk')}/lessons/`;
+			xhr.open('POST', directUrl);
+			xhr.setRequestHeader('Authorization', `Bearer ${apiContext.accessToken}`);
+			
+			// Note: When sending FormData via XMLHttpRequest, we don't set Content-Type
+			// to avoid overriding the browser boundary generated for multipart/form-data
+		} else {
+			xhr.open('POST', form.action);
+		}
+
 		xhr.send(formData);
 	}
 </script>
