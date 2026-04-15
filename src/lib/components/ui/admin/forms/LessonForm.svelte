@@ -22,7 +22,8 @@
 		isSubmitting = $bindable(false),
 		onSubmit,
 		apiContext = null // { apiUrl, accessToken, courseId }
-
+	} = $props();
+	
 	// Dropdown and File Upload State
 	let searchQuery = $state('');
 	let isDropdownOpen = $state(false);
