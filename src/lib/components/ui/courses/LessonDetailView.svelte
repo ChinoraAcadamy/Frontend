@@ -14,7 +14,7 @@
 	import { fade, slide, fly } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
 	import 'plyr/dist/plyr.css';
@@ -73,7 +73,18 @@
 	let isSubmitting = $state(false);
 	let isSubmittingComplete = $state(false);
 	let isVideoFinished = $state(false);
+	let hasNextLesson = $state(false);
 	const completionThreshold = 0.95;
+
+	$effect(() => {
+		if (nextLesson) {
+			Promise.resolve(nextLesson).then(resolved => {
+				hasNextLesson = !!resolved;
+			});
+		} else {
+			hasNextLesson = false;
+		}
+	});
 
 	// --- Pagination ---
 	let currentAssignmentIndex = $state(0);
@@ -259,16 +270,29 @@
 		if (!lesson?.id) return;
 		isSubmittingComplete = true;
 		try {
+			// Backend expects seconds
+			const watchedSeconds = Math.floor(player?.currentTime || 0);
+
 			const res = await fetch('/api/progress/complete', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					lesson_id: lesson.id,
-					watched_seconds: Math.floor(player?.currentTime || 0)
+					watched_seconds: watchedSeconds
 				})
 			});
-			if (!res.ok) throw new Error('Xatolik');
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				throw new Error(data.message || data.detail || 'Darsni yakunlashda xatolik yuz berdi');
+			}
+
 			toast.success('Dars muvaffaqiyatli yakunlandi!');
+			
+			// Refresh all data to update progress bars and lesson statuses
+			await invalidateAll();
+
 			const resolvedNextLesson = await nextLesson;
 			if (resolvedNextLesson) {
 				setTimeout(() => {
@@ -279,7 +303,8 @@
 				}, 1000);
 			}
 		} catch (e) {
-			toast.error(`Xatolik yuz berdi: ${e}`);
+			console.error('Lesson completion error:', e);
+			toast.error(`${e.message || e}`);
 		} finally {
 			isSubmittingComplete = false;
 		}
@@ -434,7 +459,7 @@
 							{:else}
 								<CheckCircle2 size={16} />
 							{/if}
-							<span>Darsni yakunlash</span>
+							<span>{hasNextLesson ? "Keyingi darsga o'tish" : "Darsni yakunlash"}</span>
 						{/if}
 					</button>
 				</div>

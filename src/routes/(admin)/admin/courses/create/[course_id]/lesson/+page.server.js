@@ -7,11 +7,11 @@ export const load = async ({ parent, params, cookies }) => {
     if (!modules || modules.length === 0) {
         throw redirect(303, `/admin/courses/create/${params.course_id}`);
     }
-    return { 
-        modules, 
+    return {
+        modules,
         accessToken: cookies.get('access_token'),
         apiUrl: API_URL,
-        courseId: params.course_id 
+        courseId: params.course_id
     };
 };
 

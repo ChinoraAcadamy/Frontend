@@ -14,6 +14,18 @@
 	 * @property {number} [order_index]
 	 */
 
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} [action]
+	 * @property {any} [lessonTarget]
+	 * @property {any[]} [modules]
+	 * @property {number|null} [modulePk]
+	 * @property {boolean} [isSubmitting]
+	 * @property {function} [onSubmit]
+	 * @property {{ apiUrl: string, accessToken: string, courseId: string } | null} [apiContext]
+	 */
+
+	/** @type {Props} */
 	let {
 		action = '?/createLesson',
 		lessonTarget = {},
@@ -21,7 +33,7 @@
 		modulePk = $bindable(null),
 		isSubmitting = $bindable(false),
 		onSubmit,
-		apiContext = null // { apiUrl, accessToken, courseId }
+		apiContext = null
 	} = $props();
 	
 	// Dropdown and File Upload State
@@ -117,6 +129,7 @@
 						const json = JSON.parse(xhr.responseText);
 						result = { type: 'success', status: xhr.status, data: { success: true, lesson: json } };
 					} else {
+						/** @type {any} */
 						let errData = {};
 						try { errData = JSON.parse(xhr.responseText); } catch(e){}
 						result = { 

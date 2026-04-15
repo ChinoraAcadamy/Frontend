@@ -11,16 +11,21 @@ export async function load({ params, cookies, url, fetch }) {
         throw error(400, 'Module ID kiritilmadi');
     }
 
-    const headers = { 
+    const headers = {
         'Authorization': `Bearer ${token}`,
-        'Accept-Language': getLocale() 
+        'Accept-Language': getLocale()
     };
 
     try {
         // Parallelizing the fetches
         const lessonPromise = fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/lessons/${params.lesson_id}/`, { headers })
             .then(async (res) => {
-                if (!res.ok) throw error(res.status, 'Dars topilmadi');
+                if (!res.ok) {
+                    let errBody = '';
+                    try { errBody = await res.text(); } catch(e){}
+                    console.error("Backend error for lesson:", res.status, errBody);
+                    throw error(res.status, `Dars topilmadi student page. Status: ${res.status}, Message: ${errBody}`);
+                }
                 return res.json();
             });
 
@@ -69,7 +74,7 @@ export const actions = {
     uploadAssignment: async ({ request, cookies, fetch }) => {
         const token = cookies.get('access_token');
         const formData = await request.formData();
-        
+
         const assignmentId = formData.get('assignment');
         const file = formData.get('file');
         const textAnswer = formData.get('text_answer') || '';

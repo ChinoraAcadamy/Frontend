@@ -22,6 +22,13 @@
 	function handleImageError(e) {
 		e.currentTarget.src = `https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`;
 	}
+
+	function getLessonStatus(lesson) {
+		if (!isStudentView) return 'available';
+		if (lesson.is_completed) return 'completed';
+		if (lesson.can_access === false) return 'locked';
+		return 'available';
+	}
 </script>
 
 <div class="relative mx-auto min-h-[calc(100vh-80px)] max-w-5xl bg-[#f8fafc] p-4 font-sans md:p-8">
@@ -135,11 +142,15 @@
 					{#if mod.lessons && mod.lessons.length > 0}
 						<div class="flex flex-col gap-2">
 							{#each mod.lessons as lesson (lesson.id)}
+								{console.log(lesson, mod)}
 								<LessonsRow
-									index={lesson.id}
+									index={lesson.order_index}
 									title={lesson.title}
 									duration={lesson.duration}
-									href={getLessonHref && !isStudentBlocked
+									status={getLessonStatus(lesson)}
+									href={getLessonHref &&
+									!isStudentBlocked &&
+									(!isStudentView || lesson.can_access !== false)
 										? getLessonHref(lesson.id, mod.id)
 										: undefined}
 								>

@@ -7,6 +7,10 @@ export async function load({ locals, cookies, url, fetch, parent }) {
         throw redirect(302, '/login');
     }
 
+    if (locals.user?.role === 'admin' || locals.user?.role === 'superadmin') {
+        throw redirect(302, '/admin/dashboard');
+    }
+
     const accessToken = cookies.get('access_token');
 
     const search = url.searchParams.get('search') || '';

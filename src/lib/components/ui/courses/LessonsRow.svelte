@@ -25,7 +25,7 @@
 			<span
 				class="text-sm font-medium {status === 'active' ? 'text-rose-100' : 'text-slate-500'}"
 			>
-				Lesson {index}
+				{index}
 			</span>
 			<span class="line-clamp-1 text-sm font-semibold sm:text-base">{title}</span>
 		</div>
