@@ -13,7 +13,7 @@
 		Save,
 		Globe,
 		Tag,
-		CheckCircle2,
+		CheckCircle2
 	} from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
@@ -87,9 +87,9 @@
 		return async ({ result, update }) => {
 			isSaving = false;
 			if (result.type === 'success') {
-				toast.success("Kurs muvaffaqiyatli yangilandi");
+				toast.success('Kurs muvaffaqiyatli yangilandi');
 			} else if (result.type === 'failure') {
-				toast.error(result.data?.error || "Xatolik yuz berdi");
+				toast.error(result.data?.error || 'Xatolik yuz berdi');
 			}
 			await update();
 		};
@@ -244,9 +244,9 @@
 		{:else if activeTab === 'settings'}
 			<div in:fade={{ duration: 200 }} class="space-y-8">
 				{@render settingsTab()}
-				
+
 				{#if adminFooterActions}
-					<div class="pt-4 mt-8 border-t border-slate-100">
+					<div class="mt-8 border-t border-slate-100 pt-4">
 						{@render adminFooterActions()}
 					</div>
 				{/if}
@@ -377,7 +377,7 @@
 					type="text"
 					bind:value={searchQuery}
 					placeholder="Ism yoki telefon raqami bo'yicha qidirish..."
-					class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pl-11 pr-4 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
+					class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pr-4 pl-11 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 				/>
 			</div>
 			<div class="flex items-center gap-2">
@@ -391,17 +391,20 @@
 		<!-- Students Table -->
 		{#if filteredStudents().length > 0}
 			<div class="overflow-hidden rounded-[32px] border border-slate-100 bg-white shadow-sm">
-				<div class="overflow-x-auto scrollbar-hide">
+				<div class="scrollbar-hide overflow-x-auto">
 					<table class="w-full min-w-[600px] border-collapse text-left">
 						<thead>
 							<tr class="border-b border-slate-50 bg-slate-50/50">
-								<th class="px-6 py-4 text-[10px] font-black tracking-widest text-slate-400 uppercase"
+								<th
+									class="px-6 py-4 text-[10px] font-black tracking-widest text-slate-400 uppercase"
 									>#</th
 								>
-								<th class="px-6 py-4 text-[10px] font-black tracking-widest text-slate-400 uppercase"
+								<th
+									class="px-6 py-4 text-[10px] font-black tracking-widest text-slate-400 uppercase"
 									>O'quvchi</th
 								>
-								<th class="px-6 py-4 text-[10px] font-black tracking-widest text-slate-400 uppercase"
+								<th
+									class="px-6 py-4 text-[10px] font-black tracking-widest text-slate-400 uppercase"
 									>Telefon</th
 								>
 								<th
@@ -420,7 +423,7 @@
 											class="flex max-w-fit items-center gap-3 transition-transform hover:translate-x-1"
 										>
 											<div
-												class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-black ring-4 ring-white shadow-sm transition-all group-hover:ring-[#ed4b72]/10 {getAvatarColor(
+												class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-black shadow-sm ring-4 ring-white transition-all group-hover:ring-[#ed4b72]/10 {getAvatarColor(
 													student.id
 												)}"
 											>
@@ -430,15 +433,15 @@
 												<span
 													class="text-sm font-extrabold text-slate-800 transition-colors group-hover:text-[#ed4b72]"
 												>
-													{student.first_name} {student.last_name}
+													{student.first_name}
+													{student.last_name}
 												</span>
-												<span class="text-[11px] font-bold text-slate-400"
-													>@{student.username}</span
+												<span class="text-[11px] font-bold text-slate-400">@{student.username}</span
 												>
 											</div>
 										</a>
 									</td>
-									<td class="px-6 py-4 text-sm font-bold text-slate-600 font-mono">
+									<td class="px-6 py-4 font-mono text-sm font-bold text-slate-600">
 										{student.phone_number}
 									</td>
 									<td class="px-6 py-4 text-right">
@@ -512,7 +515,7 @@
 					</div>
 					<div>
 						<h3 class="text-sm font-black tracking-tight text-slate-800">Publishing Status</h3>
-						<p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+						<p class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
 							{isPublished ? 'Live on platform' : 'Hidden from students'}
 						</p>
 					</div>
@@ -538,14 +541,20 @@
 		<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 			<div class="rounded-[32px] border border-slate-100 bg-white p-6 shadow-sm">
 				<div class="mb-5 flex items-center gap-3 border-b border-slate-50 pb-4">
-					<div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-50 text-[#ed4b72]">
+					<div
+						class="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-50 text-[#ed4b72]"
+					>
 						<Globe size={20} />
 					</div>
 					<h3 class="text-[16px] font-black tracking-tight text-slate-800">O'zbek tilida (UZ)</h3>
 				</div>
 				<div class="space-y-5">
 					<div class="space-y-2">
-						<label for="title_uz" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Kurs nomi</label>
+						<label
+							for="title_uz"
+							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+							>Kurs nomi</label
+						>
 						<input
 							type="text"
 							id="title_uz"
@@ -556,7 +565,11 @@
 						/>
 					</div>
 					<div class="space-y-2">
-						<label for="description_uz" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Tavsif</label>
+						<label
+							for="description_uz"
+							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+							>Tavsif</label
+						>
 						<textarea
 							id="description_uz"
 							name="description_uz"
@@ -567,7 +580,11 @@
 						></textarea>
 					</div>
 					<div class="space-y-2">
-						<label for="level_uz" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Daraja</label>
+						<label
+							for="level_uz"
+							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+							>Daraja</label
+						>
 						<input
 							type="text"
 							id="level_uz"
@@ -583,14 +600,20 @@
 			<!-- Section: Basic Information (RU) -->
 			<div class="rounded-[32px] border border-slate-100 bg-white p-6 shadow-sm">
 				<div class="mb-5 flex items-center gap-3 border-b border-slate-50 pb-4">
-					<div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-500">
+					<div
+						class="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-500"
+					>
 						<Globe size={20} />
 					</div>
 					<h3 class="text-[16px] font-black tracking-tight text-slate-800">На русском (RU)</h3>
 				</div>
 				<div class="space-y-5">
 					<div class="space-y-2">
-						<label for="title_ru" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Название курса</label>
+						<label
+							for="title_ru"
+							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+							>Название курса</label
+						>
 						<input
 							type="text"
 							id="title_ru"
@@ -601,7 +624,11 @@
 						/>
 					</div>
 					<div class="space-y-2">
-						<label for="description_ru" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Описание</label>
+						<label
+							for="description_ru"
+							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+							>Описание</label
+						>
 						<textarea
 							id="description_ru"
 							name="description_ru"
@@ -612,7 +639,11 @@
 						></textarea>
 					</div>
 					<div class="space-y-2">
-						<label for="level_ru" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Level (RU)</label>
+						<label
+							for="level_ru"
+							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+							>Level (RU)</label
+						>
 						<input
 							type="text"
 							id="level_ru"
@@ -629,27 +660,39 @@
 		<!-- Section: Technical & Pricing -->
 		<div class="rounded-[40px] border border-slate-100 bg-white p-8 shadow-sm">
 			<div class="mb-6 flex items-center gap-3">
-				<div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+				<div
+					class="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-50 text-amber-500"
+				>
 					<Tag size={22} />
 				</div>
-				<h3 class="text-lg font-black tracking-tight text-slate-800">Texnik va Moliyaviy ma'lumotlar</h3>
+				<h3 class="text-lg font-black tracking-tight text-slate-800">
+					Texnik va Moliyaviy ma'lumotlar
+				</h3>
 			</div>
 
 			<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
 				<div class="space-y-2">
-					<label for="duration" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Davomiyligi (minut)</label>
+					<label
+						for="duration"
+						class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+						>Davomiyligi (minut)</label
+					>
 					<div class="relative">
 						<input
 							type="number"
 							id="duration"
 							name="duration"
 							value={course.duration || 0}
-							class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pl-4 pr-10 text-sm font-black transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
+							class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pr-10 pl-4 text-sm font-black transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						/>
 					</div>
 				</div>
 				<div class="space-y-2">
-					<label for="price" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Joriy Narx</label>
+					<label
+						for="price"
+						class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+						>Joriy Narx</label
+					>
 					<div class="relative">
 						<input
 							type="text"
@@ -657,12 +700,16 @@
 							name="price"
 							value={course.price || ''}
 							placeholder="0.00"
-							class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pl-4 pr-10 text-sm font-black transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
+							class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pr-10 pl-4 text-sm font-black transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						/>
 					</div>
 				</div>
 				<div class="space-y-2">
-					<label for="old_price" class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase">Eski Narx</label>
+					<label
+						for="old_price"
+						class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
+						>Eski Narx</label
+					>
 					<div class="relative">
 						<input
 							type="text"
@@ -670,7 +717,7 @@
 							name="old_price"
 							value={course.old_price || ''}
 							placeholder="0.00"
-							class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pl-4 pr-10 text-sm font-black transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
+							class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pr-10 pl-4 text-sm font-black transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						/>
 					</div>
 				</div>
@@ -685,7 +732,9 @@
 				class="group flex w-full items-center justify-center gap-3 rounded-[32px] bg-[#ed4b72] py-5 text-lg font-black text-white shadow-2xl shadow-rose-500/30 transition-all hover:bg-[#d93a5f] hover:shadow-rose-500/40 active:scale-[0.98] disabled:opacity-50"
 			>
 				{#if isSaving}
-					<div class="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
+					<div
+						class="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
+					></div>
 					<span>Saqlanmoqda...</span>
 				{:else}
 					<Save size={20} />

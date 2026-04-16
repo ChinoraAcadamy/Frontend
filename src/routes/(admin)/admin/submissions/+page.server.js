@@ -3,10 +3,11 @@ import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
 
 export const load = async ({ cookies, fetch, url, setHeaders }) => {
-    // Optimizatsiya: 1 daqiqalik kesh (submissonlar tez o'zgarishi mumkinligi uchun)
+    // Submissionlar doimo yangi bo'lishi kerak
     setHeaders({
-        'cache-control': 'private, max-age=60'
+        'cache-control': 'private, no-cache, must-revalidate'
     });
+
 
     const accessToken = cookies.get('access_token');
 

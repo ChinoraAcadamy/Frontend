@@ -6,10 +6,11 @@ export const load = async ({ fetch, cookies, setHeaders }) => {
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw error(401, 'Avtorizatsiya talab qilinadi');
 
-    // Optimizatsiya: 10 daqiqalik kesh
+    // Admin list sahifasi doimo yangi bo'lishi kerak
     setHeaders({
-        'cache-control': 'private, max-age=600'
+        'cache-control': 'private, no-cache, must-revalidate'
     });
+
 
     const getCourses = async () => {
         const headers = {

@@ -10,10 +10,11 @@ export const load = async ({ fetch, cookies, url, setHeaders }) => {
     const ordering = url.searchParams.get('ordering')  ?? '';
     const page     = url.searchParams.get('page')      ?? '1';
 
-    // Optimizatsiya: 10 daqiqalik kesh
+    // Admin list sahifasi doimo yangi bo'lishi kerak
     setHeaders({
-        'cache-control': 'private, max-age=600'
+        'cache-control': 'private, no-cache, must-revalidate'
     });
+
 
     const getStudentsData = async () => {
         const params = new URLSearchParams();
