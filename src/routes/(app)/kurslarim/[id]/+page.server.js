@@ -4,7 +4,7 @@ import { enrichCourseWithProgress } from '@/lib/server/courseService.js';
 import { getLocale } from '@/lib/paraglide/runtime';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ fetch, params, cookies, setHeaders }) => {
+export const load = async ({ params, cookies, }) => {
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw redirect(303, '/login');
 
@@ -18,7 +18,9 @@ export const load = async ({ fetch, params, cookies, setHeaders }) => {
     const getCourseDetail = async () => {
         const headers = { 'Authorization': `Bearer ${accessToken}`, 'Accept-Language': getLocale() };
         try {
-            const res = await fetch(`${API_URL}/courses/${params.id}/`, { headers });
+            // SvelteKit's event.fetch is for dependencies tracking during load().
+            // For streamed data, global fetch avoids warnings.
+            const res = await globalThis.fetch(`${API_URL}/courses/${params.id}/`, { headers });
 
             if (!res.ok) {
                 throw error(res.status === 404 ? 404 : 400, 'Kurs topilmadi yoki ulanishda xatolik');
@@ -26,15 +28,14 @@ export const load = async ({ fetch, params, cookies, setHeaders }) => {
 
             let course = await res.json();
 
-            // Markazlashgan servis orqali progressni biriktiramiz
-            // Global fetch Sveltekit warning bermasligini ta'minlaydi (backgroundda ishlaydi)
+            // Progressni biriktirish (global fetch ishlatadi)
             course = await enrichCourseWithProgress(accessToken, course, globalThis.fetch);
 
-            // Fetch accurate lessons mapping with `can_access` and `is_completed`
+            // Fetch accurate lessons mapping
             if (course.modules && course.modules.length > 0) {
                 const modulesPromises = course.modules.map(async (mod) => {
                     try {
-                        const lessonsRes = await fetch(`${API_URL}/courses/${course.id}/modules/${mod.id}/lessons/`, { headers });
+                        const lessonsRes = await globalThis.fetch(`${API_URL}/courses/${course.id}/modules/${mod.id}/lessons/`, { headers });
                         if (lessonsRes.ok) {
                             const lessonsData = await lessonsRes.json();
                             mod.lessons = lessonsData.results || lessonsData;

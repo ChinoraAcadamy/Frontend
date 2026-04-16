@@ -1,15 +1,12 @@
 <script lang="ts">
-	import StatCard from '@/lib/components/ui/courses/StatCard.svelte';
 	import InputField from '@/lib/components/ui/InputField.svelte';
-	import { Users, BookOpen, FileText, Pencil } from 'lucide-svelte';
+	import { User, Shield, Info, Save, Settings as SettingsIcon } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
+	import { fade } from 'svelte/transition';
 
 	let { data, form: serverForm } = $props();
 
-	/** @type {any} */
-	let userData = $derived(data.user || {});
-	
 	// Svelte 5 state
 	let profileForm = $state({
 		firstName: '',
@@ -19,22 +16,35 @@
 		role: ''
 	});
 
-	// Sync data to form state safely to avoid 'state_referenced_locally' warning
-	$effect(() => {
-		if (userData) {
-			profileForm.firstName = userData['first_name'] || '';
-			profileForm.lastName = userData['last_name'] || '';
-			profileForm.phone = userData['phone_number'] || '';
-			profileForm.username = userData['username'] || "Noma'lum";
-			profileForm.role = userData['role'] === 'admin' ? 'Administrator' : userData['role'] || 'Foydalanuvchi';
-		}
-	});
-
 	let isSubmitting = $state(false);
+
+	// Ma'lumotlar kelganda formani to'ldiramiz
+	function syncData(user) {
+		if (user) {
+			profileForm.firstName = user['first_name'] || '';
+			profileForm.lastName = user['last_name'] || '';
+			profileForm.phone = user['phone_number'] || '';
+			profileForm.username = user['username'] || "Noma'lum";
+			profileForm.role =
+				user['role'] === 'admin'
+					? 'Administrator'
+					: user['role'] === 'superadmin'
+						? 'Super Admin'
+						: user['role'] || 'Admin';
+		}
+	}
+
+	$effect(() => {
+		// Lazy load orqali keladigan ma'lumotni kutiladi
+		data.lazy.profile.then((user) => {
+			if (user) syncData(user);
+		});
+	});
 
 	$effect(() => {
 		if (serverForm?.success) {
 			toast.success('Profil muvaffaqiyatli saqlandi!');
+			if (serverForm.user) syncData(serverForm.user);
 		} else if (serverForm?.error) {
 			toast.error(serverForm.error);
 		}
@@ -47,137 +57,238 @@
 			await update();
 		};
 	}
-
-	// Mock timeline datalari
-	const activities = [
-		{ id: 1, title: 'Course completed', date: 'Jan 27, 2022', points: '+20 point' },
-		{ id: 2, title: 'Quiz submission', date: 'Jan 21, 2022', points: '+10 point' },
-		{ id: 3, title: 'Quiz submission', date: 'Jan 27, 2022', points: '+30 point' }
-	];
 </script>
 
-<div class="mx-auto min-h-screen max-w-5xl space-y-6 bg-[#f8fafc] p-4 font-sans md:p-8">
-	<div class="rounded-4xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
-		<h2 class="mb-8 text-xl font-bold text-slate-800">Profil Sozlamalari</h2>
+<svelte:head>
+	<title>Admin Profil | Chinora Academy</title>
+</svelte:head>
 
-		<form
-			method="POST"
-			action="?/updateProfile"
-			use:enhance={handleSubmit}
-			class="flex flex-col gap-8 md:flex-row lg:gap-12"
-		>
-			<div class="flex w-32 shrink-0 flex-col items-center gap-4">
-				<div
-					class="relative flex h-32 w-32 shrink-0 items-end justify-center overflow-hidden rounded-full border border-slate-100 bg-[#dbeafe]"
-				>
-					<img
-						src={'https://ui-avatars.com/api/?name=' +
-							encodeURIComponent(profileForm.firstName || 'U')}
-						alt="Profile"
-						class="h-full w-full object-cover"
-						width="112"
-						height="112"
-					/>
-					<button
-						type="button"
-						class="absolute right-1 bottom-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#ed4b72] text-white shadow-md transition-transform hover:scale-105"
-					>
-						<Pencil size={14} />
-					</button>
-					<!-- Fayl yuklash keyinchalik qoshamiz -->
-				</div>
-
-				<p class="text-sm font-semibold text-slate-700">Profil surati</p>
+<div
+	class="mx-auto min-h-screen max-w-4xl space-y-6 bg-[#f8fafc] px-4 py-8 font-sans sm:px-6 lg:px-8"
+>
+	<!-- Header Section -->
+	<header class="mb-8 flex flex-col gap-2">
+		<div class="flex items-center gap-3 text-[#9b1c48]">
+			<div class="rounded-lg bg-rose-50 p-2 text-[#9b1c48]">
+				<User size={24} />
 			</div>
+			<h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">
+				Profil Sozlamalari
+			</h1>
+		</div>
+		<p class="text-sm font-medium text-slate-500">
+			Shaxsiy ma'lumotlaringizni boshqarish va xavfsizlik sozlamalari.
+		</p>
+	</header>
 
-			<div class="grid flex-1 grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
-				<InputField
-					id="firstName"
-					name="first_name"
-					label="Ism"
-					bind:value={profileForm.firstName}
-				/>
-				<InputField
-					id="username"
-					label="Foydalanuvchi nomi"
-					bind:value={profileForm.username}
-					readonly
-				/>
-
-				<InputField
-					id="lastName"
-					name="last_name"
-					label="Familiya"
-					bind:value={profileForm.lastName}
-					placeholder="Familiya"
-				/>
-				<InputField id="role" label="Rol" bind:value={profileForm.role} readonly />
-
-				<InputField
-					id="phone"
-					name="phone_number"
-					label="Telefon raqam"
-					bind:value={profileForm.phone}
-				/>
-
-				<div class="mt-2 flex items-end justify-end sm:col-start-2">
-					<button
-						type="submit"
-						disabled={isSubmitting}
-						class="h-11 w-full rounded-xl bg-[#ed4b72] font-bold text-white shadow-sm shadow-rose-200 transition-colors hover:bg-[#de3c61] disabled:opacity-70"
-					>
-						{isSubmitting ? 'Saqlanmoqda...' : "O'zgarishlarni saqlash"}
-					</button>
+	<div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_2fr]">
+		{#await data.lazy.profile}
+			<!-- Loading State for Left Side -->
+			<div class="animate-pulse space-y-4">
+				<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+					<div class="mb-6 flex flex-col items-center text-center">
+						<div class="mb-4 h-20 w-20 rounded-full bg-slate-100"></div>
+						<div class="mb-2 h-6 w-32 rounded bg-slate-100"></div>
+						<div class="h-3 w-16 rounded bg-slate-100"></div>
+					</div>
+					<div class="space-y-3 border-t border-slate-50 pt-6">
+						<div class="flex items-center justify-between">
+							<div class="h-4 w-20 rounded bg-slate-50"></div>
+							<div class="h-4 w-12 rounded bg-slate-50"></div>
+						</div>
+						<div class="flex items-center justify-between">
+							<div class="h-4 w-20 rounded bg-slate-50"></div>
+							<div class="h-4 w-12 rounded bg-slate-50"></div>
+						</div>
+					</div>
 				</div>
 			</div>
-		</form>
-	</div>
 
-	<div>
-		<h2 class="mb-4 px-2 text-xl font-bold text-slate-800">My Stats</h2>
-
-		<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-			<div class="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:col-span-2">
-				<StatCard title="Total score" value="350" isPrimary={true}>
-					<Users size={24} />
-				</StatCard>
-
-				<StatCard title="Courses count" value="40">
-					<BookOpen size={24} strokeWidth={1.5} />
-				</StatCard>
-
-				<StatCard title="Submissions count" value="3">
-					<FileText size={24} strokeWidth={1.5} />
-				</StatCard>
-			</div>
-
-			<div class="h-full min-h-35 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-				<h3 class="mb-5 text-[17px] font-bold text-slate-800">Score history or activity</h3>
-
-				<div class="relative space-y-5 pl-3">
-					<div class="absolute top-2 bottom-2 left-1.25 w-0.5 rounded-full bg-slate-100"></div>
-
-					{#each activities as item, i (item.id)}
-						<div class="relative pl-5">
-							<div
-								class="absolute top-1.5 -left-2.5 h-2.5 w-2.5 rounded-full {i === 2
-									? 'bg-[#ed4b72] ring-4 ring-rose-50'
-									: 'bg-slate-300'}"
-							></div>
-
-							<div class="flex items-start justify-between gap-4">
-								<div>
-									<p class="text-sm font-semibold text-slate-800">{item.title}</p>
-									<p class="mt-0.5 text-[13px] font-medium text-slate-400">{item.date}</p>
-								</div>
-								<span class="text-sm font-semibold whitespace-nowrap text-[#10b981]">
-									{item.points}
-								</span>
-							</div>
+			<!-- Loading State for Right Side -->
+			<div class="animate-pulse rounded-3xl border border-slate-100 bg-white p-6 shadow-sm sm:p-10">
+				<div class="mb-8 h-6 w-48 rounded bg-slate-100"></div>
+				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+					{#each Array(4) as _, i (i)}
+						<div class="space-y-2">
+							<div class="h-3 w-16 rounded bg-slate-50"></div>
+							<div class="h-11 w-full rounded-xl bg-slate-50"></div>
 						</div>
 					{/each}
 				</div>
 			</div>
-		</div>
+		{:then userData}
+			<!-- Left Side: Role Info & Badges -->
+			<div class="space-y-4" in:fade={{ duration: 300 }}>
+				<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+					<div class="mb-6 flex flex-col items-center text-center">
+						<div
+							class="flex h-20 w-20 items-center justify-center rounded-full border-2 border-slate-100 bg-slate-50 text-3xl font-black text-slate-400"
+						>
+							{profileForm.firstName?.[0] || 'A'}
+						</div>
+						<h2 class="mt-4 text-lg font-bold text-slate-900">
+							{profileForm.firstName}
+							{profileForm.lastName}
+						</h2>
+						<span class="mt-1 text-xs font-black tracking-widest text-[#9b1c48] uppercase"
+							>@{profileForm.username}</span
+						>
+					</div>
+
+					<div class="space-y-3 border-t border-slate-50 pt-6">
+						<div class="flex items-center justify-between text-sm">
+							<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+								>Tizimdagi roli</span
+							>
+							<div
+								class="flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-black text-[#9b1c48]"
+							>
+								<Shield size={12} />
+								{profileForm.role}
+							</div>
+						</div>
+						<div class="flex items-center justify-between text-sm">
+							<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+								>Status</span
+							>
+							<div
+								class="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-600"
+							>
+								Faol
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="rounded-3xl border border-slate-100 bg-[#9b1c48] p-6 text-white shadow-sm">
+					<div class="flex items-center gap-3">
+						<Info size={20} class="opacity-80" />
+						<h3 class="text-sm font-bold tracking-widest uppercase">Ma'lumot</h3>
+					</div>
+					<p class="mt-3 text-xs leading-relaxed opacity-80">
+						Admin profili orqali siz tizimdagi boshqaruv huquqlariga ega bo'lasiz. Statistika va
+						natijalar faqat o'quvchi profili uchun mavjud.
+					</p>
+				</div>
+			</div>
+
+			<!-- Right Side: Edit Form -->
+			<div
+				class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm sm:p-10"
+				in:fade={{ duration: 400 }}
+			>
+				<div class="mb-8 flex items-center gap-3 border-b border-slate-50 pb-6">
+					<SettingsIcon size={20} class="text-slate-400" />
+					<h3 class="text-sm font-black tracking-widest text-slate-800 uppercase">
+						Ma'lumotlarni tahrirlash
+					</h3>
+				</div>
+
+				<form
+					method="POST"
+					action="?/updateProfile"
+					use:enhance={handleSubmit}
+					class="flex flex-col gap-6"
+				>
+					<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+						<div class="space-y-1.5">
+							<label
+								for="first_name"
+								class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Ism</label
+							>
+							<input
+								type="text"
+								id="first_name"
+								name="first_name"
+								bind:value={profileForm.firstName}
+								placeholder="Ismingiz"
+								class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
+							/>
+						</div>
+
+						<div class="space-y-1.5">
+							<label
+								for="last_name"
+								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+								>Familiya</label
+							>
+							<input
+								type="text"
+								id="last_name"
+								name="last_name"
+								bind:value={profileForm.lastName}
+								placeholder="Familiyangiz"
+								class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
+							/>
+						</div>
+
+						<div class="space-y-1.5 sm:col-span-2">
+							<label
+								for="phone_number"
+								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+								>Telefon raqam</label
+							>
+							<input
+								type="tel"
+								id="phone_number"
+								name="phone_number"
+								bind:value={profileForm.phone}
+								placeholder="+998 00 000 00 00"
+								class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
+							/>
+						</div>
+
+						<div class="space-y-1.5">
+							<label
+								for="username"
+								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+								>Foydalanuvchi nomi</label
+							>
+							<div
+								class="flex h-11 items-center rounded-xl bg-slate-100 px-4 text-sm font-bold text-slate-400 select-none"
+							>
+								@{profileForm.username}
+							</div>
+						</div>
+
+						<div class="space-y-1.5">
+							<label
+								for="role_display"
+								class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Maqom</label
+							>
+							<div
+								class="flex h-11 items-center rounded-xl bg-slate-100 px-4 text-sm font-bold text-slate-400 select-none"
+							>
+								{profileForm.role}
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-8 flex justify-end">
+						<button
+							type="submit"
+							disabled={isSubmitting}
+							class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#9b1c48] px-8 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-rose-900/10 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:opacity-50 sm:w-auto"
+						>
+							{#if isSubmitting}
+								<div
+									class="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white"
+								></div>
+								<span>Saqlanmoqda...</span>
+							{:else}
+								<Save size={16} />
+								<span>O'zgarishlarni saqlash</span>
+							{/if}
+						</button>
+					</div>
+				</form>
+			</div>
+		{/await}
 	</div>
 </div>
+
+<style>
+	:global(body) {
+		background-color: #f8fafc;
+	}
+</style>

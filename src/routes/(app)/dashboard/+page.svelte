@@ -3,8 +3,9 @@
 
 	import { resolve } from '$app/paths';
 	import CourseCard from '@/lib/components/ui/courses/CourseCard.svelte';
-	import { BookOpen, Award, TrendingUp } from 'lucide-svelte';
+	import { BookOpen, Award, TrendingUp, ChevronRight, FileCheck } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { getLocale } from '$lib/paraglide/runtime.js';
 
 	let { data } = $props();
 
@@ -32,6 +33,21 @@
 			key: 'rank'
 		}
 	];
+
+	function formatDate(dateStr) {
+		if (!dateStr) return '—';
+		return new Date(dateStr).toLocaleDateString(getLocale() === 'uz' ? 'uz-UZ' : 'ru-RU', {
+			day: 'numeric',
+			month: 'short'
+		});
+	}
+
+	const statusColors = {
+		pending: { bg: 'bg-slate-100', text: 'text-slate-600' },
+		submitted: { bg: 'bg-blue-50', text: 'text-blue-600' },
+		graded: { bg: 'bg-emerald-50', text: 'text-emerald-600' },
+		rejected: { bg: 'bg-rose-50', text: 'text-rose-600' }
+	};
 </script>
 
 <div class="mx-auto min-h-screen max-w-7xl space-y-8 bg-[#f8fafc] p-4 font-sans md:p-8">
@@ -77,9 +93,10 @@
 	<section>
 		<div class="mb-4 flex items-center justify-between">
 			<h2 class="text-xl font-bold text-slate-800">{m.menu_my_courses()}</h2>
-			<a href={resolve('/kurslarim')} class="text-sm font-medium text-[#ef4444] hover:underline"
-				>{m.dashboard_view_all()}</a
-			>
+			<a href={resolve('/kurslarim')} class="group flex items-center gap-1 text-sm font-semibold text-[#ef4444] hover:underline">
+				{m.dashboard_view_all()}
+				<ChevronRight size={16} class="transition-transform group-hover:translate-x-0.5" />
+			</a>
 		</div>
 
 		<div class="scrollbar-hide flex snap-x gap-4 overflow-x-auto pb-4">
@@ -90,16 +107,29 @@
 			{:then courses}
 				{#if courses && courses.length > 0}
 					{#each courses as course (course.id)}
-						<div class="snap-start">
-							<a href={resolve(`/kurslarim/${course.id}`)}>
+						{#if course.is_blocked}
+							<div class="snap-start cursor-not-allowed">
 								<CourseCard
 									title={course.title}
 									progress={course.progress}
 									lessons={course.lessons}
 									image={course.img}
+									is_blocked={true}
 								/>
-							</a>
-						</div>
+							</div>
+						{:else}
+							<div class="snap-start">
+								<a href={resolve(`/kurslarim/${course.id}`)}>
+									<CourseCard
+										title={course.title}
+										progress={course.progress}
+										lessons={course.lessons}
+										image={course.img}
+										is_blocked={false}
+									/>
+								</a>
+							</div>
+						{/if}
 					{/each}
 				{:else}
 					<p class="p-4 text-slate-400">{m.dashboard_no_courses()}</p>
@@ -108,54 +138,51 @@
 		</div>
 	</section>
 
-	<!-- Ranking Leaderboard -->
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-		<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-			<h2 class="mb-6 text-xl font-bold text-slate-800">{m.dashboard_leaderboard()}</h2>
+		<!-- Ranking Leaderboard -->
+		<div class="rounded-3xl border border-white/70 bg-white p-6 shadow-sm">
+			<div class="mb-6 flex items-center justify-between">
+				<h2 class="text-xl font-bold text-slate-800">{m.dashboard_leaderboard()}</h2>
+			</div>
 
 			<div class="overflow-x-auto">
 				{#await data.lazy.ranking}
-					<div class="scrollbar-hide flex snap-x gap-4 overflow-x-auto pb-4">
-						{#each Array(2) as _, i (i)}
-							<div class="h-10 rounded-lg bg-slate-50"></div>
+					<div class="space-y-3">
+						{#each Array(5) as _, i (i)}
+							<div class="h-12 w-full animate-pulse rounded-2xl bg-slate-50"></div>
 						{/each}
 					</div>
 				{:then ranking}
 					<table class="w-full border-collapse text-left">
 						<thead>
-							<tr class="border-b border-slate-100 text-sm text-slate-400">
-								<th class="px-2 pb-3 font-medium">{m.rank_pos()}</th>
-								<th class="px-2 pb-3 font-medium">{m.rank_student()}</th>
-								<th class="px-2 pb-3 font-medium">{m.rank_score()}</th>
-								<th class="px-2 pb-3 font-medium">{m.rank_course()}</th>
-								<th class="px-2 pb-3 font-medium">{m.rank_score()}</th>
+							<tr class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
+								<th class="px-2 pb-3">{m.rank_pos()}</th>
+								<th class="px-2 pb-3">{m.rank_student()}</th>
+								<th class="px-2 pb-3">{m.rank_score()}</th>
+								<th class="px-2 pb-3">{m.rank_course()}</th>
+								<th class="px-2 pb-3">{m.rank_score()}</th>
 							</tr>
 						</thead>
 						<tbody class="text-sm">
-							{#each (ranking || []).slice(0, 5) as user (user.id || user.name)}
-								<tr
-									class="border-b border-slate-50 transition-colors last:border-0 hover:bg-slate-50"
-								>
+							{#each (ranking || []).slice(0, 5) as user, i (user.id || user.name)}
+								<tr class="group transition-colors hover:bg-slate-50">
 									<td class="px-2 py-3">
-										<div
-											class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs"
-										>
-											{user.medal || '🏅'}
+										<div class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold">
+											{i + 1}
 										</div>
 									</td>
-									<td class="flex items-center gap-3 px-2 py-3">
-										<div class="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-200">
-											<img
-												src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user.name || user.username}`}
-												alt="avatar"
-												class="h-full w-full object-cover"
-											/>
+									<td class="px-2 py-3">
+										<div class="flex items-center gap-3">
+											<span class="font-bold text-slate-700">{user.name || user.username}</span>
 										</div>
-										<span class="font-medium">{user.name || user.username}</span>
 									</td>
-									<td class="px-2 py-3 font-medium">{user.score || user.total_score}</td>
+									<td class="px-2 py-3 font-semibold text-slate-600">{user.score || user.total_score}</td>
 									<td class="px-2 py-3 text-slate-500">{user.courses_count || '—'}</td>
-									<td class="px-2 py-3 font-semibold">{user.total_score}</td>
+									<td class="px-2 py-3">
+										<span class="rounded-lg bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-600">
+											{user.total_score}
+										</span>
+									</td>
 								</tr>
 							{/each}
 						</tbody>
@@ -164,11 +191,61 @@
 			</div>
 		</div>
 
-		<!-- Recent Submissions (hozircha mock) -->
-		<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-			<h2 class="mb-6 text-xl font-bold text-slate-800">{m.dashboard_recent_submissions()}</h2>
-			<div class="overflow-x-auto">
-				<p class="p-4 text-center text-slate-400">{m.dashboard_no_submissions()}</p>
+		<!-- Recent Submissions -->
+		<div class="rounded-3xl border border-white/70 bg-white p-6 shadow-sm">
+			<div class="mb-6 flex items-center justify-between">
+				<h2 class="text-xl font-bold text-slate-800">{m.dashboard_recent_submissions()}</h2>
+				<a href={resolve('/baholar')} class="group flex items-center gap-1 text-sm font-semibold text-[#ef4444] hover:underline">
+					{m.dashboard_view_all()}
+					<ChevronRight size={16} class="transition-transform group-hover:translate-x-0.5" />
+				</a>
+			</div>
+
+			<div class="space-y-4">
+				{#await data.lazy.recentSubmissions}
+					{#each Array(3) as _, i (i)}
+						<div class="h-20 w-full animate-pulse rounded-2xl bg-slate-50"></div>
+					{/each}
+				{:then submissions}
+					{#if submissions && submissions.length > 0}
+						{#each submissions as sub (sub.id)}
+							<div class="group relative flex items-center gap-4 rounded-2xl border border-slate-50 bg-white p-4 transition-all hover:border-[#ef4444]/10 hover:shadow-sm">
+								<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#ef4444]/5 group-hover:text-[#ef4444]">
+									<FileCheck size={20} />
+								</div>
+								
+								<div class="min-w-0 flex-1">
+									<h4 class="truncate text-sm font-bold text-slate-800 tracking-tight">
+										{sub.assignment_title || sub.assignment?.title || 'Assignment'}
+									</h4>
+									<div class="mt-0.5 flex items-center gap-2 text-xs font-medium text-slate-400">
+										<span>{formatDate(sub.submitted_at)}</span>
+										<span>•</span>
+										<span class="truncate">{sub.lesson_title || sub.assignment?.lesson_title || 'Lesson'}</span>
+									</div>
+								</div>
+
+								<div class="text-right">
+									{#if sub.status === 'graded'}
+										<div class="text-sm font-bold text-slate-800">{sub.score}<span class="text-[10px] text-slate-400">/{sub.max_score || 10}</span></div>
+									{/if}
+									<div class="mt-1">
+										<span class="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {statusColors[sub.status]?.bg} {statusColors[sub.status]?.text}">
+											{m[`status_${sub.status}`]?.() || sub.status}
+										</span>
+									</div>
+								</div>
+							</div>
+						{/each}
+					{:else}
+						<div class="flex flex-col items-center justify-center py-10 text-center">
+							<div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-200">
+								<FileCheck size={24} />
+							</div>
+							<p class="text-sm font-medium text-slate-400">{m.dashboard_no_submissions()}</p>
+						</div>
+					{/if}
+				{/await}
 			</div>
 		</div>
 	</div>

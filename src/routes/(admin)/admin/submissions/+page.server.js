@@ -21,10 +21,11 @@ export const load = async ({ cookies, fetch, url, setHeaders }) => {
     if (ordering) params.set('ordering', ordering);
     if (page) params.set('page', page);
 
-    // Status filtri
-    if (status !== 'all') {
-        params.set('status', status);
-    }
+    // Status filtri backendga yuborilmaydi, chunki biz barcha ma'lumotni keshlab
+    // va client-side filter qilishimiz kerak.
+    // if (status !== 'all') {
+    //     params.set('status', status);
+    // }
 
     // URL'ni standart va xavfsiz ko'rinishda shakllantiramiz
     const apiUrl = new URL(`${API_URL}/progress/submissions/`);

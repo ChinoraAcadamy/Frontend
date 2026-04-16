@@ -1,5 +1,6 @@
 import { getRanking } from '@/lib/server/api.js';
 import { getMyCourses } from '@/lib/server/myCourses.js';
+import { getRecentSubmissions } from '@/lib/server/submissions.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load(event) {
@@ -12,7 +13,8 @@ export async function load(event) {
         // Hammasini lazy (streaming) qilamiz
         lazy: {
             courses: getMyCourses(event).then(data => data.courses),
-            ranking: getRanking(event).then(data => data.ranking)
+            ranking: getRanking(event).then(data => data.ranking),
+            recentSubmissions: getRecentSubmissions(event, 3)
         }
     };
 }

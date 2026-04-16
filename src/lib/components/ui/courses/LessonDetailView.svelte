@@ -17,6 +17,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
+	import * as m from '$lib/paraglide/messages.js';
 	import 'plyr/dist/plyr.css';
 
 	let { lesson, nextLesson = null } = $props();
@@ -32,7 +33,7 @@
 		$page.data.user?.username || $page.data.user?.phone_number || 'Chinora Student'
 	);
 
-	const videoSources = $derived(() => {
+	const videoSources = $derived.by(() => {
 		if (lesson.video_qualities?.length > 0) {
 			return lesson.video_qualities.map((q) => ({
 				src: getProxiedUrl(q.url),
@@ -43,7 +44,7 @@
 		return [{ src: getProxiedUrl(lesson.video_url), type: 'video/mp4', size: 720 }];
 	});
 
-	const videoTracks = $derived(() => {
+	const videoTracks = $derived.by(() => {
 		if (lesson.subtitle_url) {
 			return [
 				{
@@ -78,7 +79,7 @@
 
 	$effect(() => {
 		if (nextLesson) {
-			Promise.resolve(nextLesson).then(resolved => {
+			Promise.resolve(nextLesson).then((resolved) => {
 				hasNextLesson = !!resolved;
 			});
 		} else {
@@ -169,6 +170,12 @@
 		if (player && lesson.id && lastLoadedLessonId !== lesson.id) {
 			lastLoadedLessonId = lesson.id;
 
+			// --- Reset per-lesson state ---
+			isVideoFinished = lesson.is_completed || false;
+			isSubmittingComplete = false;
+			selectedFile = null;
+			currentAssignmentIndex = 0;
+
 			const storageKey = getProgressKey(lesson.id);
 			const saved = localStorage.getItem(storageKey);
 
@@ -185,9 +192,9 @@
 			player.source = {
 				type: 'video',
 				title: lesson.title,
-				sources: videoSources(),
+				sources: videoSources,
 				poster: lesson.image,
-				tracks: videoTracks()
+				tracks: videoTracks
 			};
 
 			const checkProgress = () => {
@@ -289,7 +296,7 @@
 			}
 
 			toast.success('Dars muvaffaqiyatli yakunlandi!');
-			
+
 			// Refresh all data to update progress bars and lesson statuses
 			await invalidateAll();
 
@@ -304,7 +311,8 @@
 			}
 		} catch (e) {
 			console.error('Lesson completion error:', e);
-			toast.error(`${e.message || e}`);
+			const errorMsg = e instanceof Error ? e.message : String(e);
+			toast.error(errorMsg);
 		} finally {
 			isSubmittingComplete = false;
 		}
@@ -412,7 +420,7 @@
 			<!-- Lesson Metadata -->
 			<div class="flex flex-col gap-2">
 				<span class="text-xs font-bold tracking-wider text-slate-500 uppercase"
-					>Dars ma'lumotlari</span
+					>{m.lesson_info_title()}</span
 				>
 				<h1 class="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
 					{lesson.title}
@@ -429,7 +437,7 @@
 							transition:slide
 						>
 							<Lock size={16} />
-							<span>Tugmachani ochish uchun videoni oxirigacha ko'ring</span>
+							<span>{m.lesson_video_lock()}</span>
 						</div>
 					{:else}
 						<div
@@ -437,7 +445,7 @@
 							transition:slide
 						>
 							<CheckCircle2 size={16} />
-							<span>Video ko'rildi! Endi darsni yakunlashingiz mumkin</span>
+							<span>{m.lesson_video_watched()}</span>
 						</div>
 					{/if}
 
@@ -452,14 +460,14 @@
 							<div
 								class="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
 							></div>
-							<span>Yuborilmoqda...</span>
+							<span>{m.lesson_submitting()}</span>
 						{:else}
 							{#if !isVideoFinished}
 								<Lock size={16} />
 							{:else}
 								<CheckCircle2 size={16} />
 							{/if}
-							<span>{hasNextLesson ? "Keyingi darsga o'tish" : "Darsni yakunlash"}</span>
+							<span>{hasNextLesson ? m.lesson_next_lesson() : m.lesson_mark_complete()}</span>
 						{/if}
 					</button>
 				</div>
@@ -479,12 +487,16 @@
 								<span
 									class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[11px] font-bold tracking-wider text-slate-600 uppercase"
 								>
-									{lesson.assignments.length > 1 ? `${currentAssignmentIndex + 1}-topshiriq` : ''}
-									{assignment.type === 'text'
-										? 'Matn'
-										: assignment.type === 'link'
-											? 'Havola'
-											: 'Fayl'}
+									{lesson.assignments.length > 1
+										? `${currentAssignmentIndex + 1}-${m.assignment_title_n()}`
+										: ''}
+									{#if assignment.type === 'text'}
+										{m.assignment_type_text()}
+									{:else if assignment.type === 'link'}
+										{m.assignment_type_link()}
+									{:else}
+										{m.assignment_type_file()}
+									{/if}
 								</span>
 								<Upload size={18} class="text-slate-400" />
 							</div>
@@ -496,14 +508,14 @@
 							<div class="mt-4 flex items-center gap-6 border-t border-slate-100 pt-4">
 								<div class="flex flex-col">
 									<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-										>Maks Ball</span
+										>{m.assignment_max_score()}</span
 									>
 									<span class="text-base font-black text-slate-900">{assignment.max_score}</span>
 								</div>
 								<div class="h-8 w-px bg-slate-200"></div>
 								<div class="flex flex-col">
 									<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-										>Urinishlar</span
+										>{m.assignment_attempts()}</span
 									>
 									<span class="text-base font-black text-slate-900">{assignment.max_attempts}</span>
 								</div>
@@ -547,15 +559,18 @@
 										>
 									{:else}
 										<Upload size={24} class="mb-2 text-slate-400" />
-										<span class="text-sm font-bold text-slate-800">Faylni yuklash</span>
-										<span class="text-xs text-slate-500">Bu yerga tashlang yoki bosing</span>
+										<span class="text-sm font-bold text-slate-800"
+											>{m.assignment_upload_file()}</span
+										>
+										<span class="text-xs text-slate-500">{m.assignment_drop_file()}</span>
 									{/if}
 								</label>
 							{:else if assignment.type === 'text'}
 								<div class="flex flex-col gap-1.5">
 									<label
 										for="text_answer"
-										class="text-xs font-bold tracking-wider text-slate-600 uppercase">Javob</label
+										class="text-xs font-bold tracking-wider text-slate-600 uppercase"
+										>{m.assignment_type_text()}</label
 									>
 									<textarea
 										id="text_answer"
@@ -570,7 +585,8 @@
 								<div class="flex flex-col gap-1.5">
 									<label
 										for="text_answer"
-										class="text-xs font-bold tracking-wider text-slate-600 uppercase">Havola</label
+										class="text-xs font-bold tracking-wider text-slate-600 uppercase"
+										>{m.assignment_type_link()}</label
 									>
 									<input
 										type="url"
@@ -588,13 +604,13 @@
 									<label
 										for="desc_answer"
 										class="text-xs font-bold tracking-wider text-slate-600 uppercase"
-										>Izoh (ixtiyoriy)</label
+										>{m.assignment_desc_label()}</label
 									>
 									<textarea
 										id="desc_answer"
 										name="desc_answer"
 										rows="2"
-										placeholder="Topshiriq yuzasidan izoh qoldiring..."
+										placeholder={m.assignment_desc_placeholder()}
 										class="w-full rounded-md border border-slate-300 p-3 text-sm transition-colors outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
 									></textarea>
 								</div>
@@ -609,9 +625,9 @@
 									<div
 										class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
 									></div>
-									<span>Yuborilmoqda...</span>
+									<span>{m.lesson_submitting()}</span>
 								{:else}
-									<span>Topshiriqni yuborish</span>
+									<span>{m.assignment_submit_btn()}</span>
 									<ArrowRight size={16} />
 								{/if}
 							</button>
@@ -620,7 +636,9 @@
 						<!-- Submissions History -->
 						{#if assignment.submissions && assignment.submissions.length > 0}
 							<div class="flex flex-col border-t border-slate-200 bg-slate-50 p-5 sm:p-6">
-								<h3 class="mb-4 text-sm font-bold text-slate-900">Oldingi urinishlar</h3>
+								<h3 class="mb-4 text-sm font-bold text-slate-900">
+									{m.assignment_prev_attempts()}
+								</h3>
 								<div class="flex flex-col gap-3">
 									{#each assignment.submissions as sub (sub.id)}
 										<div
@@ -641,10 +659,10 @@
 														)}</span
 													>
 												</div>
-												{#if sub.status === 'Graded'}
+												{#if sub.status === 'Graded' || sub.status === 'graded'}
 													<span
 														class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[10px] font-bold tracking-wider text-slate-600 uppercase"
-														>Baholandi</span
+														>{m.assignment_graded()}</span
 													>
 												{:else}
 													<div
@@ -652,7 +670,7 @@
 													>
 														<span
 															class="text-[10px] font-bold tracking-wider text-sky-600 uppercase"
-															>Kutilmoqda</span
+															>{m.assignment_pending()}</span
 														>
 														<div class="flex gap-0.5">
 															<div class="h-1 w-1 animate-ping rounded-full bg-sky-400"></div>
@@ -679,7 +697,7 @@
 												<div class="mt-1 border-l-2 border-[#FA2E69] bg-slate-50/80 p-3">
 													<span
 														class="mb-1 block text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-														>Mentor:</span
+														>{m.assignment_mentor()}</span
 													>
 													<p class="text-[13px] font-medium text-slate-700 italic">
 														"{sub.feedback}"
@@ -703,7 +721,7 @@
 							class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-[#FA2E69] disabled:opacity-30"
 						>
 							<ChevronLeft size={16} />
-							<span>Oldingi</span>
+							<span>{m.pagination_prev_short()}</span>
 						</button>
 
 						<div class="flex gap-1.5">
@@ -725,7 +743,7 @@
 							disabled={currentAssignmentIndex === lesson.assignments.length - 1}
 							class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-[#FA2E69] disabled:opacity-30"
 						>
-							<span>Keyingi</span>
+							<span>{m.pagination_next_short()}</span>
 							<ChevronRight size={16} />
 						</button>
 					</div>

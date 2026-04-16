@@ -20,40 +20,21 @@
 		basePath = '/baholar'
 	} = $props();
 
-	// --- Client-side Caching Logic ---
+	// --- Client-side Caching & Filtering Logic ---
 	let activeStatus = $state(filters.status);
-	let submissionCache = $state(new Map());
 	let isRefreshing = $state(false);
-
-	// Initialize cache with initial data from props
-	$effect(() => {
-		if (submissions.length > 0 && !submissionCache.has(filters.status)) {
-			submissionCache.set(filters.status, {
-				results: submissions,
-				count: totalCount,
-				next: nextPage,
-				prev: prevPage,
-				page: currentPage
-			});
-		}
-	});
-
 	let localUpdates = $state(new Map());
 
-	// Derived current data from cache or props
-	let activeData = $derived(submissionCache.get(activeStatus) || { 
-		results: activeStatus === filters.status ? submissions : [], 
-		count: activeStatus === filters.status ? totalCount : 0, 
-		next: activeStatus === filters.status ? nextPage : null, 
-		prev: activeStatus === filters.status ? prevPage : null,
-		page: activeStatus === filters.status ? currentPage : 1
-	});
-
+	// Filtered data for the current view
 	let localSubmissions = $derived(
-		activeData.results.map((sub) =>
-			localUpdates.has(sub.id) ? { ...sub, ...localUpdates.get(sub.id) } : sub
-		)
+		submissions
+			.map((sub) => (localUpdates.has(sub.id) ? { ...sub, ...localUpdates.get(sub.id) } : sub))
+			.filter((sub) => activeStatus === 'all' || sub.status === activeStatus)
 	);
+
+	// Calculate counts based on the currently loaded 10 items (or whatever the page size is)
+	// Note: totalCount remains the server-side total for the 'all' filter
+	let currentCount = $derived(localSubmissions.length);
 
 	// Status config with professional grading colors
 	const getScoreColor = (score, maxScore = 10) => {
@@ -96,23 +77,11 @@
 
 	async function refreshData() {
 		isRefreshing = true;
-		
-		const url = new URL($page.url);
-		url.searchParams.set('status', activeStatus);
-		url.searchParams.set('page', '1');
-		
-		// SvelteKit's goto with invalidateAll triggers a fresh fetch
-		const { goto, invalidateAll } = await import('$app/navigation');
-		// @ts-ignore
-		await goto(resolve(`${basePath}?${url.searchParams}`), { 
-			keepFocus: true, 
-			noScroll: true 
-		});
+
+		// SvelteKit's invalidateAll will trigger a fresh fetch from +page.server.js
+		const { invalidateAll } = await import('$app/navigation');
 		await invalidateAll();
-		
-		// Cache will be updated by the $effect when new props arrive
-		submissionCache.clear();
-		
+
 		isRefreshing = false;
 		showToast(m.refresh_success?.() || 'Ma\'lumotlar yangilandi', { type: 'success' });
 	}
@@ -122,23 +91,14 @@
 
 		activeStatus = newStatus;
 
+		// Update URL ONLY without navigation/request
 		const url = new URL($page.url);
 		url.searchParams.set('status', newStatus);
-		url.searchParams.set('page', '1');
+		// Note: We don't reset 'page' here because the user might want to stay on the same page 
+		// but see filtered results. Usually, it's better to reset to 1, but we stick to client-side filter.
+		url.searchParams.set('page', '1'); 
 		
-		// Check if we have this status in cache
-		if (submissionCache.has(newStatus)) {
-			// Update URL ONLY without full navigation/request
-			window.history.replaceState({}, '', url.toString());
-		} else {
-			// Trigger standard navigation to fetch data
-			// @ts-ignore
-			goto(resolve(`${basePath}?${url.searchParams}`), { 
-				keepFocus: true, 
-				noScroll: true,
-				replaceState: true 
-			});
-		}
+		window.history.replaceState({}, '', url.toString());
 	}
 
 	function goToPage(p) {
@@ -172,13 +132,24 @@
 				showToast(m.grade_success(), { type: 'success' });
 				isGradeModalOpen = false;
 				
-				// Optional: clear cache to ensure next full load is fresh
-				submissionCache.clear();
+				// Refresh is handled by invalidateAll or manual refresh
 			} else if (result.type === 'failure') {
 				showToast(result.data?.error || m.error_occurred(), { type: 'error' });
 			}
 			isGrading = false;
 		};
+	}
+	function ensureUrl(url) {
+		if (!url) return '';
+		
+		// If it's already an absolute URL, return it
+		if (url.startsWith('http')) return url;
+		
+		// Fix cases where protocol might be mangled (e.g. "ttps:/")
+		if (url.startsWith('ttps:/')) return 'h' + url.replace('ttps:/', 'ttps://');
+		
+		// For relative paths, use SvelteKit's resolve
+		return resolve(url);
 	}
 </script>
 
@@ -298,7 +269,7 @@
 							"{sub.text_answer}"
 						</p>
 					{:else if sub.assignment_type === 'link'}
-						<a href={resolve(sub.text_answer)} target="_blank" class="flex items-center gap-2 text-sm font-bold text-[#9b1c48] hover:underline underline-offset-4 decoration-2">
+						<a href={ensureUrl(sub.text_answer)} target="_blank" class="flex items-center gap-2 text-sm font-bold text-[#9b1c48] hover:underline underline-offset-4 decoration-2">
 							<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
 							Havolani ochish
 						</a>
@@ -330,7 +301,8 @@
 					<div class="flex flex-row items-center gap-2">
 						{#if sub.file}
 							<a
-								href={resolve(sub.file)}
+								href={ensureUrl(sub.file)}
+								download={sub.file.split('/').pop()}
 								target="_blank"
 								rel="noopener noreferrer"
 								class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 transition-all duration-300 hover:scale-110 hover:bg-[#9b1c48] hover:text-white hover:shadow-[0_8px_20px_-6px_rgba(155,28,72,0.4)]"

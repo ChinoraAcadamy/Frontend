@@ -57,9 +57,9 @@
 				<img
 					src={displayImage}
 					alt={title}
-					class="h-full w-full object-cover"
-					width="80"
-					height="80"
+					class="h-full w-full object-cover transition-transform duration-500"
+					width="400"
+					height="225"
 					loading="lazy"
 					onerror={handleImageError}
 				/>
