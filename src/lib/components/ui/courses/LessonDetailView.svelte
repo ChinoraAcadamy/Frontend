@@ -297,17 +297,19 @@
 
 			toast.success('Dars muvaffaqiyatli yakunlandi!');
 
-			// Refresh all data to update progress bars and lesson statuses
-			await invalidateAll();
+			// Orqa fonni zudlik bilan yangilaymiz (Progress bar va Sidebar update uchun)
+			invalidateAll();
 
 			const resolvedNextLesson = await nextLesson;
 			if (resolvedNextLesson) {
-				setTimeout(() => {
-					const url = `/kurslarim/${$page.params.id}/lessons/${resolvedNextLesson.id}?module_id=${resolvedNextLesson.moduleId || $page.url.searchParams.get('module_id')}`;
-					/** @type {any} */
-					const route = url;
-					goto(resolve(route));
-				}, 1000);
+				const url = `/kurslarim/${$page.params.id}/lessons/${resolvedNextLesson.id}?module_id=${resolvedNextLesson.moduleId || $page.url.searchParams.get('module_id')}`;
+				/** @type {any} */
+				const route = url;
+				// 1 soniya kutmasdan darhol keyingi darsga o'tamiz:
+				goto(resolve(route));
+			} else {
+				// Agar keyingi dars bo'lmasa, shunchaki hozirgi darsni yangilaymiz
+				// (invalidateAll() chaqirilgani yetarli bo'lishi mumkin)
 			}
 		} catch (e) {
 			console.error('Lesson completion error:', e);

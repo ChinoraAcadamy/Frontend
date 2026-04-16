@@ -23,7 +23,7 @@ export const actions = {
             return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });
         }
 
-        throw redirect(303, '/admin/courses');
+        throw redirect(303, `/admin/courses?deleted_course=${params.course_id}`);
     },
 
     updateCourse: async ({ request, params, cookies, fetch }) => {

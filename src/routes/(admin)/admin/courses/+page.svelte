@@ -3,6 +3,8 @@
 
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 	import CourseAdminCard from '@/lib/components/ui/courses/CourseAdminCard.svelte';
 	import CourseAdminListRow from '@/lib/components/ui/courses/CourseAdminListRow.svelte';
 	import { Plus, Search, LayoutGrid, List } from 'lucide-svelte';
@@ -10,10 +12,25 @@
 	const { data } = $props();
 
 	let viewMode = $state('grid'); // 'grid' | 'list'
+	let deletedCourseIds = $state([]);
 
 	onMount(() => {
 		const savedView = localStorage.getItem('adminCourseViewMode');
 		if (savedView) viewMode = savedView;
+
+		// Kesh hisobiga o'chirilgan kurslarni ekranda darhol yo'q qilish siri
+		let storedIds = [];
+		try {
+			storedIds = JSON.parse(sessionStorage.getItem('deletedCourseIds') || '[]');
+		} catch (e) {}
+
+		// Agar serverdan redirect bo'lib, url'da id kelsa, uni saqlab olamiz
+		const newlyDeleted = $page.url.searchParams.get('deleted_course');
+		if (newlyDeleted && !storedIds.includes(newlyDeleted)) {
+			storedIds.push(newlyDeleted);
+			sessionStorage.setItem('deletedCourseIds', JSON.stringify(storedIds));
+		}
+		deletedCourseIds = storedIds;
 	});
 
 	function toggleView(mode) {
@@ -113,7 +130,8 @@
 				</div>
 			{/each}
 		{:then courses}
-			{#each courses as course (course.id)}
+			{@const activeCourses = courses.filter(c => !deletedCourseIds.includes(c.id.toString()))}
+			{#each activeCourses as course (course.id)}
 				<div class="animate-in fade-in slide-in-from-bottom-2 duration-300">
 					{#if viewMode === 'grid'}
 						<CourseAdminCard

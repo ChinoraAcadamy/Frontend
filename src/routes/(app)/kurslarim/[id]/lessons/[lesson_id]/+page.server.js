@@ -3,13 +3,18 @@ import { API_URL } from '$env/static/private';
 import { getLocale } from '@/lib/paraglide/runtime';
 
 
-export async function load({ params, cookies, url, fetch }) {
+export async function load({ params, cookies, url, fetch, setHeaders }) {
     const token = cookies.get('access_token');
     const moduleId = url.searchParams.get('module_id');
 
     if (!moduleId) {
         throw error(400, 'Module ID kiritilmadi');
     }
+
+    // Prefetching tezlik bersa-da, HTTP cache ham yuklamani kamaytiradi (ayniqsa video orasida navigate qilganda)
+    setHeaders({
+        'cache-control': 'private, max-age=60'
+    });
 
     const headers = {
         'Authorization': `Bearer ${token}`,
@@ -22,7 +27,7 @@ export async function load({ params, cookies, url, fetch }) {
             .then(async (res) => {
                 if (!res.ok) {
                     let errBody = '';
-                    try { errBody = await res.text(); } catch(e){}
+                    try { errBody = await res.text(); } catch (e) { }
                     console.error("Backend error for lesson:", res.status, errBody);
                     throw error(res.status, `Dars topilmadi student page. Status: ${res.status}, Message: ${errBody}`);
                 }

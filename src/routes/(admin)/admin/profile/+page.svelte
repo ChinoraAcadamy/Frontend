@@ -1,5 +1,5 @@
 <script lang="ts">
-	import InputField from '@/lib/components/ui/InputField.svelte';
+	// import InputField from '@/lib/components/ui/InputField.svelte';
 	import { User, Shield, Info, Save, Settings as SettingsIcon } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
@@ -116,7 +116,7 @@
 					{/each}
 				</div>
 			</div>
-		{:then userData}
+		{:then}
 			<!-- Left Side: Role Info & Badges -->
 			<div class="space-y-4" in:fade={{ duration: 300 }}>
 				<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">

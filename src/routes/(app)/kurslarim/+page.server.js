@@ -2,10 +2,11 @@ import { getMyCourses } from "@/lib/server/myCourses.js"
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load(event) {
-    // Kesh va Performance optimizatsiyasi
+    // Kesh va Performance optimizatsiyasi (10 daqiqa)
     event.setHeaders({
-        'cache-control': 'private, max-age=60'
+        'cache-control': 'private, max-age=600'
     });
+
 
     return {
         // Asinxron (streaming) qaytaramiz

@@ -32,20 +32,35 @@
 	};
 
 	const getActionConfig = (action) => {
+		const safeAction = (action || '').toUpperCase();
 		const map = {
-			CREATE: {
-				label: 'Yilratildi',
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
-			},
+			CREATE: { label: 'Yaratildi', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' },
 			UPDATE: { label: 'Yangilandi', classes: 'bg-blue-50 text-blue-700 ring-blue-600/20' },
-			DELETE: { label: "O'chirildi", classes: 'bg-rose-50 text-rose-700 ring-rose-600/20' }
+			DELETE: { label: "O'chirildi", classes: 'bg-rose-50 text-rose-700 ring-rose-600/20' },
+			LOGOUT: { label: 'Tizimdan chiqish', classes: 'bg-amber-50 text-amber-700 ring-amber-600/20' },
+			LOGIN: { label: 'Tizimga kirish', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' },
+			SUBMISSION_CREATED: { label: 'Topshiriq yubordi', classes: 'bg-indigo-50 text-indigo-700 ring-indigo-600/20' },
+			SUBMISSION_GRADED: { label: 'Topshiriq baholandi', classes: 'bg-purple-50 text-purple-700 ring-purple-600/20' },
+			LESSON_COMPLETED: { label: 'Darsni tugatdi', classes: 'bg-teal-50 text-teal-700 ring-teal-600/20' },
+			STUDENT_DEACTIVATED: { label: 'Talaba faolsizlantirildi', classes: 'bg-rose-50 text-rose-700 ring-rose-600/20' },
+			PASSWORD_CHANGED: { label: 'Parol o\'zgartirildi', classes: 'bg-amber-50 text-amber-700 ring-amber-600/20' },
+			ADMIN_CREATED: { label: 'Admin yaratildi', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' },
+			ENROLLMENT_BLOCKED: { label: 'A\'zo bloklandi', classes: 'bg-rose-50 text-rose-700 ring-rose-600/20' },
+			ENROLLMENT_UNBLOCKED: { label: 'A\'zo blokdan chiqarildi', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' },
+			ENROLLMENT_CREATED: { label: 'Kursga a\'zo qilindi', classes: 'bg-blue-50 text-blue-700 ring-blue-600/20' },
+			LESSON_DELETED: { label: 'Dars o\'chirildi', classes: 'bg-rose-50 text-rose-700 ring-rose-600/20' },
+			LESSON_CREATED: { label: 'Dars yaratildi', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' },
+			LESSON_EDITED: { label: 'Dars tahrirlandi', classes: 'bg-blue-50 text-blue-700 ring-blue-600/20' },
+			MODULE_CREATED: { label: 'Modul yaratildi', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' },
+			MODULE_EDITED: { label: 'Modul tahrirlandi', classes: 'bg-blue-50 text-blue-700 ring-blue-600/20' },
+			COURSE_EDITED: { label: 'Kurs tahrirlandi', classes: 'bg-blue-50 text-blue-700 ring-blue-600/20' },
+			COURSE_CREATED: { label: 'Kurs yaratildi', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' }
 		};
-		return (
-			map[action?.toUpperCase()] || {
-				label: action,
-				classes: 'bg-gray-50 text-gray-700 ring-gray-600/20'
-			}
-		);
+		
+		return map[safeAction] || {
+			label: action ? action.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Noma\'lum',
+			classes: 'bg-gray-50 text-gray-700 ring-gray-600/20'
+		};
 	};
 </script>
 
