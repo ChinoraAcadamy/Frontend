@@ -13,7 +13,8 @@
 		Save,
 		Globe,
 		Tag,
-		CheckCircle2
+		CheckCircle2,
+		UploadCloud
 	} from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
@@ -81,6 +82,14 @@
 	let isSaving = $state(false);
 	// eslint-disable-next-line svelte/prefer-writable-derived
 	let isPublished = $state(course.is_published);
+	let imgPreview = $state(course?.img || null);
+
+	function handleImageChange(e) {
+		const file = e.target.files?.[0];
+		if (file && file.type.startsWith('image/')) {
+			imgPreview = URL.createObjectURL(file);
+		}
+	}
 
 	const onUpdateCourse = () => {
 		isSaving = true;
@@ -499,7 +508,70 @@
 		action="?/updateCourse"
 		use:enhance={onUpdateCourse}
 		class="flex flex-col gap-6"
+		enctype="multipart/form-data"
 	>
+		<!-- Section: Course Image -->
+		<div class="rounded-[32px] border border-slate-100 bg-white p-6 shadow-sm">
+			<div class="mb-5 flex items-center justify-between border-b border-slate-50 pb-4">
+				<div class="flex flex-col">
+					<h3 class="text-[16px] font-black tracking-tight text-slate-800">
+						Kurs muqovasi (rasmi)
+					</h3>
+					<p class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
+						1920x1080px tavsiya etiladi
+					</p>
+				</div>
+			</div>
+
+			<div
+				class="group relative flex min-h-[220px] flex-col items-center justify-center overflow-hidden rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50 transition-colors hover:border-rose-400 hover:bg-rose-50/30"
+			>
+				<input
+					type="file"
+					id="img"
+					name="img"
+					accept="image/*"
+					class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+					onchange={handleImageChange}
+				/>
+
+				{#if imgPreview}
+					<img
+						src={imgPreview}
+						alt="Preview"
+						class="absolute inset-0 z-0 h-full w-full object-cover"
+					/>
+					<div
+						class="absolute inset-0 z-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
+					>
+						<span
+							class="rounded-full bg-white/95 px-5 py-2.5 text-sm font-bold text-slate-800 shadow-xl transition-transform hover:scale-105"
+							>Boshqa rasm tanlash</span
+						>
+					</div>
+				{:else}
+					<div
+						class="pointer-events-none flex flex-col items-center p-6 text-center text-slate-400"
+					>
+						<div
+							class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-100 transition-all group-hover:ring-rose-100"
+						>
+							<UploadCloud
+								size={32}
+								class="text-slate-400 transition-colors group-hover:text-[#ed4b72]"
+							/>
+						</div>
+						<span class="text-[15px] font-bold text-slate-700"
+							>Yuklash uchun shu yerga bosing yoki tashlang</span
+						>
+						<span class="mt-2 text-[11px] font-bold tracking-widest text-slate-400 uppercase"
+							>JPG, PNG Yoki WEBP (Max 5MB)</span
+						>
+					</div>
+				{/if}
+			</div>
+		</div>
+
 		<!-- Section: Status & Publishing -->
 		<div
 			class="relative overflow-hidden rounded-[32px] border border-slate-100 bg-white p-6 shadow-sm"

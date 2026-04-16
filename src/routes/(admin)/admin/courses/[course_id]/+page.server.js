@@ -30,32 +30,35 @@ export const actions = {
         const accessToken = cookies.get('access_token');
         if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
-        const formData = await request.formData();
-        
-        const payload = {
-            title_uz: formData.get('title_uz'),
-            title_ru: formData.get('title_ru'),
-            description_uz: formData.get('description_uz'),
-            description_ru: formData.get('description_ru'),
-            level_uz: formData.get('level_uz'),
-            level_ru: formData.get('level_ru'),
-            duration: Number(formData.get('duration')) || null,
-            price: formData.get('price') || null,
-            old_price: formData.get('old_price') || null,
-            is_published: formData.get('is_published') === 'true'
-        };
+        const rawFormData = await request.formData();
+        const cleanFormData = new FormData();
 
-        // Remove null values for partial update if needed, but PATCH usually handles them
-        // If the backend doesn't like nulls for duration/price, we can filter them.
+        for (const [key, value] of rawFormData.entries()) {
+            if (key === 'img') {
+                // Rasm yuborilganini tekshirish (agar bo'sh bo'lsa yoki fayl bo'lmasa e'tibor bermaydi, joriy rasm o'zgarmas qoladi)
+                if (value instanceof File && value.size > 0) {
+                    cleanFormData.append(key, value);
+                }
+            } else if (['duration', 'price', 'old_price'].includes(key)) {
+                // Raqamli maydonlar bo'sh qolsa ularni ignore qilamiz, backend'ga noto'g'ri string bormasligi uchun
+                if (value && value.toString().trim() !== '') {
+                    cleanFormData.append(key, value);
+                }
+            } else if (key === 'is_published') {
+                cleanFormData.append(key, value === 'true' ? 'true' : 'false');
+            } else {
+                cleanFormData.append(key, value);
+            }
+        }
 
         try {
             const response = await fetch(`${API_URL}/courses/${params.course_id}/`, {
                 method: 'PATCH',
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${accessToken}`
+                    // 'Content-Type' yo'q qilinadi, chunki formData avtomat qo'shadi (multipart/form-data; boundary=...)
                 },
-                body: JSON.stringify(payload)
+                body: cleanFormData
             });
 
             if (!response.ok) {
