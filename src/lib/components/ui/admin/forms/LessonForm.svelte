@@ -88,8 +88,8 @@
 						let errData = {};
 						try {
 							errData = JSON.parse(xhr.responseText);
-						} catch (e) {
-							console.log(e);
+						} catch {
+							console.log(xhr.responseText);
 						}
 
 						const errorMessage = parseBackendError(errData);

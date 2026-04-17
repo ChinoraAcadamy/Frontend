@@ -54,9 +54,8 @@
 		try {
 			await navigator.clipboard.writeText(chosenCardNumber);
 			toast.success(m.modal_copy_success());
-		} catch (err) {
+		} catch {
 			toast.error(m.modal_copy_error());
-			console.log('Clipboard API error:', err);
 		}
 	}
 </script>

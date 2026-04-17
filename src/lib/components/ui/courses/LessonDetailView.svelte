@@ -12,8 +12,7 @@
 		ChevronRight,
 		List,
 		ChevronDown,
-		PlayCircle,
-		Circle
+		PlayCircle
 	} from 'lucide-svelte';
 	import { fade, slide, fly } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
@@ -283,8 +282,20 @@
 		if (!lesson?.id) return;
 		isSubmittingComplete = true;
 		try {
-			// Backend expects seconds
-			const watchedSeconds = Math.floor(player?.currentTime || 0);
+			// Yuboriladigan vaqt (soniyalarda)
+			let watchedSeconds = Math.floor(player?.currentTime || 0);
+			const videoDuration = player?.duration || 0;
+			const backendLessonSeconds = (lesson?.duration || 0) * 60;
+
+			// Agar user videoni 90% yoki undan ko'proq ko'rgan bo'lsa va
+			// Backenddagi l.duration videoning haqiqiy uzunligidan 10 soniyadan ko'proq farq qilsa(kattaroq bo'lsa)
+			if (
+				videoDuration > 0 &&
+				watchedSeconds / videoDuration >= 0.9 &&
+				backendLessonSeconds - videoDuration >= 10
+			) {
+				watchedSeconds = backendLessonSeconds; // backendga aynan o'zi kutayotgan uzunlikni yuboramiz
+			}
 
 			const res = await fetch('/api/progress/complete', {
 				method: 'POST',
@@ -469,7 +480,9 @@
 										</div>
 									{:else}
 										<a
-											href={`/kurslarim/${$page.params.id}/lessons/${l.id}?module_id=${module.id}`}
+											href={resolve(
+												`/kurslarim/${$page.params.id}/lessons/${l.id}?module_id=${module.id}`
+											)}
 											class="group flex items-center justify-between gap-3 rounded-2xl p-3 transition-colors {l.id ===
 											lesson.id
 												? 'bg-rose-50/80 shadow-sm ring-1 shadow-rose-100/50 ring-rose-100'

@@ -142,7 +142,6 @@
 					{#if mod.lessons && mod.lessons.length > 0}
 						<div class="flex flex-col gap-2">
 							{#each mod.lessons as lesson (lesson.id)}
-								{console.log(lesson, mod)}
 								<LessonsRow
 									index={lesson.order_index}
 									title={lesson.title}
