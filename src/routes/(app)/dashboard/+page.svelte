@@ -2,7 +2,9 @@
 	/* eslint-disable no-unused-vars */
 
 	import { resolve } from '$app/paths';
+	import { page } from '$app/stores';
 	import CourseCard from '@/lib/components/ui/courses/CourseCard.svelte';
+	import LeaderboardTable from '@/lib/components/ui/dashboard/LeaderboardTable.svelte';
 	import { BookOpen, Award, TrendingUp, ChevronRight, FileCheck } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale } from '$lib/paraglide/runtime.js';
@@ -76,9 +78,9 @@
 						{#if config.key === 'courses_count'}
 							{courses?.length ?? 0}
 						{:else if config.key === 'total_score'}
-							200
+							{data.userScore}
 						{:else if config.key === 'rank'}
-							115
+							{data.myRank ?? '—'}
 						{:else}
 							0
 						{/if}
@@ -93,7 +95,10 @@
 	<section>
 		<div class="mb-4 flex items-center justify-between">
 			<h2 class="text-xl font-bold text-slate-800">{m.menu_my_courses()}</h2>
-			<a href={resolve('/kurslarim')} class="group flex items-center gap-1 text-sm font-semibold text-[#ef4444] hover:underline">
+			<a
+				href={resolve('/kurslarim')}
+				class="group flex items-center gap-1 text-sm font-semibold text-[#ef4444] hover:underline"
+			>
 				{m.dashboard_view_all()}
 				<ChevronRight size={16} class="transition-transform group-hover:translate-x-0.5" />
 			</a>
@@ -108,7 +113,7 @@
 				{#if courses && courses.length > 0}
 					{#each courses as course (course.id)}
 						{#if course.is_blocked}
-							<div class="snap-start cursor-not-allowed">
+							<div class="cursor-not-allowed snap-start">
 								<CourseCard
 									title={course.title}
 									progress={course.progress}
@@ -139,63 +144,33 @@
 	</section>
 
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-		<!-- Ranking Leaderboard -->
-		<div class="rounded-3xl border border-white/70 bg-white p-6 shadow-sm">
-			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-xl font-bold text-slate-800">{m.dashboard_leaderboard()}</h2>
-			</div>
-
-			<div class="overflow-x-auto">
-				{#await data.lazy.ranking}
-					<div class="space-y-3">
-						{#each Array(5) as _, i (i)}
-							<div class="h-12 w-full animate-pulse rounded-2xl bg-slate-50"></div>
-						{/each}
-					</div>
-				{:then ranking}
-					<table class="w-full border-collapse text-left">
-						<thead>
-							<tr class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-								<th class="px-2 pb-3">{m.rank_pos()}</th>
-								<th class="px-2 pb-3">{m.rank_student()}</th>
-								<th class="px-2 pb-3">{m.rank_score()}</th>
-								<th class="px-2 pb-3">{m.rank_course()}</th>
-								<th class="px-2 pb-3">{m.rank_score()}</th>
-							</tr>
-						</thead>
-						<tbody class="text-sm">
-							{#each (ranking || []).slice(0, 5) as user, i (user.id || user.name)}
-								<tr class="group transition-colors hover:bg-slate-50">
-									<td class="px-2 py-3">
-										<div class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold">
-											{i + 1}
-										</div>
-									</td>
-									<td class="px-2 py-3">
-										<div class="flex items-center gap-3">
-											<span class="font-bold text-slate-700">{user.name || user.username}</span>
-										</div>
-									</td>
-									<td class="px-2 py-3 font-semibold text-slate-600">{user.score || user.total_score}</td>
-									<td class="px-2 py-3 text-slate-500">{user.courses_count || '—'}</td>
-									<td class="px-2 py-3">
-										<span class="rounded-lg bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-600">
-											{user.total_score}
-										</span>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				{/await}
-			</div>
+		<!-- Ranking Leaderboard dynamically imported -->
+		<div class="h-full">
+			{#await data.lazy.ranking}
+				<div
+					class="flex h-96 flex-col items-center justify-center rounded-3xl border border-white/70 bg-white p-6 shadow-sm"
+				>
+					<div
+						class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#ed4b72]"
+					></div>
+				</div>
+			{:then ranking}
+				<LeaderboardTable
+					rankingData={ranking}
+					isAdmin={false}
+					currentUserId={data.user?.id}
+				/>
+			{/await}
 		</div>
 
 		<!-- Recent Submissions -->
 		<div class="rounded-3xl border border-white/70 bg-white p-6 shadow-sm">
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-xl font-bold text-slate-800">{m.dashboard_recent_submissions()}</h2>
-				<a href={resolve('/baholar')} class="group flex items-center gap-1 text-sm font-semibold text-[#ef4444] hover:underline">
+				<a
+					href={resolve('/baholar')}
+					class="group flex items-center gap-1 text-sm font-semibold text-[#ef4444] hover:underline"
+				>
 					{m.dashboard_view_all()}
 					<ChevronRight size={16} class="transition-transform group-hover:translate-x-0.5" />
 				</a>
@@ -209,28 +184,42 @@
 				{:then submissions}
 					{#if submissions && submissions.length > 0}
 						{#each submissions as sub (sub.id)}
-							<div class="group relative flex items-center gap-4 rounded-2xl border border-slate-50 bg-white p-4 transition-all hover:border-[#ef4444]/10 hover:shadow-sm">
-								<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#ef4444]/5 group-hover:text-[#ef4444]">
+							<div
+								class="group relative flex items-center gap-4 rounded-2xl border border-slate-50 bg-white p-4 transition-all hover:border-[#ef4444]/10 hover:shadow-sm"
+							>
+								<div
+									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#ef4444]/5 group-hover:text-[#ef4444]"
+								>
 									<FileCheck size={20} />
 								</div>
-								
+
 								<div class="min-w-0 flex-1">
-									<h4 class="truncate text-sm font-bold text-slate-800 tracking-tight">
+									<h4 class="truncate text-sm font-bold tracking-tight text-slate-800">
 										{sub.assignment_title || sub.assignment?.title || 'Assignment'}
 									</h4>
 									<div class="mt-0.5 flex items-center gap-2 text-xs font-medium text-slate-400">
 										<span>{formatDate(sub.submitted_at)}</span>
 										<span>•</span>
-										<span class="truncate">{sub.lesson_title || sub.assignment?.lesson_title || 'Lesson'}</span>
+										<span class="truncate"
+											>{sub.lesson_title || sub.assignment?.lesson_title || 'Lesson'}</span
+										>
 									</div>
 								</div>
 
 								<div class="text-right">
 									{#if sub.status === 'graded'}
-										<div class="text-sm font-bold text-slate-800">{sub.score}<span class="text-[10px] text-slate-400">/{sub.max_score || 10}</span></div>
+										<div class="text-sm font-bold text-slate-800">
+											{sub.score}<span class="text-[10px] text-slate-400"
+												>/{sub.max_score || 10}</span
+											>
+										</div>
 									{/if}
 									<div class="mt-1">
-										<span class="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {statusColors[sub.status]?.bg} {statusColors[sub.status]?.text}">
+										<span
+											class="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase {statusColors[
+												sub.status
+											]?.bg} {statusColors[sub.status]?.text}"
+										>
 											{m[`status_${sub.status}`]?.() || sub.status}
 										</span>
 									</div>
@@ -239,7 +228,9 @@
 						{/each}
 					{:else}
 						<div class="flex flex-col items-center justify-center py-10 text-center">
-							<div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-200">
+							<div
+								class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-200"
+							>
 								<FileCheck size={24} />
 							</div>
 							<p class="text-sm font-medium text-slate-400">{m.dashboard_no_submissions()}</p>

@@ -1,7 +1,9 @@
 <script lang="ts">
-    /* eslint-disable no-unused-vars */
+	/* eslint-disable no-unused-vars */
 	import { resolve } from '$app/paths';
+	import { page } from '$app/stores';
 	import { Users, BookOpen, TrendingUp, DollarSign, Award, Plus, Search } from 'lucide-svelte';
+	import LeaderboardTable from '@/lib/components/ui/dashboard/LeaderboardTable.svelte';
 
 	let { data } = $props();
 
@@ -108,70 +110,22 @@
 		</div>
 
 		<div class="grid grid-cols-1 gap-8 xl:grid-cols-12">
-			<div class="rounded-3xl border border-white/70 bg-white p-8 shadow-sm xl:col-span-8">
-				<div class="mb-6 flex items-center justify-between">
-					<h2 class="text-2xl font-semibold text-slate-800">Top 5 - Eng yaxshi shogirdlar</h2>
-					<span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-500"
-						>Umumiy reyting</span
+			<div class="h-full xl:col-span-8">
+				{#await data.lazy.ranking}
+					<div
+						class="flex h-96 flex-col items-center justify-center rounded-3xl border border-white/70 bg-white p-6 shadow-sm"
 					>
-				</div>
-
-				<div class="overflow-x-auto">
-					{#await data.lazy.ranking}
-						<div class="scrollbar-hide flex snap-x gap-4 overflow-x-auto pb-4">
-							{#each Array(2) as _, i (i)}
-								<div class="h-48 w-72 shrink-0 animate-pulse rounded-3xl bg-slate-100"></div>
-							{/each}
-						</div>
-					{:then ranking}
-						<table class="w-full border-collapse text-left">
-							<thead>
-								<tr class="border-b border-slate-100 text-sm text-slate-400">
-									<th class="w-12 px-2 pb-3 font-medium">Pos.</th>
-									<th class="px-2 pb-3 font-medium">Shogird</th>
-									<th class="px-2 pb-3 font-medium">Ball</th>
-									<th class="px-2 pb-3 font-medium">Kurslar soni</th>
-								</tr>
-							</thead>
-							<tbody class="text-sm">
-								{#each ranking?.slice(0, 5) || [] as user, index (user.id || index)}
-									<tr
-										class="border-b border-slate-50 text-slate-700 transition-colors last:border-0 hover:bg-slate-50"
-									>
-										<td class="px-2 py-4">
-											<div
-												class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-sm font-bold"
-											>
-												{getMedal(index)}
-											</div>
-										</td>
-										<td class="flex items-center gap-3 px-2 py-4">
-											<a href={resolve(`/admin/students/${user.id}`)} class="text-base font-medium">
-												{#if user.first_name || user.last_name}
-													<span class="text-base font-medium"
-														>{user.first_name} {user.last_name}</span
-													>
-												{:else}
-													<span class="text-base font-medium">{user.username}</span>
-												{/if}
-											</a>
-										</td>
-										<td class="px-2 py-4 font-medium text-emerald-600">{user.total_score ?? 0}</td>
-										<td class="px-2 py-4 text-slate-500">{user.courses_count ?? 0} ta</td>
-									</tr>
-								{/each}
-
-								{#if !ranking || ranking.length === 0}
-									<tr>
-										<td colspan="4" class="py-8 text-center text-slate-500">
-											Hozircha reyting ma'lumotlari yo'q
-										</td>
-									</tr>
-								{/if}
-							</tbody>
-						</table>
-					{/await}
-				</div>
+						<div
+							class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-primary"
+						></div>
+					</div>
+				{:then ranking}
+					<LeaderboardTable
+						rankingData={ranking}
+						isAdmin={true}
+						currentUserId={data.user?.id}
+					/>
+				{/await}
 			</div>
 
 			<div class="space-y-8 xl:col-span-4">

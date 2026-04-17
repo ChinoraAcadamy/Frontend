@@ -248,7 +248,28 @@
 		<!-- Section: Media & Footer -->
 		<FormSection title="Video va Davomiylik" icon={Video}>
 			<VideoUploadZone bind:videoFile bind:uploadProgress bind:autoDuration {isSubmitting} />
-			<input type="hidden" name="duration" value={autoDuration} />
+			
+			<div class="mt-4 flex flex-col gap-1.5">
+				<label
+					for="les_duration"
+					class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
+					>Davomiyligi (Daqiqa)</label
+				>
+				<div class="relative">
+					<input
+						type="number"
+						id="les_duration"
+						name="duration"
+						step="0.1"
+						min="0"
+						bind:value={autoDuration}
+						class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition-colors outline-none focus:border-[#fa2e69]"
+					/>
+					<div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+						<span class="text-xs font-bold text-slate-400 uppercase">min</span>
+					</div>
+				</div>
+			</div>
 
 			<!-- Integrated Action Bar -->
 			<div class="mt-6 flex items-center justify-end border-t border-slate-50 pt-6">

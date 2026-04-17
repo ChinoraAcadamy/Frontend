@@ -44,8 +44,9 @@ export async function getVideoDuration(file) {
         video.preload = "metadata";
         video.onloadedmetadata = () => {
             window.URL.revokeObjectURL(video.src);
-            // Duration is in seconds, convert to minutes and round up to nearest integer
-            resolve(Math.ceil(video.duration / 60));
+            // Duration is in seconds, convert to minutes and round to 1 decimal place
+            const minutes = video.duration / 60;
+            resolve(Math.round(minutes * 10) / 10);
         };
         video.onerror = () => {
             resolve(0);

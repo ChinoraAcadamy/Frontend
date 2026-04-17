@@ -9,7 +9,11 @@
 		Lock,
 		CheckCircle2,
 		ChevronLeft,
-		ChevronRight
+		ChevronRight,
+		List,
+		ChevronDown,
+		PlayCircle,
+		Circle
 	} from 'lucide-svelte';
 	import { fade, slide, fly } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
@@ -20,7 +24,9 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import 'plyr/dist/plyr.css';
 
-	let { lesson, nextLesson = null } = $props();
+	let { lesson, nextLesson = null, moduleData = null } = $props();
+
+	let showMobileSidebar = $state(false);
 
 	// --- Helpers ---
 	const getProxiedUrl = (url) =>
@@ -371,14 +377,161 @@
 		<Breadcrumb />
 	</nav>
 
-	<div
-		class="grid grid-cols-1 gap-6 {hasAssignments ? 'lg:grid-cols-[2fr_1fr]' : 'mx-auto max-w-4xl'}"
-	>
-		<!-- Left Col: Video & Info -->
-		<div class="flex flex-col gap-6">
+	<!-- Mobile Sidebar Toggle -->
+	<div class="mb-4 block lg:hidden">
+		<button
+			onclick={() => (showMobileSidebar = !showMobileSidebar)}
+			class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+		>
+			<div class="flex items-center gap-2.5">
+				<div class="flex items-center justify-center rounded-lg bg-rose-50 p-1.5 text-[#ed4b72]">
+					<List size={18} />
+				</div>
+				<span>Modul darslari</span>
+			</div>
+			<ChevronDown
+				size={18}
+				class="text-slate-400 transition-transform duration-200 {showMobileSidebar
+					? 'rotate-180'
+					: ''}"
+			/>
+		</button>
+	</div>
+
+	<div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[320px_1fr] xl:grid-cols-[340px_1fr]">
+		<!-- Left Sidebar: Lessons List -->
+		<div
+			class="flex flex-col gap-4 lg:sticky lg:top-6 {showMobileSidebar ? '' : 'mobile-drawer-hide'}"
+		>
+			{#await moduleData}
+				<div
+					class="flex h-64 flex-col items-center justify-center rounded-3xl border border-slate-100 bg-white shadow-sm"
+				>
+					<div
+						class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#ed4b72]"
+					></div>
+				</div>
+			{:then module}
+				{#if module}
+					<div
+						class="flex max-h-[calc(100vh-120px)] flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm"
+					>
+						<!-- Sidebar Header -->
+						<div class="border-b border-slate-100 bg-slate-50/50 p-5">
+							<h3 class="line-clamp-2 text-base font-black text-slate-800">{module.title}</h3>
+							<div class="mt-3 flex flex-col gap-1.5">
+								<div class="flex items-center justify-between text-[11px] font-bold text-slate-400">
+									<span class="tracking-wider uppercase">Progress</span>
+									<span class="text-[#ed4b72]"
+										>{Math.round(
+											(module.lessons.filter((l) => l.is_completed).length /
+												module.lessons.length) *
+												100
+										) || 0}%</span
+									>
+								</div>
+								<div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+									<div
+										class="h-full bg-[#ed4b72] transition-all duration-500"
+										style="width: {(module.lessons.filter((l) => l.is_completed).length /
+											module.lessons.length) *
+											100}%"
+									></div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Sidebar List -->
+						<div class="scrollbar-hide flex-1 overflow-y-auto p-3">
+							<div class="flex flex-col gap-1.5">
+								{#each module.lessons as l (l.id)}
+									{#if l.can_access === false}
+										<div
+											class="flex cursor-not-allowed items-center justify-between gap-3 rounded-2xl border border-slate-100/50 bg-slate-50 p-3 opacity-60"
+										>
+											<div class="flex min-w-0 items-start gap-3">
+												<div class="mt-0.5 shrink-0">
+													<Lock size={18} class="text-slate-400" />
+												</div>
+												<div class="flex min-w-0 flex-col">
+													<span class="line-clamp-2 text-sm font-bold text-slate-500">
+														{l.title}
+													</span>
+													<span class="mt-0.5 text-xs font-semibold text-slate-400"
+														>{l.duration || 0} min</span
+													>
+												</div>
+											</div>
+
+											<div class="shrink-0 pl-2">
+												<div class="h-2 w-2 rounded-full bg-slate-200"></div>
+											</div>
+										</div>
+									{:else}
+										<a
+											href={`/kurslarim/${$page.params.id}/lessons/${l.id}?module_id=${module.id}`}
+											class="group flex items-center justify-between gap-3 rounded-2xl p-3 transition-colors {l.id ===
+											lesson.id
+												? 'bg-rose-50/80 shadow-sm ring-1 shadow-rose-100/50 ring-rose-100'
+												: 'hover:bg-slate-50'}"
+										>
+											<div class="flex min-w-0 items-start gap-3">
+												<div class="mt-0.5 shrink-0">
+													{#if l.id === lesson.id}
+														<PlayCircle size={18} class="fill-[#ed4b72] text-rose-100" />
+													{:else}
+														<PlayCircle
+															size={18}
+															class="text-slate-300 transition-colors group-hover:text-slate-400"
+														/>
+													{/if}
+												</div>
+												<div class="flex min-w-0 flex-col">
+													<span
+														class="line-clamp-2 text-sm font-bold {l.id === lesson.id
+															? 'text-[#9b1c48]'
+															: 'text-slate-700'}"
+													>
+														{l.title}
+													</span>
+													<span class="mt-0.5 text-xs font-semibold text-slate-400"
+														>{l.duration || 0} min</span
+													>
+												</div>
+											</div>
+
+											<div class="shrink-0 pl-2">
+												{#if l.is_completed}
+													<div
+														class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100"
+													>
+														<CheckCircle2 size={12} class="text-emerald-600" />
+													</div>
+												{:else if l.id === lesson.id}
+													<div
+														class="h-2 w-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50"
+													></div>
+												{:else}
+													<div
+														class="h-2 w-2 rounded-full bg-slate-200 transition-colors group-hover:bg-slate-300"
+													></div>
+												{/if}
+											</div>
+										</a>
+									{/if}
+								{/each}
+							</div>
+						</div>
+					</div>
+				{/if}
+			{/await}
+		</div>
+
+		<!-- Right Col/Main Content: Video & Info & Assignments -->
+		<div class="flex min-w-0 flex-col gap-6">
 			<!-- Video Player -->
 			<div
-				class="relative aspect-video w-full overflow-hidden rounded-md border border-slate-200 bg-slate-900"
+				class="relative aspect-video w-full overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 shadow-sm"
 			>
 				{#if !player}
 					<div
@@ -420,33 +573,37 @@
 			</div>
 
 			<!-- Lesson Metadata -->
-			<div class="flex flex-col gap-2">
-				<span class="text-xs font-bold tracking-wider text-slate-500 uppercase"
+			<div class="flex flex-col gap-2 px-1">
+				<span class="text-[11px] font-black tracking-widest text-[#ed4b72] uppercase"
 					>{m.lesson_info_title()}</span
 				>
 				<h1 class="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
 					{lesson.title}
 				</h1>
-				<p class="text-sm leading-relaxed text-slate-600">{lesson.description}</p>
+				<p class="mt-2 text-sm leading-relaxed text-slate-600">{lesson.description}</p>
 			</div>
 
 			<!-- Completion Action -->
 			{#if $page.data.user?.role !== 'admin' && $page.data.user?.role !== 'superadmin'}
-				<div class="mt-4 flex flex-col gap-3">
+				<div class="flex flex-col gap-3">
 					{#if !isVideoFinished}
 						<div
-							class="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs font-bold text-amber-700"
+							class="flex items-center gap-3 rounded-2xl border border-amber-200/60 bg-amber-50/50 p-4 text-sm font-bold text-amber-700"
 							transition:slide
 						>
-							<Lock size={16} />
+							<div class="flex items-center justify-center rounded-xl bg-amber-100 p-2">
+								<Lock size={16} class="text-amber-600" />
+							</div>
 							<span>{m.lesson_video_lock()}</span>
 						</div>
 					{:else}
 						<div
-							class="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-xs font-bold text-emerald-700"
+							class="flex items-center gap-3 rounded-2xl border border-emerald-200/60 bg-emerald-50/50 p-4 text-sm font-bold text-emerald-700"
 							transition:slide
 						>
-							<CheckCircle2 size={16} />
+							<div class="flex items-center justify-center rounded-xl bg-emerald-100 p-2">
+								<CheckCircle2 size={16} class="text-emerald-600" />
+							</div>
 							<span>{m.lesson_video_watched()}</span>
 						</div>
 					{/if}
@@ -454,309 +611,320 @@
 					<button
 						onclick={markComplete}
 						disabled={isSubmittingComplete || !isVideoFinished}
-						class="flex w-full items-center justify-center gap-2 rounded-md border py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 {isVideoFinished
-							? 'border-[#FA2E69] bg-[#FA2E69] text-white hover:bg-[#D81B53]'
-							: 'border-slate-200 bg-slate-50 text-slate-400'}"
+						class="flex w-full items-center justify-center gap-2 rounded-2xl border py-4 text-sm font-bold shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] disabled:scale-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 {isVideoFinished
+							? 'border-[#FA2E69] bg-[#FA2E69] text-white shadow-md hover:bg-[#D81B53] hover:shadow-[#fa2e69]/20'
+							: 'border-slate-200 bg-white text-slate-400'}"
 					>
 						{#if isSubmittingComplete}
 							<div
-								class="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+								class="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"
 							></div>
 							<span>{m.lesson_submitting()}</span>
 						{:else}
 							{#if !isVideoFinished}
-								<Lock size={16} />
+								<Lock size={18} />
 							{:else}
-								<CheckCircle2 size={16} />
+								<CheckCircle2 size={18} />
 							{/if}
 							<span>{hasNextLesson ? m.lesson_next_lesson() : m.lesson_mark_complete()}</span>
 						{/if}
 					</button>
 				</div>
 			{/if}
-		</div>
 
-		<!-- Right Col: Assignments -->
-		{#if hasAssignments}
-			<div
-				class="sticky top-6 flex h-fit flex-col overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm"
-			>
-				{#key currentAssignmentIndex}
-					<div in:fly={{ x: 20, duration: 400 }} class="flex flex-col">
-						<!-- Assignment Header -->
-						<div class="bg-white p-5 pb-2 sm:p-6">
-							<div class="mb-4 flex items-center justify-between">
-								<span
-									class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[11px] font-bold tracking-wider text-slate-600 uppercase"
-								>
-									{lesson.assignments.length > 1
-										? `${currentAssignmentIndex + 1}-${m.assignment_title_n()}`
-										: ''}
-									{#if assignment.type === 'text'}
-										{m.assignment_type_text()}
-									{:else if assignment.type === 'link'}
-										{m.assignment_type_link()}
-									{:else}
-										{m.assignment_type_file()}
-									{/if}
-								</span>
-								<Upload size={18} class="text-slate-400" />
+			<!-- Assignments (Now stacked below) -->
+			{#if hasAssignments}
+				<div
+					class="mt-4 flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+				>
+					{#key currentAssignmentIndex}
+						<div in:fly={{ x: 20, duration: 400 }} class="flex flex-col">
+							<!-- Assignment Header -->
+							<div class="bg-white p-5 pb-2 sm:p-6">
+								<div class="mb-4 flex items-center justify-between">
+									<span
+										class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[11px] font-bold tracking-wider text-slate-600 uppercase"
+									>
+										{lesson.assignments.length > 1
+											? `${currentAssignmentIndex + 1}-${m.assignment_title_n()}`
+											: ''}
+										{#if assignment.type === 'text'}
+											{m.assignment_type_text()}
+										{:else if assignment.type === 'link'}
+											{m.assignment_type_link()}
+										{:else}
+											{m.assignment_type_file()}
+										{/if}
+									</span>
+									<Upload size={18} class="text-slate-400" />
+								</div>
+								<h2 class="s-idpCsxdjyqUy text-xl font-bold tracking-tight text-slate-900">
+									{assignment.title}
+								</h2>
+								<p class="mt-2 text-sm text-slate-600">{assignment.description}</p>
+
+								<div class="mt-4 flex items-center gap-6 border-t border-slate-100 pt-4">
+									<div class="flex flex-col">
+										<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+											>{m.assignment_max_score()}</span
+										>
+										<span class="text-base font-black text-slate-900">{assignment.max_score}</span>
+									</div>
+									<div class="h-8 w-px bg-slate-200"></div>
+									<div class="flex flex-col">
+										<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+											>{m.assignment_attempts()}</span
+										>
+										<span class="text-base font-black text-slate-900"
+											>{assignment.max_attempts}</span
+										>
+									</div>
+								</div>
 							</div>
-							<h2 class="s-idpCsxdjyqUy text-xl font-bold tracking-tight text-slate-900">
-								{assignment.title}
-							</h2>
-							<p class="mt-2 text-sm text-slate-600">{assignment.description}</p>
 
-							<div class="mt-4 flex items-center gap-6 border-t border-slate-100 pt-4">
-								<div class="flex flex-col">
-									<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-										>{m.assignment_max_score()}</span
-									>
-									<span class="text-base font-black text-slate-900">{assignment.max_score}</span>
-								</div>
-								<div class="h-8 w-px bg-slate-200"></div>
-								<div class="flex flex-col">
-									<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-										>{m.assignment_attempts()}</span
-									>
-									<span class="text-base font-black text-slate-900">{assignment.max_attempts}</span>
-								</div>
-							</div>
-						</div>
-
-						<!-- Assignment Form -->
-						<form
-							method="POST"
-							action="?/uploadAssignment"
-							use:enhance={submitAssignment}
-							enctype="multipart/form-data"
-							class="flex flex-col gap-5 bg-white p-5 sm:p-6"
-						>
-							<input type="hidden" name="assignment" value={assignment.id} />
-
-							{#if assignment.type === 'file'}
-								<label
-									class="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed p-6 transition-colors {isDragging
-										? 'border-[#FA2E69] bg-[#FA2E69]/5'
-										: 'border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-slate-100'}"
-									ondragover={handleDragOver}
-									ondragleave={handleDragLeave}
-									ondrop={handleFileDrop}
-									role="presentation"
-								>
-									<input
-										type="file"
-										name="file"
-										class="hidden"
-										onchange={handleFileSelect}
-										required
-									/>
-									{#if selectedFile}
-										<FileIcon size={24} class="mb-2 text-[#FA2E69]" />
-										<span class="line-clamp-1 text-center text-sm font-bold text-slate-800"
-											>{selectedFile.name}</span
-										>
-										<span class="text-xs text-slate-500"
-											>{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</span
-										>
-									{:else}
-										<Upload size={24} class="mb-2 text-slate-400" />
-										<span class="text-sm font-bold text-slate-800"
-											>{m.assignment_upload_file()}</span
-										>
-										<span class="text-xs text-slate-500">{m.assignment_drop_file()}</span>
-									{/if}
-								</label>
-							{:else if assignment.type === 'text'}
-								<div class="flex flex-col gap-1.5">
-									<label
-										for="text_answer"
-										class="text-xs font-bold tracking-wider text-slate-600 uppercase"
-										>{m.assignment_type_text()}</label
-									>
-									<textarea
-										id="text_answer"
-										name="text_answer"
-										rows="5"
-										placeholder="Topshiriq yuzasidan batafsilroq yozing..."
-										class="w-full rounded-md border border-slate-300 p-3 text-sm transition-colors outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
-										required
-									></textarea>
-								</div>
-							{:else if assignment.type === 'link'}
-								<div class="flex flex-col gap-1.5">
-									<label
-										for="text_answer"
-										class="text-xs font-bold tracking-wider text-slate-600 uppercase"
-										>{m.assignment_type_link()}</label
-									>
-									<input
-										type="url"
-										id="text_answer"
-										name="text_answer"
-										placeholder="https://example.com/your-work"
-										class="w-full rounded-md border border-slate-300 p-3 text-sm transition-colors outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
-										required
-									/>
-								</div>
-							{/if}
-
-							{#if assignment.type !== 'text'}
-								<div class="flex flex-col gap-1.5">
-									<label
-										for="desc_answer"
-										class="text-xs font-bold tracking-wider text-slate-600 uppercase"
-										>{m.assignment_desc_label()}</label
-									>
-									<textarea
-										id="desc_answer"
-										name="desc_answer"
-										rows="2"
-										placeholder={m.assignment_desc_placeholder()}
-										class="w-full rounded-md border border-slate-300 p-3 text-sm transition-colors outline-none focus:border-[#FA2E69] focus:ring-1 focus:ring-[#FA2E69]"
-									></textarea>
-								</div>
-							{/if}
-
-							<button
-								type="submit"
-								disabled={isSubmitting || (assignment.type === 'file' && !selectedFile)}
-								class="flex w-full items-center justify-center gap-2 rounded-md border border-slate-900 bg-slate-900 py-3.5 text-sm font-bold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+							<!-- Assignment Form -->
+							<form
+								method="POST"
+								action="?/uploadAssignment"
+								use:enhance={submitAssignment}
+								enctype="multipart/form-data"
+								class="flex flex-col gap-5 bg-white p-5 sm:p-6"
 							>
-								{#if isSubmitting}
-									<div
-										class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
-									></div>
-									<span>{m.lesson_submitting()}</span>
-								{:else}
-									<span>{m.assignment_submit_btn()}</span>
-									<ArrowRight size={16} />
-								{/if}
-							</button>
-						</form>
+								<input type="hidden" name="assignment" value={assignment.id} />
 
-						<!-- Submissions History -->
-						{#if assignment.submissions && assignment.submissions.length > 0}
-							<div class="flex flex-col border-t border-slate-200 bg-slate-50 p-5 sm:p-6">
-								<h3 class="mb-4 text-sm font-bold text-slate-900">
-									{m.assignment_prev_attempts()}
-								</h3>
-								<div class="flex flex-col gap-3">
-									{#each assignment.submissions as sub (sub.id)}
-										<div
-											class="flex flex-col gap-3 rounded-md border border-slate-200 bg-white p-4"
-											transition:slide
+								{#if assignment.type === 'file'}
+									<label
+										class="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed p-6 transition-colors {isDragging
+											? 'border-[#FA2E69] bg-[#FA2E69]/5'
+											: 'border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-slate-100'}"
+										ondragover={handleDragOver}
+										ondragleave={handleDragLeave}
+										ondrop={handleFileDrop}
+										role="presentation"
+									>
+										<input
+											type="file"
+											name="file"
+											class="hidden"
+											onchange={handleFileSelect}
+											required
+										/>
+										{#if selectedFile}
+											<FileIcon size={24} class="mb-2 text-[#FA2E69]" />
+											<span class="line-clamp-1 text-center text-sm font-bold text-slate-800"
+												>{selectedFile.name}</span
+											>
+											<span class="text-xs text-slate-500"
+												>{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</span
+											>
+										{:else}
+											<Upload size={24} class="mb-2 text-slate-400" />
+											<span class="text-sm font-bold text-slate-800"
+												>{m.assignment_upload_file()}</span
+											>
+											<span class="text-xs text-slate-500">{m.assignment_drop_file()}</span>
+										{/if}
+									</label>
+								{:else if assignment.type === 'text'}
+									<div class="flex flex-col gap-1.5">
+										<label
+											for="text_answer"
+											class="text-xs font-bold tracking-wider text-slate-600 uppercase"
+											>{m.assignment_type_text()}</label
 										>
-											<div class="flex items-center justify-between">
-												<div class="flex items-center gap-2 text-[11px] font-medium text-slate-500">
-													<span
-														>{new Date(sub.submitted_at || Date.now()).toLocaleDateString(
-															'uz'
-														)}</span
-													>
-													<span class="h-1 w-1 rounded-full bg-slate-300"></span>
-													<span
-														>{new Date(sub.submitted_at || Date.now()).toLocaleTimeString(
-															'uz'
-														)}</span
-													>
-												</div>
-												{#if sub.status === 'Graded' || sub.status === 'graded'}
-													<span
-														class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[10px] font-bold tracking-wider text-slate-600 uppercase"
-														>{m.assignment_graded()}</span
-													>
-												{:else}
+										<textarea
+											id="text_answer"
+											name="text_answer"
+											rows="5"
+											placeholder="Topshiriq yuzasidan batafsilroq yozing..."
+											class="w-full rounded-2xl border-none bg-slate-100 p-4 text-sm font-bold transition-all outline-none focus:bg-white focus:ring-4 focus:ring-rose-50"
+											required
+										></textarea>
+									</div>
+								{:else if assignment.type === 'link'}
+									<div class="flex flex-col gap-1.5">
+										<label
+											for="text_answer"
+											class="text-xs font-bold tracking-wider text-slate-600 uppercase"
+											>{m.assignment_type_link()}</label
+										>
+										<input
+											type="url"
+											id="text_answer"
+											name="text_answer"
+											placeholder="https://example.com/your-work"
+											class="w-full rounded-2xl border-none bg-slate-100 p-4 text-sm font-bold transition-all outline-none focus:bg-white focus:ring-4 focus:ring-rose-50"
+											required
+										/>
+									</div>
+								{/if}
+
+								{#if assignment.type !== 'text'}
+									<div class="flex flex-col gap-1.5">
+										<label
+											for="desc_answer"
+											class="text-xs font-bold tracking-wider text-slate-600 uppercase"
+											>{m.assignment_desc_label()}</label
+										>
+										<textarea
+											id="desc_answer"
+											name="desc_answer"
+											rows="2"
+											placeholder={m.assignment_desc_placeholder()}
+											class="w-full rounded-2xl border-none bg-slate-100 p-4 text-sm font-bold transition-all outline-none focus:bg-white focus:ring-4 focus:ring-rose-50"
+										></textarea>
+									</div>
+								{/if}
+
+								<button
+									type="submit"
+									disabled={isSubmitting || (assignment.type === 'file' && !selectedFile)}
+									class="flex w-full items-center justify-center gap-2 rounded-2xl bg-rose-50 py-4 text-sm font-bold text-[#ed4b72] transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+								>
+									{#if isSubmitting}
+										<div
+											class="h-5 w-5 animate-spin rounded-full border-2 border-slate-200 border-t-[#ed4b72]"
+										></div>
+										<span>{m.lesson_submitting()}</span>
+									{:else}
+										<span>{m.assignment_submit_btn()}</span>
+										<ArrowRight size={18} />
+									{/if}
+								</button>
+							</form>
+
+							<!-- Submissions History -->
+							{#if assignment.submissions && assignment.submissions.length > 0}
+								<div class="flex flex-col border-t border-slate-200 bg-slate-50 p-5 sm:p-6">
+									<h3 class="mb-4 text-sm font-bold text-slate-900">
+										{m.assignment_prev_attempts()}
+									</h3>
+									<div class="flex flex-col gap-3">
+										{#each assignment.submissions as sub (sub.id)}
+											<div
+												class="flex flex-col gap-3 rounded-md border border-slate-200 bg-white p-4"
+												transition:slide
+											>
+												<div class="flex items-center justify-between">
 													<div
-														class="flex items-center gap-1.5 rounded border border-sky-100 bg-sky-50 px-2 py-1"
+														class="flex items-center gap-2 text-[11px] font-medium text-slate-500"
 													>
 														<span
-															class="text-[10px] font-bold tracking-wider text-sky-600 uppercase"
-															>{m.assignment_pending()}</span
+															>{new Date(sub.submitted_at || Date.now()).toLocaleDateString(
+																'uz'
+															)}</span
 														>
-														<div class="flex gap-0.5">
-															<div class="h-1 w-1 animate-ping rounded-full bg-sky-400"></div>
+														<span class="h-1 w-1 rounded-full bg-slate-300"></span>
+														<span
+															>{new Date(sub.submitted_at || Date.now()).toLocaleTimeString(
+																'uz'
+															)}</span
+														>
+													</div>
+													{#if sub.status === 'Graded' || sub.status === 'graded'}
+														<span
+															class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[10px] font-bold tracking-wider text-slate-600 uppercase"
+															>{m.assignment_graded()}</span
+														>
+													{:else}
+														<div
+															class="flex items-center gap-1.5 rounded border border-sky-100 bg-sky-50 px-2 py-1"
+														>
+															<span
+																class="text-[10px] font-bold tracking-wider text-sky-600 uppercase"
+																>{m.assignment_pending()}</span
+															>
+															<div class="flex gap-0.5">
+																<div class="h-1 w-1 animate-ping rounded-full bg-sky-400"></div>
+															</div>
 														</div>
+													{/if}
+												</div>
+
+												{#if sub.status === 'Graded'}
+													<div class="flex items-center gap-1.5">
+														<span
+															class="text-xl font-black {getScoreColor(
+																sub.score,
+																assignment.max_score
+															).split(' ')[0]}">{sub.score}</span
+														>
+														<span class="text-sm font-bold text-slate-400"
+															>/ {assignment.max_score}</span
+														>
+													</div>
+												{/if}
+
+												{#if sub.feedback}
+													<div class="mt-1 border-l-2 border-[#FA2E69] bg-slate-50/80 p-3">
+														<span
+															class="mb-1 block text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+															>{m.assignment_mentor()}</span
+														>
+														<p class="text-[13px] font-medium text-slate-700 italic">
+															"{sub.feedback}"
+														</p>
 													</div>
 												{/if}
 											</div>
-
-											{#if sub.status === 'Graded'}
-												<div class="flex items-center gap-1.5">
-													<span
-														class="text-xl font-black {getScoreColor(
-															sub.score,
-															assignment.max_score
-														).split(' ')[0]}">{sub.score}</span
-													>
-													<span class="text-sm font-bold text-slate-400"
-														>/ {assignment.max_score}</span
-													>
-												</div>
-											{/if}
-
-											{#if sub.feedback}
-												<div class="mt-1 border-l-2 border-[#FA2E69] bg-slate-50/80 p-3">
-													<span
-														class="mb-1 block text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-														>{m.assignment_mentor()}</span
-													>
-													<p class="text-[13px] font-medium text-slate-700 italic">
-														"{sub.feedback}"
-													</p>
-												</div>
-											{/if}
-										</div>
-									{/each}
+										{/each}
+									</div>
 								</div>
-							</div>
-						{/if}
-					</div>
-				{/key}
-
-				<!-- Pagination Controls -->
-				{#if lesson.assignments.length > 1}
-					<div class="flex items-center justify-between border-t border-slate-200 bg-white p-4">
-						<button
-							onclick={() => (currentAssignmentIndex = Math.max(0, currentAssignmentIndex - 1))}
-							disabled={currentAssignmentIndex === 0}
-							class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-[#FA2E69] disabled:opacity-30"
-						>
-							<ChevronLeft size={16} />
-							<span>{m.pagination_prev_short()}</span>
-						</button>
-
-						<div class="flex gap-1.5">
-							{#each lesson.assignments as _, i (i)}
-								<div
-									class="h-1.5 w-1.5 rounded-full transition-colors {i === currentAssignmentIndex
-										? 'bg-[#FA2E69]'
-										: 'bg-slate-200'}"
-								></div>
-							{/each}
+							{/if}
 						</div>
+					{/key}
 
-						<button
-							onclick={() =>
-								(currentAssignmentIndex = Math.min(
-									lesson.assignments.length - 1,
-									currentAssignmentIndex + 1
-								))}
-							disabled={currentAssignmentIndex === lesson.assignments.length - 1}
-							class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-[#FA2E69] disabled:opacity-30"
-						>
-							<span>{m.pagination_next_short()}</span>
-							<ChevronRight size={16} />
-						</button>
-					</div>
-				{/if}
-			</div>
-		{/if}
+					<!-- Pagination Controls -->
+					{#if lesson.assignments.length > 1}
+						<div class="flex items-center justify-between border-t border-slate-200 bg-white p-4">
+							<button
+								onclick={() => (currentAssignmentIndex = Math.max(0, currentAssignmentIndex - 1))}
+								disabled={currentAssignmentIndex === 0}
+								class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-[#FA2E69] disabled:opacity-30"
+							>
+								<ChevronLeft size={16} />
+								<span>{m.pagination_prev_short()}</span>
+							</button>
+
+							<div class="flex gap-1.5">
+								{#each lesson.assignments as _, i (i)}
+									<div
+										class="h-1.5 w-1.5 rounded-full transition-colors {i === currentAssignmentIndex
+											? 'bg-[#FA2E69]'
+											: 'bg-slate-200'}"
+									></div>
+								{/each}
+							</div>
+
+							<button
+								onclick={() =>
+									(currentAssignmentIndex = Math.min(
+										lesson.assignments.length - 1,
+										currentAssignmentIndex + 1
+									))}
+								disabled={currentAssignmentIndex === lesson.assignments.length - 1}
+								class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-[#FA2E69] disabled:opacity-30"
+							>
+								<span>{m.pagination_next_short()}</span>
+								<ChevronRight size={16} />
+							</button>
+						</div>
+					{/if}
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
 
 <style>
 	/* ... existing styles ... */
+
+	@media (max-width: 1023px) {
+		.mobile-drawer-hide {
+			display: none !important;
+		}
+	}
+
 	/* Plyr Custom Styles */
 	:global(.plyr) {
 		--plyr-color-main: #ed4b72;

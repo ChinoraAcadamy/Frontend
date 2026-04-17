@@ -41,7 +41,6 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
         // Await only the primary content (Lesson) to ensure it renders ASAP
         const lessonData = await lessonPromise;
 
-        // Process nextLesson as a promise that SvelteKit will stream
         const nextLessonPromise = coursePromise.then(courseData => {
             if (!courseData) return null;
             const modules = courseData.modules || [];
@@ -58,10 +57,15 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
             return (currentIndex !== -1 && currentIndex < allLessons.length - 1) ? allLessons[currentIndex + 1] : null;
         });
 
+        // Modulni alohida fetch qilamiz, chunki backendda faqat modul/lesson API'si user_progress va can_access beradi
+        const moduleDataPromise = fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/`, { headers })
+            .then(res => res.ok ? res.json() : null);
+
         return {
             lesson: lessonData,
             lazy: {
-                nextLesson: nextLessonPromise
+                nextLesson: nextLessonPromise,
+                moduleData: moduleDataPromise
             },
             breadcrumbs: {
                 course: "Mening kursim",
