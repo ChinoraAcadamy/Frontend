@@ -14,6 +14,7 @@
 	import { fly, fade } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import * as m from '$lib/paraglide/messages.js';
 
 	import AddStudentModal from '@/lib/components/ui/admin/AddStudentModal.svelte';
 	import EditStudentModal from '@/lib/components/ui/admin/EditStudentModal.svelte';
@@ -62,21 +63,21 @@
 	// ==================== EFFECTS ====================
 	$effect(() => {
 		if (form?.createSuccess) {
-			showToast('Student yaratildi!');
+			showToast(m.admin_students_created ? m.admin_students_created() : 'Student yaratildi!');
 			isAddModalOpen = false;
 		}
 		if (form?.createError) {
 			showToast(form.createError, 'error');
 		}
 		if (form?.updateSuccess) {
-			showToast("Ma'lumotlar yangilandi!");
+			showToast(m.admin_students_updated ? m.admin_students_updated() : "Ma'lumotlar yangilandi!");
 			editTarget = null;
 		}
 		if (form?.updateError) {
 			showToast(form.updateError, 'error');
 		}
 		if (form?.deleteSuccess) {
-			showToast("Student o'chirildi!");
+			showToast(m.admin_students_deleted ? m.admin_students_deleted() : "Student o'chirildi!");
 			deleteTarget = null;
 			isDeleting = false;
 		}
@@ -120,10 +121,10 @@
 
 		<div class="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
 			<div>
-				<h1 class="text-2xl font-semibold text-gray-900">Studentlar ro'yxati</h1>
+				<h1 class="text-2xl font-semibold text-gray-900">{m.admin_students_title ? m.admin_students_title() : "Studentlar ro'yxati"}</h1>
 				{#await data.lazy.studentsData then resolvedData}
 					<p class="mt-1 text-sm text-gray-500">
-						Jami <span class="font-medium text-gray-900">{resolvedData.totalCount}</span> ta student
+						{m.admin_students_total ? m.admin_students_total() : 'Jami'} <span class="font-medium text-gray-900">{resolvedData.totalCount}</span> {m.admin_students_count_suffix ? m.admin_students_count_suffix() : 'ta student'}
 					</p>
 				{/await}
 			</div>
@@ -133,7 +134,7 @@
 				class="flex h-10 items-center gap-2 rounded-lg bg-emerald-600 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-600/20 active:scale-95"
 			>
 				<Plus size={18} strokeWidth={2.5} />
-				Yangi qo‘shish
+				{m.admin_students_add_new ? m.admin_students_add_new() : 'Yangi qo‘shish'}
 			</button>
 		</div>
 
@@ -142,7 +143,7 @@
 				<Search size={18} class="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
 				<input
 					type="text"
-					placeholder="Ism yoki username bo'yicha qidirish..."
+					placeholder={m.admin_students_search_placeholder ? m.admin_students_search_placeholder() : "Ism yoki username bo'yicha qidirish..."}
 					bind:value={searchValue}
 					class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-4 pl-10 text-sm text-gray-900 transition-colors outline-none placeholder:text-gray-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 				/>
@@ -151,9 +152,9 @@
 				bind:value={statusFilter}
 				class="h-10 rounded-lg border border-gray-200 bg-white px-4 text-sm text-gray-700 transition-colors outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 			>
-				<option value="all">Barcha statuslar</option>
-				<option value="true">Faol</option>
-				<option value="false">Nofaol</option>
+				<option value="all">{m.admin_students_filter_all ? m.admin_students_filter_all() : 'Barcha statuslar'}</option>
+				<option value="true">{m.admin_students_filter_active ? m.admin_students_filter_active() : 'Faol'}</option>
+				<option value="false">{m.admin_students_filter_inactive ? m.admin_students_filter_inactive() : 'Nofaol'}</option>
 			</select>
 		</div>
 
@@ -179,12 +180,12 @@
 					<table class="w-full min-w-[900px] text-left text-sm">
 						<thead class="border-b border-gray-200 bg-gray-50/80">
 							<tr>
-								<th class="admin-table">Ism Familiya</th>
-								<th class="admin-table">Username</th>
-								<th class="admin-table">Telefon</th>
-								<th class="admin-table text-center">Kurslar</th>
-								<th class="admin-table">Status</th>
-								<th class="admin-table text-right">Amallar</th>
+								<th class="admin-table">{m.admin_students_col_name ? m.admin_students_col_name() : 'Ism Familiya'}</th>
+								<th class="admin-table">{m.admin_students_col_username ? m.admin_students_col_username() : 'Username'}</th>
+								<th class="admin-table">{m.admin_students_col_phone ? m.admin_students_col_phone() : 'Telefon'}</th>
+								<th class="admin-table text-center">{m.admin_students_col_courses ? m.admin_students_col_courses() : 'Kurslar'}</th>
+								<th class="admin-table">{m.admin_students_col_status ? m.admin_students_col_status() : 'Status'}</th>
+								<th class="admin-table text-right">{m.admin_students_col_actions ? m.admin_students_col_actions() : 'Amallar'}</th>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-100">
@@ -218,7 +219,7 @@
 												? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 ring-inset'
 												: 'bg-gray-100 text-gray-600 ring-1 ring-gray-500/10 ring-inset'}"
 										>
-											{student.is_active ? 'Faol' : 'Nofaol'}
+											{student.is_active ? (m.admin_students_active ? m.admin_students_active() : 'Faol') : (m.admin_students_inactive ? m.admin_students_inactive() : 'Nofaol')}
 										</span>
 									</td>
 									<td class="px-6 py-3.5 text-right">
@@ -228,7 +229,7 @@
 											<button
 												onclick={() => (editTarget = { ...student })}
 												class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
-												title="Tahrirlash"
+												title={m.admin_students_edit ? m.admin_students_edit() : "Tahrirlash"}
 											>
 												<Edit2 size={16} />
 											</button>
@@ -236,7 +237,7 @@
 												onclick={() =>
 													(deleteTarget = { id: student.id, name: getFullName(student) })}
 												class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
-												title="O'chirish"
+												title={m.admin_students_delete ? m.admin_students_delete() : "O'chirish"}
 											>
 												<Trash2 size={16} />
 											</button>
@@ -247,7 +248,7 @@
 								<tr>
 									<td colspan="6" class="py-12 text-center text-gray-500">
 										<Users class="mx-auto mb-3 h-10 w-10 text-gray-300" />
-										Hech qanday ma'lumot topilmadi.
+										{m.admin_students_not_found ? m.admin_students_not_found() : "Hech qanday ma'lumot topilmadi."}
 									</td>
 								</tr>
 							{/each}
@@ -264,7 +265,7 @@
 							disabled={currentPage === 1}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent"
 						>
-							<ChevronLeft size={16} /> Ortga
+							<ChevronLeft size={16} /> {m.admin_students_prev ? m.admin_students_prev() : 'Ortga'}
 						</button>
 						<div class="flex gap-1">
 							{#each Array.from({ length: totalPages }, (_, i) => i + 1) as p (p)}
@@ -284,14 +285,14 @@
 							disabled={currentPage === totalPages}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent"
 						>
-							Keyingi <ChevronRight size={16} />
+							{m.admin_students_next ? m.admin_students_next() : 'Keyingi'} <ChevronRight size={16} />
 						</button>
 					</div>
 				{/if}
 			</div>
 		{:catch error}
 			<div class="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
-				Ma'lumotlarni yuklashda xatolik yuz berdi. {error}
+				{m.admin_students_error_loading ? m.admin_students_error_loading({ error }) : `Ma'lumotlarni yuklashda xatolik yuz berdi. ${error}`}
 			</div>
 		{/await}
 	</div>
@@ -324,12 +325,11 @@
 				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
 					<AlertTriangle size={20} class="text-red-600" />
 				</div>
-				<h3 class="text-lg font-semibold text-gray-900">O'chirishni tasdiqlang</h3>
+				<h3 class="text-lg font-semibold text-gray-900">{m.admin_students_delete_confirm_title ? m.admin_students_delete_confirm_title() : "O'chirishni tasdiqlang"}</h3>
 			</div>
 
 			<p class="mb-6 text-sm text-gray-500">
-				Haqiqatan ham <strong class="font-medium text-gray-900">{deleteTarget.name}</strong> ni o‘chirib
-				tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.
+				{@html m.admin_students_delete_confirm_desc ? m.admin_students_delete_confirm_desc({ name: `<strong class="font-medium text-gray-900">${deleteTarget.name}</strong>` }) : `Haqiqatan ham <strong class="font-medium text-gray-900">${deleteTarget.name}</strong> ni o‘chirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.`}
 			</p>
 
 			<form
@@ -350,14 +350,14 @@
 					onclick={() => (deleteTarget = null)}
 					class="flex-1 rounded-lg border border-gray-300 bg-white py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
 				>
-					Bekor qilish
+					{m.admin_students_cancel ? m.admin_students_cancel() : 'Bekor qilish'}
 				</button>
 				<button
 					type="submit"
 					disabled={isDeleting}
 					class="flex-1 rounded-lg bg-red-600 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
 				>
-					{isDeleting ? 'O‘chirilmoqda...' : 'O‘chirish'}
+					{isDeleting ? (m.admin_students_deleting ? m.admin_students_deleting() : 'O‘chirilmoqda...') : (m.admin_students_delete ? m.admin_students_delete() : 'O‘chirish')}
 				</button>
 			</form>
 		</div>

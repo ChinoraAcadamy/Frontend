@@ -1,6 +1,20 @@
 <script>
-	import { Search, Bell, Menu, Accessibility, Plus, Minus, Palette, Contrast, Type, EyeOff } from 'lucide-svelte';
+	import {
+		Search,
+		Bell,
+		Menu,
+		Accessibility,
+		Plus,
+		Minus,
+		Palette,
+		Contrast,
+		Type,
+		EyeOff
+	} from 'lucide-svelte';
 	import LanguageSwitcher from '@/lib/components/ui/LanguageSwitcher.svelte';
+	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import { page } from '$app/state';
 	// import { onMount } from 'svelte';
 
 	let { user = null, notificationCount = 0, mobileOpen = $bindable(false) } = $props();
@@ -113,34 +127,40 @@
 </script>
 
 <header
-	class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#f0f0f0] bg-white px-4 lg:px-7"
+	class="sticky top-0 z-999 flex h-16 items-center justify-between border-b border-[#f0f0f0] bg-white px-4 lg:px-7"
 >
-	<div class="flex items-center gap-4">
+	<div class="flex flex-1 items-center gap-4">
 		<button
-			class="cursor-pointer border-none bg-transparent p-1 text-[#1a0e13] lg:hidden"
+			class="shrink-0 cursor-pointer border-none bg-transparent p-1 text-[#1a0e13] lg:hidden"
 			onclick={() => (mobileOpen = true)}
-			aria-label="Menyuni ochish"
+			aria-label={m.admin_menu_open ? m.admin_menu_open() : 'Menyuni ochish'}
 		>
 			<Menu size={24} />
 		</button>
 
-		<div class="relative hidden items-center lg:flex">
+		{#if page.url.pathname.split('/').filter(Boolean).length > 2 && user.role === 'admin'}
+			<div class="mr-4 flex items-center">
+				<Breadcrumb inNavbar={true} />
+			</div>
+		{/if}
+
+		<div class="relative hidden max-w-sm flex-1 items-center lg:flex">
 			<Search size={16} class="pointer-events-none absolute left-3.5 text-gray-400" />
 			<input
 				type="text"
-				placeholder="Qidirish..."
+				placeholder={m.admin_search_placeholder ? m.admin_search_placeholder() : 'Qidirish...'}
 				bind:value={searchQuery}
-				class="w-70 rounded-xl border border-[#f0f0f0] bg-gray-50 py-2.25 pr-4 pl-10 text-sm text-[#1a0e13] transition-all duration-150 outline-none focus:border-[#C43C66] focus:bg-white focus:ring-[3px] focus:ring-[#C43C66]/10"
+				class="w-full rounded-xl border border-[#f0f0f0] bg-gray-50 py-2.25 pr-4 pl-10 text-sm text-[#1a0e13] transition-all duration-150 outline-none focus:border-[#C43C66] focus:bg-white focus:ring-[3px] focus:ring-[#C43C66]/10"
 			/>
 		</div>
 	</div>
 
-	<div class="relative flex items-center gap-3">
+	<div class="relative flex shrink-0 items-center gap-3">
 		<LanguageSwitcher variant="minimal" />
-		
+
 		<button
 			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-[#9B1C48] lg:hidden"
-			aria-label="Qidirish"
+			aria-label={m.admin_search_label ? m.admin_search_label() : 'Qidirish'}
 		>
 			<Search size={18} />
 		</button>
@@ -163,7 +183,7 @@
 					? 'border-[#f5c0cf] bg-[#fdf2f6] text-[#9B1C48]'
 					: ''}"
 				onclick={() => (isA11yOpen = !isA11yOpen)}
-				aria-label="Maxsus imkoniyatlar"
+				aria-label={m.admin_a11y_label ? m.admin_a11y_label() : 'Maxsus imkoniyatlar'}
 			>
 				<Accessibility size={18} />
 			</button>
@@ -180,14 +200,20 @@
 					class="absolute top-12 right-0 z-50 w-72 rounded-3xl border border-gray-100 bg-white p-5 shadow-2xl"
 				>
 					<div class="flex items-center justify-between border-b pb-3">
-						<h3 class="text-sm font-bold text-gray-800">Maxsus imkoniyatlar</h3>
-						<button onclick={resetA11y} class="text-xs text-red-500 hover:underline">Reset</button>
+						<h3 class="text-sm font-bold text-gray-800">
+							{m.admin_a11y_title ? m.admin_a11y_title() : 'Maxsus imkoniyatlar'}
+						</h3>
+						<button onclick={resetA11y} class="text-xs text-red-500 hover:underline"
+							>{m.admin_reset ? m.admin_reset() : 'Reset'}</button
+						>
 					</div>
 
 					<div class="mt-4 space-y-5">
 						<!-- Matn o'lchami -->
 						<div>
-							<span class="text-xs font-semibold text-gray-500">Matn o'lchami</span>
+							<span class="text-xs font-semibold text-gray-500"
+								>{m.admin_a11y_text_size ? m.admin_a11y_text_size() : "Matn o'lchami"}</span
+							>
 							<div class="mt-2 flex items-center justify-between rounded-2xl border bg-gray-50 p-1">
 								<button
 									onclick={() => changeZoom(-0.1)}
@@ -207,7 +233,11 @@
 
 						<!-- Qator orasidagi masofa -->
 						<div>
-							<span class="text-xs font-semibold text-gray-500">Qatorlar orasidagi masofa</span>
+							<span class="text-xs font-semibold text-gray-500"
+								>{m.admin_a11y_line_height
+									? m.admin_a11y_line_height()
+									: 'Qatorlar orasidagi masofa'}</span
+							>
 							<div class="mt-2 flex items-center justify-between rounded-2xl border bg-gray-50 p-1">
 								<button
 									onclick={() => changeLineHeight(-0.1)}
@@ -235,7 +265,9 @@
 							>
 								<div class="flex items-center gap-3">
 									<Palette size={18} />
-									<span class="text-sm">Oq-qora rejim</span>
+									<span class="text-sm"
+										>{m.admin_a11y_grayscale ? m.admin_a11y_grayscale() : 'Oq-qora rejim'}</span
+									>
 								</div>
 								<div class="toggle-switch {isGrayscale ? 'active' : ''}"></div>
 							</button>
@@ -248,7 +280,11 @@
 							>
 								<div class="flex items-center gap-3">
 									<Contrast size={18} />
-									<span class="text-sm">Yuqori kontrast</span>
+									<span class="text-sm"
+										>{m.admin_a11y_high_contrast
+											? m.admin_a11y_high_contrast()
+											: 'Yuqori kontrast'}</span
+									>
 								</div>
 								<div class="toggle-switch {isHighContrast ? 'active' : ''}"></div>
 							</button>
@@ -261,7 +297,11 @@
 							>
 								<div class="flex items-center gap-3">
 									<EyeOff size={18} />
-									<span class="text-sm">Animatsiyalarni o'chirish</span>
+									<span class="text-sm"
+										>{m.admin_a11y_reduced_motion
+											? m.admin_a11y_reduced_motion()
+											: "Animatsiyalarni o'chirish"}</span
+									>
 								</div>
 								<div class="toggle-switch {isReducedMotion ? 'active' : ''}"></div>
 							</button>
@@ -274,7 +314,11 @@
 							>
 								<div class="flex items-center gap-3">
 									<Type size={18} />
-									<span class="text-sm">Dyslexia-friendly shrift</span>
+									<span class="text-sm"
+										>{m.admin_a11y_dyslexia_font
+											? m.admin_a11y_dyslexia_font()
+											: 'Dyslexia-friendly shrift'}</span
+									>
 								</div>
 								<div class="toggle-switch {isDyslexiaFont ? 'active' : ''}"></div>
 							</button>
@@ -285,8 +329,8 @@
 		</div>
 
 		<button
-			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-[#9B1C48]"
-			aria-label="Bildirishnomalar"
+			class="relative hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-[#9B1C48]"
+			aria-label={m.admin_notifications_label ? m.admin_notifications_label() : 'Bildirishnomalar'}
 		>
 			<Bell size={18} />
 			{#if notificationCount > 0}
@@ -306,11 +350,10 @@
 			/>
 		{:else}
 			<div
-				class="flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-full border-2 border-[#f0f0f0] bg-linear-to-br from-[#C7A27C] to-[#9B1C48] font-bold text-white"
+				class="hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-full border-2 border-[#f0f0f0] bg-linear-to-br from-[#C7A27C] to-[#9B1C48] font-bold text-white"
 			>
 				{(user?.first_name?.[0] || user?.username?.[0] || 'A').toUpperCase()}
 			</div>
 		{/if}
 	</div>
 </header>
-

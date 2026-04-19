@@ -2,6 +2,7 @@
 	import { X } from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { enhance } from '$app/forms';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { isOpen = false, student = null, onClose } = $props();
 
@@ -38,7 +39,7 @@
 		>
 			<div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-6">
 				<div>
-					<h2 class="text-xl font-bold text-slate-800">Ma'lumotlarni yangilash</h2>
+					<h2 class="text-xl font-bold text-slate-800">{m.update_info ? m.update_info() : "Ma'lumotlarni yangilash"}</h2>
 					<p class="mt-1 text-sm font-medium text-slate-500">@{student.username}</p>
 				</div>
 				<button
@@ -67,25 +68,25 @@
 
 				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-2">
-						<label class="ml-1 text-xs font-bold tracking-wide text-slate-500 uppercase">Ism</label>
+						<label class="ml-1 text-xs font-bold tracking-wide text-slate-500 uppercase">{m.profile_first_name ? m.profile_first_name() : "Ism"}</label>
 						<input
 							name="firstName"
 							type="text"
 							bind:value={firstName}
-							placeholder="Ism kiriting"
+							placeholder={m.enter_first_name ? m.enter_first_name() : "Ism kiriting"}
 							class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
 						/>
 					</div>
 
 					<div class="space-y-2">
 						<label class="ml-1 text-xs font-bold tracking-wide text-slate-500 uppercase"
-							>Familiya</label
+							>{m.profile_last_name ? m.profile_last_name() : "Familiya"}</label
 						>
 						<input
 							name="lastName"
 							type="text"
 							bind:value={lastName}
-							placeholder="Familiya"
+							placeholder={m.profile_last_name ? m.profile_last_name() : "Familiya"}
 							class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
 						/>
 					</div>
@@ -93,7 +94,7 @@
 
 				<div class="space-y-2">
 					<label class="ml-1 text-xs font-bold tracking-wide text-slate-500 uppercase"
-						>Telefon raqam</label
+						>{m.profile_phone ? m.profile_phone() : "Telefon raqam"}</label
 					>
 					<input
 						name="phoneNumber"
@@ -110,14 +111,14 @@
 						onclick={onClose}
 						class="flex-1 rounded-xl bg-slate-100 py-3.5 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
 					>
-						Bekor qilish
+						{m.admin_students_cancel ? m.admin_students_cancel() : "Bekor qilish"}
 					</button>
 					<button
 						type="submit"
 						disabled={isSubmitting}
 						class="flex-1 rounded-xl bg-slate-900 py-3.5 font-bold text-white shadow-lg shadow-slate-900/20 transition-all hover:bg-[#ed4b72] hover:shadow-[#ed4b72]/30 active:scale-95 disabled:opacity-60"
 					>
-						{isSubmitting ? 'Saqlanmoqda...' : 'Saqlash'}
+						{isSubmitting ? (m.profile_saving ? m.profile_saving() : 'Saqlanmoqda...') : (m.profile_save ? m.profile_save() : 'Saqlash')}
 					</button>
 				</div>
 			</form>

@@ -67,7 +67,7 @@
 		<!-- Progress -->
 		<div class="w-full lg:w-48 shrink-0">
 			<div class="flex items-center justify-between mb-1.5">
-				<span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{m.course_progress || 'Progress'}</span>
+				<span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{m.course_progress ? m.course_progress() : 'Progress'}</span>
 				<span class="text-[11px] font-black text-slate-800">{progress}%</span>
 			</div>
 			<div class="h-2 w-full overflow-hidden rounded-full bg-slate-50">

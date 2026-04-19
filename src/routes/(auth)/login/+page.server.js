@@ -2,6 +2,8 @@
 // src/routes/(auth)/login/+page.server.js
 import { fail, redirect } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
+import * as m from '$lib/paraglide/messages.js';
+import { translateServerMessage } from '$lib/utils/server-messages.js';
 
 export const load = async ({ locals }) => {
     if (locals.isAuthenticated && locals.user) {
@@ -21,7 +23,7 @@ export const actions = {
         const password = formData.get('password');
 
         if (!username || !password) {
-            return fail(400, { error: "Username va parolni to'ldiring." });
+            return fail(400, { error: m.login_error_required ? m.login_error_required() : "Username va parolni to'ldiring." });
         }
 
         let result;
@@ -38,12 +40,12 @@ export const actions = {
 
             if (!response.ok) {
                 return fail(response.status, {
-                    error: result?.detail || result?.message || "Username yoki parol noto'g'ri."
+                    error: translateServerMessage(result, m)
                 });
             }
         } catch (err) {
             console.error('API xatosi:', err);
-            return fail(500, { error: "Server bilan ulanishda xatolik." });
+            return fail(500, { error: m.error_occurred ? m.error_occurred() : "Server bilan ulanishda xatolik." });
         }
 
         const cookieOptions = {

@@ -64,7 +64,7 @@
 	</div>
 
 	<!-- Navigation -->
-	<nav class="nav" aria-label="Asosiy menyu">
+	<nav class="nav" aria-label={m.admin_main_menu ? m.admin_main_menu() : "Asosiy menyu"}>
 		{#each navItems as item (item.href || item.label)}
 			{#if item.divider}
 				{#if !collapsed}

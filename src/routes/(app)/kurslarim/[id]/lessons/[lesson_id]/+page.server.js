@@ -1,6 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
 import { getLocale } from '@/lib/paraglide/runtime';
+import * as m from '$lib/paraglide/messages.js';
+import { translateServerMessage } from '$lib/utils/server-messages.js';
 
 
 export async function load({ params, cookies, url, fetch, setHeaders }) {
@@ -8,7 +10,7 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
     const moduleId = url.searchParams.get('module_id');
 
     if (!moduleId) {
-        throw error(400, 'Module ID kiritilmadi');
+        throw error(400, m.error_occurred ? m.error_occurred() : 'Module ID kiritilmadi');
     }
 
     // Prefetching tezlik bersa-da, HTTP cache ham yuklamani kamaytiradi (ayniqsa video orasida navigate qilganda)
@@ -26,10 +28,8 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
         const lessonPromise = fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/lessons/${params.lesson_id}/`, { headers })
             .then(async (res) => {
                 if (!res.ok) {
-                    let errBody = '';
-                    try { errBody = await res.text(); } catch (e) { }
-                    console.error("Backend error for lesson:", res.status, errBody);
-                    throw error(res.status, `Dars topilmadi student page. Status: ${res.status}, Message: ${errBody}`);
+                    const errData = await res.json().catch(() => ({}));
+                    throw error(res.status, translateServerMessage(errData, m));
                 }
                 return res.json();
             });
@@ -75,7 +75,8 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
 
     } catch (err) {
         console.error("Darsni yuklashda xatolik:", err);
-        throw error(err.status || 500, err.body?.message || 'Ma\'lumotni yuklash imkonsiz');
+        if (err.status) throw err;
+        throw error(500, m.error_occurred ? m.error_occurred() : 'Ma\'lumotni yuklash imkonsiz');
     }
 }
 
@@ -89,7 +90,7 @@ export const actions = {
         const textAnswer = formData.get('text_answer') || '';
 
         if (!assignmentId) {
-            return { success: false, error: 'Topshiriq ID topilmadi.' };
+            return { success: false, error: m.error_occurred ? m.error_occurred() : 'Topshiriq ID topilmadi.' };
         }
 
         // Backendga formData sifatida yuboramiz
@@ -110,14 +111,14 @@ export const actions = {
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
                 console.error("[uploadAssignment] API error:", errorData);
-                return { success: false, error: errorData.detail || 'Faylni yuklashda xatolik yuz berdi.' };
+                return { success: false, error: translateServerMessage(errorData, m) };
             }
 
             const result = await res.json();
             return { success: true, result };
         } catch (err) {
             console.error("[uploadAssignment] System error:", err);
-            return { success: false, error: 'Server bilan ulanishda xatolik.' };
+            return { success: false, error: m.error_occurred ? m.error_occurred() : 'Server bilan ulanishda xatolik.' };
         }
     }
 };

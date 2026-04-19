@@ -8,6 +8,7 @@
 	import CourseAdminCard from '@/lib/components/ui/courses/CourseAdminCard.svelte';
 	import CourseAdminListRow from '@/lib/components/ui/courses/CourseAdminListRow.svelte';
 	import { Plus, Search, LayoutGrid, List } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 
@@ -40,10 +41,16 @@
 </script>
 
 <svelte:head>
-	<title>Kurslar ro'yxati - Admin Panel</title>
+	<title
+		>{m.admin_courses_head_title
+			? m.admin_courses_head_title()
+			: "Kurslar ro'yxati - Admin Panel"}</title
+	>
 	<meta
 		name="description"
-		content="Chinora Academy platformasidagi barcha kurslarni ko'rish va boshqarish uchun bu yerda ro'yxat mavjud. Har bir kursning tafsilotlarini ko'rish, tahrirlash yoki o'chirish uchun kerakli kursni tanlang."
+		content={m.admin_courses_head_desc
+			? m.admin_courses_head_desc()
+			: "Chinora Academy platformasidagi barcha kurslarni ko'rish va boshqarish uchun bu yerda ro'yxat mavjud. Har bir kursning tafsilotlarini ko'rish, tahrirlash yoki o'chirish uchun kerakli kursni tanlang."}
 	/>
 </svelte:head>
 
@@ -51,10 +58,12 @@
 	<div class="mb-10 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
 		<div>
 			<h1 class="text-3xl font-black tracking-tighter text-slate-900 uppercase md:text-4xl">
-				Kurslar ro'yxati
+				{m.admin_courses_title ? m.admin_courses_title() : "Kurslar ro'yxati"}
 			</h1>
 			<p class="mt-2 text-[11px] font-black tracking-[0.2em] text-slate-400 uppercase opacity-80">
-				Barcha kurslarni boshqarish va tahrirlash markazi.
+				{m.admin_courses_subtitle
+					? m.admin_courses_subtitle()
+					: 'Barcha kurslarni boshqarish va tahrirlash markazi.'}
 			</p>
 		</div>
 
@@ -87,7 +96,9 @@
 				<Search size={14} class="absolute top-1/2 left-4 -translate-y-1/2 text-slate-400" />
 				<input
 					type="text"
-					placeholder="Search courses..."
+					placeholder={m.admin_courses_search_placeholder
+						? m.admin_courses_search_placeholder()
+						: 'Search courses...'}
 					class="h-12 w-full rounded-xl border border-slate-200 bg-white pr-4 pl-11 text-[11px] font-black tracking-widest uppercase transition-all outline-none focus:border-[#9b1c48]/30 focus:ring-4 focus:ring-[#9b1c48]/5"
 				/>
 			</div>
@@ -97,7 +108,9 @@
 				class="flex h-12 shrink-0 items-center gap-2 rounded-xl bg-[#9b1c48] px-6 text-[11px] font-black tracking-widest text-white uppercase shadow-lg shadow-[#9b1c48]/20 transition-all hover:bg-[#80163a] active:scale-95"
 			>
 				<Plus size={16} strokeWidth={3} />
-				<span class="hidden sm:inline">Kurs qo'shish</span>
+				<span class="hidden sm:inline"
+					>{m.admin_courses_btn_add ? m.admin_courses_btn_add() : "Kurs qo'shish"}</span
+				>
 			</a>
 		</div>
 	</div>
@@ -130,7 +143,7 @@
 				</div>
 			{/each}
 		{:then courses}
-			{@const activeCourses = courses.filter(c => !deletedCourseIds.includes(c.id.toString()))}
+			{@const activeCourses = courses.filter((c) => !deletedCourseIds.includes(c.id.toString()))}
 			{#each activeCourses as course (course.id)}
 				<div class="animate-in fade-in slide-in-from-bottom-2 duration-300">
 					{#if viewMode === 'grid'}
@@ -138,7 +151,11 @@
 							title={course.title}
 							price={course.price}
 							modules={course.modules_count}
-							status={course.is_published ? 'published' : 'Qoralama'}
+							status={course.is_published
+								? 'published'
+								: m.admin_courses_status_draft
+									? m.admin_courses_status_draft()
+									: 'Qoralama'}
 							link={course.id}
 							image={course.img}
 						/>
@@ -147,7 +164,11 @@
 							title={course.title}
 							price={course.price}
 							modules={course.modules_count}
-							status={course.is_published ? 'published' : 'Qoralama'}
+							status={course.is_published
+								? 'published'
+								: m.admin_courses_status_draft
+									? m.admin_courses_status_draft()
+									: 'Qoralama'}
 							link={course.id}
 							image={course.img}
 						/>
@@ -161,10 +182,12 @@
 						<Search size={48} class="text-slate-200" />
 					</div>
 					<h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter">
-						Kurslar topilmadi
+						{m.admin_courses_not_found ? m.admin_courses_not_found() : 'Kurslar topilmadi'}
 					</h3>
 					<p class="mt-2 text-[11px] font-black text-slate-400 uppercase tracking-tight">
-						Hozircha hech qanday kurs yaratilmagan.
+						{m.admin_courses_not_found_desc
+							? m.admin_courses_not_found_desc()
+							: 'Hozircha hech qanday kurs yaratilmagan.'}
 					</p>
 				</div>
 			{/each}

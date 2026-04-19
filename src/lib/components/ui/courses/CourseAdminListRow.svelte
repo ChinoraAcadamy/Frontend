@@ -54,7 +54,7 @@
 					class="flex items-center gap-1 text-[9px] font-black tracking-widest text-slate-400 uppercase"
 				>
 					<LayoutList size={10} />
-					{modules} Modules
+					{modules} {m.admin_courses_modules ? m.admin_courses_modules() : 'Modullar'}
 				</span>
 				<span class="text-[10px] font-bold text-slate-200">|</span>
 				<span class="text-[14px] font-black text-slate-900"
@@ -67,17 +67,19 @@
 		<div class="flex w-full shrink-0 items-center gap-2 lg:w-auto">
 			<a
 				href={resolve(`/admin/courses/${link}`)}
+				onclick={() => sessionStorage.setItem('admin_course_detail_tab', 'content')}
 				class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-100 bg-slate-50 px-4 py-2 text-[10px] font-black tracking-widest text-slate-600 uppercase transition-all hover:bg-slate-100 lg:flex-none"
 			>
 				<Play size={10} class="fill-current" />
-				Preview
+				{m.admin_courses_preview ? m.admin_courses_preview() : "Ko'rish"}
 			</a>
 			<a
 				href={resolve(`/admin/courses/${link}`)}
+				onclick={() => sessionStorage.setItem('admin_course_detail_tab', 'settings')}
 				class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#9b1c48] px-4 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-sm transition-all hover:bg-[#80163a] active:scale-95 lg:flex-none"
 			>
 				<Edit2 size={10} />
-				Edit
+				{m.admin_courses_edit ? m.admin_courses_edit() : 'Tahrirlash'}
 			</a>
 		</div>
 	</div>

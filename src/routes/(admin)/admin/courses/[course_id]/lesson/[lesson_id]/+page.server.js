@@ -18,6 +18,12 @@ export async function load({ params, cookies, url }) {
         if (!res.ok) throw error(res.status, 'Dars topilmadi');
         const lessonData = await res.json();
 
+        // Modul darslarini fetching (Sidebar uchun)
+        const moduleRes = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const moduleData = moduleRes.ok ? await moduleRes.json() : null;
+
         // Keyingi darsni aniqlash (preview uchun)
         let nextLesson = null;
         try {
@@ -48,6 +54,7 @@ export async function load({ params, cookies, url }) {
 
         return {
             lesson: lessonData,
+            moduleData,
             nextLesson,
             breadcrumbs: {
                 course: "Kursni ko'rish",

@@ -6,6 +6,7 @@
 	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { page } from '$app/state';
+	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
 
 	let { data, children } = $props();
 
@@ -32,16 +33,19 @@
 	const isProfilePage = $derived(page.url.pathname.includes('/profil'));
 </script>
 
-<SeoMeta 
-	title="Student Dashboard - Chinora Academy"
-	robots="noindex, nofollow" 
-/>
+<SeoMeta title="Student Dashboard - Chinora Academy" robots="noindex, nofollow" />
 
 <div class="admin-shell {collapsed ? 'collapsed' : ''}">
 	<Sidebar bind:collapsed bind:mobileOpen user={data.user} navItems={studentNavItems} />
 
 	<div class="admin-body">
 		<DashboardNavbar notificationCount={3} bind:mobileOpen user={data.user} />
+
+		{#if page.url.pathname.split('/').filter(Boolean).length > 1}
+			<div class="mobile-breadcrumb-container">
+				<Breadcrumb inNavbar={false} />
+			</div>
+		{/if}
 
 		<main class={isProfilePage ? '' : 'md:admin-content md:p-6'}>
 			{@render children()}
@@ -74,6 +78,24 @@
 	@media (max-width: 1024px) {
 		.admin-body {
 			margin-left: 0 !important;
+		}
+	}
+
+	.mobile-breadcrumb-container {
+		display: none;
+		position: sticky;
+		top: 4rem;
+		z-index: 40;
+		padding: 0.5rem 1.5rem;
+		background: rgba(255, 255, 255, 0.6);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border-bottom: 1px solid rgba(240, 240, 240, 0.5);
+	}
+
+	@media (max-width: 1023px) {
+		.mobile-breadcrumb-container {
+			display: block !important;
 		}
 	}
 </style>

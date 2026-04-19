@@ -20,7 +20,6 @@
 	import { toast } from 'svelte-sonner';
 	import { fade, slide } from 'svelte/transition';
 	import { resolve } from '$app/paths';
-	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
 
 	let {
 		course,
@@ -107,6 +106,15 @@
 	$effect(() => {
 		isPublished = course.is_published;
 	});
+
+	// Handle initial tab from sessionStorage (to support "Edit" vs "Preview" without URL params)
+	$effect(() => {
+		const storedTab = sessionStorage.getItem('admin_course_detail_tab');
+		if (storedTab && (storedTab === 'content' || storedTab === 'students' || storedTab === 'settings')) {
+			activeTab = storedTab;
+			sessionStorage.removeItem('admin_course_detail_tab');
+		}
+	});
 </script>
 
 <div class="min-h-screen bg-[#f8fafc] pb-20 font-sans lg:pb-10">
@@ -123,9 +131,6 @@
 					<ChevronLeft size={20} />
 				</a>
 				<div class="min-w-0 flex-1">
-					<div class="hidden sm:block">
-						<Breadcrumb />
-					</div>
 					<h1 class="line-clamp-1 text-base font-bold text-slate-900 sm:text-xl">
 						{course.title}
 					</h1>

@@ -1,7 +1,7 @@
 <script>
 	// @ts-nocheck
 
-	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 	import LessonsRow from '@/lib/components/ui/courses/LessonsRow.svelte';
 	import ModuleAccordion from '@/lib/components/ui/courses/ModuleAccordion.svelte';
 	import { Lock } from 'lucide-svelte';
@@ -40,10 +40,13 @@
 				<Lock size={20} class="text-red-600" />
 			</div>
 			<div>
-				<h3 class="mb-1 text-lg font-bold text-red-800">Kurs bloklangan</h3>
+				<h3 class="mb-1 text-lg font-bold text-red-800">
+					{m.course_locked ? m.course_locked() : 'Kurs bloklangan'}
+				</h3>
 				<p class="text-sm leading-relaxed font-medium text-red-600">
-					Ushbu kursga kirish huquqingiz cheklangan. Darslarni ko'rish va davom ettirish uchun
-					ma'muriyat bilan bog'laning yoki to'lovni amalga oshiring.
+					{m.err_not_enrolled_or_blocked
+						? m.err_not_enrolled_or_blocked()
+						: 'Ushbu kursga kirish huquqingiz cheklangan.'}
 				</p>
 			</div>
 		</div>
@@ -57,9 +60,6 @@
 		<!-- Header -->
 		<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
 			<div>
-				<p class="mb-1 text-xs font-semibold tracking-wider text-slate-400 uppercase">
-					<Breadcrumb />
-				</p>
 				<h1 class="text-2xl font-bold text-slate-800 sm:text-3xl">{course.title}</h1>
 			</div>
 
@@ -109,18 +109,26 @@
 			<div
 				class="flex flex-col justify-center rounded-3xl border border-slate-100 bg-white p-6 shadow-sm"
 			>
-				<h3 class="mb-4 text-lg font-bold text-slate-800">Progress</h3>
+				<h3 class="mb-4 text-lg font-bold text-slate-800">{m.progress ? m.progress() : 'Progress'}</h3>
 				<div class="space-y-3">
 					<div class="flex items-center justify-between text-sm">
-						<span class="font-medium text-slate-500">Jami darslar</span>
+						<span class="font-medium text-slate-500"
+							>{m.admin_courses_total
+								? m.admin_courses_total().replace("Ro'yxat", 'Hamma')
+								: 'Jami darslar'}</span
+						>
 						<span class="font-bold text-slate-800">{course.lessons_count || 0}</span>
 					</div>
 					<div class="flex items-center justify-between text-sm">
-						<span class="font-medium text-slate-500">Ko'rilgan</span>
+						<span class="font-medium text-slate-500"
+							>{m.status_submitted ? m.status_submitted() : "Ko'rilgan"}</span
+						>
 						<span class="font-bold text-slate-800">{course.completed_lessons || 0}</span>
 					</div>
 					<div class="flex items-center justify-between text-sm">
-						<span class="font-medium text-slate-500">Qolgan</span>
+						<span class="font-medium text-slate-500"
+							>{m.lesson_next_lesson ? m.lesson_next_lesson() : 'Qolgan'}</span
+						>
 						<span class="font-bold text-slate-800"
 							>{course.lessons_count - course.completed_lessons || 0}</span
 						>
@@ -162,7 +170,11 @@
 							{/each}
 						</div>
 					{:else}
-						<p class="py-2 text-sm text-slate-500 italic">Hozircha darslar mavjud emas.</p>
+						<p class="py-2 text-sm text-slate-500 italic">
+							{m.admin_courses_not_found_desc
+								? m.admin_courses_not_found_desc()
+								: 'Hozircha darslar mavjud emas.'}
+						</p>
 					{/if}
 				</ModuleAccordion>
 			{:else}

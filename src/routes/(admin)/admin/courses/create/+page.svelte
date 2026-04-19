@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import CourseForm from '@/lib/components/ui/admin/forms/CourseForm.svelte';
     import { CheckCircle2 } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
     // Svelte 5 State'lar
     let step = $state(1);
@@ -47,24 +48,24 @@
 
 <div class="page-container">
     <div class="header">
-        <h1 class="title">Yangi kurs qo'shish</h1>
-        <p class="subtitle">Platformaga yangi o'quv dasturini kiritish paneli</p>
+        <h1 class="title">{m.admin_course_create_title ? m.admin_course_create_title() : "Yangi kurs qo'shish"}</h1>
+        <p class="subtitle">{m.admin_course_create_subtitle ? m.admin_course_create_subtitle() : "Platformaga yangi o'quv dasturini kiritish paneli"}</p>
     </div>
 
     <div class="progress-tracker">
         <div class="step {step >= 1 ? 'active' : ''}">
             <div class="step-circle">{step > 1 ? '' : '1'} {#if step > 1} <CheckCircle2 size={18}/> {/if}</div>
-            <span class="step-label">Kurs</span>
+            <span class="step-label">{m.admin_course_create_step_course ? m.admin_course_create_step_course() : "Kurs"}</span>
         </div>
         <div class="step-line {step >= 2 ? 'active-line' : ''}"></div>
         <div class="step {step >= 2 ? 'active' : ''}">
             <div class="step-circle">{step > 2 ? '' : '2'} {#if step > 2} <CheckCircle2 size={18}/> {/if}</div>
-            <span class="step-label">Modul</span>
+            <span class="step-label">{m.admin_course_create_step_module ? m.admin_course_create_step_module() : "Modul"}</span>
         </div>
         <div class="step-line {step === 3 ? 'active-line' : ''}"></div>
         <div class="step {step === 3 ? 'active' : ''}">
             <div class="step-circle">3</div>
-            <span class="step-label">Dars</span>
+            <span class="step-label">{m.admin_course_create_step_lesson ? m.admin_course_create_step_lesson() : "Dars"}</span>
         </div>
     </div>
 

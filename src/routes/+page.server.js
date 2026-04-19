@@ -3,11 +3,14 @@ import { API_URL } from '$env/static/private';
 import { getLocale } from '$lib/paraglide/runtime.js';
 // import { redirect } from '@sveltejs/kit';
 
-export const load = async () => {
+export const load = async ({ setHeaders }) => {
+    setHeaders({
+        'Cache-Control': 'public, max-age=3600'
+    });
     try {
         const response = await fetch(`${API_URL}/courses/`, {
             headers: {
-                
+
                 'Accept-Language': getLocale()
             }
         });

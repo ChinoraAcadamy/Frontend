@@ -1,6 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
 import { getLocale } from '@/lib/paraglide/runtime';
+import * as m from '$lib/paraglide/messages.js';
+import { translateServerMessage } from '$lib/utils/server-messages.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ cookies, fetch, setHeaders }) => {
@@ -20,22 +22,24 @@ export const load = async ({ cookies, fetch, setHeaders }) => {
         });
 
         if (!res.ok) {
-            throw error(res.status, 'Profil ma\'lumotlarini yuklab bo\'lmadi.');
+            const errData = await res.json().catch(() => ({}));
+            throw error(res.status, translateServerMessage(errData, m));
         }
 
         const profile = await res.json();
         return { profile };
     } catch (err) {
         console.error("[Profile Load] Error:", err);
-        throw error(err.status || 500, err.body?.message || "Xatolik yuz berdi");
+        if (err.status) throw err;
+        throw error(500, m.error_occurred ? m.error_occurred() : "Xatolik yuz berdi");
     }
 };
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-    updateProfile: async ({ request, cookies, fetch, locals }) => {
+    updateProfile: async ({ request, cookies, fetch }) => {
         const token = cookies.get('access_token');
-        if (!token) return { success: false, error: 'Avtorizatsiya talab qilinadi' };
+        if (!token) return { success: false, error: m.err_auth_required ? m.err_auth_required() : 'Avtorizatsiya talab qilinadi' };
         
         const formData = await request.formData();
         const data = {
@@ -57,7 +61,7 @@ export const actions = {
 
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
-                return { success: false, error: errData.detail || 'Ma\'lumotlarni yangilashda xatolik yuz berdi.' };
+                return { success: false, error: translateServerMessage(errData, m) };
             }
 
             const updatedProfile = await res.json();
@@ -82,7 +86,7 @@ export const actions = {
             return { success: true, profile: fullUserData };
         } catch (err) {
             console.error("[Profile Update] Error:", err);
-            return { success: false, error: 'Server bilan ulanishda xatolik.' };
+            return { success: false, error: m.error_occurred ? m.error_occurred() : 'Server bilan ulanishda xatolik.' };
         }
     }
 

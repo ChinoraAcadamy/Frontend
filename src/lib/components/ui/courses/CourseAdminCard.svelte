@@ -41,10 +41,11 @@
 
 		<a
 			href={resolve(`/admin/courses/${link}`)}
+			onclick={() => sessionStorage.setItem('admin_course_detail_tab', 'content')}
 			class="absolute right-3 bottom-3 flex items-center gap-1.5 rounded-lg border border-slate-100 bg-white px-3 py-1.5 text-[10px] font-black tracking-widest text-[#9b1c48] uppercase opacity-0 shadow-sm transition-all duration-300 group-hover:opacity-100"
 		>
 			<Play size={10} class="fill-current" />
-			Preview
+			{m.admin_courses_preview ? m.admin_courses_preview() : "Ko'rish"}
 		</a>
 
 		<!-- Status badge on image -->
@@ -65,7 +66,7 @@
 		</h3>
 
 		<p class="mb-4 text-[10px] font-black tracking-widest text-slate-400 uppercase">
-			{modules} Modules
+			{modules} {m.admin_courses_modules ? m.admin_courses_modules() : 'Modullar'}
 		</p>
 
 		<!-- Price + Button -->
@@ -78,9 +79,10 @@
 
 			<a
 				href={resolve(`/admin/courses/${link}`)}
+				onclick={() => sessionStorage.setItem('admin_course_detail_tab', 'settings')}
 				class="inline-flex items-center gap-2 rounded-lg bg-[#9b1c48] px-4 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-sm transition-all hover:bg-[#80163a] active:scale-95"
 			>
-				Edit
+				{m.admin_courses_edit ? m.admin_courses_edit() : 'Tahrirlash'}
 				<span class="text-sm leading-none">→</span>
 			</a>
 		</div>

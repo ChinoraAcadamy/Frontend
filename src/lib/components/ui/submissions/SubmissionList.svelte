@@ -170,7 +170,7 @@
 			class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 hover:text-[#9b1c48] active:scale-95 disabled:opacity-50"
 		>
 			<svg class="h-4 w-4 {isRefreshing ? 'animate-spin' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v9h-9"/></svg>
-			{isRefreshing ? 'Yuklanmoqda...' : 'Yangilash'}
+			{isRefreshing ? (m.admin_btn_refreshing ? m.admin_btn_refreshing() : 'Yuklanmoqda...') : (m.admin_btn_refresh ? m.admin_btn_refresh() : 'Yangilash')}
 		</button>
 	</div>
 
@@ -216,14 +216,14 @@
 					<div class="flex-1">
 						<div class="mb-2 flex items-center gap-2">
 							<span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-								{sub.assignment_type === 'text' ? 'Matn' : sub.assignment_type === 'link' ? 'Havola' : 'Fayl'}
+								{sub.assignment_type === 'text' ? (m.type_text ? m.type_text() : 'Matn') : sub.assignment_type === 'link' ? (m.type_link ? m.type_link() : 'Havola') : (m.type_file ? m.type_file() : 'Fayl')}
 							</span>
 							<div class="h-1 w-1 rounded-full bg-slate-200"></div>
 							<span class="text-[11px] font-medium text-slate-400">{formatDate(sub.submitted_at)}</span>
 						</div>
 						
 						<h3 class="mb-1 line-clamp-2 text-[17px] leading-[1.4] font-bold text-[#1a0e13]">
-							{sub.course_title ?? 'Kurs'}
+							{sub.course_title ?? (m.breadcrumb_courses ? m.breadcrumb_courses().slice(0,-1) : 'Kurs')}
 							{#if sub.assignment_title}
 								<span class="font-medium text-slate-400">/ {sub.assignment_title}</span>
 							{/if}
@@ -240,7 +240,7 @@
 								<div class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#9b1c48] shadow-sm">
 									<User size={12} />
 								</div>
-								{sub.student?.first_name || ''} {sub.student?.last_name || 'Talaba'}
+								{sub.student?.first_name || ''} {sub.student?.last_name || (m.breadcrumb_students ? m.breadcrumb_students().slice(0,-3) + 'a' : 'Talaba')}
 							</div>
 						{/if}
 					</div>
@@ -271,7 +271,7 @@
 					{:else if sub.assignment_type === 'link'}
 						<a href={ensureUrl(sub.text_answer)} target="_blank" class="flex items-center gap-2 text-sm font-bold text-[#9b1c48] hover:underline underline-offset-4 decoration-2">
 							<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-							Havolani ochish
+							{m.open_link ? m.open_link() : "Havolani ochish"}
 						</a>
 					{:else}
 						<div class="flex items-center gap-3">
@@ -279,8 +279,8 @@
 								<FileIcon size={20} />
 							</div>
 							<div>
-								<span class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Fayl yuklangan</span>
-								<span class="text-[12px] font-medium text-slate-600">{sub.file ? sub.file.split('/').pop() : 'Fayl nomi topilmadi'}</span>
+								<span class="block text-xs font-bold text-slate-400 uppercase tracking-wider">{m.file_uploaded ? m.file_uploaded() : "Fayl yuklangan"}</span>
+								<span class="text-[12px] font-medium text-slate-600">{sub.file ? sub.file.split('/').pop() : (m.admin_student_unknown_date ? m.admin_student_unknown_date() : 'Fayl nomi topilmadi')}</span>
 							</div>
 						</div>
 					{/if}
