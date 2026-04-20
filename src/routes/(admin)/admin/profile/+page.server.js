@@ -30,7 +30,7 @@ export const load = async ({ fetch, cookies }) => {
 };
 
 export const actions = {
-    updateProfile: async ({ request, fetch, cookies, locals }) => {
+    updateProfile: async ({ request, fetch, cookies }) => {
         const accessToken = cookies.get('access_token');
         if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 

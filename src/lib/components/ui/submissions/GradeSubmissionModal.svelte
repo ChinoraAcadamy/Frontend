@@ -43,7 +43,7 @@
 {#if isOpen}
 	<!-- Background Overlay -->
 	<div
-		class="fixed inset-0 z-100 flex items-end justify-center bg-slate-900/60 p-4 backdrop-blur-sm md:items-center md:p-6"
+		class="fixed inset-0 z-9999999 flex items-end justify-center bg-slate-900/60 p-4 backdrop-blur-sm md:items-center md:p-6"
 		transition:fade={{ duration: 300 }}
 		onclick={handleClose}
 		onkeydown={(e) => e.key === 'Escape' && handleClose()}

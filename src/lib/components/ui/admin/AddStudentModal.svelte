@@ -1,11 +1,12 @@
 <script>
-// @ts-nocheck
+	// @ts-nocheck
 
 	import { browser } from '$app/environment';
 	import { X, Eye, EyeOff, Search, Check, BookOpen } from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
 
 	let { isOpen = false, onClose, availableCourses = [] } = $props();
 
@@ -48,7 +49,7 @@
 
 {#if isOpen}
 	<div
-		class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/50 p-2 backdrop-blur-sm sm:items-center sm:p-6"
+		class="fixed inset-0 z-9999 flex items-end justify-center bg-slate-900/50 p-2 backdrop-blur-sm sm:items-center sm:p-6"
 		transition:fade={{ duration: 200 }}
 	>
 		<div
@@ -126,21 +127,7 @@
 							<label for="phone_number" class="text-sm font-bold text-slate-700"
 								>Telefon <span class="text-rose-500">*</span></label
 							>
-							<div
-								class="flex h-12 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition-all focus-within:border-[#ed4b72] focus-within:bg-white focus-within:ring-4 focus-within:ring-[#ed4b72]/10"
-							>
-								<span
-									class="flex h-full items-center border-r border-slate-200 bg-slate-100 pr-2 pl-4 text-sm font-bold text-slate-500"
-									>+998</span
-								>
-								<input
-									name="phone_number"
-									id="phone_number"
-									type="tel"
-									placeholder="90 123 45 67"
-									class="h-full flex-1 bg-transparent px-3 text-sm font-medium outline-none"
-								/>
-							</div>
+							<PhoneInput name="phone_number" id="phone_number" placeholder="+998 90 123 45 67" />
 						</div>
 
 						<div class="space-y-1.5">
@@ -216,7 +203,7 @@
 											{@const isSelected = selectedCourseIds.includes(course.id)}
 											<button
 												type="button"
-												class="flex w-full cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all text-left
+												class="flex w-full cursor-pointer items-center justify-between rounded-xl border p-2.5 text-left transition-all
                                                     {isSelected
 													? 'border-[#ed4b72] bg-[#ed4b72]/5'
 													: 'border-transparent hover:bg-slate-50'}"

@@ -58,13 +58,17 @@
 			</div>
 		{/if}
 
-		<button class="mobile-close-btn" aria-label={m.menu_close()} onclick={() => (mobileOpen = false)}>
+		<button
+			class="mobile-close-btn"
+			aria-label={m.menu_close()}
+			onclick={() => (mobileOpen = false)}
+		>
 			<X size={20} />
 		</button>
 	</div>
 
 	<!-- Navigation -->
-	<nav class="nav" aria-label={m.admin_main_menu ? m.admin_main_menu() : "Asosiy menyu"}>
+	<nav class="nav" aria-label={m.admin_main_menu ? m.admin_main_menu() : 'Asosiy menyu'}>
 		{#each navItems as item (item.href || item.label)}
 			{#if item.divider}
 				{#if !collapsed}
@@ -116,7 +120,9 @@
 							user?.username ||
 							m.rank_student()}
 					</span>
-					<span class="user-role">{user?.role === 'student' ? m.role_student() : user?.role || 'student'}</span>
+					<span class="user-role"
+						>{user?.role === 'student' ? m.role_student() : user?.role || 'student'}</span
+					>
 				</div>
 			{/if}
 		</div>
@@ -548,7 +554,7 @@
 		inset: 0;
 		background: rgba(17, 24, 39, 0.6);
 		backdrop-filter: blur(4px);
-		z-index: 49;
+		z-index: 9999999;
 		animation: fadeIn 0.3s ease-out forwards;
 	}
 	@keyframes fadeIn {

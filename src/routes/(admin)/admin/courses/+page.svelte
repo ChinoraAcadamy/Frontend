@@ -23,7 +23,9 @@
 		let storedIds = [];
 		try {
 			storedIds = JSON.parse(sessionStorage.getItem('deletedCourseIds') || '[]');
-		} catch (e) {}
+		} catch (e) {
+			console.log(e);
+		}
 
 		// Agar serverdan redirect bo'lib, url'da id kelsa, uni saqlab olamiz
 		const newlyDeleted = $page.url.searchParams.get('deleted_course');

@@ -1,5 +1,6 @@
 <script lang="ts">
 	// import InputField from '@/lib/components/ui/InputField.svelte';
+	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
 	import { User, Shield, Info, Save, Settings as SettingsIcon } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
@@ -228,13 +229,11 @@
 								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
 								>Telefon raqam</label
 							>
-							<input
-								type="tel"
+							<PhoneInput
 								id="phone_number"
 								name="phone_number"
 								bind:value={profileForm.phone}
 								placeholder="+998 00 000 00 00"
-								class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
 							/>
 						</div>
 

@@ -10,7 +10,7 @@
 	// Data is expected to be an array or a DRF object. We convert it to a flat array.
 	let results = $derived(rankingData?.results ? rankingData.results : rankingData || []);
 	let count = $derived(results.length);
-	let pageSize = 5;
+	let pageSize = $derived(isAdmin ? 10 : 5);
 	let totalPages = $derived(Math.max(1, Math.ceil(count / pageSize)));
 
 	// Frontend-only reactive pagination: slice the full results array

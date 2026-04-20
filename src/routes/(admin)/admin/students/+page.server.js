@@ -10,9 +10,9 @@ export const load = async ({ fetch, cookies, url, setHeaders }) => {
     const ordering = url.searchParams.get('ordering')  ?? '';
     const page     = url.searchParams.get('page')      ?? '1';
 
-    // Admin list sahifasi doimo yangi bo'lishi kerak
+    // Admin list sahifasi tezkor ishlashi uchun 10 daqiqalik kesh
     setHeaders({
-        'cache-control': 'private, no-cache, must-revalidate'
+        'cache-control': 'private, max-age=600, s-maxage=600'
     });
 
 

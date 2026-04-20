@@ -1,6 +1,5 @@
 <script>
 	import {
-		ArrowLeft,
 		Key,
 		UserCog,
 		UserMinus,
@@ -39,7 +38,11 @@
 			? new Date(date).toLocaleDateString('uz-UZ', {
 					day: 'numeric',
 					month: 'long',
-			: (m.admin_student_unknown_date ? m.admin_student_unknown_date() : "Noma'lum");
+					year: 'numeric'
+				})
+			: m.admin_student_unknown_date
+				? m.admin_student_unknown_date()
+				: "Noma'lum";
 
 	const formatShortDate = (date) =>
 		date ? new Date(date).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short' }) : '';
@@ -54,7 +57,12 @@
 
 	$effect(() => {
 		if (form?.updateSuccess) {
-			showToast(m.admin_student_toast_updated ? m.admin_student_toast_updated() : 'Talaba muvaffaqiyatli yangilandi!', 'success');
+			showToast(
+				m.admin_student_toast_updated
+					? m.admin_student_toast_updated()
+					: 'Talaba muvaffaqiyatli yangilandi!',
+				'success'
+			);
 		}
 	});
 
@@ -67,13 +75,26 @@
 			});
 
 			if (!res.ok) {
-				showToast(m.admin_student_toast_delete_err ? m.admin_student_toast_delete_err() : 'Talaba o‘chirilmadi!', 'error');
+				showToast(
+					m.admin_student_toast_delete_err
+						? m.admin_student_toast_delete_err()
+						: 'Talaba o‘chirilmadi!',
+					'error'
+				);
 			}
 
-			showToast(m.admin_student_toast_deleted ? m.admin_student_toast_deleted() : 'Talaba o‘chirildi!', 'success');
+			showToast(
+				m.admin_student_toast_deleted ? m.admin_student_toast_deleted() : 'Talaba o‘chirildi!',
+				'success'
+			);
 		} catch (error) {
 			console.error(error);
-			showToast(m.admin_student_toast_delete_err ? m.admin_student_toast_delete_err() : 'Talaba o‘chirilmadi!', 'error');
+			showToast(
+				m.admin_student_toast_delete_err
+					? m.admin_student_toast_delete_err()
+					: 'Talaba o‘chirilmadi!',
+				'error'
+			);
 		} finally {
 			isDeleting = false;
 		}
@@ -81,16 +102,6 @@
 </script>
 
 <div class="mx-auto min-h-screen max-w-7xl space-y-8 bg-[#f8fafc] p-4 font-sans md:p-8">
-	<div class="mb-6 flex items-center gap-4">
-		<button
-			onclick={() => history.back()}
-			class="flex items-center gap-2 text-slate-500 transition-colors hover:text-slate-700"
-		>
-			<ArrowLeft size={20} />
-			{m.admin_students_prev ? m.admin_students_prev() : 'Ortga'}
-		</button>
-	</div>
-
 	<div class="flex flex-col justify-between gap-4 md:flex-row md:items-center">
 		<div>
 			<h1 class="text-3xl font-black tracking-tight text-slate-800">
@@ -105,14 +116,16 @@
 				onclick={() => (isChangePasswordOpen = true)}
 				class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:bg-slate-50"
 			>
-				<Key size={16} /> {m.admin_student_btn_password ? m.admin_student_btn_password() : 'Parol'}
+				<Key size={16} />
+				{m.admin_student_btn_password ? m.admin_student_btn_password() : 'Parol'}
 			</button>
 			{#if isActive}
 				<button
 					class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50"
 					onclick={() => openEdit(data.student)}
 				>
-					<UserCog size={16} /> {m.admin_students_edit ? m.admin_students_edit() : 'Tahrirlash'}
+					<UserCog size={16} />
+					{m.admin_students_edit ? m.admin_students_edit() : 'Tahrirlash'}
 				</button>
 				<button
 					onclick={() => {
@@ -124,7 +137,10 @@
 					{#if isDeleting}
 						<Loader2 size={16} class="animate-spin" />
 					{:else}
-						<UserMinus size={16} /> {m.admin_student_btn_deactivate ? m.admin_student_btn_deactivate() : 'Faolsizlashtirish'}
+						<UserMinus size={16} />
+						{m.admin_student_btn_deactivate
+							? m.admin_student_btn_deactivate()
+							: 'Faolsizlashtirish'}
 					{/if}
 				</button>
 			{/if}
@@ -150,7 +166,13 @@
 					<span
 						class="mx-auto inline-block w-fit rounded-full border px-4 py-1 text-xs font-bold {statusClass} sm:mx-0"
 					>
-						{data.student.is_active ? (m.admin_students_active ? m.admin_students_active() : 'Faol') : (m.admin_students_inactive ? m.admin_students_inactive() : 'Nofaol')}
+						{data.student.is_active
+							? m.admin_students_active
+								? m.admin_students_active()
+								: 'Faol'
+							: m.admin_students_inactive
+								? m.admin_students_inactive()
+								: 'Nofaol'}
 					</span>
 				</div>
 
@@ -159,9 +181,20 @@
 				<div
 					class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-400 sm:justify-start"
 				>
-					<span>📱 {data.student.phone_number || (m.admin_student_no_phone ? m.admin_student_no_phone() : 'Telefon yo‘q')}</span>
-					<span>📅 {m.admin_student_joined ? m.admin_student_joined() : 'Qo‘shilgan'}: {formatDate(data.student.created_at)}</span>
-					<span>🕒 {m.admin_student_last_login ? m.admin_student_last_login() : 'Oxirgi kirish'}: {formatShortDate(data.student.last_login) || (m.admin_student_never ? m.admin_student_never() : 'Hech qachon')}</span>
+					<span
+						>📱 {data.student.phone_number ||
+							(m.admin_student_no_phone ? m.admin_student_no_phone() : 'Telefon yo‘q')}</span
+					>
+					<span
+						>📅 {m.admin_student_joined ? m.admin_student_joined() : 'Qo‘shilgan'}: {formatDate(
+							data.student.created_at
+						)}</span
+					>
+					<span
+						>🕒 {m.admin_student_last_login ? m.admin_student_last_login() : 'Oxirgi kirish'}: {formatShortDate(
+							data.student.last_login
+						) || (m.admin_student_never ? m.admin_student_never() : 'Hech qachon')}</span
+					>
 				</div>
 			</div>
 		</div>
@@ -171,9 +204,13 @@
 		>
 			<Trophy class="absolute -right-6 -bottom-6 h-40 w-40 text-white/10" strokeWidth={1} />
 			<div class="relative z-10">
-				<h2 class="text-lg font-medium opacity-90">{m.admin_student_total_score ? m.admin_student_total_score() : 'Total Score'}</h2>
+				<h2 class="text-lg font-medium opacity-90">
+					{m.admin_student_total_score ? m.admin_student_total_score() : 'Total Score'}
+				</h2>
 				<div class="mt-1 text-5xl font-bold">{data.student.total_score}</div>
-				<p class="mt-1 text-sm opacity-90">{m.admin_student_score_desc ? m.admin_student_score_desc() : 'Umumiy yig‘ilgan ball'}</p>
+				<p class="mt-1 text-sm opacity-90">
+					{m.admin_student_score_desc ? m.admin_student_score_desc() : 'Umumiy yig‘ilgan ball'}
+				</p>
 			</div>
 		</div>
 	</div>
@@ -182,11 +219,12 @@
 		<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-2">
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-xl font-bold text-slate-800">
-					{m.admin_students_col_courses ? m.admin_students_col_courses() : 'Kurslar'} ({data.student.courses_count || 0})
+					{m.admin_students_col_courses ? m.admin_students_col_courses() : 'Kurslar'} ({data.student
+						.courses_count || 0})
 				</h2>
-				<button 
+				<button
 					class="flex items-center gap-1 text-sm font-medium text-[#ed4b72] hover:underline"
-					onclick={() => isAddEnrollmentOpen = true}
+					onclick={() => (isAddEnrollmentOpen = true)}
 				>
 					+ {m.admin_student_add_course ? m.admin_student_add_course() : 'Kurs qo‘shish'}
 				</button>
@@ -203,7 +241,13 @@
 								<div>
 									<h4 class="font-semibold text-slate-800">{course.title}</h4>
 									<p class="text-xs text-slate-400">
-										{m.admin_student_course_status ? m.admin_student_course_status() : 'Status'}: {course.is_blocked ? (m.admin_student_course_blocked ? m.admin_student_course_blocked() : 'Bloklangan') : (m.admin_students_active ? m.admin_students_active() : 'Faol')}
+										{m.admin_student_course_status ? m.admin_student_course_status() : 'Status'}: {course.is_blocked
+											? m.admin_student_course_blocked
+												? m.admin_student_course_blocked()
+												: 'Bloklangan'
+											: m.admin_students_active
+												? m.admin_students_active()
+												: 'Faol'}
 									</p>
 								</div>
 							</div>
@@ -244,7 +288,10 @@
 												<Loader2 size={18} class="animate-spin" />
 											{:else}
 												<div class="flex items-center gap-2">
-													<Lock size={18} /> {m.admin_student_course_block ? m.admin_student_course_block() : 'Bloklash'}
+													<Lock size={18} />
+													{m.admin_student_course_block
+														? m.admin_student_course_block()
+														: 'Bloklash'}
 												</div>
 											{/if}
 										</button>
@@ -287,7 +334,10 @@
 												<Loader2 size={18} class="animate-spin" />
 											{:else}
 												<div class="flex items-center gap-2">
-													<Unlock size={18} /> {m.admin_student_course_unblock ? m.admin_student_course_unblock() : 'Ochish'}
+													<Unlock size={18} />
+													{m.admin_student_course_unblock
+														? m.admin_student_course_unblock()
+														: 'Ochish'}
 												</div>
 											{/if}
 										</button>
@@ -322,7 +372,9 @@
 					<div
 						class="rounded-2xl border-2 border-dashed border-slate-200 py-10 text-center text-slate-400"
 					>
-						{m.admin_student_no_courses ? m.admin_student_no_courses() : 'Student hali hech qanday kursga biriktirilmagan'}
+						{m.admin_student_no_courses
+							? m.admin_student_no_courses()
+							: 'Student hali hech qanday kursga biriktirilmagan'}
 					</div>
 				{/if}
 			</div>
@@ -330,17 +382,25 @@
 
 		<div class="space-y-6 lg:col-span-1">
 			<div class="rounded-3xl border border-slate-100 bg-white p-6 text-center shadow-sm">
-				<h2 class="text-lg font-medium text-slate-600">{m.admin_student_rank_title ? m.admin_student_rank_title() : 'Reyting o‘rni'}</h2>
+				<h2 class="text-lg font-medium text-slate-600">
+					{m.admin_student_rank_title ? m.admin_student_rank_title() : 'Reyting o‘rni'}
+				</h2>
 				<div class="mt-2 text-4xl font-bold text-slate-800">Top 15%</div>
-				<p class="text-sm text-slate-400">{m.admin_student_rank_desc ? m.admin_student_rank_desc() : 'Jami studentlar orasida'}</p>
+				<p class="text-sm text-slate-400">
+					{m.admin_student_rank_desc ? m.admin_student_rank_desc() : 'Jami studentlar orasida'}
+				</p>
 			</div>
 
 			<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-				<h2 class="mb-4 text-lg font-bold text-slate-800">{m.admin_student_note_title ? m.admin_student_note_title() : 'Platforma eslatmasi'}</h2>
+				<h2 class="mb-4 text-lg font-bold text-slate-800">
+					{m.admin_student_note_title ? m.admin_student_note_title() : 'Platforma eslatmasi'}
+				</h2>
 				<div class="flex gap-3 rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
 					<CheckCircle2 size={22} class="mt-0.5 text-blue-500" />
 					<p class="text-sm leading-relaxed text-blue-700/90">
-						{m.admin_student_note_desc ? m.admin_student_note_desc() : 'Student barcha kurslarni 80%+ natija bilan tugatsa, avtomatik sertifikat beriladi.'}
+						{m.admin_student_note_desc
+							? m.admin_student_note_desc()
+							: 'Student barcha kurslarni 80%+ natija bilan tugatsa, avtomatik sertifikat beriladi.'}
 					</p>
 				</div>
 			</div>

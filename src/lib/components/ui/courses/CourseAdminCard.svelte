@@ -66,7 +66,8 @@
 		</h3>
 
 		<p class="mb-4 text-[10px] font-black tracking-widest text-slate-400 uppercase">
-			{modules} {m.admin_courses_modules ? m.admin_courses_modules() : 'Modullar'}
+			{modules}
+			{m.admin_courses_modules ? m.admin_courses_modules() : 'Modullar'}
 		</p>
 
 		<!-- Price + Button -->

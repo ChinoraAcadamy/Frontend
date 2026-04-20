@@ -3,8 +3,9 @@
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
 	import { page } from '$app/stores';
-	import { User, Phone, CheckCircle2, Copy, BookOpen, FileCheck, Star, Settings, ChevronRight, LogOut } from 'lucide-svelte';
+	import { User, CheckCircle2, Copy, BookOpen, FileCheck, Star, Settings, ChevronRight, LogOut } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
+	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
 
 	let { data, form } = $props();
 
@@ -199,16 +200,12 @@
 					<div class="flex flex-col gap-3">
 						<label for="phone_number" class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">{m.profile_phone_label ? m.profile_phone_label() : 'TELEFON RAQAMINGIZ'}</label>
 						<div class="group relative">
-							<div class="absolute left-0 top-1/2 -translate-y-1/2 text-slate-400">
-								<Phone size={18} />
-							</div>
-							<input 
-								type="tel" 
-								id="phone_number" 
-								name="phone_number" 
-								value={profile?.phone_number || ''} 
-								class="w-full border-b-2 border-slate-200 bg-transparent py-3 pl-8 text-lg font-bold text-slate-900 outline-none transition-colors placeholder:text-slate-300 group-hover:border-slate-300 focus:border-[#FA2E69]" 
-								placeholder="+998 90 123 45 67" 
+							<PhoneInput
+								id="phone_number"
+								name="phone_number"
+								bind:value={profile.phone_number}
+								placeholder="+998 90 123 45 67"
+								variant="flat"
 							/>
 						</div>
 					</div>

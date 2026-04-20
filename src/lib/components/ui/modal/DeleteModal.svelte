@@ -34,7 +34,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 100000;
+		z-index: 9999999;
 	}
 
 	.delete-modal {

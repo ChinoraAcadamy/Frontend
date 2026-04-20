@@ -1,23 +1,42 @@
 <!-- src/lib/components/ui/modal/EditModal.svelte -->
 <script>
+	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
 	let { student, onSave, onClose } = $props();
 </script>
 
-<div class="modal-overlay" onclick={onClose} role="dialog" aria-modal="true" tabindex="0" onkeydown={(e) => e.key === 'Escape' && onClose()}>
-	<div class="modal rounded-lg" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" tabindex="0" onkeydown={(e) => e.key === 'Escape' && onClose()}>
+<div
+	class="modal-overlay"
+	onclick={onClose}
+	role="dialog"
+	aria-modal="true"
+	tabindex="0"
+	onkeydown={(e) => e.key === 'Escape' && onClose()}
+>
+	<div
+		class="modal rounded-lg"
+		onclick={(e) => e.stopPropagation()}
+		role="dialog"
+		aria-modal="true"
+		tabindex="0"
+		onkeydown={(e) => e.key === 'Escape' && onClose()}
+	>
 		<h3>Edit Student</h3>
 
 		<div class="form-grid">
 			<input bind:value={student.fullName} placeholder="Full Name" />
 			<input bind:value={student.username} placeholder="Username" />
-			<input bind:value={student.phone} placeholder="Phone Number" />
+			<div class="col-span-1 sm:col-span-2">
+				<PhoneInput bind:value={student.phone} placeholder="+998 00 000 00 00" />
+			</div>
 			<input bind:value={student.courses} type="number" placeholder="Courses" />
 			<input bind:value={student.score} type="number" placeholder="Total Score" />
 		</div>
 
 		<div class="modal-buttons">
 			<button class="cancel-btn" onclick={onClose}>Bekor qilish</button>
-			<button class=" bg-primary rounded-md text-background px-4 font-bold" onclick={onSave}>O'zgarishlarni saqlash</button>
+			<button class=" rounded-md bg-primary px-4 font-bold text-background" onclick={onSave}
+				>O'zgarishlarni saqlash</button
+			>
 		</div>
 	</div>
 </div>
@@ -32,7 +51,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 1000;
+		z-index: 99999999;
 		animation: fadeIn 0.2s ease;
 	}
 
@@ -45,7 +64,7 @@
 		box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
 		animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-        @apply rounded-lg;
+		@apply rounded-lg;
 	}
 
 	h3 {
@@ -72,11 +91,11 @@
 		outline: none;
 		transition: all 0.2s;
 
-        @apply rounded-lg;
+		@apply rounded-lg;
 	}
 
 	input:focus {
-		border-color: #FF4D8D;
+		border-color: #ff4d8d;
 		box-shadow: 0 0 0 3px rgba(255, 77, 141, 0.15);
 	}
 
@@ -94,13 +113,13 @@
 		font-weight: 600;
 		cursor: pointer;
 
-        @apply rounded-lg;
+		@apply rounded-lg;
 	}
 
 	.save-btn {
 		flex: 1;
 		padding: 14px;
-		background: #FF4D8D;
+		background: #ff4d8d;
 		color: white;
 		border: none;
 		/* border-radius: 12px; */
@@ -109,12 +128,22 @@
 	}
 
 	@keyframes modalPop {
-		from { transform: scale(0.8); opacity: 0; }
-		to { transform: scale(1); opacity: 1; }
+		from {
+			transform: scale(0.8);
+			opacity: 0;
+		}
+		to {
+			transform: scale(1);
+			opacity: 1;
+		}
 	}
 
 	@keyframes fadeIn {
-		from { opacity: 0; }
-		to { opacity: 1; }
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
 	}
 </style>
