@@ -1,6 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { ChevronRight, Save } from 'lucide-svelte';
+    import * as m from '$lib/paraglide/messages.js';
 
     /** 
      * @typedef {Object} Module
@@ -32,25 +33,25 @@
 
     <div class="grid-form">
         <div class="form-group">
-            <label for="mod_title_uz">Modul nomi (UZ)</label>
+            <label for="mod_title_uz">{m.label_module_title_uz ? m.label_module_title_uz() : 'Modul nomi (UZ)'}</label>
             <input type="text" id="mod_title_uz" name="title_uz" class="input" required minlength="1" value={moduleTarget.title_uz || ''}>
         </div>
         <div class="form-group">
-            <label for="mod_title_ru">Modul nomi (RU)</label>
+            <label for="mod_title_ru">{m.label_module_title_ru ? m.label_module_title_ru() : 'Modul nomi (RU)'}</label>
             <input type="text" id="mod_title_ru" name="title_ru" class="input" required minlength="1" value={moduleTarget.title_ru || ''}>
         </div>
 
         <div class="form-group full-width">
-            <label for="mod_desc_uz">Modul ta'rifi (UZ)</label>
+            <label for="mod_desc_uz">{m.label_module_desc_uz ? m.label_module_desc_uz() : 'Modul ta\'rifi (UZ)'}</label>
             <textarea id="mod_desc_uz" name="description_uz" class="input textarea" rows="2">{moduleTarget.description_uz || ''}</textarea>
         </div>
         <div class="form-group full-width">
-            <label for="mod_desc_ru">Modul ta'rifi (RU)</label>
+            <label for="mod_desc_ru">{m.label_module_desc_ru ? m.label_module_desc_ru() : 'Modul ta\'rifi (RU)'}</label>
             <textarea id="mod_desc_ru" name="description_ru" class="input textarea" rows="2">{moduleTarget.description_ru || ''}</textarea>
         </div>
 
         <div class="form-group full-width">
-            <label for="mod_order">Tartib raqami</label>
+            <label for="mod_order">{m.label_order_index ? m.label_order_index() : 'Tartib raqami'}</label>
             <input type="number" id="mod_order" name="order_index" class="input" value={moduleTarget.order_index ?? 1}>
         </div>
     </div>
@@ -58,9 +59,9 @@
     <div class="actions">
         <button type="submit" class="btn btn-primary" disabled={isSubmitting}>
             {#if isSubmitting}
-                Saqlanmoqda...
+                {m.profile_saving ? m.profile_saving() : 'Saqlanmoqda...'}
             {:else}
-                Saqlash
+                {m.profile_save ? m.profile_save() : 'Saqlash'}
                 {#if action.includes('create')}
                     <ChevronRight size={18} />
                 {:else}

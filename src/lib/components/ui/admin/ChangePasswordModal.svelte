@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { browser } from '$app/environment';
 	import { X, Loader2, CheckCircle2 } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { isOpen, studentName, onClose } = $props();
 
@@ -17,6 +19,17 @@
 		}
 	});
 
+	// Orqa fonni qulflash (Mobil UX uchun juda muhim)
+	$effect(() => {
+		if (browser) {
+			if (isOpen) document.body.style.overflow = 'hidden';
+			else document.body.style.overflow = '';
+		}
+		return () => {
+			if (browser) document.body.style.overflow = '';
+		};
+	});
+
 	// Form Action natijasini ushlash uchun funksiya
 	const handleSubmit = () => {
 		loading = true;
@@ -26,9 +39,9 @@
 		return async ({ result, update }) => {
 			loading = false;
 			if (result.type === 'failure') {
-				errorMessage = result.data?.error || 'Xatolik yuz berdi.';
+				errorMessage = result.data?.error || (m.error_occurred ? m.error_occurred() : 'Xatolik yuz berdi.');
 			} else if (result.type === 'success') {
-				successMessage = result.data?.message || "Muvaffaqiyatli o'zgartirildi.";
+				successMessage = result.data?.message || (m.msg_password_changed ? m.msg_password_changed() : "Muvaffaqiyatli o'zgartirildi.");
 				// 1.5 soniyadan keyin modalni avtomatik yopish
 				setTimeout(() => {
 					onClose();
@@ -48,7 +61,9 @@
 			class="animate-in fade-in zoom-in-95 w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl duration-200"
 		>
 			<div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-				<h3 class="text-lg font-bold text-slate-800">Parolni almashtirish</h3>
+				<h3 class="text-lg font-bold text-slate-800">
+					{m.modal_change_password_title ? m.modal_change_password_title() : 'Parolni almashtirish'}
+				</h3>
 				<button
 					onclick={onClose}
 					class="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
@@ -64,7 +79,9 @@
 				class="space-y-5 p-6"
 			>
 				<p class="text-sm text-slate-500">
-					<span class="font-semibold text-slate-700">{studentName}</span> uchun yangi parol kiriting.
+					{m.modal_change_password_subtitle
+						? m.modal_change_password_subtitle({ name: studentName })
+						: `${studentName} uchun yangi parol kiriting.`}
 				</p>
 
 				{#if errorMessage}
@@ -86,9 +103,9 @@
 
 				<div class="space-y-4">
 					<div class="space-y-1.5">
-						<label for="new_password" class="text-sm font-medium text-slate-700"
-							>Yangi parol *</label
-						>
+						<label for="new_password" class="text-sm font-medium text-slate-700">
+							{m.login_password_label ? m.login_password_label() : 'Parol'} *
+						</label>
 						<input
 							type="password"
 							id="new_password"
@@ -96,14 +113,14 @@
 							required
 							minlength="8"
 							class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-1 focus:ring-[#ed4b72]"
-							placeholder="Kamida 8 ta belgi"
+							placeholder={m.placeholder_min_length ? m.placeholder_min_length() : 'Kamida 8 ta belgi'}
 						/>
 					</div>
 
 					<div class="space-y-1.5">
-						<label for="confirm_password" class="text-sm font-medium text-slate-700"
-							>Parolni tasdiqlash *</label
-						>
+						<label for="confirm_password" class="text-sm font-medium text-slate-700">
+							{m.label_confirm_password ? m.label_confirm_password() : 'Parolni tasdiqlash'} *
+						</label>
 						<input
 							type="password"
 							id="confirm_password"
@@ -111,7 +128,7 @@
 							required
 							minlength="1"
 							class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-1 focus:ring-[#ed4b72]"
-							placeholder="Parolni qayta kiriting"
+							placeholder={m.placeholder_password_confirm ? m.placeholder_password_confirm() : 'Parolni qayta kiriting'}
 						/>
 					</div>
 				</div>
@@ -123,7 +140,7 @@
 						disabled={loading}
 						class="rounded-xl px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800 disabled:opacity-50"
 					>
-						Bekor qilish
+						{m.admin_btn_cancel ? m.admin_btn_cancel() : 'Bekor qilish'}
 					</button>
 					<button
 						type="submit"
@@ -132,9 +149,9 @@
 					>
 						{#if loading}
 							<Loader2 size={16} class="animate-spin" />
-							Saqlanmoqda...
+							{m.profile_saving ? m.profile_saving() : 'Saqlanmoqda...'}
 						{:else}
-							Saqlash
+							{m.profile_save ? m.profile_save() : 'Saqlash'}
 						{/if}
 					</button>
 				</div>

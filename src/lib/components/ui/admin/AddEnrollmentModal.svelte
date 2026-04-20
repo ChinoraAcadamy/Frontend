@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { X, Search, Check, BookOpen } from 'lucide-svelte';
+	import { browser } from '$app/environment';
 	import { fade, fly } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import { showToast } from '@/lib/utils/toast.js';
@@ -29,6 +30,17 @@
 			selectedCourseIds = [...selectedCourseIds, id];
 		}
 	}
+
+	// Orqa fonni qulflash (Mobil UX uchun juda muhim)
+	$effect(() => {
+		if (browser) {
+			if (isOpen) document.body.style.overflow = 'hidden';
+			else document.body.style.overflow = '';
+		}
+		return () => {
+			if (browser) document.body.style.overflow = '';
+		};
+	});
 </script>
 
 {#if isOpen}

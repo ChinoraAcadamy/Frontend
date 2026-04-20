@@ -4,6 +4,7 @@
 	import { CheckCircle2, Save, Video } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { fade } from 'svelte/transition';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Parts
 	import FormSection from './parts/FormSection.svelte';
@@ -145,7 +146,10 @@
 >
 	<div class="flex flex-col gap-5">
 		<!-- Section: General Info -->
-		<FormSection title="Umumiy ma'lumotlar" icon={Save}>
+		<FormSection 
+			title={m.section_general_info ? m.section_general_info() : 'Umumiy ma\'lumotlar'} 
+			icon={Save}
+		>
 			<div class="grid grid-cols-1 gap-5 sm:grid-cols-[1.5fr_1fr]">
 				<ModuleSelector {modules} bind:modulePk />
 
@@ -153,7 +157,7 @@
 					<label
 						for="les_order"
 						class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
-						>Tartib raqami</label
+						>{m.label_order_index ? m.label_order_index() : 'Tartib raqami'}</label
 					>
 					<input
 						type="number"
@@ -167,7 +171,10 @@
 		</FormSection>
 
 		<!-- Section: Multilingual Content -->
-		<FormSection title="Dars mazmuni" icon={CheckCircle2}>
+		<FormSection 
+			title={m.section_lesson_content ? m.section_lesson_content() : 'Dars mazmuni'} 
+			icon={CheckCircle2}
+		>
 			{#snippet extra()}
 				<LanguageTabs bind:activeTab />
 			{/snippet}
@@ -179,13 +186,13 @@
 						<label
 							for="les_title_uz"
 							class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
-							>Dars nomi (O'zbekcha)</label
+							>{m.label_lesson_title_uz ? m.label_lesson_title_uz() : 'Dars nomi (O\'zbekcha)'}</label
 						>
 						<input
 							type="text"
 							id="les_title_uz"
 							name="title_uz"
-							placeholder="Masalan: Kirish qismi"
+							placeholder={m.placeholder_lesson_title_uz ? m.placeholder_lesson_title_uz() : 'Masalan: Kirish qismi'}
 							class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 transition-colors outline-none focus:border-[#fa2e69]"
 							required
 							value={lessonTarget.title_uz || lessonTarget.title || ''}
@@ -195,14 +202,14 @@
 						<label
 							for="les_desc_uz"
 							class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
-							>Tavsif (O'zbekcha)</label
+							>{m.label_lesson_desc_uz ? m.label_lesson_desc_uz() : 'Tavsif (O\'zbekcha)'}</label
 						>
 						<textarea
 							id="les_desc_uz"
 							name="description_uz"
 							class="min-h-[100px] w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-[#fa2e69]"
 							rows="3"
-							placeholder="Dars haqida qisqacha ma'lumot..."
+							placeholder={m.placeholder_lesson_desc_uz ? m.placeholder_lesson_desc_uz() : 'Dars haqida qisqacha ma\'lumot...'}
 							>{lessonTarget.description_uz || lessonTarget.description || ''}</textarea
 						>
 					</div>
@@ -214,13 +221,13 @@
 						<label
 							for="les_title_ru"
 							class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
-							>Название урока (RU)</label
+							>{m.label_lesson_title_ru ? m.label_lesson_title_ru() : 'Название урока (RU)'}</label
 						>
 						<input
 							type="text"
 							id="les_title_ru"
 							name="title_ru"
-							placeholder="Например: Введение"
+							placeholder={m.placeholder_lesson_title_ru ? m.placeholder_lesson_title_ru() : 'Например: Введение'}
 							class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-[#fa2e69]"
 							required
 							value={lessonTarget.title_ru || lessonTarget.title || ''}
@@ -230,14 +237,14 @@
 						<label
 							for="les_desc_ru"
 							class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
-							>Описание (RU)</label
+							>{m.label_lesson_desc_ru ? m.label_lesson_desc_ru() : 'Описание (RU)'}</label
 						>
 						<textarea
 							id="les_desc_ru"
 							name="description_ru"
 							class="min-h-[100px] w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-[#fa2e69]"
 							rows="3"
-							placeholder="Краткое описание урока..."
+							placeholder={m.placeholder_lesson_desc_ru ? m.placeholder_lesson_desc_ru() : 'Краткое описание урока...'}
 							>{lessonTarget.description_ru || lessonTarget.description || ''}</textarea
 						>
 					</div>
@@ -246,14 +253,17 @@
 		</FormSection>
 
 		<!-- Section: Media & Footer -->
-		<FormSection title="Video va Davomiylik" icon={Video}>
+		<FormSection 
+			title={m.section_media_duration ? m.section_media_duration() : 'Video va Davomiylik'} 
+			icon={Video}
+		>
 			<VideoUploadZone bind:videoFile bind:uploadProgress bind:autoDuration {isSubmitting} />
 			
 			<div class="mt-4 flex flex-col gap-1.5">
 				<label
 					for="les_duration"
 					class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
-					>Davomiyligi (Daqiqa)</label
+					>{m.label_duration_minutes ? m.label_duration_minutes() : 'Davomiyligi (Daqiqa)'}</label
 				>
 				<div class="relative">
 					<input
@@ -282,9 +292,13 @@
 						<div
 							class="h-4 w-4 animate-spin rounded-full border-2 border-[#fa2e69]/20 border-t-[#fa2e69]"
 						></div>
-						<span>Nashr qilinmoqda...</span>
+						<span>{m.text_publishing ? m.text_publishing() : 'Nashr qilinmoqda...'}</span>
 					{:else}
-						<span>{action.includes('create') ? "Darsni qo'shish" : 'Saqlash'}</span>
+						<span>
+							{action.includes('create') 
+								? (m.btn_add_lesson ? m.btn_add_lesson() : "Darsni qo'shish") 
+								: (m.profile_save ? m.profile_save() : 'Saqlash')}
+						</span>
 						{#if action.includes('create')}
 							<CheckCircle2 size={16} />
 						{:else}

@@ -53,7 +53,9 @@
 			class="absolute top-3 left-3 rounded bg-white/90 px-2 py-1 text-[9px] font-black tracking-widest uppercase shadow-sm backdrop-blur-sm
             {isPublished ? 'text-emerald-600' : 'text-amber-600'}"
 		>
-			{status}
+			{isPublished 
+				? (m.admin_courses_status_published ? m.admin_courses_status_published() : 'Published') 
+				: (m.admin_courses_status_draft ? m.admin_courses_status_draft() : 'Draft')}
 		</div>
 	</div>
 

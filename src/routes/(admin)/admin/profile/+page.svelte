@@ -5,6 +5,7 @@
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { fade } from 'svelte/transition';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data, form: serverForm } = $props();
 
@@ -25,13 +26,13 @@
 			profileForm.firstName = user['first_name'] || '';
 			profileForm.lastName = user['last_name'] || '';
 			profileForm.phone = user['phone_number'] || '';
-			profileForm.username = user['username'] || "Noma'lum";
+			profileForm.username = user['username'] || (m.profile_unknown ? m.profile_unknown() : "Noma'lum");
 			profileForm.role =
 				user['role'] === 'admin'
-					? 'Administrator'
+					? (m.profile_role_administrator ? m.profile_role_administrator() : 'Administrator')
 					: user['role'] === 'superadmin'
-						? 'Super Admin'
-						: user['role'] || 'Admin';
+						? (m.profile_role_superadmin ? m.profile_role_superadmin() : 'Super Admin')
+						: user['role'] || (m.profile_role_admin ? m.profile_role_admin() : 'Admin');
 		}
 	}
 
@@ -44,7 +45,7 @@
 
 	$effect(() => {
 		if (serverForm?.success) {
-			toast.success('Profil muvaffaqiyatli saqlandi!');
+			toast.success(m.profile_update_success ? m.profile_update_success() : 'Profil muvaffaqiyatli saqlandi!');
 			if (serverForm.user) syncData(serverForm.user);
 		} else if (serverForm?.error) {
 			toast.error(serverForm.error);
@@ -61,7 +62,7 @@
 </script>
 
 <svelte:head>
-	<title>Admin Profil | Chinora Academy</title>
+	<title>{m.profile_seo_title ? m.profile_seo_title() : 'Admin Profil | Chinora Academy'}</title>
 </svelte:head>
 
 <div
@@ -74,11 +75,11 @@
 				<User size={24} />
 			</div>
 			<h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">
-				Profil Sozlamalari
+				{m.profile_settings_title ? m.profile_settings_title() : "Profil Sozlamalari"}
 			</h1>
 		</div>
 		<p class="text-sm font-medium text-slate-500">
-			Shaxsiy ma'lumotlaringizni boshqarish va xavfsizlik sozlamalari.
+			{m.profile_settings_subtitle ? m.profile_settings_subtitle() : "Shaxsiy ma'lumotlaringizni boshqarish va xavfsizlik sozlamalari."}
 		</p>
 	</header>
 
@@ -139,7 +140,7 @@
 					<div class="space-y-3 border-t border-slate-50 pt-6">
 						<div class="flex items-center justify-between text-sm">
 							<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-								>Tizimdagi roli</span
+								>{m.profile_role_in_system ? m.profile_role_in_system() : "Tizimdagi roli"}</span
 							>
 							<div
 								class="flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-black text-[#9b1c48]"
@@ -150,12 +151,12 @@
 						</div>
 						<div class="flex items-center justify-between text-sm">
 							<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-								>Status</span
+								>{m.profile_status_label ? m.profile_status_label() : "Status"}</span
 							>
 							<div
 								class="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-600"
 							>
-								Faol
+								{m.profile_status_active ? m.profile_status_active() : "Faol"}
 							</div>
 						</div>
 					</div>
@@ -164,11 +165,10 @@
 				<div class="rounded-3xl border border-slate-100 bg-[#9b1c48] p-6 text-white shadow-sm">
 					<div class="flex items-center gap-3">
 						<Info size={20} class="opacity-80" />
-						<h3 class="text-sm font-bold tracking-widest uppercase">Ma'lumot</h3>
+						<h3 class="text-sm font-bold tracking-widest uppercase">{m.profile_info_card_title ? m.profile_info_card_title() : "Ma'lumot"}</h3>
 					</div>
 					<p class="mt-3 text-xs leading-relaxed opacity-80">
-						Admin profili orqali siz tizimdagi boshqaruv huquqlariga ega bo'lasiz. Statistika va
-						natijalar faqat o'quvchi profili uchun mavjud.
+						{m.profile_info_card_desc ? m.profile_info_card_desc() : "Admin profili orqali siz tizimdagi boshqaruv huquqlariga ega bo'lasiz. Statistika va natijalar faqat o'quvchi profili uchun mavjud."}
 					</p>
 				</div>
 			</div>
@@ -181,7 +181,7 @@
 				<div class="mb-8 flex items-center gap-3 border-b border-slate-50 pb-6">
 					<SettingsIcon size={20} class="text-slate-400" />
 					<h3 class="text-sm font-black tracking-widest text-slate-800 uppercase">
-						Ma'lumotlarni tahrirlash
+						{m.profile_edit_details_title ? m.profile_edit_details_title() : "Ma'lumotlarni tahrirlash"}
 					</h3>
 				</div>
 
@@ -195,14 +195,14 @@
 						<div class="space-y-1.5">
 							<label
 								for="first_name"
-								class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Ism</label
+								class="text-[10px] font-black tracking-widest text-slate-400 uppercase">{m.profile_first_name ? m.profile_first_name() : "Ism"}</label
 							>
 							<input
 								type="text"
 								id="first_name"
 								name="first_name"
 								bind:value={profileForm.firstName}
-								placeholder="Ismingiz"
+								placeholder={m.profile_first_name_placeholder ? m.profile_first_name_placeholder() : "Ismingiz"}
 								class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
 							/>
 						</div>
@@ -211,14 +211,14 @@
 							<label
 								for="last_name"
 								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
-								>Familiya</label
+								>{m.profile_last_name ? m.profile_last_name() : "Familiya"}</label
 							>
 							<input
 								type="text"
 								id="last_name"
 								name="last_name"
 								bind:value={profileForm.lastName}
-								placeholder="Familiyangiz"
+								placeholder={m.profile_last_name_placeholder ? m.profile_last_name_placeholder() : "Familiyangiz"}
 								class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
 							/>
 						</div>
@@ -227,7 +227,7 @@
 							<label
 								for="phone_number"
 								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
-								>Telefon raqam</label
+								>{m.profile_phone_label ? m.profile_phone_label() : "Telefon raqam"}</label
 							>
 							<PhoneInput
 								id="phone_number"
@@ -241,7 +241,7 @@
 							<label
 								for="username"
 								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
-								>Foydalanuvchi nomi</label
+								>{m.profile_username_label ? m.profile_username_label() : "Foydalanuvchi nomi"}</label
 							>
 							<div
 								class="flex h-11 items-center rounded-xl bg-slate-100 px-4 text-sm font-bold text-slate-400 select-none"
@@ -253,7 +253,7 @@
 						<div class="space-y-1.5">
 							<label
 								for="role_display"
-								class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Maqom</label
+								class="text-[10px] font-black tracking-widest text-slate-400 uppercase">{m.profile_role_label ? m.profile_role_label() : "Maqom"}</label
 							>
 							<div
 								class="flex h-11 items-center rounded-xl bg-slate-100 px-4 text-sm font-bold text-slate-400 select-none"
@@ -273,10 +273,10 @@
 								<div
 									class="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white"
 								></div>
-								<span>Saqlanmoqda...</span>
+								<span>{m.profile_saving ? m.profile_saving() : "Saqlanmoqda..."}</span>
 							{:else}
 								<Save size={16} />
-								<span>O'zgarishlarni saqlash</span>
+								<span>{m.profile_save_changes ? m.profile_save_changes() : "O'zgarishlarni saqlash"}</span>
 							{/if}
 						</button>
 					</div>

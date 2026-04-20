@@ -127,7 +127,7 @@
 </script>
 
 <header
-	class="sticky top-0 z-999 flex h-16 items-center justify-between border-b border-[#f0f0f0] bg-white px-4 lg:px-7"
+	class="sticky top-0 z-900 flex h-16 items-center justify-between border-b border-[#f0f0f0] bg-white px-4 lg:px-7"
 >
 	<div class="flex flex-1 items-center gap-4">
 		<button

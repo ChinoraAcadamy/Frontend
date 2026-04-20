@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { Save, Plus, FileText, Type, Link, UploadCloud, Info } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let {
 		action = '?/createAssignment',
@@ -32,13 +33,13 @@
 					<FileText size={16} />
 				</div>
 				<h3 class="text-sm font-bold tracking-wider text-slate-400 uppercase">
-					Umumiy ma'lumotlar
+					{m.section_general_info ? m.section_general_info() : 'Umumiy ma\'lumotlar'}
 				</h3>
 			</div>
 
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="space-y-1.5">
-					<label for="ass_title_uz">Topshiriq nomi (UZ) *</label>
+					<label for="ass_title_uz">{m.label_assignment_title_uz ? m.label_assignment_title_uz() : 'Topshiriq nomi (UZ) *'}</label>
 					<input
 						type="text"
 						id="ass_title_uz"
@@ -50,7 +51,7 @@
 					/>
 				</div>
 				<div class="space-y-1.5">
-					<label for="ass_title_ru">Topshiriq nomi (RU) *</label>
+					<label for="ass_title_ru">{m.label_assignment_title_ru ? m.label_assignment_title_ru() : 'Topshiriq nomi (RU) *'}</label>
 					<input
 						type="text"
 						id="ass_title_ru"
@@ -67,24 +68,24 @@
 		<div class="form-group full-width">
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="space-y-1.5">
-					<label for="ass_desc_uz">Ta'rif (UZ)</label>
+					<label for="ass_desc_uz">{m.label_course_desc_uz ? m.label_course_desc_uz() : 'Ta\'rif (UZ)'}</label>
 					<textarea
 						id="ass_desc_uz"
 						name="description_uz"
 						class="input textarea"
 						rows="3"
-						placeholder="Topshiriq haqida qisqacha ma'lumot..."
+						placeholder={m.placeholder_lesson_desc_uz ? m.placeholder_lesson_desc_uz() : 'Topshiriq haqida qisqacha ma\'lumot...'}
 						>{assignmentTarget.description_uz || ''}</textarea
 					>
 				</div>
 				<div class="space-y-1.5">
-					<label for="ass_desc_ru">Ta'rif (RU)</label>
+					<label for="ass_desc_ru">{m.label_course_desc_ru ? m.label_course_desc_ru() : 'Ta\'rif (RU)'}</label>
 					<textarea
 						id="ass_desc_ru"
 						name="description_ru"
 						class="input textarea"
 						rows="3"
-						placeholder="Kratkaya informatsiya o zadanii..."
+						placeholder={m.placeholder_lesson_desc_ru ? m.placeholder_lesson_desc_ru() : 'Kratkaya informatsiya o zadanii...'}
 						>{assignmentTarget.description_ru || ''}</textarea
 					>
 				</div>
@@ -93,12 +94,12 @@
 
 		<!-- Configuration -->
 		<div class="form-group">
-			<label for="ass_type">Topshiriq Turi *</label>
+			<label for="ass_type">{m.label_assignment_type ? m.label_assignment_type() : 'Topshiriq Turi *'}</label>
 			<div class="relative">
 				<select id="ass_type" name="type" class="input pr-10" required bind:value={selectedType}>
-					<option value="file">Fayl yuklash</option>
-					<option value="text">Matn kiritish</option>
-					<option value="link">Link yuborish</option>
+					<option value="file">{m.option_type_file ? m.option_type_file() : 'Fayl yuklash'}</option>
+					<option value="text">{m.option_type_text ? m.option_type_text() : 'Matn kiritish'}</option>
+					<option value="link">{m.option_type_link ? m.option_type_link() : 'Link yuborish'}</option>
 				</select>
 				<div class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-slate-400">
 					{#if selectedType === 'file'}
@@ -113,7 +114,7 @@
 		</div>
 
 		<div class="form-group">
-			<label for="max_attempts">Maksimal urinishlar soni *</label>
+			<label for="max_attempts">{m.label_max_attempts ? m.label_max_attempts() : 'Maksimal urinishlar soni *'}</label>
 			<input
 				type="number"
 				id="max_attempts"
@@ -126,7 +127,7 @@
 		</div>
 
 		<div class="form-group">
-			<label for="max_score">Maksimal ball *</label>
+			<label for="max_score">{m.label_max_score ? m.label_max_score() : 'Maksimal ball *'}</label>
 			<input
 				type="number"
 				id="max_score"
@@ -148,10 +149,9 @@
 					<Info size={16} />
 				</div>
 				<div>
-					<h4 class="text-sm font-bold tracking-tight">Eslatma</h4>
+					<h4 class="text-sm font-bold tracking-tight">{m.profile_about ? m.profile_about() : 'Eslatma'}</h4>
 					<p class="mt-0.5 text-[13px] leading-relaxed font-medium opacity-80">
-						Tanlangan <strong>topshiriq turi</strong> studentlar qanday ko'rinishda javob yuborishi kerakligini
-						belgilaydi. Admin sifatida siz faqat topshiriq shartlarini belgilaysiz.
+						{m.text_assignment_hint ? m.text_assignment_hint() : 'Tanlangan topshiriq turi studentlar qanday ko\'rinishda javob yuborishi kerakligini belgilaydi. Admin sifatida siz faqat topshiriq shartlarini belgilaysiz.'}
 					</p>
 				</div>
 			</div>
@@ -161,9 +161,9 @@
 	<div class="actions">
 		<button type="submit" class="btn btn-primary" disabled={isSubmitting}>
 			{#if isSubmitting}
-				Saqlanmoqda...
+				{m.profile_saving ? m.profile_saving() : 'Saqlanmoqda...'}
 			{:else}
-				Topshiriqni saqlash
+				{m.btn_save_assignment ? m.btn_save_assignment() : 'Topshiriqni saqlash'}
 				{#if action.includes('create')}
 					<Plus size={18} />
 				{:else}

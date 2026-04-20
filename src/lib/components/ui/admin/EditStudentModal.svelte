@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { X } from 'lucide-svelte';
+	import { browser } from '$app/environment';
 	import { fade, fly } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import * as m from '$lib/paraglide/messages.js';
@@ -16,7 +17,6 @@
 	let phoneNumber = $state('');
 	let isActive = $state(true);
 
-	// Qachonki modal ochilsa va student props kelsa, qiymatlarni to'ldiramiz.
 	$effect(() => {
 		if (isOpen && student) {
 			firstName = student.first_name ?? '';
@@ -24,6 +24,17 @@
 			phoneNumber = student.phone_number ?? student.phone ?? '';
 			isActive = student.is_active ?? true;
 		}
+	});
+
+	// Orqa fonni qulflash (Mobil UX uchun juda muhim)
+	$effect(() => {
+		if (browser) {
+			if (isOpen) document.body.style.overflow = 'hidden';
+			else document.body.style.overflow = '';
+		}
+		return () => {
+			if (browser) document.body.style.overflow = '';
+		};
 	});
 </script>
 
@@ -101,7 +112,7 @@
 					<label class="ml-1 text-xs font-bold tracking-wide text-slate-500 uppercase"
 						>{m.profile_phone ? m.profile_phone() : 'Telefon raqam'}</label
 					>
-					<PhoneInput name="phoneNumber" bind:value={phoneNumber} placeholder="+998 90 123 45 67" />
+					<PhoneInput name="phoneNumber" bind:value={phoneNumber} placeholder={m.placeholder_phone ? m.placeholder_phone() : '+998 90 123 45 67'} />
 				</div>
 
 				<div class="flex gap-3 border-t border-slate-100 pt-4">

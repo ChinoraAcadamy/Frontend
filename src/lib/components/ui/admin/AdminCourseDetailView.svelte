@@ -20,6 +20,7 @@
 	import { toast } from 'svelte-sonner';
 	import { fade, slide } from 'svelte/transition';
 	import { resolve } from '$app/paths';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let {
 		course,
@@ -167,10 +168,12 @@
 						<span
 							class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold tracking-wider text-emerald-600 uppercase ring-1 ring-emerald-600/20 ring-inset"
 						>
-							{course.is_published ? 'Active' : 'Draft'}
+							{course.is_published 
+								? (m.admin_courses_status_published ? m.admin_courses_status_published() : 'Nashr qilingan') 
+								: (m.admin_courses_status_draft ? m.admin_courses_status_draft() : 'Qoralama')}
 						</span>
 						<span class="text-xs font-medium text-slate-400"
-							>• Created {new Date().toLocaleDateString()}</span
+							>• {m.date_created_at ? m.date_created_at({ date: new Date().toLocaleDateString() }) : `Yaratilgan sana: ${new Date().toLocaleDateString()}`}</span
 						>
 					</div>
 					<h2 class="line-clamp-1 text-lg font-extrabold text-slate-800">{course.title}</h2>
@@ -188,7 +191,9 @@
 					<Layout size={24} />
 				</div>
 				<div>
-					<p class="text-xs font-bold tracking-tight text-slate-400 uppercase">Modules</p>
+					<p class="text-xs font-bold tracking-tight text-slate-400 uppercase">
+						{m.admin_courses_modules ? m.admin_courses_modules() : 'Modullar'}
+					</p>
 					<p class="text-2xl font-black text-slate-800">{modules.length}</p>
 				</div>
 			</div>
@@ -202,7 +207,9 @@
 					<ListChecks size={24} />
 				</div>
 				<div>
-					<p class="text-xs font-bold tracking-tight text-slate-400 uppercase">Lessons</p>
+					<p class="text-xs font-bold tracking-tight text-slate-400 uppercase">
+						{m.lessons_label ? m.lessons_label() : 'Darslar'}
+					</p>
 					<p class="text-2xl font-black text-slate-800">{course.lessons_count || 0}</p>
 				</div>
 			</div>
@@ -221,7 +228,7 @@
 						: 'text-slate-500 hover:text-slate-700'}"
 				>
 					<Layout size={18} />
-					Tuzilma
+					{m.tab_structure ? m.tab_structure() : 'Mundarija'}
 				</button>
 				<button
 					onclick={() => (activeTab = 'students')}
@@ -231,7 +238,7 @@
 						: 'text-slate-500 hover:text-slate-700'}"
 				>
 					<Users size={18} />
-					O'quvchilar
+					{m.tab_students ? m.tab_students() : 'O\'quvchilar'}
 				</button>
 				<button
 					onclick={() => (activeTab = 'settings')}
@@ -241,7 +248,7 @@
 						: 'text-slate-500 hover:text-slate-700'}"
 				>
 					<Settings size={18} />
-					Sozlamalar
+					{m.tab_settings ? m.tab_settings() : 'Sozlamalar'}
 				</button>
 			</div>
 		</div>
@@ -306,7 +313,7 @@
 								{mod.title}
 							</h3>
 							<p class="mt-0.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-								{mod.lessons?.length || 0} ta dars • Modul {mod.order || ''}
+								{m.text_lessons_count ? m.text_lessons_count({ count: mod.lessons?.length || 0 }) : `${mod.lessons?.length || 0} ta dars`} • {m.label_modul ? m.label_modul() : 'Modul'} {mod.order || ''}
 							</p>
 						</div>
 					</div>
@@ -338,7 +345,7 @@
 													{lesson.title}
 												</h4>
 												<span class="text-xs font-semibold text-slate-400 capitalize"
-													>{lesson.duration || 0} minut • Video dars</span
+													>{lesson.duration || 0} {m.min_label ? m.min_label() : 'minut'} • {m.text_video_lesson ? m.text_video_lesson() : 'Video dars'}</span
 												>
 											</div>
 										</div>
@@ -355,7 +362,7 @@
 							<div
 								class="flex flex-col items-center justify-center py-8 text-center text-slate-400 italic"
 							>
-								<p class="text-sm">Hozircha darslar mavjud emas.</p>
+								<p class="text-sm">{m.text_no_lessons ? m.text_no_lessons() : 'Hozircha darslar mavjud emas.'}</p>
 							</div>
 						{/if}
 					</div>
@@ -368,8 +375,8 @@
 				class="flex flex-col items-center justify-center rounded-[40px] border-2 border-dashed border-slate-200 bg-white p-20 text-center text-slate-400"
 			>
 				<Layout size={48} class="mb-4 opacity-20" />
-				<p class="text-lg font-bold">Modullar hali qo'shilmagan</p>
-				<p class="text-sm">Yangi modul qo'shish uchun yuqoridagi tugmani bosing.</p>
+				<p class="text-lg font-bold">{m.text_no_modules ? m.text_no_modules() : 'Modullar hali qo\'shilmagan'}</p>
+				<p class="text-sm">{m.text_add_module_hint ? m.text_add_module_hint() : 'Yangi modul qo\'shish uchun yuqoridagi tugmani bosing.'}</p>
 			</div>
 		{/if}
 	</div>
@@ -390,12 +397,14 @@
 				<input
 					type="text"
 					bind:value={searchQuery}
-					placeholder="Ism yoki telefon raqami bo'yicha qidirish..."
+					placeholder={m.placeholder_student_search ? m.placeholder_student_search() : 'Ism yoki telefon raqami bo\'yicha qidirish...'}
 					class="w-full rounded-2xl border-none bg-slate-100 py-3.5 pr-4 pl-11 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 				/>
 			</div>
 			<div class="flex items-center gap-2">
-				<span class="text-xs font-black tracking-widest text-slate-400 uppercase">Jami</span>
+				<span class="text-xs font-black tracking-widest text-slate-400 uppercase">
+					{m.label_total ? m.label_total() : 'Jami'}
+				</span>
 				<div class="rounded-xl bg-rose-50 px-3 py-1.5 text-sm font-black text-[#ed4b72]">
 					{course.students?.length || 0}
 				</div>
@@ -415,15 +424,15 @@
 								>
 								<th
 									class="px-6 py-4 text-[10px] font-black tracking-widest text-slate-400 uppercase"
-									>O'quvchi</th
+									>{m.label_student ? m.label_student() : 'O\'quvchi'}</th
 								>
 								<th
 									class="px-6 py-4 text-[10px] font-black tracking-widest text-slate-400 uppercase"
-									>Telefon</th
+									>{m.admin_students_col_phone ? m.admin_students_col_phone() : 'Telefon'}</th
 								>
 								<th
 									class="px-6 py-4 text-right text-[10px] font-black tracking-widest text-slate-400 uppercase"
-									>Amallar</th
+									>{m.admin_students_col_actions ? m.admin_students_col_actions() : 'Amallar'}</th
 								>
 							</tr>
 						</thead>
@@ -488,8 +497,12 @@
 				>
 					<Search size={32} />
 				</div>
-				<p class="text-lg font-bold text-slate-800">Hech kim topilmadi</p>
-				<p class="text-sm text-slate-400">"{searchQuery}" so'ziga mos o'quvchi mavjud emas.</p>
+				<p class="text-lg font-bold text-slate-800">
+					{m.msg_no_students_found ? m.msg_no_students_found() : 'Hech kim topilmadi'}
+				</p>
+				<p class="text-sm text-slate-400">
+					{m.msg_no_students_found_desc ? m.msg_no_students_found_desc({ query: searchQuery }) : `"${searchQuery}" so'ziga mos o'quvchi mavjud emas.`}
+				</p>
 			</div>
 		{:else}
 			<div
@@ -500,8 +513,12 @@
 				>
 					<Users size={40} />
 				</div>
-				<h3 class="text-lg font-bold text-slate-800">O'quvchilar ro'yxati bo'sh</h3>
-				<p class="mt-1 text-sm text-slate-400">Ushbu kursga hali o'quvchilar qo'shilmagan.</p>
+				<h3 class="text-lg font-bold text-slate-800">
+					{m.msg_students_list_empty ? m.msg_students_list_empty() : 'O\'quvchilar ro\'yxati bo\'sh'}
+				</h3>
+				<p class="mt-1 text-sm text-slate-400">
+					{m.msg_students_list_empty_desc ? m.msg_students_list_empty_desc() : 'Ushbu kursga hali o\'quvchilar qo\'shilmagan.'}
+				</p>
 			</div>
 		{/if}
 	</div>
@@ -520,10 +537,10 @@
 			<div class="mb-5 flex items-center justify-between border-b border-slate-50 pb-4">
 				<div class="flex flex-col">
 					<h3 class="text-[16px] font-black tracking-tight text-slate-800">
-						Kurs muqovasi (rasmi)
+						{m.label_course_image ? m.label_course_image() : 'Kurs muqovasi (rasmi)'}
 					</h3>
 					<p class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-						1920x1080px tavsiya etiladi
+						{m.text_recommended_size ? m.text_recommended_size() : '1920x1080px tavsiya etiladi'}
 					</p>
 				</div>
 			</div>
@@ -551,7 +568,7 @@
 					>
 						<span
 							class="rounded-full bg-white/95 px-5 py-2.5 text-sm font-bold text-slate-800 shadow-xl transition-transform hover:scale-105"
-							>Boshqa rasm tanlash</span
+							>{m.btn_change_image ? m.btn_change_image() : 'Boshqa rasm tanlash'}</span
 						>
 					</div>
 				{:else}
@@ -567,10 +584,10 @@
 							/>
 						</div>
 						<span class="text-[15px] font-bold text-slate-700"
-							>Yuklash uchun shu yerga bosing yoki tashlang</span
+							>{m.text_upload_image ? m.text_upload_image() : 'Yuklash uchun shu yerga bosing yoki tashlang'}</span
 						>
 						<span class="mt-2 text-[11px] font-bold tracking-widest text-slate-400 uppercase"
-							>JPG, PNG Yoki WEBP (Max 5MB)</span
+							>{m.text_file_types_hint ? m.text_file_types_hint() : 'JPG, PNG Yoki WEBP (Max 5MB)'}</span
 						>
 					</div>
 				{/if}
@@ -591,9 +608,13 @@
 						<CheckCircle2 size={20} />
 					</div>
 					<div>
-						<h3 class="text-sm font-black tracking-tight text-slate-800">Publishing Status</h3>
+						<h3 class="text-sm font-black tracking-tight text-slate-800">
+							{m.label_course_status ? m.label_course_status() : 'Holati'}
+						</h3>
 						<p class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-							{isPublished ? 'Live on platform' : 'Hidden from students'}
+							{isPublished 
+								? (m.text_live_on_platform ? m.text_live_on_platform() : 'Platformada ochiq') 
+								: (m.text_hidden_from_students ? m.text_hidden_from_students() : 'O\'quvchilardan yashirilgan')}
 						</p>
 					</div>
 				</div>
@@ -623,21 +644,23 @@
 					>
 						<Globe size={20} />
 					</div>
-					<h3 class="text-[16px] font-black tracking-tight text-slate-800">O'zbek tilida (UZ)</h3>
+					<h3 class="text-[16px] font-black tracking-tight text-slate-800">
+						{m.label_lang_uz ? m.label_lang_uz() : 'O\'zbek tilida (UZ)'}
+					</h3>
 				</div>
 				<div class="space-y-5">
 					<div class="space-y-2">
 						<label
 							for="title_uz"
 							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-							>Kurs nomi</label
+							>{m.label_course_title_uz ? m.label_course_title_uz() : 'Kurs nomi'}</label
 						>
 						<input
 							type="text"
 							id="title_uz"
 							name="title_uz"
 							value={course.title_uz || course.title}
-							placeholder="Masalan: Tikuvchilik asoslari"
+							placeholder={m.placeholder_course_title_uz ? m.placeholder_course_title_uz() : 'Masalan: Tikuvchilik asoslari'}
 							class="w-full rounded-2xl border-none bg-slate-100 px-4 py-3.5 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						/>
 					</div>
@@ -645,14 +668,14 @@
 						<label
 							for="description_uz"
 							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-							>Tavsif</label
+							>{m.label_course_desc_uz ? m.label_course_desc_uz() : 'Tavsif'}</label
 						>
 						<textarea
 							id="description_uz"
 							name="description_uz"
 							rows="4"
 							value={course.description_uz || course.description}
-							placeholder="Kurs haqida batafsil ma'lumot..."
+							placeholder={m.placeholder_lesson_desc_uz ? m.placeholder_lesson_desc_uz() : 'Kurs haqida batafsil ma\'lumot...'}
 							class="min-h-[120px] w-full rounded-2xl border-none bg-slate-100 p-4 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						></textarea>
 					</div>
@@ -660,14 +683,14 @@
 						<label
 							for="level_uz"
 							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-							>Daraja</label
+							>{m.label_course_level_uz ? m.label_course_level_uz() : 'Daraja'}</label
 						>
 						<input
 							type="text"
 							id="level_uz"
 							name="level_uz"
 							value={course.level_uz || ''}
-							placeholder="Masalan: Boshlang'ich"
+							placeholder={m.placeholder_course_level_uz ? m.placeholder_course_level_uz() : 'Masalan: Boshlang\'ich'}
 							class="w-full rounded-2xl border-none bg-slate-100 px-4 py-3.5 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						/>
 					</div>
@@ -682,21 +705,23 @@
 					>
 						<Globe size={20} />
 					</div>
-					<h3 class="text-[16px] font-black tracking-tight text-slate-800">На русском (RU)</h3>
+					<h3 class="text-[16px] font-black tracking-tight text-slate-800">
+						{m.label_lang_ru ? m.label_lang_ru() : 'Rus tilida (RU)'}
+					</h3>
 				</div>
 				<div class="space-y-5">
 					<div class="space-y-2">
 						<label
 							for="title_ru"
 							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-							>Название курса</label
+							>{m.label_course_title_ru ? m.label_course_title_ru() : 'Kurs nomi (RU)'}</label
 						>
 						<input
 							type="text"
 							id="title_ru"
 							name="title_ru"
 							value={course.title_ru || ''}
-							placeholder="Например: Основы шитья"
+							placeholder={m.placeholder_course_title_ru ? m.placeholder_course_title_ru() : 'Например: Основы шитья'}
 							class="w-full rounded-2xl border-none bg-slate-100 px-4 py-3.5 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						/>
 					</div>
@@ -704,14 +729,14 @@
 						<label
 							for="description_ru"
 							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-							>Описание</label
+							>{m.label_course_desc_ru ? m.label_course_desc_ru() : 'Tavsif (RU)'}</label
 						>
 						<textarea
 							id="description_ru"
 							name="description_ru"
 							rows="4"
 							value={course.description_ru || ''}
-							placeholder="Подробная информация о курсе..."
+							placeholder={m.placeholder_lesson_desc_ru ? m.placeholder_lesson_desc_ru() : 'Подробная информация о курсе...'}
 							class="min-h-[120px] w-full rounded-2xl border-none bg-slate-100 p-4 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						></textarea>
 					</div>
@@ -719,14 +744,14 @@
 						<label
 							for="level_ru"
 							class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-							>Level (RU)</label
+							>{m.label_course_level_ru ? m.label_course_level_ru() : 'Level (RU)'}</label
 						>
 						<input
 							type="text"
 							id="level_ru"
 							name="level_ru"
 							value={course.level_ru || ''}
-							placeholder="Например: Для начинающих"
+							placeholder={m.placeholder_course_level_ru ? m.placeholder_course_level_ru() : 'Например: Для начинающих'}
 							class="w-full rounded-2xl border-none bg-slate-100 px-4 py-3.5 text-sm font-bold transition-all focus:bg-white focus:ring-4 focus:ring-rose-50"
 						/>
 					</div>
@@ -743,7 +768,7 @@
 					<Tag size={22} />
 				</div>
 				<h3 class="text-lg font-black tracking-tight text-slate-800">
-					Texnik va Moliyaviy ma'lumotlar
+					{m.section_technical_financial ? m.section_technical_financial() : 'Texnik va Moliyaviy ma\'lumotlar'}
 				</h3>
 			</div>
 
@@ -752,7 +777,7 @@
 					<label
 						for="duration"
 						class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-						>Davomiyligi (minut)</label
+						>{m.label_duration_minutes ? m.label_duration_minutes() : 'Davomiyligi (minut)'}</label
 					>
 					<div class="relative">
 						<input
@@ -768,7 +793,7 @@
 					<label
 						for="price"
 						class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-						>Joriy Narx</label
+						>{m.label_current_price ? m.label_current_price() : 'Joriy Narx'}</label
 					>
 					<div class="relative">
 						<input
@@ -785,7 +810,7 @@
 					<label
 						for="old_price"
 						class="ml-1 text-[11px] font-black tracking-widest text-slate-400 uppercase"
-						>Eski Narx</label
+						>{m.label_old_price_settings ? m.label_old_price_settings() : 'Eski Narx'}</label
 					>
 					<div class="relative">
 						<input
@@ -812,10 +837,10 @@
 					<div
 						class="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
 					></div>
-					<span>Saqlanmoqda...</span>
+					<span>{m.profile_saving ? m.profile_saving() : 'Saqlanmoqda...'}</span>
 				{:else}
 					<Save size={20} />
-					<span>O'zgarishlarni saqlash</span>
+					<span>{m.profile_save_changes ? m.profile_save_changes() : 'O\'zgarishlarni saqlash'}</span>
 				{/if}
 			</button>
 		</div>

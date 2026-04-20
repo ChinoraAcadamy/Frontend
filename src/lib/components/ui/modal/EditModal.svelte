@@ -1,7 +1,18 @@
 <!-- src/lib/components/ui/modal/EditModal.svelte -->
 <script>
+	import { browser } from '$app/environment';
 	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
 	let { student, onSave, onClose } = $props();
+
+	// Orqa fonni qulflash (Mobil UX uchun juda muhim)
+	$effect(() => {
+		if (browser) {
+			document.body.style.overflow = 'hidden';
+		}
+		return () => {
+			if (browser) document.body.style.overflow = '';
+		};
+	});
 </script>
 
 <div

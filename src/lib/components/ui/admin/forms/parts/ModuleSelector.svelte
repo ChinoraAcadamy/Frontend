@@ -1,6 +1,7 @@
 <script lang="ts">
     import { ChevronDown, Search } from 'lucide-svelte';
     import { slide } from 'svelte/transition';
+    import * as m from '$lib/paraglide/messages.js';
 
     let { modules = [], modulePk = $bindable(null) } = $props();
 
@@ -21,7 +22,9 @@
 </script>
 
 <div class="flex flex-col gap-1.5 relative">
-    <label for="module" class="text-[12px] font-bold text-slate-400 pl-0.5 uppercase tracking-wider">Modul</label>
+    <label for="module" class="text-[12px] font-bold text-slate-400 pl-0.5 uppercase tracking-wider">
+        {m.label_modul ? m.label_modul() : 'Modul'}
+    </label>
     <button
         type="button"
         onclick={() => (isDropdownOpen = !isDropdownOpen)}
@@ -32,7 +35,9 @@
             <span class="text-sm text-slate-700 font-medium">{selectedModule.title}</span>
             <input type="hidden" name="module_pk" value={modulePk} />
         {:else}
-            <span class="text-sm text-slate-300">Modulni tanlang...</span>
+            <span class="text-sm text-slate-300">
+                {m.placeholder_select_module ? m.placeholder_select_module() : 'Modulni tanlang...'}
+            </span>
         {/if}
         <ChevronDown size={16} class="text-slate-400 transition-transform duration-200 {isDropdownOpen ? 'rotate-180' : ''}" />
     </button>
@@ -46,7 +51,7 @@
                 <Search size={14} class="text-slate-400" />
                 <input
                     bind:value={searchQuery}
-                    placeholder="Qidirish..."
+                    placeholder={m.admin_courses_search_placeholder ? m.admin_courses_search_placeholder() : 'Qidirish...'}
                     autocomplete="off"
                     class="bg-transparent border-none outline-none text-xs w-full text-slate-600"
                 />
@@ -62,7 +67,9 @@
                         <span class="text-[10px] font-black text-slate-300 uppercase">{module.lessons_count || 0}</span>
                     </button>
                 {:else}
-                    <div class="px-4 py-4 text-center text-xs text-slate-400">Topilmadi</div>
+                    <div class="px-4 py-4 text-center text-xs text-slate-400">
+                        {m.not_found ? m.not_found() : 'Topilmadi'}
+                    </div>
                 {/each}
             </div>
         </div>

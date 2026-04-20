@@ -2,6 +2,7 @@
 	import { UploadCloud, Video, X } from 'lucide-svelte';
 	import { fade } from 'svelte/transition';
 	import { getVideoDuration } from '$lib/utils/lessonForm';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let {
 		videoFile = $bindable(null),
@@ -83,7 +84,7 @@
 						videoFile = null;
 						autoDuration = 0;
 					}}
-					title="O'chirish"
+					title={m.admin_students_delete ? m.admin_students_delete() : 'O\'chirish'}
 				>
 					<X size={14} />
 				</button>
@@ -97,13 +98,17 @@
 					<UploadCloud size={32} />
 				</div>
 				<div class="mb-4 text-center">
-					<span class="mb-0.5 block text-sm font-bold text-slate-600">Video yuklash</span>
-					<span class="text-[11px] font-medium text-slate-400">MP4, MOV, WEBM (Maks: 2GB)</span>
+					<span class="mb-0.5 block text-sm font-bold text-slate-600">
+						{m.text_upload_video ? m.text_upload_video() : 'Video yuklash'}
+					</span>
+					<span class="text-[11px] font-medium text-slate-400">
+						{m.text_file_types_hint ? m.text_file_types_hint() : 'MP4, MOV, WEBM (Maks: 2GB)'}
+					</span>
 				</div>
 				<span
 					class="rounded border border-slate-200 bg-white px-4 py-1.5 text-[11px] font-bold tracking-wider text-slate-500 uppercase shadow-sm transition-colors hover:border-slate-300"
 				>
-					Faylni tanlash
+					{m.btn_select_file ? m.btn_select_file() : 'Faylni tanlash'}
 				</span>
 			</label>
 		{/if}
@@ -115,9 +120,9 @@
 			>
 				<div class="mb-4 flex flex-col items-center">
 					<span class="text-2xl leading-none font-black text-slate-700">{uploadProgress}%</span>
-					<span class="mt-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase"
-						>Yuklanmoqda</span
-					>
+					<span class="mt-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+						{m.text_uploading ? m.text_uploading() : 'Yuklanmoqda'}
+					</span>
 				</div>
 				<div class="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-slate-100">
 					<div
@@ -137,7 +142,7 @@
 				!
 			</div>
 			<p class="text-[11px] font-medium text-slate-400 italic">
-				Video davomiyligi avtomatik hisoblanadi
+				{m.text_duration_auto_hint ? m.text_duration_auto_hint() : 'Video davomiyligi avtomatik hisoblanadi'}
 			</p>
 		</div>
 	{/if}

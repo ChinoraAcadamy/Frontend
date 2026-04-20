@@ -17,7 +17,7 @@ export const load = async ({ locals }) => {
 };
 
 export const actions = {
-    login: async ({ request, cookies }) => {
+    login: async ({ request, cookies, fetch }) => {
         const formData = await request.formData();
         const username = formData.get('username');
         const password = formData.get('password');

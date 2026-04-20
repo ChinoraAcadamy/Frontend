@@ -178,7 +178,7 @@
 		display: flex;
 		flex-direction: column;
 		padding: 24px 16px;
-		z-index: 50;
+		z-index: 1000;
 		transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 		box-shadow: 2px 0 16px rgba(0, 0, 0, 0.02);
 	}
@@ -498,7 +498,7 @@
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 		cursor: pointer;
 		color: #6b7280;
-		z-index: 51;
+		z-index: 1001;
 		transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 	.collapse-btn:hover {
@@ -554,7 +554,7 @@
 		inset: 0;
 		background: rgba(17, 24, 39, 0.6);
 		backdrop-filter: blur(4px);
-		z-index: 9999999;
+		z-index: 800;
 		animation: fadeIn 0.3s ease-out forwards;
 	}
 	@keyframes fadeIn {

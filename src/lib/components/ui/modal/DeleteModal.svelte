@@ -1,6 +1,17 @@
 <!-- src/lib/components/ui/modal/DeleteModal.svelte -->
 <script>
+	import { browser } from '$app/environment';
 	let { student, onConfirm, onClose } = $props();
+
+	// Orqa fonni qulflash (Mobil UX uchun juda muhim)
+	$effect(() => {
+		if (browser) {
+			document.body.style.overflow = 'hidden';
+		}
+		return () => {
+			if (browser) document.body.style.overflow = '';
+		};
+	});
 </script>
 
 <div

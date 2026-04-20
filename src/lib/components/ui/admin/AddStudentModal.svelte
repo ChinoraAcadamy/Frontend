@@ -7,6 +7,7 @@
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { isOpen = false, onClose, availableCourses = [] } = $props();
 
@@ -57,7 +58,9 @@
 			transition:fly={{ y: 50, duration: 300, opacity: 0 }}
 		>
 			<div class="flex shrink-0 items-center justify-between border-b border-slate-100 p-5 sm:p-6">
-				<h2 class="text-xl font-extrabold text-slate-800 sm:text-2xl">Yangi Student</h2>
+				<h2 class="text-xl font-extrabold text-slate-800 sm:text-2xl">
+					{m.modal_add_student_title ? m.modal_add_student_title() : 'Yangi Student'}
+				</h2>
 				<button
 					type="button"
 					onclick={onClose}
@@ -76,7 +79,9 @@
 					return async ({ result, update }) => {
 						isSubmitting = false;
 						if (result.type === 'failure') {
-							serverError = result.data?.error ?? 'Xatolik yuz berdi.';
+							serverError =
+								result.data?.error ??
+								(m.error_occurred ? m.error_occurred() : 'Xatolik yuz berdi.');
 							return;
 						}
 						if (result.type === 'success') {
@@ -101,37 +106,51 @@
 					<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 						<div class="space-y-1.5">
 							<label for="firstName" class="text-sm font-bold text-slate-700"
-								>Ism <span class="text-rose-500">*</span></label
+								>{m.admin_student_first_name ? m.admin_student_first_name() : 'Ism'}
+								<span class="text-rose-500">*</span></label
 							>
 							<input
 								name="firstName"
 								id="firstName"
 								type="text"
-								placeholder="Masalan: Alisher"
+								placeholder={m.placeholder_first_name
+									? m.placeholder_first_name()
+									: 'Masalan: Alisher'}
 								class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
 							/>
 						</div>
 
 						<div class="space-y-1.5">
-							<label for="lastName" class="text-sm font-bold text-slate-700">Familiya</label>
+							<label for="lastName" class="text-sm font-bold text-slate-700">
+								{m.admin_student_last_name ? m.admin_student_last_name() : 'Familiya'}
+							</label>
 							<input
 								name="lastName"
 								id="lastName"
 								type="text"
-								placeholder="Masalan: Navoiy"
+								placeholder={m.placeholder_last_name
+									? m.placeholder_last_name()
+									: 'Masalan: Navoiy'}
 								class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
 							/>
 						</div>
 
 						<div class="space-y-1.5">
 							<label for="phone_number" class="text-sm font-bold text-slate-700"
-								>Telefon <span class="text-rose-500">*</span></label
+								>{m.admin_student_phone ? m.admin_student_phone() : 'Telefon'}
+								<span class="text-rose-500">*</span></label
 							>
-							<PhoneInput name="phone_number" id="phone_number" placeholder="+998 90 123 45 67" />
+							<PhoneInput
+								name="phone_number"
+								id="phone_number"
+								placeholder={m.placeholder_phone ? m.placeholder_phone() : '+998 90 123 45 67'}
+							/>
 						</div>
 
 						<div class="space-y-1.5">
-							<label for="username" class="text-sm font-bold text-slate-700">Username</label>
+							<label for="username" class="text-sm font-bold text-slate-700">
+								{m.profile_username ? m.profile_username() : 'Username'}
+							</label>
 							<div
 								class="flex h-12 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition-all focus-within:border-[#ed4b72] focus-within:bg-white focus-within:ring-4 focus-within:ring-[#ed4b72]/10"
 							>
@@ -140,7 +159,7 @@
 									id="username"
 									name="username"
 									type="text"
-									placeholder="login"
+									placeholder={m.placeholder_username ? m.placeholder_username() : 'login'}
 									autocomplete="off"
 									class="h-full flex-1 bg-transparent pr-4 text-sm font-medium outline-none"
 								/>
@@ -148,13 +167,15 @@
 						</div>
 
 						<div class="space-y-1.5 md:col-span-2">
-							<label for="password" class="text-sm font-bold text-slate-700">Parol</label>
+							<label for="password" class="text-sm font-bold text-slate-700">
+								{m.login_password_label ? m.login_password_label() : 'Parol'}
+							</label>
 							<div class="relative">
 								<input
 									name="password"
 									id="password"
 									type={showPassword ? 'text' : 'password'}
-									placeholder="Yashirin parol"
+									placeholder={m.placeholder_password ? m.placeholder_password() : 'Yashirin parol'}
 									class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pr-12 pl-4 text-sm font-medium transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
 								/>
 								<button
@@ -169,7 +190,7 @@
 
 						<div class="relative space-y-1.5 md:col-span-2">
 							<label for="biriktirish" class="text-sm font-bold text-slate-700">
-								Kurslarga biriktirish
+								{m.label_attach_courses ? m.label_attach_courses() : 'Kurslarga biriktirish'}
 							</label>
 
 							<div class="relative">
@@ -181,7 +202,9 @@
 								<input
 									id="biriktirish"
 									type="text"
-									placeholder="Kurs qidirish..."
+									placeholder={m.placeholder_search_courses
+										? m.placeholder_search_courses()
+										: 'Kurs qidirish...'}
 									autocomplete="off"
 									bind:value={courseSearchQuery}
 									onfocus={() => (showCourseDropdown = true)}
@@ -224,7 +247,11 @@
 													<div>
 														<h4 class="text-sm font-bold text-slate-800">{course.title}</h4>
 														<p class="text-xs font-medium text-slate-500">
-															{course.price ? course.price.toLocaleString() + ' UZS' : 'Bepul'}
+															{course.price
+																? course.price.toLocaleString() + ' UZS'
+																: m.course_free
+																	? m.course_free()
+																	: 'Bepul'}
 														</p>
 													</div>
 												</div>
@@ -271,14 +298,20 @@
 						onclick={onClose}
 						class="w-full rounded-xl border border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100 sm:w-auto sm:px-6"
 					>
-						Bekor qilish
+						{m.admin_btn_cancel ? m.admin_btn_cancel() : 'Bekor qilish'}
 					</button>
 					<button
 						type="submit"
 						disabled={isSubmitting}
 						class="flex w-full items-center justify-center rounded-xl bg-[#ed4b72] py-3.5 text-sm font-bold text-white shadow-lg shadow-rose-200 transition-all hover:bg-[#de3c61] active:scale-[0.98] disabled:opacity-70 sm:w-auto sm:min-w-[160px]"
 					>
-						{isSubmitting ? 'Yaratilmoqda...' : 'Student Yaratish'}
+						{isSubmitting
+							? m.btn_creating
+								? m.btn_creating()
+								: 'Yaratilmoqda...'
+							: m.btn_create_student
+								? m.btn_create_student()
+								: 'Student Yaratish'}
 					</button>
 				</div>
 			</form>

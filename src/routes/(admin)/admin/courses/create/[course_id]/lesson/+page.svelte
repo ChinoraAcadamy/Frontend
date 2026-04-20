@@ -2,6 +2,7 @@
 <script>
 	import { CheckCircle2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data, form } = $props();
 
@@ -13,8 +14,8 @@
 	// if lesson is created, make toast message and clear all inputs
 	$effect(() => {
 		if (form?.success) {
-			toast.success(`${form.lesson.title_uz} darsi muvaffaqiyatli yaratildi!`, {
-				description: `Davomiyligi: ${form.lesson.duration} minut`
+			toast.success(m.msg_lesson_created ? m.msg_lesson_created({ title: form.lesson.title_uz }) : `${form.lesson.title_uz} darsi muvaffaqiyatli yaratildi!`, {
+				description: m.label_duration_param ? m.label_duration_param({ minutes: form.lesson.duration }) : `Davomiyligi: ${form.lesson.duration} minut`
 			});
 			// Formani tozalash
 			modulePk = null;
@@ -35,25 +36,26 @@
 <div class="page-container">
 	<div class="header">
 		<h1 class="title">
-			<b class="text-primary">{data.course.title}</b> kursi uchun yangi dars qo'shish
+			<b class="text-primary">{data.course.title}</b> 
+			{m.text_create_lesson_for ? m.text_create_lesson_for({ course: '' }).replace(': ', '').trim() : "kursi uchun yangi dars qo'shish"}
 		</h1>
-		<p class="subtitle">Platformaga yangi o'quv dasturini kiritish paneli</p>
+		<p class="subtitle">{m.admin_course_create_subtitle ? m.admin_course_create_subtitle() : "Platformaga yangi o'quv dasturini kiritish paneli"}</p>
 	</div>
 
 	<div class="progress-tracker">
 		<div class="step active">
 			<div class="step-circle"><CheckCircle2 size={18} /></div>
-			<span class="step-label">Kurs</span>
+			<span class="step-label">{m.admin_course_create_step_course ? m.admin_course_create_step_course() : "Kurs"}</span>
 		</div>
 		<div class="step-line active-line"></div>
 		<div class="step active">
 			<div class="step-circle"><CheckCircle2 size={18} /></div>
-			<span class="step-label">Modul</span>
+			<span class="step-label">{m.admin_course_create_step_module ? m.admin_course_create_step_module() : "Modul"}</span>
 		</div>
 		<div class="step-line active-line"></div>
 		<div class="step active">
 			<div class="step-circle"><CheckCircle2 size={18} /></div>
-			<span class="step-label">Dars</span>
+			<span class="step-label">{m.admin_course_create_step_lesson ? m.admin_course_create_step_lesson() : "Dars"}</span>
 		</div>
 	</div>
 
