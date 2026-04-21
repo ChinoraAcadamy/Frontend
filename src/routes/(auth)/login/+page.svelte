@@ -11,13 +11,16 @@
 		Globe,
 		Phone,
 		Send,
-		CreditCard
+		CreditCard,
+		Eye,
+		EyeOff
 	} from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
 	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
 
 	let { form } = $props();
 	let loading = $state(false);
+	let showPassword = $state(false);
 
 	const currentLocale = $derived(browser ? getLocale() : 'uz');
 
@@ -125,12 +128,28 @@
 							<input
 								id="password"
 								name="password"
-								type="password"
+								type={showPassword ? 'text' : 'password'}
 								required
 								autocomplete="current-password"
-								class="input"
+								class="input password-input"
 								placeholder={m.login_password_placeholder?.() ?? 'Parolingizni kiriting'}
 							/>
+							<button
+								type="button"
+								class="eye-btn"
+								onclick={() => (showPassword = !showPassword)}
+								aria-label={showPassword ? 'Hide password' : 'Show password'}
+							>
+								{#if showPassword}
+									<div in:fade={{ duration: 150 }} class="eye-icon-wrap">
+										<EyeOff size={18} strokeWidth={2} />
+									</div>
+								{:else}
+									<div in:fade={{ duration: 150 }} class="eye-icon-wrap">
+										<Eye size={18} strokeWidth={2} />
+									</div>
+								{/if}
+							</button>
 						</div>
 					</div>
 
@@ -480,6 +499,43 @@
 		background: #fff;
 		border-color: #e63e7a;
 		box-shadow: 0 0 0 4px rgba(230, 62, 122, 0.1);
+	}
+
+	.password-input {
+		padding-right: 3.5rem;
+	}
+
+	.eye-btn {
+		position: absolute;
+		right: 0.75rem;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		border: none;
+		border-radius: 12px;
+		color: #94a3b8;
+		cursor: pointer;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		z-index: 10;
+		padding: 0;
+	}
+	.eye-btn:hover {
+		background: rgba(230, 62, 122, 0.08);
+		color: #e63e7a;
+		transform: translateY(-50%) scale(1.05);
+	}
+	.eye-btn:active {
+		transform: translateY(-50%) scale(0.95);
+	}
+	.eye-icon-wrap {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.error-msg {

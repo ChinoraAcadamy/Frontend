@@ -300,7 +300,10 @@
 
 			const res = await fetch('/api/progress/complete', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					'Accept-Language': getLocale()
+				},
 				body: JSON.stringify({
 					lesson_id: lesson.id,
 					watched_seconds: watchedSeconds

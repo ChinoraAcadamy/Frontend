@@ -41,10 +41,16 @@ export async function getRanking({ cookies, fetch = globalThis.fetch }) {
 			allResults = [...allResults, ...pageResults];
 		});
 
-		return allResults;
+		return {
+			results: allResults,
+			count: count
+		};
 	} catch (e) {
 		console.error("[getRanking] Parallel fetch error:", e);
-		return [];
+		return {
+			results: [],
+			count: 0
+		};
 	}
 }
 

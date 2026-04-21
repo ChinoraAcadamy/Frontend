@@ -12,8 +12,8 @@ export async function load(event) {
     const user = event.locals.user || {};
     
     // We fetch all ranking here to find the rank AND pass to leaderboard
-    const ranking = await getRanking(event);
-    const myRank = await getMyRank({ ranking, myId: user.id });
+    const rankingData = await getRanking(event);
+    const myRank = await getMyRank({ ranking: rankingData.results, myId: user.id });
 
     return {
         user,
@@ -22,7 +22,7 @@ export async function load(event) {
         // Hammasini lazy (streaming) qilamiz
         lazy: {
             courses: getMyCourses(event).then(data => data.courses),
-            ranking: ranking, // Already fetched
+            ranking: rankingData.results, // Already fetched
             recentSubmissions: getRecentSubmissions(event, 3)
         }
     };

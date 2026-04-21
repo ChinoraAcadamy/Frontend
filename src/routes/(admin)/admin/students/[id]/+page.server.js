@@ -1,6 +1,6 @@
-// src/routes/(admin)/admin/students/[id]/+page.server.js
-import { API_URL } from '$env/static/private';
 import { error, fail } from '@sveltejs/kit';
+import { API_URL } from '$env/static/private';
+import { getRanking, getMyRank } from '@/lib/server/api.js';
 
 const HEADERS = (token) => ({
     'Authorization': `Bearer ${token}`,
@@ -33,9 +33,17 @@ export const load = async ({ fetch, params, cookies }) => {
         coursesData = cData.results ?? cData ?? [];
     }
 
+    // Rank hisoblash
+    const rankingData = await getRanking({ cookies, fetch });
+    const rank = await getMyRank({ ranking: rankingData.results, myId: studentData.id });
+    const totalStudents = rankingData.count;
+
     return { 
         student: studentData,
-        availableCourses: coursesData 
+        availableCourses: coursesData,
+        rank,
+        totalStudents,
+        rankPercent: rank ? Math.max(1, Math.round((rank / totalStudents) * 100)) : null
     };
 };
 

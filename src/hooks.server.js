@@ -129,6 +129,7 @@ function clearAuthCookies(cookies) {
 const handleParaglide = ({ event, resolve }) =>
 	paraglideMiddleware(event.request, ({ request, locale }) => {
 		event.request = request;
+		event.locals.lang = locale;
 		return resolve(event, {
 			transformPageChunk: ({ html }) =>
 				html
@@ -136,5 +137,14 @@ const handleParaglide = ({ event, resolve }) =>
 					.replace('%paraglide.dir%', getTextDirection(locale))
 		});
 	});
+
+/** @type {import('@sveltejs/kit').HandleFetch} */
+export async function handleFetch({ event, request, fetch }) {
+	if (request.url.startsWith(API_URL)) {
+		const lang = event.locals.lang || 'uz';
+		request.headers.set('Accept-Language', lang);
+	}
+	return fetch(request);
+}
 
 export const handle = sequence(authHandle, handleParaglide);

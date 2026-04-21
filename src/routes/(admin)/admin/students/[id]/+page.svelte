@@ -17,6 +17,7 @@
 	import AddEnrollmentModal from '@/lib/components/ui/admin/AddEnrollmentModal.svelte';
 	import { showToast } from '@/lib/utils/toast.js';
 	import * as m from '$lib/paraglide/messages.js';
+	import { getLocale } from '@/lib/paraglide/runtime';
 
 	let { data, form } = $props();
 
@@ -35,17 +36,15 @@
 
 	const formatDate = (date) =>
 		date
-			? new Date(date).toLocaleDateString('uz-UZ', {
+			? new Date(date).toLocaleDateString(getLocale(), {
 					day: 'numeric',
 					month: 'long',
 					year: 'numeric'
 				})
-			: m.admin_student_unknown_date
-				? m.admin_student_unknown_date()
-				: "Noma'lum";
+			: m.admin_student_unknown_date();
 
 	const formatShortDate = (date) =>
-		date ? new Date(date).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short' }) : '';
+		date ? new Date(date).toLocaleDateString(getLocale(), { day: 'numeric', month: 'short' }) : '';
 
 	const getInitials = (first, last) => `${first?.[0] || ''}${last?.[0] || ''}`.toUpperCase() || '?';
 
@@ -57,12 +56,7 @@
 
 	$effect(() => {
 		if (form?.updateSuccess) {
-			showToast(
-				m.admin_student_toast_updated
-					? m.admin_student_toast_updated()
-					: 'Talaba muvaffaqiyatli yangilandi!',
-				'success'
-			);
+			showToast(m.admin_student_toast_updated(), 'success');
 		}
 	});
 
@@ -71,30 +65,19 @@
 		try {
 			const res = await fetch('/api/student', {
 				method: 'DELETE',
+				headers: {
+					'Accept-Language': getLocale()
+				},
 				body: JSON.stringify({ id: data.student.id })
 			});
 
 			if (!res.ok) {
-				showToast(
-					m.admin_student_toast_delete_err
-						? m.admin_student_toast_delete_err()
-						: 'Talaba o‘chirilmadi!',
-					'error'
-				);
+				showToast(m.admin_student_toast_delete_err(), 'error');
 			}
-
-			showToast(
-				m.admin_student_toast_deleted ? m.admin_student_toast_deleted() : 'Talaba o‘chirildi!',
-				'success'
-			);
+			showToast(m.admin_student_toast_deleted(), 'success');
 		} catch (error) {
 			console.error(error);
-			showToast(
-				m.admin_student_toast_delete_err
-					? m.admin_student_toast_delete_err()
-					: 'Talaba o‘chirilmadi!',
-				'error'
-			);
+			showToast(m.admin_student_toast_delete_err(), 'error');
 		} finally {
 			isDeleting = false;
 		}
@@ -117,7 +100,7 @@
 				class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:bg-slate-50"
 			>
 				<Key size={16} />
-				{m.admin_student_btn_password ? m.admin_student_btn_password() : 'Parol'}
+				{m.admin_student_btn_password()}
 			</button>
 			{#if isActive}
 				<button
@@ -125,7 +108,7 @@
 					onclick={() => openEdit(data.student)}
 				>
 					<UserCog size={16} />
-					{m.admin_students_edit ? m.admin_students_edit() : 'Tahrirlash'}
+					{m.admin_students_edit()}
 				</button>
 				<button
 					onclick={() => {
@@ -138,9 +121,7 @@
 						<Loader2 size={16} class="animate-spin" />
 					{:else}
 						<UserMinus size={16} />
-						{m.admin_student_btn_deactivate
-							? m.admin_student_btn_deactivate()
-							: 'Faolsizlashtirish'}
+						{m.admin_student_btn_deactivate()}
 					{/if}
 				</button>
 			{/if}
@@ -166,13 +147,7 @@
 					<span
 						class="mx-auto inline-block w-fit rounded-full border px-4 py-1 text-xs font-bold {statusClass} sm:mx-0"
 					>
-						{data.student.is_active
-							? m.admin_students_active
-								? m.admin_students_active()
-								: 'Faol'
-							: m.admin_students_inactive
-								? m.admin_students_inactive()
-								: 'Nofaol'}
+						{data.student.is_active ? m.admin_students_active() : m.admin_students_inactive()}
 					</span>
 				</div>
 
@@ -181,19 +156,11 @@
 				<div
 					class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-400 sm:justify-start"
 				>
+					<span>📱 {data.student.phone_number || m.admin_student_no_phone()}</span>
+					<span>📅 {m.admin_student_joined()}: {formatDate(data.student.created_at)}</span>
 					<span
-						>📱 {data.student.phone_number ||
-							(m.admin_student_no_phone ? m.admin_student_no_phone() : 'Telefon yo‘q')}</span
-					>
-					<span
-						>📅 {m.admin_student_joined ? m.admin_student_joined() : 'Qo‘shilgan'}: {formatDate(
-							data.student.created_at
-						)}</span
-					>
-					<span
-						>🕒 {m.admin_student_last_login ? m.admin_student_last_login() : 'Oxirgi kirish'}: {formatShortDate(
-							data.student.last_login
-						) || (m.admin_student_never ? m.admin_student_never() : 'Hech qachon')}</span
+						>🕒 {m.admin_student_last_login()}: {formatShortDate(data.student.last_login) ||
+							m.admin_student_never()}</span
 					>
 				</div>
 			</div>
@@ -205,11 +172,11 @@
 			<Trophy class="absolute -right-6 -bottom-6 h-40 w-40 text-white/10" strokeWidth={1} />
 			<div class="relative z-10">
 				<h2 class="text-lg font-medium opacity-90">
-					{m.admin_student_total_score ? m.admin_student_total_score() : 'Total Score'}
+					{m.admin_student_total_score()}
 				</h2>
 				<div class="mt-1 text-5xl font-bold">{data.student.total_score}</div>
 				<p class="mt-1 text-sm opacity-90">
-					{m.admin_student_score_desc ? m.admin_student_score_desc() : 'Umumiy yig‘ilgan ball'}
+					{m.admin_student_score_desc()}
 				</p>
 			</div>
 		</div>
@@ -219,150 +186,123 @@
 		<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-2">
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-xl font-bold text-slate-800">
-					{m.admin_students_col_courses ? m.admin_students_col_courses() : 'Kurslar'} ({data.student
-						.courses_count || 0})
+					{m.admin_students_col_courses()} ({data.student.courses_count || 0})
 				</h2>
 				<button
 					class="flex items-center gap-1 text-sm font-medium text-[#ed4b72] hover:underline"
 					onclick={() => (isAddEnrollmentOpen = true)}
 				>
-					+ {m.admin_student_add_course ? m.admin_student_add_course() : 'Kurs qo‘shish'}
+					+ {m.admin_student_add_course()}
 				</button>
 			</div>
 
-			<div class="flex flex-col gap-3">
+			<div class="space-y-4">
 				{#if courses.length > 0}
 					{#each courses as course (course.enrollment_id)}
-						<div class="flex items-center justify-between rounded-2xl border border-slate-100 p-5">
+						<div
+							class="group relative flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-5 transition-all hover:border-[#ed4b72]/10 hover:shadow-md sm:flex-row sm:items-center sm:justify-between {course.is_blocked
+								? 'opacity-80 grayscale-[0.3]'
+								: ''}"
+						>
 							<div class="flex items-center gap-4">
-								<div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-									<BookOpen size={24} />
+								<div
+									class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl transition-colors {course.is_blocked
+										? 'bg-slate-100 text-slate-400'
+										: 'bg-rose-50 text-[#ed4b72]'}"
+								>
+									<BookOpen size={28} />
 								</div>
-								<div>
-									<h4 class="font-semibold text-slate-800">{course.title}</h4>
-									<p class="text-xs text-slate-400">
-										{m.admin_student_course_status ? m.admin_student_course_status() : 'Status'}: {course.is_blocked
-											? m.admin_student_course_blocked
+								<div class="min-w-0">
+									<h4 class="truncate font-bold text-slate-800">{course.title}</h4>
+									<div class="mt-1 flex items-center gap-2">
+										<span
+											class="inline-flex items-center rounded-lg px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase {course.is_blocked
+												? 'bg-slate-100 text-slate-500'
+												: 'bg-emerald-50 text-emerald-600'}"
+										>
+											{course.is_blocked
 												? m.admin_student_course_blocked()
-												: 'Bloklangan'
-											: m.admin_students_active
-												? m.admin_students_active()
-												: 'Faol'}
-									</p>
+												: m.admin_students_active()}
+										</span>
+										{#if course.progress !== undefined}
+											<span class="text-[10px] font-bold text-slate-400">
+												• {course.progress}%
+											</span>
+										{/if}
+									</div>
 								</div>
 							</div>
 
-							<div class="flex gap-2">
-								<!-- BLOKLASH tugmasi -->
-								{#if !course.is_blocked}
-									<form
-										method="POST"
-										action="?/blockEnrollment"
-										use:enhance={() => {
-											const id = course.enrollment_id;
-											loadingEnrollments = [...loadingEnrollments, id];
-
-											return async ({ result }) => {
-												if (result.type === 'success') {
-													const idx = courses.findIndex((c) => c.enrollment_id === id);
-													if (idx !== -1) {
-														courses[idx] = {
-															...courses[idx],
-															is_blocked: true
-														};
-													}
-												}
-												loadingEnrollments = loadingEnrollments.filter((x) => x !== id);
-											};
-										}}
-									>
-										<input type="hidden" name="enrollmentId" value={course.enrollment_id} />
-										<button
-											type="submit"
-											disabled={course.is_blocked ||
-												loadingEnrollments.includes(course.enrollment_id)}
-											class="rounded-xl border bg-white px-5 py-3 text-sm font-bold shadow-sm transition-all disabled:opacity-40
-								   {course.is_blocked ? 'display-none' : 'text-orange-500 hover:bg-orange-50'}"
-										>
-											{#if loadingEnrollments.includes(course.enrollment_id)}
-												<Loader2 size={18} class="animate-spin" />
-											{:else}
-												<div class="flex items-center gap-2">
-													<Lock size={18} />
-													{m.admin_student_course_block
-														? m.admin_student_course_block()
-														: 'Bloklash'}
-												</div>
-											{/if}
-										</button>
-									</form>
-								{/if}
-
-								<!-- OCHISH tugmasi -->
-
-								{#if course.is_blocked}
-									<form
-										method="POST"
-										action="?/unblockEnrollment"
-										use:enhance={() => {
-											const id = course.enrollment_id;
-											loadingEnrollments = [...loadingEnrollments, id];
-
-											return async ({ result }) => {
-												if (result.type === 'success') {
-													const idx = courses.findIndex((c) => c.enrollment_id === id);
-													if (idx !== -1) {
-														courses[idx] = {
-															...courses[idx],
-															is_blocked: false
-														};
-													}
-												}
-												loadingEnrollments = loadingEnrollments.filter((x) => x !== id);
-											};
-										}}
-									>
-										<input type="hidden" name="enrollmentId" value={course.enrollment_id} />
-										<button
-											type="submit"
-											disabled={!course.is_blocked ||
-												loadingEnrollments.includes(course.enrollment_id)}
-											class="rounded-xl border bg-white px-5 py-3 text-sm font-bold shadow-sm transition-all disabled:opacity-40
-								   {!course.is_blocked ? 'display-none' : 'text-emerald-500 hover:bg-emerald-50'}"
-										>
-											{#if loadingEnrollments.includes(course.enrollment_id)}
-												<Loader2 size={18} class="animate-spin" />
-											{:else}
-												<div class="flex items-center gap-2">
-													<Unlock size={18} />
-													{m.admin_student_course_unblock
-														? m.admin_student_course_unblock()
-														: 'Ochish'}
-												</div>
-											{/if}
-										</button>
-									</form>
-								{/if}
-
-								<!-- O‘chirish tugmasi (o‘zgarmaydi) -->
+							<div class="flex flex-wrap items-center gap-2 sm:justify-end">
+								<!-- BLOKLASH/OCHISH tugmasi -->
 								<form
 									method="POST"
-									action="?/removeEnrollment"
+									action={course.is_blocked ? '?/unblockEnrollment' : '?/blockEnrollment'}
 									use:enhance={() => {
 										const id = course.enrollment_id;
 										loadingEnrollments = [...loadingEnrollments, id];
 
 										return async ({ result }) => {
 											if (result.type === 'success') {
-												courses = courses.filter((c) => c.enrollment_id !== id);
+												const idx = courses.findIndex((c) => c.enrollment_id === id);
+												if (idx !== -1) {
+													courses[idx].is_blocked = !courses[idx].is_blocked;
+												}
 											}
 											loadingEnrollments = loadingEnrollments.filter((x) => x !== id);
 										};
 									}}
 								>
 									<input type="hidden" name="enrollmentId" value={course.enrollment_id} />
-									<button type="submit" class="rounded-xl border p-3 text-red-500 hover:bg-red-50">
-										<Trash2 size={18} />
+									<button
+										type="submit"
+										disabled={loadingEnrollments.includes(course.enrollment_id)}
+										class="flex h-11 items-center gap-2 rounded-xl border px-4 text-xs font-bold transition-all disabled:opacity-40 {course.is_blocked
+											? 'border-emerald-100 bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+											: 'border-orange-100 bg-orange-50 text-orange-600 hover:bg-orange-100'}"
+									>
+										{#if loadingEnrollments.includes(course.enrollment_id)}
+											<Loader2 size={16} class="animate-spin" />
+										{:else if course.is_blocked}
+											<Unlock size={16} />
+											{m.admin_student_course_unblock()}
+										{:else}
+											<Lock size={16} />
+											{m.admin_student_course_block()}
+										{/if}
+									</button>
+								</form>
+
+								<!-- O‘chirish tugmasi -->
+								<form
+									method="POST"
+									action="?/removeEnrollment"
+									use:enhance={() => {
+										const id = course.enrollment_id;
+										if (!confirm(m.admin_student_course_remove() + '?')) return;
+										loadingEnrollments = [...loadingEnrollments, id];
+
+										return async ({ result }) => {
+											if (result.type === 'success') {
+												courses = courses.filter((c) => c.enrollment_id !== id);
+												showToast(m.enroll_remove_success(), 'success');
+											}
+											loadingEnrollments = loadingEnrollments.filter((x) => x !== id);
+										};
+									}}
+								>
+									<input type="hidden" name="enrollmentId" value={course.enrollment_id} />
+									<button
+										type="submit"
+										disabled={loadingEnrollments.includes(course.enrollment_id)}
+										class="flex h-11 w-11 items-center justify-center rounded-xl border border-red-100 bg-red-50 text-red-500 transition-all hover:bg-red-100 disabled:opacity-40"
+										title={m.admin_student_course_remove()}
+									>
+										{#if loadingEnrollments.includes(course.enrollment_id)}
+											<Loader2 size={16} class="animate-spin" />
+										{:else}
+											<Trash2 size={18} />
+										{/if}
 									</button>
 								</form>
 							</div>
@@ -372,9 +312,7 @@
 					<div
 						class="rounded-2xl border-2 border-dashed border-slate-200 py-10 text-center text-slate-400"
 					>
-						{m.admin_student_no_courses
-							? m.admin_student_no_courses()
-							: 'Student hali hech qanday kursga biriktirilmagan'}
+						{m.admin_student_no_courses()}
 					</div>
 				{/if}
 			</div>
@@ -383,24 +321,24 @@
 		<div class="space-y-6 lg:col-span-1">
 			<div class="rounded-3xl border border-slate-100 bg-white p-6 text-center shadow-sm">
 				<h2 class="text-lg font-medium text-slate-600">
-					{m.admin_student_rank_title ? m.admin_student_rank_title() : 'Reyting o‘rni'}
+					{m.admin_student_rank_title()}
 				</h2>
-				<div class="mt-2 text-4xl font-bold text-slate-800">Top 15%</div>
+				<div class="mt-2 text-4xl font-bold text-slate-800">
+					{data.rankPercent ? m.admin_student_rank_percent({ percent: data.rankPercent }) : '—'}
+				</div>
 				<p class="text-sm text-slate-400">
-					{m.admin_student_rank_desc ? m.admin_student_rank_desc() : 'Jami studentlar orasida'}
+					{m.admin_student_rank_desc()}
 				</p>
 			</div>
 
 			<div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
 				<h2 class="mb-4 text-lg font-bold text-slate-800">
-					{m.admin_student_note_title ? m.admin_student_note_title() : 'Platforma eslatmasi'}
+					{m.admin_student_note_title()}
 				</h2>
 				<div class="flex gap-3 rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
 					<CheckCircle2 size={22} class="mt-0.5 text-blue-500" />
 					<p class="text-sm leading-relaxed text-blue-700/90">
-						{m.admin_student_note_desc
-							? m.admin_student_note_desc()
-							: 'Student barcha kurslarni 80%+ natija bilan tugatsa, avtomatik sertifikat beriladi.'}
+						{m.admin_student_note_desc()}
 					</p>
 				</div>
 			</div>

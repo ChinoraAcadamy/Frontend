@@ -46,14 +46,14 @@ export const load = async (event) => {
     };
 
     // Await ranking upfront to avoid lifecycle issues and provide instant data
-    const ranking = await getRanking(event);
+    const rankingData = await getRanking(event);
 
     return {
         user: event.locals.user,
         // Bular promise ko'rinishida qaytadi (streaming)
         lazy: {
             stats: fetchStats(),
-            ranking: ranking,
+            ranking: rankingData.results,
             newStudents: fetchNewStudents()
         }
     };

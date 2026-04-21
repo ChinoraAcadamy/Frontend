@@ -16,8 +16,7 @@ export async function getMyCourses({ cookies, url, fetch = globalThis.fetch }) {
     try {
         const res = await fetch(endpoint, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Accept-Language': getLocale()
+                'Authorization': `Bearer ${accessToken}`
             }
         });
 
