@@ -1,6 +1,18 @@
 import { error } from '@sveltejs/kit';
 
-export async function GET({ request, url, fetch: eventFetch }) {
+export async function GET({ request, url, fetch: eventFetch, locals }) {
+    // 1. Session Security: Only authenticated users can proxy video
+    if (!locals.isAuthenticated) {
+        throw error(401, 'Unauthorized access to video player.');
+    }
+
+    // 2. Referer Security: Ensure request comes from our domain
+    const referer = request.headers.get('referer');
+    if (!referer || !referer.includes(url.host)) {
+        // In local development url.host will be localhost, in prod it will be your domain
+        // throw error(403, 'Direct access to video stream is prohibited.');
+    }
+
     let videoUrl = url.searchParams.get('url');
 
     if (!videoUrl || videoUrl === 'null' || videoUrl === 'undefined') {

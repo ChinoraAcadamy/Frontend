@@ -72,6 +72,8 @@
 	let watermarkPos = $state({ top: 10, left: 10 });
 	let showWatermark = $state(true);
 	let watermarkInterval = $state(null);
+	let securityLocked = $state(false);
+	let securityViolationCount = $state(0);
 
 	// --- Assignment & Progress State ---
 	let selectedFile = $state(null);
@@ -99,19 +101,71 @@
 
 	// --- Security Handlers ---
 	function handleKeydown(e) {
-		const forbidden = [123, 44]; // F12, PrintScreen
-		const ctrlCombinations = [73, 74, 85, 83]; // I, J, U, S
+		const forbiddenCodes = [123, 44]; // F12, PrintScreen
+		const ctrlCombinations = [
+			73, // I (Inspect)
+			74, // J (Console)
+			85, // U (Source)
+			83, // S (Save)
+			80, // P (Print)
+			67 // C (Copy)
+		];
+
+		const isCtrlShift = (e.ctrlKey || e.metaKey) && e.shiftKey;
+		const isCtrl = e.ctrlKey || e.metaKey;
+		const isF12 = e.keyCode === 123;
+
 		if (
-			forbidden.includes(e.keyCode) ||
-			(e.ctrlKey && e.shiftKey && ctrlCombinations.slice(0, 2).includes(e.keyCode)) ||
-			(e.ctrlKey && ctrlCombinations.slice(2).includes(e.keyCode))
+			isF12 ||
+			(isCtrl && ctrlCombinations.includes(e.keyCode)) ||
+			(isCtrlShift && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67))
 		) {
 			e.preventDefault();
-			if (e.keyCode === 44)
+			securityViolationCount++;
+			if (e.keyCode === 44) {
 				toast.error(m.video_not_supported ? 'Screenshot taqiqlangan!' : 'Screenshot prohibited!');
+			}
 			return false;
 		}
 	}
+
+	function detectDevTools() {
+		if (typeof window === 'undefined') return;
+
+		// 1. The "Getter" Hack (Detects if console is open)
+		let devtoolsOpen = false;
+		const element = new Image();
+		Object.defineProperty(element, 'id', {
+			get: () => {
+				devtoolsOpen = true;
+				securityLocked = true;
+				return 'detector';
+			}
+		});
+		console.log(element);
+
+		// 2. Debugger Trap (Anti-debug loop)
+		const start = performance.now();
+		debugger;
+		const end = performance.now();
+		if (end - start > 100) {
+			securityLocked = true;
+		}
+	}
+
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+
+		const securityLoop = setInterval(() => {
+			detectDevTools();
+			if (securityLocked) {
+				console.clear();
+				if (player?.playing) player.pause();
+			}
+		}, 2000);
+
+		return () => clearInterval(securityLoop);
+	});
 
 	function handleOrientation() {
 		if (!player || !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
@@ -470,7 +524,8 @@
 						<div class="scrollbar-hide flex-1 overflow-y-auto p-3">
 							<div class="flex flex-col gap-1.5">
 								{#each module.lessons as l (l.id)}
-									{@const isAdmin = $page.data.user?.role === 'admin' || $page.data.user?.role === 'superadmin'}
+									{@const isAdmin =
+										$page.data.user?.role === 'admin' || $page.data.user?.role === 'superadmin'}
 									{#if l.can_access === false && !isAdmin}
 										<div
 											class="flex cursor-not-allowed items-center justify-between gap-3 rounded-2xl border border-slate-100/50 bg-slate-50 p-3 opacity-60"
@@ -501,7 +556,7 @@
 									{:else}
 										<a
 											href={resolve(
-												isAdmin 
+												isAdmin
 													? `/admin/courses/${$page.params.course_id}/lesson/${l.id}?module_id=${module.id}`
 													: `/kurslarim/${$page.params.id}/lessons/${l.id}?module_id=${module.id}`
 											)}
@@ -964,7 +1019,53 @@
 	</div>
 </div>
 
+<!-- Security Protection Overlay -->
+{#if securityLocked}
+	<div
+		class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-900 px-6 text-center text-white backdrop-blur-xl"
+		transition:fade
+	>
+		<div
+			class="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-pink-500/20 text-pink-500 shadow-2xl shadow-pink-500/20"
+		>
+			<Lock size={48} strokeWidth={2.5} />
+		</div>
+
+		<h2 class="mb-3 text-3xl font-black tracking-tight md:text-4xl">
+			{m.security_lock_title ? m.security_lock_title() : 'Xavfsizlik tizimi faollashdi'}
+		</h2>
+
+		<p class="mx-auto max-w-lg text-lg font-medium text-slate-400">
+			{m.security_lock_desc
+				? m.security_lock_desc()
+				: "Dars materiallarini ko'rish uchun DevTools (inspektor) panelini yoping va sahifani yangilang."}
+		</p>
+
+		<div class="mt-10 flex flex-col items-center gap-4">
+			<button
+				onclick={() => window.location.reload()}
+				class="rounded-2xl bg-white px-8 py-3.5 text-sm font-black tracking-widest text-slate-900 uppercase transition-all hover:scale-105 active:scale-95"
+			>
+				{m.refresh_page ? m.refresh_page() : 'Sahifani yangilash'}
+			</button>
+
+			<div
+				class="flex items-center gap-3 text-xs font-bold tracking-widest text-slate-500 uppercase"
+			>
+				<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-pink-500"></span>
+				Chinora Academy Security Guard
+			</div>
+		</div>
+	</div>
+{/if}
+
 <style>
+	:global(body) {
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
 	/* ... existing styles ... */
 
 	@media (max-width: 1023px) {

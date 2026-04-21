@@ -1,11 +1,13 @@
 <script>
-	import { Plus, Copy, BookOpen, Layers } from 'lucide-svelte';
+	import { Plus, Copy, BookOpen, Layers, ChevronDown, ChevronUp } from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
+	import { getLocale } from '@/lib/paraglide/runtime';
 
 	// +page.server.js dan keladi
 	let { courses = [] } = $props();
+	console.log(courses);
 
 	// Har bir kursga qo'shimcha UI meta (backend'da yo'q narsalar)
 	const courseMeta = [
@@ -23,10 +25,12 @@
 		}
 	];
 
-	// Narxni formatlash: "499000.00" → "499 000 so'm"
+	// Narxni formatlash
 	function formatPrice(price) {
 		const num = Math.round(parseFloat(price));
-		return num.toLocaleString('uz-UZ') + " so'm";
+		const locale = getLocale() === 'ru' ? 'ru-RU' : 'uz-UZ';
+		const currency = getLocale() === 'ru' ? ' сум' : " so'm";
+		return num.toLocaleString(locale) + currency;
 	}
 
 	let pricingPlans = $derived(
@@ -35,6 +39,9 @@
 			...(courseMeta[i] ?? { popular: false, cardNumber: '8600 5704 0753 9039' })
 		}))
 	);
+
+	let showAll = $state(false);
+	let displayedPlans = $derived(showAll ? pricingPlans : pricingPlans.slice(0, 3));
 
 	let isModalOpen = $state(false);
 	let chosenCardNumber = $state('');
@@ -60,124 +67,156 @@
 	}
 </script>
 
-<section id="pricing" class="bg-background py-20">
+<section id="pricing" class="bg-white py-24 md:py-32">
 	<div class="container mx-auto px-6">
-		<div class="mb-16 text-center">
-			<h2 class="mb-6 text-4xl font-bold text-foreground md:text-5xl">
+		<div class="mb-20 text-center">
+			<div
+				class="mb-4 inline-flex items-center rounded-lg bg-[#ed4b72]/5 px-4 py-1.5 text-[10px] font-black tracking-widest text-[#ed4b72] uppercase"
+			>
+				{m.nav_courses()}
+			</div>
+			<h2 class="mb-6 text-4xl font-black tracking-tighter text-slate-900 md:text-6xl">
 				{@html m.pricing_title()}
 			</h2>
-			<p class="text-muted-foreground mx-auto max-w-3xl text-xl">
+			<p class="mx-auto max-w-2xl text-lg leading-relaxed font-medium text-slate-500 md:text-xl">
 				{m.pricing_subtitle()}
 			</p>
 		</div>
 
-		<!-- Kurslar yo'q yoki load bo'lmagan holat -->
 		{#if courses.length === 0}
-			<div class="text-muted-foreground py-20 text-center">
-				<p>Kurslar hozircha mavjud emas.</p>
+			<div class="flex flex-col items-center justify-center py-20 text-center">
+				<div
+					class="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-50 text-slate-300"
+				>
+					<BookOpen size={40} />
+				</div>
+				<p class="text-xl font-bold text-slate-400">
+					{m.no_data_found ? m.no_data_found() : 'Kurslar hozircha mavjud emas.'}
+				</p>
 			</div>
 		{:else}
-			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-3">
-				{#each pricingPlans as plan (plan.id)}
+			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+				{#each displayedPlans as plan (plan.id)}
 					<div
-						class="group relative flex transform flex-col rounded-xl border border-transparent transition-all duration-300 hover:-translate-y-2 hover:shadow-lg
-                        {plan.popular
-							? 'bg-linear-to-br from-primary to-accent text-white shadow-md'
-							: 'bg-card text-card-foreground border-border'}"
+						class="group relative flex flex-col rounded-3xl border border-slate-100 bg-white p-8 transition-all duration-300 hover:border-[#ed4b72]/30 hover:bg-slate-50/50 {plan.popular
+							? 'border-2 border-[#ed4b72]/20 shadow-xl shadow-[#ed4b72]/5'
+							: ''}"
 					>
 						{#if plan.popular}
 							<div class="absolute -top-4 left-1/2 -translate-x-1/2">
 								<span
-									class="text-primary-foreground inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-semibold tracking-wide shadow-md"
+									class="flex items-center gap-1.5 rounded-full bg-[#ed4b72] px-6 py-1.5 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-[#ed4b72]/20"
 								>
 									{m.pricing_popular()}
 								</span>
 							</div>
 						{/if}
 
-						<div class="px-6 pt-8 pb-4 text-center">
-							<!-- Level badge (description maydoni: Beginner/Middle/Advance) -->
-							<span
-								class="mx-auto mb-4 inline-flex w-fit cursor-pointer items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors
-                                {plan.popular
-									? 'border-white/50 bg-black/30 text-white'
-									: 'border-primary/50 bg-primary/10 text-primary'}"
-							>
-								{plan.description}
-							</span>
+						<!-- Top Content Area -->
+						<div class="flex flex-1 flex-col">
+							<div class="mb-6">
+								<span
+									class="inline-flex rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black tracking-widest text-slate-500 uppercase"
+								>
+									{plan.level || 'Boshlang‘ich'}
+								</span>
+							</div>
 
-							<h3 class="mb-3 text-2xl leading-none font-bold tracking-tight">
+							<h3
+								class="mb-3 line-clamp-2 min-h-[3.5rem] text-2xl leading-none font-black tracking-tight text-slate-900 md:text-3xl"
+							>
 								{plan.title}
 							</h3>
 
-							<div class="mt-4 space-y-2">
+							<p class="mb-8 line-clamp-4 text-sm leading-relaxed text-slate-600">
+								{plan.description}
+							</p>
+						</div>
+
+						<!-- Bottom Content Area (Sticks to bottom) -->
+						<div class="mt-auto border-t border-slate-100 pt-8">
+							<div class="flex flex-col gap-1">
 								{#if plan.old_price}
-									<div
-										class="text-sm line-through opacity-70 {plan.popular
-											? 'text-white/70'
-											: 'text-muted-foreground'}"
-									>
+									<span class="text-sm font-bold text-slate-400 line-through">
 										{formatPrice(plan.old_price)}
-									</div>
+									</span>
 								{/if}
-								<div
-									class="text-4xl font-extrabold {plan.popular
-										? 'text-[#FFE4E4]'
-										: 'text-foreground'}"
-								>
+								<div class="text-4xl font-black tracking-tighter text-slate-900 md:text-5xl">
 									{formatPrice(plan.price)}
 								</div>
 							</div>
-						</div>
 
-						<div class="flex grow flex-col justify-between space-y-6 p-6">
-							<!-- Modul va darslar soni -->
-							<div class="space-y-3">
-								<div class="flex items-center gap-3">
-									<Layers class="h-5 w-5 shrink-0 {plan.popular ? 'text-white' : 'text-primary'}" />
-									<span class={plan.popular ? 'text-white/90' : 'text-muted-foreground'}>
-										{plan.modules_count} ta modul
+							<div class="mt-8 space-y-4">
+								<div class="group/item flex items-center gap-4">
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-[#ed4b72] transition-colors group-hover/item:bg-[#ed4b72] group-hover/item:text-white"
+									>
+										<Layers size={18} strokeWidth={2.5} />
+									</div>
+									<span
+										class="text-sm font-bold text-slate-600 transition-colors group-hover/item:text-slate-900"
+									>
+										{plan.modules_count}
+										{m.admin_courses_modules ? m.admin_courses_modules() : 'ta modul'}
 									</span>
 								</div>
-								<div class="flex items-center gap-3">
-									<BookOpen
-										class="h-5 w-5 shrink-0 {plan.popular ? 'text-white' : 'text-primary'}"
-									/>
-									<span class={plan.popular ? 'text-white/90' : 'text-muted-foreground'}>
-										{plan.lessons_count} ta dars
+								<div class="group/item flex items-center gap-4">
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-[#ed4b72] transition-colors group-hover/item:bg-[#ed4b72] group-hover/item:text-white"
+									>
+										<BookOpen size={18} strokeWidth={2.5} />
+									</div>
+									<span
+										class="text-sm font-bold text-slate-600 transition-colors group-hover/item:text-slate-900"
+									>
+										{plan.lessons_count}
+										{m.lesson_all_lessons
+											? m.lesson_all_lessons({ count: plan.lessons_count })
+											: 'ta dars'}
 									</span>
 								</div>
 							</div>
 
 							<button
 								onclick={() => handleRegisterClick(plan.cardNumber, plan.title)}
-								class="group relative mt-auto flex w-full items-center justify-center gap-4 rounded-lg px-6 py-3 text-lg leading-tight font-bold shadow-md transition-all duration-300 hover:shadow-lg
-                                {plan.popular
-									? 'bg-gradient-section text-secondary-foreground border border-[#C7A27C]/20 hover:border-[#C7A27C] hover:bg-[#C7A27C]/90'
-									: 'text-primary-foreground bg-linear-to-r from-primary to-accent hover:opacity-90'}"
+								class="mt-10 flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-[#ed4b72] px-8 text-lg font-black tracking-tight text-white shadow-lg shadow-[#ed4b72]/10 transition-all hover:bg-[#de3c61] active:scale-[0.98]"
 							>
 								{m.pricing_button()}
-								<span
-									class="flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 ease-in-out
-                                    {plan.popular
-										? 'text-secondary-foreground group-hover:bg-black/10'
-										: 'text-white group-hover:bg-white/20'}"
-								>
-									<Plus size={20} strokeWidth={2.5} />
-								</span>
+								<Plus size={20} strokeWidth={3} />
 							</button>
 						</div>
 					</div>
 				{/each}
 			</div>
+
+			{#if pricingPlans.length > 3}
+				<div class="mt-20 flex justify-center">
+					<button
+						onclick={() => (showAll = !showAll)}
+						class="group flex items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white px-10 py-5 text-lg font-black tracking-tight text-slate-900 transition-all hover:border-[#ed4b72] hover:text-[#ed4b72] active:scale-95"
+					>
+						{#if showAll}
+							<ChevronUp size={24} strokeWidth={3} />
+							{m.pricing_show_less()}
+						{:else}
+							<ChevronDown
+								size={24}
+								strokeWidth={3}
+								class="transition-transform group-hover:translate-y-1"
+							/>
+							{m.pricing_show_more()}
+						{/if}
+					</button>
+				</div>
+			{/if}
 		{/if}
 	</div>
 
 	<!-- Payment Modal -->
 	{#if isModalOpen}
 		<div
-			transition:fade={{ duration: 200 }}
-			class="fixed inset-0 z-50 flex items-center justify-center bg-background/60 p-4 backdrop-blur-sm"
+			transition:fade={{ duration: 300 }}
+			class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md"
 			onclick={handleCloseModal}
 			role="button"
 			tabindex="0"
@@ -186,8 +225,8 @@
 			}}
 		>
 			<div
-				transition:fly={{ y: 50, duration: 300 }}
-				class="bg-card border-border w-full max-w-md rounded-2xl border p-6 shadow-2xl"
+				transition:fly={{ y: 50, duration: 400, easing: (t) => t * t * (3 - 2 * t) }}
+				class="relative w-full max-w-lg overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white p-8 shadow-2xl shadow-slate-900/20 md:p-12"
 				onclick={(e) => e.stopPropagation()}
 				role="dialog"
 				aria-modal="true"
@@ -198,51 +237,75 @@
 					}
 				}}
 			>
-				<h2 class="mb-1 text-2xl leading-tight font-bold text-foreground">
-					{m.modal_title()}
-				</h2>
-				<p class="text-muted-foreground mb-4 text-sm">{chosenCourseTitle}</p>
-
+				<!-- Decoration -->
 				<div
-					class="border-border group mb-6 flex cursor-pointer items-center justify-between gap-2 rounded-xl border bg-muted/50 p-3 transition-colors hover:bg-muted"
-					onclick={handleCopyCardNumber}
-					role="button"
-					tabindex="0"
-					onkeydown={(e) => {
-						if (e.key === 'Enter') handleCopyCardNumber();
-					}}
-				>
-					<div class="font-mono text-lg font-semibold tracking-wider text-foreground">
-						{chosenCardNumber}
+					class="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-[#ed4b72]/10 blur-2xl"
+				></div>
+
+				<div class="mb-8 flex items-center justify-between">
+					<div>
+						<h2 class="text-3xl font-black tracking-tight text-slate-800">
+							{m.modal_title()}
+						</h2>
+						<p class="mt-2 font-bold text-[#ed4b72]">{chosenCourseTitle}</p>
 					</div>
-					<button
-						class="rounded-md p-2 text-primary transition-transform group-hover:scale-110 hover:bg-primary/10"
-					>
-						<Copy class="h-5 w-5" />
-					</button>
 				</div>
 
-				<div class="mb-4 text-sm font-medium text-foreground">{m.modal_card_owner()}</div>
-				<hr class="border-border mb-4 border-t" />
+				<div class="space-y-6">
+					<div class="group relative">
+						<div
+							class="absolute -inset-1 rounded-[2rem] bg-linear-to-r from-[#ed4b72] to-[#de3c61] opacity-25 blur transition duration-300 group-hover:opacity-40"
+						></div>
+						<div
+							class="relative flex cursor-pointer items-center justify-between gap-4 rounded-[1.5rem] border border-slate-100 bg-slate-50 p-6 transition-all hover:bg-white"
+							onclick={handleCopyCardNumber}
+							role="button"
+							tabindex="0"
+							onkeydown={(e) => {
+								if (e.key === 'Enter') handleCopyCardNumber();
+							}}
+						>
+							<div
+								class="font-mono text-2xl font-black tracking-[0.2em] text-slate-800 md:text-3xl"
+							>
+								{chosenCardNumber}
+							</div>
+							<div
+								class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#ed4b72] shadow-sm transition-transform hover:scale-110 active:scale-95"
+							>
+								<Copy size={24} />
+							</div>
+						</div>
+					</div>
 
-				<p class="text-muted-foreground mb-6 text-sm leading-relaxed">
-					{m.modal_instruction()}
-					<a
-						href="https://t.me/chinora_academy"
-						target="_blank"
-						class="font-semibold text-primary hover:underline"
+					<div class="flex items-center gap-3 px-2">
+						<div class="h-2 w-2 rounded-full bg-[#ed4b72]"></div>
+						<div class="text-sm font-black tracking-wider text-slate-400 uppercase">
+							{m.modal_card_owner()}
+						</div>
+					</div>
+
+					<div class="rounded-3xl border border-blue-100 bg-blue-50/50 p-6">
+						<p class="text-sm leading-relaxed font-medium text-slate-600">
+							{m.modal_instruction()}
+							<a
+								href="https://t.me/chinora_academy"
+								target="_blank"
+								class="font-black text-[#ed4b72] hover:underline"
+							>
+								{m.modal_tg_link()}
+							</a>
+							{m.modal_instruction2()}
+						</p>
+					</div>
+
+					<button
+						onclick={handleCloseModal}
+						class="mt-4 flex w-full items-center justify-center rounded-2xl bg-slate-900 py-5 text-lg font-black tracking-tight text-white transition-all hover:bg-slate-800 active:scale-[0.98]"
 					>
-						{m.modal_tg_link()}
-					</a>
-					{m.modal_instruction2()}
-				</p>
-
-				<button
-					onclick={handleCloseModal}
-					class="text-primary-foreground w-full rounded-lg bg-primary px-4 py-3 font-semibold transition-opacity hover:opacity-90"
-				>
-					{m.modal_close()}
-				</button>
+						{m.modal_close()}
+					</button>
+				</div>
 			</div>
 		</div>
 	{/if}
