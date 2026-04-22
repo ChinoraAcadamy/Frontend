@@ -7,6 +7,7 @@
 	import AdminCourseDetailView from '@/lib/components/ui/admin/AdminCourseDetailView.svelte';
 	import ModuleEditModal from '@/lib/components/ui/admin/ModuleEditModal.svelte';
 	import ActionMenu from '@/lib/components/ui/admin/ActionMenu.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 
@@ -34,7 +35,7 @@
 	// O'chirish formasi yuborilishidan oldin tasdiq so'rash
 	function handleDelete(msg) {
 		return async ({ cancel }) => {
-			const confirmed = confirm(msg || 'Davom etishni xohlaysizmi?');
+			const confirmed = confirm(msg || m.admin_confirm_continue());
 
 			if (!confirmed) {
 				cancel(); // Formani yuborishni to'xtatish
@@ -46,7 +47,7 @@
 			return async ({ update, result }) => {
 				isDeleting = false;
 				if (result.type === 'failure') {
-					alert(result.data?.error || 'Xatolik yuz berdi');
+					alert(result.data?.error || m.error_occurred());
 				}
 				await update();
 			};
@@ -61,10 +62,9 @@
 />
 
 <AdminCourseDetailView course={data.course} modules={data.modules}>
-
 	{#snippet adminModuleActions(mod)}
 		{#if isAdmin}
-			<ActionMenu label="Modul amallari">
+			<ActionMenu label={m.admin_module_actions()}>
 				{@render renderModuleEditAction(mod)}
 				{@render renderModuleDeleteAction(mod)}
 			</ActionMenu>
@@ -73,7 +73,7 @@
 
 	{#snippet adminLessonActions(lesson, mod)}
 		{#if isAdmin}
-			<ActionMenu label="Dars amallari">
+			<ActionMenu label={m.admin_lesson_actions()}>
 				{@render renderLessonViewAction(lesson, mod)}
 				{@render renderLessonAssignmentAction(lesson, mod)}
 				{@render renderLessonEditAction(lesson, mod)}
@@ -87,18 +87,20 @@
 			<div class="flex items-center gap-2">
 				<a
 					href={resolve(`/admin/courses/create/${$page.params.course_id}`)}
+					title={m.admin_add_module()}
 					class="flex h-10 items-center gap-2 rounded-xl bg-[#ed4b72] px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#d93a5f] active:scale-95"
 				>
 					<Plus size={18} strokeWidth={3} />
-					<span class="hidden sm:inline">Modul</span>
+					<span class="sm:inline">{m.admin_module_label()}</span>
 				</a>
 				{#if checkNotEmptyModule !== 0}
 					<a
 						href={resolve(`/admin/courses/create/${$page.params.course_id}/lesson`)}
+						title={m.admin_add_lesson()}
 						class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-[#ed4b72] hover:text-[#ed4b72] active:scale-95"
 					>
 						<BookPlus size={18} />
-						<span class="hidden sm:inline">Dars</span>
+						<span class="sm:inline">{m.admin_lesson_label()}</span>
 					</a>
 				{/if}
 			</div>
@@ -110,11 +112,11 @@
 			<div class="mt-4 overflow-hidden rounded-[32px] border border-red-100 bg-white shadow-sm">
 				<div class="border-b border-red-50 bg-red-50/50 p-6">
 					<h3 class="flex items-center gap-2 text-lg font-black text-red-700">
-						<AlertTriangle size={22} /> Danger Zone
+						<AlertTriangle size={22} />
+						{m.admin_danger_zone_title()}
 					</h3>
 					<p class="mt-2 text-sm font-medium text-red-600/70">
-						Kursni o'chirish barcha ma'lumotlarni (modullar, darslar, natijalar) butunlay yo'q
-						qiladi. Bu amalni ortga qaytarib bo'lmaydi.
+						{m.admin_danger_zone_description()}
 					</p>
 				</div>
 
@@ -122,7 +124,7 @@
 					<form
 						method="POST"
 						action="?/deleteCourse"
-						use:enhance={handleDelete("Rostdan ham bu kursni butunlay o'chirmoqchimisiz?")}
+						use:enhance={handleDelete(m.admin_danger_zone_confirm())}
 					>
 						<button
 							type="submit"
@@ -130,7 +132,7 @@
 							class="flex w-full items-center justify-center gap-3 rounded-2xl bg-red-600 py-4 text-base font-bold text-white shadow-lg shadow-red-200/50 transition-all hover:bg-red-700 active:scale-[0.98] disabled:opacity-50"
 						>
 							<Trash2 size={20} />
-							{isDeleting ? "O'chirilmoqda..." : "Kursni butunlay o'chirish"}
+							{isDeleting ? m.admin_danger_zone_deleting() : m.admin_danger_zone_delete_btn()}
 						</button>
 					</form>
 				</div>
@@ -143,7 +145,7 @@
 {#snippet renderModuleEditAction(mod)}
 	<button onclick={() => openModuleEdit(mod)} class="action-menu-item">
 		<Edit size={18} />
-		<span>Tahrirlash</span>
+		<span>{m.admin_courses_edit()}</span>
 	</button>
 {/snippet}
 
@@ -151,13 +153,13 @@
 	<form
 		method="POST"
 		action="?/deleteModule"
-		use:enhance={handleDelete("Modulni o'chirish?")}
+		use:enhance={handleDelete(m.admin_module_delete_confirm())}
 		class="w-full lg:w-auto"
 	>
 		<input type="hidden" name="module_id" value={mod.id} />
 		<button type="submit" class="action-menu-item">
 			<Trash2 size={18} />
-			<span>O'chirish</span>
+			<span>{m.admin_students_delete()}</span>
 		</button>
 	</form>
 {/snippet}
@@ -170,7 +172,7 @@
 		class="action-menu-item"
 	>
 		<Play size={18} />
-		<span>Ko'rish</span>
+		<span>{m.admin_courses_preview()}</span>
 	</a>
 {/snippet}
 
@@ -182,7 +184,7 @@
 		class="action-menu-item"
 	>
 		<FileText size={18} />
-		<span>Topshiriq</span>
+		<span>{m.admin_assignment_label()}</span>
 	</a>
 {/snippet}
 
@@ -194,7 +196,7 @@
 		class="action-menu-item"
 	>
 		<Edit size={18} />
-		<span>Tahrirlash</span>
+		<span>{m.admin_courses_edit()}</span>
 	</a>
 {/snippet}
 
@@ -202,14 +204,14 @@
 	<form
 		method="POST"
 		action="?/deleteLesson"
-		use:enhance={handleDelete("Darsni o'chirish?")}
+		use:enhance={handleDelete(m.admin_lesson_delete_confirm())}
 		class="w-full lg:w-auto"
 	>
 		<input type="hidden" name="module_id" value={mod.id} />
 		<input type="hidden" name="lesson_id" value={lesson.id} />
 		<button type="submit" class="action-menu-item">
 			<Trash2 size={18} />
-			<span>O'chirish</span>
+			<span>{m.admin_students_delete()}</span>
 		</button>
 	</form>
 {/snippet}

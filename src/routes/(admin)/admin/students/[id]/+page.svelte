@@ -200,11 +200,11 @@
 				{#if courses.length > 0}
 					{#each courses as course (course.enrollment_id)}
 						<div
-							class="group relative flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-5 transition-all hover:border-[#ed4b72]/10 hover:shadow-md sm:flex-row sm:items-center sm:justify-between {course.is_blocked
+							class="group relative flex flex-col gap-4 rounded-[32px] border border-slate-100 bg-white p-5 transition-all hover:border-[#ed4b72]/10 hover:shadow-md sm:flex-row sm:items-center sm:justify-between {course.is_blocked
 								? 'opacity-80 grayscale-[0.3]'
 								: ''}"
 						>
-							<div class="flex items-center gap-4">
+							<div class="flex min-w-0 flex-1 items-center gap-4">
 								<div
 									class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl transition-colors {course.is_blocked
 										? 'bg-slate-100 text-slate-400'
@@ -233,7 +233,7 @@
 								</div>
 							</div>
 
-							<div class="flex flex-wrap items-center gap-2 sm:justify-end">
+							<div class="flex shrink-0 items-center gap-2 sm:justify-end">
 								<!-- BLOKLASH/OCHISH tugmasi -->
 								<form
 									method="POST"

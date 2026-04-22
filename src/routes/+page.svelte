@@ -35,9 +35,9 @@
 
   <AboutInstruction />
 
-  <CourseContent />
+  <CourseContent courses={data.lazy.courses} />
 
-  <PricingSection courses={data.courses} />
+  <PricingSection courses={data.lazy.courses} />
 
   <Faq />
 

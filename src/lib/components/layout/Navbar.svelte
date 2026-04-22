@@ -1,9 +1,7 @@
 <script>
-	import { onMount, tick } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
-	import { getLocale } from '$lib/paraglide/runtime.js';
 	import LanguageSwitcher from '@/lib/components/ui/LanguageSwitcher.svelte';
 	import { Menu, X, User, LogIn, ChevronRight } from 'lucide-svelte';
 	import { gsap } from 'gsap';
@@ -87,16 +85,17 @@
 
 <div
 	class="fixed top-0 right-0 left-0 z-50 flex w-full justify-center transition-all duration-500"
-	class:pt-4={!scrolled}
-	class:pt-2={scrolled}
+	class:pt-2={!scrolled}
+	class:pt-1={scrolled}
 >
 	<nav
-		class="relative flex w-full max-w-7xl items-center justify-between rounded-[2rem] border border-white/30 bg-white/70 px-6 py-3 shadow-[0_8px_32px_rgba(237,75,114,0.15)] backdrop-blur-2xl transition-all duration-500 md:mx-6 md:px-10"
-		class:shadow-[0_4px_30px_rgba(237,75,114,0.2)]={scrolled}
+		class="relative flex w-full max-w-7xl items-center justify-between rounded-full border border-white/30 bg-white/70 px-6 py-1.5 shadow-[0_8px_32px_rgba(155,28,72,0.15)] backdrop-blur-2xl transition-all duration-500 md:mx-6 md:px-10"
+		class:bg-primary={scrolled}
+		class:shadow-[0_4px_30px_rgba(155,28,72,0.2)]={scrolled}
 		style="overflow: visible !important;"
 	>
 		<!-- Liquid Background Decor -->
-		<div class="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]">
+		<div class="pointer-events-none absolute inset-0 overflow-hidden rounded-4xl">
 			<div
 				class="absolute -top-10 -right-10 h-40 w-40 animate-pulse rounded-full bg-[#ed4b72]/10 blur-3xl"
 			></div>
@@ -139,7 +138,7 @@
 			{#if $page.data.isAuthenticated}
 				<a
 					href={resolve('/profil')}
-					class="flex items-center gap-2 rounded-full border-2 border-slate-900 bg-slate-900 px-7 py-3 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95"
+					class="flex items-center gap-2 rounded-full border-2 border-foreground bg-foreground px-6 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-foreground/10 transition-all hover:opacity-90 active:scale-95"
 				>
 					<User size={16} />
 					{m.nav_profile()}
@@ -147,7 +146,7 @@
 			{:else}
 				<a
 					href={resolve('/login')}
-					class="flex items-center gap-2 rounded-full bg-[#ed4b72] px-8 py-3.5 text-xs font-black tracking-widest text-white uppercase shadow-[0_8px_20px_rgba(237,75,114,0.3)] transition-all hover:bg-[#de3c61] hover:shadow-[0_12px_24px_rgba(237,75,114,0.4)] active:scale-95"
+					class="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-[0_8px_20px_rgba(155,28,72,0.3)] transition-all hover:bg-primary-light hover:shadow-[0_12px_24px_rgba(155,28,72,0.4)] active:scale-95"
 				>
 					<LogIn size={16} />
 					{m.nav_login()}
@@ -178,7 +177,7 @@
 <!-- Mobile Menu Overlay (Always in DOM for GSAP) -->
 <div
 	bind:this={mobileMenuRef}
-	class="invisible fixed inset-0 z-[100] flex flex-col overflow-hidden bg-white"
+	class="invisible fixed inset-0 z-100 flex flex-col overflow-hidden bg-[#EADBCF]"
 	style="clip-path: circle(0% at 100% 0%);"
 >
 	<!-- Liquid Decor -->
@@ -213,48 +212,48 @@
 
 	<div
 		bind:this={mobileContentRef}
-		class="relative z-10 flex flex-1 flex-col justify-center gap-8 px-10"
+		class="relative z-10 flex flex-1 flex-col justify-center gap-4 px-10"
 	>
 		{#each navLinks as link (link.id)}
 			<a
 				href="#{link.id}"
-				class="group flex items-center justify-between border-b border-slate-50 py-6 transition-all"
+				class="group flex items-center justify-between border-b border-slate-50 py-4 transition-all"
 				onclick={(e) => handleAnchorClick(e, link.id)}
 			>
 				<span
-					class="text-4xl font-black tracking-tighter text-slate-900 transition-colors group-hover:text-[#ed4b72]"
+					class="text-2xl font-bold tracking-tighter text-slate-900 transition-colors group-hover:text-[#ed4b72]"
 				>
 					{link.label}
 				</span>
 				<ChevronRight
-					size={32}
+					size={24}
 					class="-translate-x-4 text-[#ed4b72] opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
 				/>
 			</a>
 		{/each}
 
-		<div class="mt-12 flex flex-col gap-5">
+		<div class="mt-8 flex flex-col gap-4">
 			{#if !$page.data.isAuthenticated}
 				<a
 					href={resolve('/login')}
-					class="flex h-20 items-center justify-center rounded-3xl bg-[#ed4b72] text-xl font-black tracking-widest text-white uppercase shadow-2xl shadow-[#ed4b72]/30 transition-all active:scale-[0.98]"
+					class="flex h-14 items-center justify-center rounded-2xl bg-primary text-lg font-bold tracking-widest text-white uppercase shadow-xl shadow-primary/30 transition-all active:scale-[0.98]"
 					onclick={closeMenu}
 				>
-					<LogIn class="mr-3" size={24} />
+					<LogIn class="mr-3" size={20} />
 					{m.nav_login()}
 				</a>
 			{:else}
 				<a
 					href={resolve('/profil')}
-					class="flex h-20 items-center justify-center gap-4 rounded-3xl bg-slate-900 text-xl font-black tracking-widest text-white uppercase shadow-2xl transition-all active:scale-[0.98]"
+					class="flex h-14 items-center justify-center gap-4 rounded-2xl bg-foreground text-lg font-bold tracking-widest text-white uppercase shadow-xl transition-all active:scale-[0.98]"
 					onclick={closeMenu}
 				>
-					<User size={24} />
+					<User size={20} />
 					{m.nav_profile()}
 				</a>
 			{/if}
 
-			<div class="flex justify-center rounded-3xl bg-slate-50 p-6">
+			<div class="flex justify-center py-4">
 				<LanguageSwitcher variant="minimal" />
 			</div>
 		</div>
@@ -267,15 +266,9 @@
 	}
 
 	.logo-img {
-		height: 4.5rem; /* ~ h-18 */
+		height: 3.5rem; /* Reduced size */
 		width: auto;
 		transition: transform 0.3s ease;
-	}
-
-	@media (max-width: 768px) {
-		.logo-img {
-			height: 4rem; /* h-16 equivalent */
-		}
 	}
 
 	.desktop-nav {

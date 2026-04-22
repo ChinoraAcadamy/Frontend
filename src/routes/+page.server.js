@@ -7,22 +7,57 @@ export const load = async ({ fetch, setHeaders }) => {
     setHeaders({
         'Cache-Control': 'public, max-age=3600'
     });
-    try {
-        const response = await fetch(`${API_URL}/courses/`, {
-            headers: {
-                'Accept-Language': getLocale()
-            }
-        });
 
-        if (!response.ok) {
-            return { courses: [] };
+    // Kurslar ro'yxatini darhol olamiz (bu tez va SvelteKit dependency tracking uchun kerak)
+    const fetchCoursesList = async () => {
+        try {
+            const response = await fetch(`${API_URL}/courses/`, {
+                headers: {
+                    'Accept-Language': getLocale()
+                }
+            });
+            if (!response.ok) return [];
+            const data = await response.json();
+            return (data.results ?? []).filter((c) => c.is_published);
+        } catch (err) {
+            console.error('Courses list fetch error:', err);
+            return [];
         }
+    };
 
-        const data = await response.json();
-        return { courses: data.results ?? [] };
+    const courseListPromise = fetchCoursesList();
 
-    } catch (err) {
-        console.error('Courses fetch xatosi:', err);
-        return { courses: [] };
-    }
+    // Modullarni (details) lazy load qilamiz
+    const getCoursesWithDetails = async () => {
+        const courseList = await courseListPromise;
+        if (courseList.length === 0) return [];
+
+        return await Promise.all(
+            courseList.map(async (course) => {
+                try {
+                    // SvelteKit fetch o'rniga global fetch ishlatamiz (warning'ni oldini olish uchun)
+                    // Chunki bu joyda dependency tracking bizga kerak emas
+                    const res = await globalThis.fetch(`${API_URL}/courses/${course.id}/`, {
+                        headers: {
+                            'Accept-Language': getLocale()
+                        }
+                    });
+                    if (res.ok) {
+                        return await res.json();
+                    }
+                } catch (e) {
+                    console.error(`Course ${course.id} detail fetch error:`, e);
+                }
+                return course;
+            })
+        );
+    };
+
+    return {
+        lazy: {
+            courses: getCoursesWithDetails()
+        }
+    };
 };
+
+

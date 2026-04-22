@@ -19,7 +19,12 @@
 	let selectedCourseIds = $state([]);
 
 	let filteredCourses = $derived(
-		availableCourses.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
+		availableCourses.filter((c) => {
+			const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase());
+			const isNotEnrolled = !enrolledCourseIds.includes(c.id);
+			const isPublished = c.is_published;
+			return matchesSearch && isNotEnrolled && isPublished;
+		})
 	);
 
 	function toggleCourse(id) {
@@ -89,7 +94,10 @@
 							searchQuery = '';
 							onClose();
 						} else if (result.type === 'failure') {
-							const err = result.data?.createError;
+							let err = result.data?.createError;
+							if (typeof err === 'string' && err.includes('unique set')) {
+								err = m.err_already_enrolled();
+							}
 							showToast(
 								typeof err === 'string'
 									? err
@@ -127,14 +135,11 @@
 					{:else}
 						<div class="space-y-2">
 							{#each filteredCourses as course (course.id)}
-								{@const isEnrolled = enrolledCourseIds.includes(course.id)}
 								{@const isSelected = selectedCourseIds.includes(course.id)}
 								<button
 									type="button"
 									class="flex w-full items-center justify-between rounded-[20px] border p-4 text-left transition-all
-										{isEnrolled
-										? 'cursor-not-allowed border-slate-100 bg-slate-50 opacity-60'
-										: isSelected
+										{isSelected
 											? 'cursor-pointer border-[#ed4b72] bg-[#ed4b72]/5 shadow-sm'
 											: 'cursor-pointer border-slate-100 hover:border-slate-200 hover:bg-slate-50'}"
 									onclick={() => toggleCourse(course.id)}
@@ -142,40 +147,28 @@
 									<div class="flex items-center gap-3">
 										<div
 											class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors
-												{isEnrolled
-												? 'bg-emerald-50 text-emerald-500'
-												: isSelected
+												{isSelected
 													? 'bg-[#ed4b72] text-white'
 													: 'bg-slate-100 text-slate-500'}"
 										>
-											{#if isEnrolled}
-												<Check size={18} strokeWidth={3} />
-											{:else if isSelected}
+											{#if isSelected}
 												<Check size={18} strokeWidth={3} />
 											{:else}
 												<BookOpen size={18} />
 											{/if}
 										</div>
 										<div>
-											<h4 class="font-bold {isEnrolled ? 'text-slate-400' : 'text-slate-800'}">
+											<h4 class="font-bold text-slate-800">
 												{course.title}
 											</h4>
-											<p
-												class="text-xs {isEnrolled
-													? 'font-semibold text-emerald-500'
-													: 'text-slate-500'}"
-											>
-												{#if isEnrolled}
-													{m.already_enrolled ? m.already_enrolled() : 'Allaqachon biriktirilgan'}
-												{:else}
-													{course.price
-														? course.price.toLocaleString() +
-															' ' +
-															(m.price_label ? m.price_label() : 'UZS')
-														: m.course_free
-															? m.course_free()
-															: 'Bepul'}
-												{/if}
+											<p class="text-xs text-slate-500">
+												{course.price
+													? course.price.toLocaleString() +
+														' ' +
+														(m.price_label ? m.price_label() : 'UZS')
+													: m.course_free
+														? m.course_free()
+														: 'Bepul'}
 											</p>
 										</div>
 									</div>

@@ -98,7 +98,7 @@
 		<div bind:this={scrollContainer} class="flex gap-6 px-6 will-change-transform">
 			{#each targetAudience as item (item.title)}
 				<div
-					class="group hover:bg-primary-foreground border-foreground/20 min-w-300px max-w-xs shrink-0 cursor-pointer rounded-lg border bg-white p-4 transition-all duration-300"
+					class="luxury-card group min-w-[300px] max-w-xs shrink-0 cursor-pointer p-4 transition-all duration-300 hover:bg-muted"
 				>
 					<div class="flex h-full flex-col justify-between pb-2">
 						<div class="space-y-4">
@@ -113,7 +113,7 @@
 								</h3>
 							</div>
 						</div>
-						<div class="pb-0 pl-4">
+						<div class="pb-0 pl-4 mt-4">
 							<p class="text-muted-foreground text-base leading-relaxed">
 								{item.description}
 							</p>
@@ -121,6 +121,7 @@
 					</div>
 				</div>
 			{/each}
+
 		</div>
 	</div>
 

@@ -112,7 +112,7 @@
 					</div>
 
 					<!-- Stats Card -->
-					<div class="stats-card w-full border border-border/50 shadow-sm pt-6 bg-linear-to-br from-background via-muted/20 to-muted/40 rounded-2xl">
+					<div class="stats-card w-full border border-border/50 shadow-sm pt-6 bg-gradient-to-br from-background via-muted/40 to-background rounded-2xl">
 						<div class="p-6">
 							<h4 class="text-lg font-bold mb-6 text-foreground text-center">
 								{m.about_stats_title()}
@@ -131,6 +131,7 @@
 							</div>
 						</div>
 					</div>
+
 				</div>
 			</div>
 		</div>

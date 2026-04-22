@@ -96,12 +96,14 @@
 	}
 
 	.switcher-trigger.minimal {
-		background: #f8fafc;
-		border-color: #f1f5f9;
-		color: #475569;
-		padding: 8px 14px;
-		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.4);
+		backdrop-filter: blur(8px);
+		border-color: rgba(255, 255, 255, 0.2);
+		color: #1a0e13;
+		padding: 10px 16px;
+		border-radius: 14px;
 	}
+
 	.switcher-trigger.minimal:hover {
 		border-color: #f5c0cf;
 		background: #fdf2f6;
@@ -179,9 +181,5 @@
 		line-height: 1;
 	}
 
-	@media (max-width: 640px) {
-		.switcher-label {
-			display: none;
-		}
-	}
+
 </style>

@@ -3,13 +3,112 @@
 @plugin '@tailwindcss/typography';
 
 @theme {
-	--color-primary: #1a202c;
-	--color-secondary: #2d3748;
-	--color-accent: #4a5568;
-	--color-muted: #718096;
-	--color-background: #f7fafc;
-	--color-foreground: #2d3748;
+	--color-primary: #9B1C48;
+	--color-primary-light: #C43C66;
+	--color-secondary: #E7CBAA;
+	--color-background: #FCFAF7;
+	--color-foreground: #1A0E13;
+	--color-muted: #F4ECE6;
+	--color-border: #EADAC2;
 }
+
+@font-face {
+	font-family: 'tarsk';
+	src: url('$lib/assets/tarsk.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+.header-background {
+	background: #EADBCF;
+	position: relative;
+	overflow: hidden;
+}
+
+@media (min-width: 768px) {
+	.header-background {
+		background:
+			linear-gradient(to right, #fbf0e7 75%, transparent 75%),
+			url("/images/sewing-illustration.jpg") no-repeat center;
+		background-size: auto 80%, cover;
+		background-position: right center;
+	}
+
+	.header-background::before {
+		width: 75% !important;
+	}
+}
+
+.header-background::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-image:
+		linear-gradient(90deg, #f8e8db 2px, transparent 2px),
+		linear-gradient(0deg, #f8e8db 2px, transparent 2px);
+	background-size: 55px 55px;
+	background-position: 0 0;
+	width: 100%;
+	z-index: 0;
+}
+
+.luxury-card {
+	background-color: #FCF7F3;
+	border-radius: 1rem;
+	box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+	border: 1px solid #EADBCF;
+	position: relative;
+	overflow: hidden;
+}
+
+.luxury-button-primary {
+	padding: 0.75rem 2rem;
+	border-radius: 0.75rem;
+	background-color: #7E3057;
+	color: white;
+	font-weight: 600;
+	box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+	transition: background-color 0.3s;
+}
+
+.luxury-button-primary:hover {
+	background-color: #642443;
+}
+
+.shine-effect {
+	position: relative;
+}
+
+.shine-effect::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -100%;
+	width: 200%;
+	height: 200%;
+	background: linear-gradient(120deg,
+			rgba(255, 255, 255, 0) 30%,
+			rgba(255, 255, 255, 0.3) 50%,
+			rgba(255, 255, 255, 0) 70%);
+	animation: shine 5s infinite;
+	z-index: 0;
+}
+
+@keyframes shine {
+	0% {
+		left: -100%;
+	}
+
+	20% {
+		left: 80%;
+	}
+
+	100% {
+		left: 100%;
+	}
+}
+
 
 .reduce-motion * {
 	animation-duration: 0.01ms !important;

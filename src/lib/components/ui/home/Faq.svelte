@@ -25,7 +25,8 @@
 	}
 </script>
 
-<section id="faq" class="py-20 bg-gradient-section">
+<section id="faq" class="py-24 bg-background">
+
 	<div class="container mx-auto px-6">
 		<!-- Title -->
 		<div class="mb-16 text-center">
