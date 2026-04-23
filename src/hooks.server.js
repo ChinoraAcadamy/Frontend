@@ -147,4 +147,4 @@ export async function handleFetch({ event, request, fetch }) {
 	return fetch(request);
 }
 
-export const handle = sequence(authHandle, handleParaglide);
+export const handle = sequence(handleParaglide, authHandle);

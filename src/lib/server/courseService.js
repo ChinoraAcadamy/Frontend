@@ -4,9 +4,11 @@ import { API_URL } from '$env/static/private';
  * @param {string} accessToken - JWT Token
  * @param {any} course - Kurs obyekti
  * @param {typeof fetch} [fetch] - SvelteKit fetch (optional, defaults to global fetch)
+ * @param {string} [lang] - Language code (optional)
  * @returns {Promise<any>} - Progress bilan boyitilgan kurs
  */
-export async function enrichCourseWithProgress(accessToken, course, fetch) {
+export async function enrichCourseWithProgress(accessToken, course, fetch, lang = 'uz') {
+
     if (!course || !course.id) return course;
 
     // SvelteKit event.fetch load funksiyasidan tashqarida ishlatilsa warning beradi.
@@ -15,8 +17,12 @@ export async function enrichCourseWithProgress(accessToken, course, fetch) {
 
     try {
         const res = await fetcher(`${API_URL}/progress/courses/${course.id}/`, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Accept-Language': lang
+            }
         });
+
 
         if (res.ok) {
             const data = await res.json();
@@ -45,13 +51,16 @@ export async function enrichCourseWithProgress(accessToken, course, fetch) {
  * @param {string} accessToken - JWT Token
  * @param {any[]} courses - Kurslar ro'yxati
  * @param {typeof fetch} [fetch] - SvelteKit fetch (optional)
+ * @param {string} [lang] - Language code (optional)
  * @returns {Promise<any[]>} - Progress bilan boyitilgan ro'yxat
  */
-export async function enrichCoursesList(accessToken, courses, fetch) {
+export async function enrichCoursesList(accessToken, courses, fetch, lang = 'uz') {
+
     if (!courses || courses.length === 0) return [];
 
     // Parallel ravishda barcha progress so'rovlarini yuboramiz (Best Practice)
     return await Promise.all(
-        courses.map(course => enrichCourseWithProgress(accessToken, course, fetch))
+        courses.map(course => enrichCourseWithProgress(accessToken, course, fetch, lang))
     );
+
 }

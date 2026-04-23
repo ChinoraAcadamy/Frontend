@@ -4,22 +4,16 @@ import { enrichCourseWithProgress } from '@/lib/server/courseService.js';
 import { getLocale } from '@/lib/paraglide/runtime';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ params, cookies, }) => {
+export const load = async ({ params, cookies, fetch, locals }) => {
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw redirect(303, '/login');
-
-    // Progress yangilanayotganda kesh muammo tug'dirmasligi uchun load funksiyasida keshni olib tashlaymiz
-    /*
-    setHeaders({
-        'cache-control': 'private, max-age=60'
-    });
-    */
+    const lang = locals.lang || 'uz';
 
     const getCourseDetail = async () => {
-        const headers = { 'Authorization': `Bearer ${accessToken}`, 'Accept-Language': getLocale() };
+        const headers = { 'Authorization': `Bearer ${accessToken}`, 'Accept-Language': lang };
         try {
-            // SvelteKit's event.fetch is for dependencies tracking during load().
-            // For streamed data, global fetch avoids warnings.
+            // MUHIM: load funksiyasi tugaganidan keyin ishlaydigan (streaming) so'rovlar uchun 
+            // global fetch ishlatish kerak, aks holda SvelteKit lifecycle warning beradi.
             const res = await globalThis.fetch(`${API_URL}/courses/${params.id}/`, { headers });
 
             if (!res.ok) {
@@ -29,7 +23,7 @@ export const load = async ({ params, cookies, }) => {
             let course = await res.json();
 
             // Progressni biriktirish (global fetch ishlatadi)
-            course = await enrichCourseWithProgress(accessToken, course, globalThis.fetch);
+            course = await enrichCourseWithProgress(accessToken, course, globalThis.fetch, lang);
 
             // Fetch accurate lessons mapping
             if (course.modules && course.modules.length > 0) {

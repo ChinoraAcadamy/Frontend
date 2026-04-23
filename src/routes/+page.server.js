@@ -3,19 +3,13 @@ import { API_URL } from '$env/static/private';
 import { getLocale } from '$lib/paraglide/runtime.js';
 // import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ fetch, setHeaders }) => {
-    setHeaders({
-        'Cache-Control': 'public, max-age=3600'
-    });
+export const load = async ({ fetch, locals }) => {
+    const lang = locals.lang || 'uz';
 
     // Kurslar ro'yxatini darhol olamiz (bu tez va SvelteKit dependency tracking uchun kerak)
     const fetchCoursesList = async () => {
         try {
-            const response = await fetch(`${API_URL}/courses/`, {
-                headers: {
-                    'Accept-Language': getLocale()
-                }
-            });
+            const response = await fetch(`${API_URL}/courses/`);
             if (!response.ok) return [];
             const data = await response.json();
             return (data.results ?? []).filter((c) => c.is_published);
@@ -35,12 +29,12 @@ export const load = async ({ fetch, setHeaders }) => {
         return await Promise.all(
             courseList.map(async (course) => {
                 try {
-                    // SvelteKit fetch o'rniga global fetch ishlatamiz (warning'ni oldini olish uchun)
-                    // Chunki bu joyda dependency tracking bizga kerak emas
+                    // MUHIM: SvelteKit fetch o'rniga global fetch ishlatamiz.
+                    // Chunki bu load funksiyasi qaytganidan keyin ishlashi mumkin (streaming).
+                    // SvelteKit lifecycle warning'ini oldini olish uchun global fetch kerak.
+                    // Lekin handleFetch hook ishlamasligi sababli tilni qo'lda beramiz.
                     const res = await globalThis.fetch(`${API_URL}/courses/${course.id}/`, {
-                        headers: {
-                            'Accept-Language': getLocale()
-                        }
+                        headers: { 'Accept-Language': lang }
                     });
                     if (res.ok) {
                         return await res.json();
@@ -54,10 +48,8 @@ export const load = async ({ fetch, setHeaders }) => {
     };
 
     return {
-        lazy: {
-            courses: getCoursesWithDetails()
-        }
+        courses: getCoursesWithDetails()
     };
 };
 
-
+
