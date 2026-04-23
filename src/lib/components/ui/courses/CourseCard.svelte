@@ -22,10 +22,13 @@
 		: 'cursor-pointer border-slate-100 hover:-translate-y-1 hover:shadow-md hover:border-[#ef4444]/10'}"
 >
 	{#if is_blocked}
-		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-			<div class="rounded-full bg-white/80 p-3 shadow-sm backdrop-blur-sm">
+		<div class="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center p-4 text-center">
+			<div class="mb-3 rounded-full bg-white/80 p-3 shadow-sm backdrop-blur-sm">
 				<Lock size={24} class="text-slate-400" strokeWidth={2.5} />
 			</div>
+			<p class="max-w-[140px] text-[9px] font-black leading-relaxed tracking-widest text-slate-400 uppercase">
+				{m.course_contact_admin()}
+			</p>
 		</div>
 	{/if}
 

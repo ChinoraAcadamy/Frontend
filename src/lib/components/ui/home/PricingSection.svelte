@@ -1,4 +1,6 @@
 <script>
+	/* eslint-disable no-unused-vars */
+
 	import { Plus, Copy, BookOpen, Layers, ChevronDown, ChevronUp } from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { toast } from 'svelte-sonner';
@@ -70,7 +72,7 @@
 	<div class="container mx-auto px-6">
 		<div class="mb-20 text-center">
 			<div
-				class="mb-4 inline-flex items-center rounded-lg bg-[#ed4b72]/5 px-4 py-1.5 text-[10px] font-black tracking-widest text-[#ed4b72] uppercase"
+				class="mb-4 inline-flex items-center rounded-lg bg-[#ed4b72]/10 px-4 py-1.5 text-[10px] font-black tracking-widest text-[#ed4b72] uppercase"
 			>
 				{m.nav_courses()}
 			</div>
@@ -127,7 +129,7 @@
 								<div class="mb-6">
 									<span
 										class="inline-flex rounded-lg px-3 py-1 text-[10px] font-black tracking-widest uppercase {plan.popular
-											? 'bg-white/20 text-white'
+											? 'bg-white/30 text-white'
 											: 'bg-primary/10 text-primary'}"
 									>
 										{plan.level || 'Boshlang‘ich'}
@@ -135,7 +137,7 @@
 								</div>
 
 								<h3
-									class="mb-3 line-clamp-2 min-h-[3.5rem] text-2xl leading-none font-black tracking-tight md:text-3xl {plan.popular
+									class="mb-3 line-clamp-2 min-h-14 text-2xl leading-none font-black tracking-tight md:text-3xl {plan.popular
 										? 'text-white'
 										: 'text-slate-900'}"
 								>
@@ -144,7 +146,7 @@
 
 								<p
 									class="mb-8 line-clamp-4 text-sm leading-relaxed {plan.popular
-										? 'text-white/80'
+										? 'text-white/90'
 										: 'text-slate-600'}"
 								>
 									{plan.description}
@@ -161,8 +163,8 @@
 									{#if plan.old_price}
 										<span
 											class="text-sm font-bold line-through {plan.popular
-												? 'text-white/60'
-												: 'text-slate-400'}"
+												? 'text-white/80'
+												: 'text-slate-500'}"
 										>
 											{formatPrice(plan.old_price)}
 										</span>
@@ -180,7 +182,7 @@
 									<div class="group/item flex items-center gap-4">
 										<div
 											class="flex h-10 w-10 items-center justify-center rounded-xl transition-colors {plan.popular
-												? 'bg-white/20 text-white'
+												? 'bg-white/30 text-white'
 												: 'bg-slate-50 text-primary group-hover/item:bg-primary group-hover/item:text-white'}"
 										>
 											<Layers size={18} strokeWidth={2.5} />
@@ -197,7 +199,7 @@
 									<div class="group/item flex items-center gap-4">
 										<div
 											class="flex h-10 w-10 items-center justify-center rounded-xl transition-colors {plan.popular
-												? 'bg-white/20 text-white'
+												? 'bg-white/30 text-white'
 												: 'bg-slate-50 text-primary group-hover/item:bg-primary group-hover/item:text-white'}"
 										>
 											<BookOpen size={18} strokeWidth={2.5} />
@@ -298,7 +300,7 @@
 							class="absolute -inset-1 rounded-4xl bg-linear-to-r from-[#ed4b72] to-[#de3c61] opacity-25 blur transition duration-300 group-hover:opacity-40"
 						></div>
 						<div
-							class="relative flex cursor-pointer items-center justify-between gap-4 rounded-[1.5rem] border border-slate-100 bg-slate-50 p-5 transition-all hover:bg-white"
+							class="relative flex cursor-pointer items-center justify-between gap-4 rounded-3xl border border-slate-100 bg-slate-50 p-5 transition-all hover:bg-white"
 							onclick={handleCopyCardNumber}
 							role="button"
 							tabindex="0"
@@ -306,7 +308,7 @@
 								if (e.key === 'Enter') handleCopyCardNumber();
 							}}
 						>
-							<div class="font-mono text-xl font-bold tracking-[0.1em] text-slate-800 md:text-2xl">
+							<div class="font-mono text-xl font-bold tracking-widest text-slate-800 md:text-2xl">
 								{chosenCardNumber}
 							</div>
 							<div
@@ -319,7 +321,7 @@
 
 					<div class="flex items-center gap-3 px-2">
 						<div class="h-1.5 w-1.5 rounded-full bg-[#ed4b72]"></div>
-						<div class="text-[10px] font-black tracking-wider text-slate-400 uppercase">
+						<div class="text-[10px] font-black tracking-wider text-slate-500 uppercase">
 							{m.modal_card_owner()}
 						</div>
 					</div>

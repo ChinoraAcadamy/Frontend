@@ -49,27 +49,50 @@
 
 				// Agar bu segment parametr bo'lsa (masalan [id] yoki [lesson_id])
 				const isParam = routeSegments[i]?.startsWith('[') && routeSegments[i]?.endsWith(']');
+
 				if (isParam) {
 					const paramName = routeSegments[i].slice(1, -1).replace('...', '');
 
-					// page.data dan mos nomni qidirish
 					// 1. Agar dars bo'lsa
-					if (paramName.includes('lesson') && page.data.lesson?.title) {
+					if (
+						(paramName.includes('lesson') || paramName === 'lesson_id') &&
+						page.data.lesson?.title
+					) {
 						label = page.data.lesson.title;
 					}
-					// 2. Agar kurs bo'lsa
-					else if ((paramName === 'id' || paramName.includes('course')) && page.data.course?.title) {
+					// 2. Agar modul bo'lsa (parametr sifatida)
+					else if (
+						(paramName.includes('module') || paramName === 'module_id') &&
+						(page.data.module?.title || page.data.moduleData?.title)
+					) {
+						label = page.data.module?.title || page.data.moduleData?.title;
+					}
+					// 3. Agar kurs bo'lsa
+					else if (
+						(paramName === 'id' || paramName.includes('course') || paramName === 'course_id') &&
+						page.data.course?.title
+					) {
 						label = page.data.course.title;
 					}
-					// 3. Agar student bo'lsa
-					else if (paramName.includes('student') || paramName === 'id') {
+					// 4. Agar student bo'lsa
+					else if (paramName.includes('student') || paramName === 'student_id') {
 						if (page.data.student) {
-							label = `${page.data.student.first_name} ${page.data.student.last_name}`;
+							label = `${page.data.student.first_name || ''} ${page.data.student.last_name || ''}`.trim();
+							if (!label) label = page.data.student.username;
 						}
 					}
-					// 4. Fallback: Agar page.data da title bo'lsa va bu oxirgi segment bo'lsa
+					// 5. Fallback: Agar page.data da title bo'lsa va bu oxirgi segment bo'lsa
 					else if (i === segments.length - 1 && page.data.title) {
 						label = page.data.title;
+					}
+				} else {
+					// Segment parametr bo'lmasa ham (masalan "lessons" static segmenti)
+					// Uni modul nomi bilan almashtirishimiz mumkin, agar modul ma'lumotlari bo'lsa
+					if (
+						(seg.toLowerCase() === 'lessons' || seg.toLowerCase() === 'lesson') &&
+						(page.data.module?.title || page.data.moduleData?.title)
+					) {
+						label = page.data.module?.title || page.data.moduleData?.title;
 					}
 				}
 
@@ -91,7 +114,7 @@
 		>
 	{/if}
 	{#each items as item, i (item.href)}
-		{#if i > 0}
+		{#if i > 0 && item.isClickable}
 			<span class="separator">
 				<svg
 					viewBox="0 0 24 24"

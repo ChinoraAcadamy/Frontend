@@ -66,51 +66,51 @@
 
 <div class="mx-auto min-h-[calc(100vh-80px)] max-w-7xl bg-[#f8fafc] p-4 font-sans md:p-8">
 	<!-- Sarlavha va Qidiruv Qismi -->
-	<div class="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-		<div class="flex-1">
-			<h1 class="text-[28px] font-black tracking-tighter text-slate-900 uppercase md:text-4xl">
+	<div class="mb-10 flex flex-col justify-between gap-8 md:flex-row md:items-end">
+		<div class="flex-1 text-center md:text-left">
+			<h1 class="text-3xl font-black tracking-tighter text-slate-900 uppercase sm:text-4xl lg:text-5xl">
 				{m.courses_title()}
 			</h1>
 			<p
-				class="mt-2 max-w-xl text-[11px] font-black tracking-[0.2em] text-slate-400 uppercase opacity-80"
+				class="mx-auto mt-3 max-w-xl text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase opacity-70 md:mx-0 sm:text-[11px]"
 			>
 				{m.courses_subtitle()}
 			</p>
 		</div>
 
-		<div class="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center md:w-auto">
+		<div class="flex w-full flex-col items-center gap-4 sm:flex-row sm:justify-center md:w-auto md:justify-end">
 			<!-- View Toggle -->
 			<div
-				class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm"
+				class="flex w-full items-center justify-between gap-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm sm:w-auto"
 			>
 				<button
 					onclick={() => toggleView('grid')}
-					class="flex h-9 w-10 items-center justify-center rounded-lg transition-all
+					class="flex h-10 flex-1 items-center justify-center rounded-xl transition-all sm:w-11 sm:flex-none
 					{viewMode === 'grid'
-						? 'bg-[#9b1c48] text-white shadow-md shadow-[#9b1c48]/20'
+						? 'bg-[#9b1c48] text-white shadow-lg shadow-[#9b1c48]/20'
 						: 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}"
 				>
-					<LayoutGrid size={18} />
+					<LayoutGrid size={20} />
 				</button>
 				<button
 					onclick={() => toggleView('list')}
-					class="flex h-9 w-10 items-center justify-center rounded-lg transition-all
+					class="flex h-10 flex-1 items-center justify-center rounded-xl transition-all sm:w-11 sm:flex-none
 					{viewMode === 'list'
-						? 'bg-[#9b1c48] text-white shadow-md shadow-[#9b1c48]/20'
+						? 'bg-[#9b1c48] text-white shadow-lg shadow-[#9b1c48]/20'
 						: 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}"
 				>
-					<List size={18} />
+					<List size={20} />
 				</button>
 			</div>
 
-			<div class="relative flex-1 sm:w-72">
-				<Search size={14} class="absolute top-1/2 left-4 -translate-y-1/2 text-slate-400" />
+			<div class="relative w-full sm:w-80">
+				<Search size={16} class="absolute top-1/2 left-4 -translate-y-1/2 text-slate-400" />
 				<input
 					type="text"
 					placeholder={m.courses_search_placeholder()}
 					value={searchQuery}
 					oninput={handleSearch}
-					class="h-12 w-full rounded-xl border border-slate-200 bg-white pr-4 pl-11 text-[11px] font-black tracking-widest uppercase transition-all outline-none focus:border-[#9b1c48]/30 focus:ring-4 focus:ring-[#9b1c48]/5"
+					class="h-13 w-full rounded-2xl border border-slate-200 bg-white pr-4 pl-12 text-[11px] font-bold tracking-widest uppercase transition-all outline-none focus:border-[#9b1c48] focus:ring-4 focus:ring-[#9b1c48]/10"
 				/>
 			</div>
 		</div>
@@ -193,7 +193,7 @@
 			<div
 				class={viewMode === 'grid'
 					? 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-					: 'flex flex-col gap-4'}
+					: 'grid grid-cols-1 gap-5'}
 			>
 				{#each courses as course (course.id)}
 					<div class="animate-in fade-in slide-in-from-bottom-2 duration-300">

@@ -115,8 +115,8 @@
 
 	.admin-body {
 		flex: 1;
-		margin-left: 240px;
-		transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+		margin-left: 290px;
+		transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 		display: flex;
 		flex-direction: column;
 		min-width: 0; /* Overflow muammolarini oldini oladi */
@@ -124,7 +124,7 @@
 
 	/* Collapsed holati */
 	.admin-shell.collapsed .admin-body {
-		margin-left: 72px;
+		margin-left: 90px;
 	}
 
 	/* Mobile ekran */

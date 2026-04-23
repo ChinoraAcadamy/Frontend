@@ -38,10 +38,11 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
             .then(async (res) => (res.ok ? res.json() : null))
             .catch(() => null);
 
-        // Await only the primary content (Lesson) to ensure it renders ASAP
+        // Await primary content for breadcrumbs and rendering
         const lessonData = await lessonPromise;
+        const courseData = await coursePromise;
 
-        const nextLessonPromise = coursePromise.then(courseData => {
+        const nextLessonPromise = (async () => {
             if (!courseData) return null;
             const modules = courseData.modules || [];
             const allLessons = [];
@@ -55,7 +56,7 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
 
             const currentIndex = allLessons.findIndex(l => l.id.toString() === params.lesson_id.toString());
             return (currentIndex !== -1 && currentIndex < allLessons.length - 1) ? allLessons[currentIndex + 1] : null;
-        });
+        })();
 
         // Modulni alohida fetch qilamiz, chunki backendda faqat modul/lesson API'si user_progress va can_access beradi
         const moduleDataPromise = fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/`, { headers })
@@ -63,13 +64,11 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
 
         return {
             lesson: lessonData,
+            course: courseData,
+            module: await moduleDataPromise,
             lazy: {
                 nextLesson: nextLessonPromise,
                 moduleData: moduleDataPromise
-            },
-            breadcrumbs: {
-                course: "Mening kursim",
-                lesson: lessonData.title
             }
         };
 

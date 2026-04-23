@@ -2,10 +2,8 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
-	import { LogOut, ChevronRight, X } from 'lucide-svelte';
+	import { LogOut, X, PanelLeftClose, PanelLeftOpen } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
-
-	/** @type {{ user?: any, navItems?: { href?: string, label: string, icon?: any, exact?: boolean, divider?: boolean }[], collapsed?: boolean, mobileOpen?: boolean }} */
 
 	let {
 		user,
@@ -17,7 +15,6 @@
 	let loading = $state(false);
 	let currentPath = $derived($page.url.pathname);
 
-	/** @param {{ exact?: boolean, href?: string }} item */
 	function isActive(item) {
 		if (!item.href) return false;
 		if (item.exact) return currentPath === item.href;
@@ -25,546 +22,201 @@
 	}
 </script>
 
+<svelte:window onkeydown={(e) => e.key === 'Escape' && (mobileOpen = false)} />
+
 {#if mobileOpen}
 	<div
-		class="mobile-overlay"
-		role="button"
-		tabindex="-1"
-		aria-label={m.menu_close()}
+		class="fixed inset-0 z-800 bg-slate-900/30 backdrop-blur-sm lg:hidden"
 		onclick={() => (mobileOpen = false)}
-		onkeydown={(e) => e.key === 'Escape' && (mobileOpen = false)}
+		aria-hidden="true"
 	></div>
 {/if}
 
-<aside class="sidebar" class:collapsed class:mobile-open={mobileOpen}>
-	<!-- Logo -->
-	<div class="logo">
-		<div class="logo-icon">
-			<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M16 4C16 4 8 8 8 16C8 20.418 11.582 24 16 24C20.418 24 24 20.418 24 16C24 11.582 20.418 8 16 8"
-					stroke="white"
-					stroke-width="2.5"
-					stroke-linecap="round"
-				/>
-				<circle cx="16" cy="16" r="3" fill="white" />
-			</svg>
-		</div>
+<aside
+	class="fixed top-0 bottom-0 left-0 z-1000 flex flex-col border-r border-slate-100 bg-white transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+    {collapsed ? 'w-[90px] px-3' : 'w-[290px] px-5'} 
+    {mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}"
+>
+	<div
+		class="relative flex items-center justify-center transition-all duration-300 {collapsed
+			? 'py-3'
+			: 'py-2'}"
+	>
+		<a href={resolve('/')} class="group relative flex w-full items-center justify-center">
+			<div
+				class="relative flex items-center justify-center overflow-hidden transition-all duration-500 ease-in-out
+                {collapsed ? 'h-[52px] w-[52px] rounded-[20px]' : 'h-20 w-full rounded-[28px]'} 
+                bg-linear-to-br from-[#9b1c48] to-[#d73a6a] shadow-lg shadow-rose-900/20"
+			>
+				<div
+					class="absolute inset-0 bg-linear-to-tr from-white/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+				></div>
 
-		{#if !collapsed}
-			<div class="logo-text">
-				<span class="logo-main">Chinora</span>
-				<span class="logo-sub">Academy</span>
+				<div class="relative z-10 flex items-center justify-center gap-3 px-4">
+					<img
+						src="/logo/chinora-secondary.png"
+						alt="Logo"
+						class="h-9 w-9 object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+					/>
+					{#if !collapsed}
+						<span class="text-xl font-black tracking-tight text-white transition-all duration-300">
+							CHINORA
+						</span>
+					{/if}
+				</div>
 			</div>
-		{/if}
+		</a>
 
 		<button
-			class="mobile-close-btn"
-			aria-label={m.menu_close()}
+			class="absolute top-8 -right-2 rounded-full bg-white p-2 text-slate-400 shadow-lg lg:hidden"
 			onclick={() => (mobileOpen = false)}
 		>
-			<X size={20} />
+			<X size={18} />
 		</button>
 	</div>
 
-	<!-- Navigation -->
-	<nav class="nav" aria-label={m.admin_main_menu ? m.admin_main_menu() : 'Asosiy menyu'}>
+	<nav
+		class="no-scrollbar flex flex-1 flex-col overflow-y-auto pb-4 transition-all {collapsed
+			? 'gap-1'
+			: 'gap-2'}"
+	>
 		{#each navItems as item (item.href || item.label)}
 			{#if item.divider}
-				{#if !collapsed}
-					<div class="nav-divider">
-						<span class="nav-divider-text">{item.label}</span>
-					</div>
-				{:else}
-					<div class="nav-divider collapsed"></div>
-				{/if}
+				<div class="my-3 flex items-center px-4">
+					{#if !collapsed}
+						<span class="text-[10px] font-bold tracking-[2px] text-slate-400 uppercase"
+							>{item.label}</span
+						>
+					{:else}
+						<div class="h-px w-full bg-slate-100"></div>
+					{/if}
+				</div>
 			{:else}
 				{@const active = isActive(item)}
 				{@const Icon = item.icon}
 				<a
-					href={resolve(/** @type {any} */ (item.href))}
-					class="nav-item"
-					class:active
-					aria-current={active ? 'page' : undefined}
+					href={resolve(item.href)}
+					class="group relative flex items-center justify-center gap-4 rounded-2xl transition-all duration-300
+                    {collapsed ? 'mx-auto h-[52px] w-[52px] p-3' : 'w-full px-4 py-3.5'}
+                    {active
+						? 'bg-[#9b1c48] text-white shadow-lg shadow-rose-900/15'
+						: 'text-slate-500 hover:bg-slate-50 hover:text-[#9b1c48]'}"
 					onclick={() => (mobileOpen = false)}
 				>
-					<span class="nav-icon">
-						<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-					</span>
+					<div
+						class="flex shrink-0 items-center justify-center transition-transform duration-300 group-active:scale-90"
+					>
+						<Icon size={22} strokeWidth={active ? 2.5 : 2} />
+					</div>
+
 					{#if !collapsed}
-						<span class="nav-label">{item.label}</span>
+						<span class="flex-1 truncate text-[15px] font-semibold">{item.label}</span>
 						{#if active}
-							<ChevronRight size={14} class="nav-arrow" />
+							<div class="h-1.5 w-1.5 rounded-full bg-white/60"></div>
 						{/if}
+					{/if}
+
+					{#if collapsed}
+						<div
+							class="absolute left-full z-50 ml-4 hidden rounded-md bg-slate-900 px-2 py-1 text-xs font-medium whitespace-nowrap text-white group-hover:block"
+						>
+							{item.label}
+						</div>
 					{/if}
 				</a>
 			{/if}
 		{/each}
 	</nav>
 
-	<!-- Bottom: user + logout -->
-	<div class="sidebar-bottom">
-		<div class="user-card" class:centered={collapsed}>
-			{#if user?.picture}
-				<img src={user.picture} alt="{user.username} avatari" class="avatar" />
+	<div class="mt-auto flex flex-col transition-all {collapsed ? 'gap-2 pb-6' : 'gap-4 pb-8'}">
+		<button
+			class="flex items-center justify-center gap-3 px-4 py-2 text-slate-400 transition-all hover:text-[#9b1c48]"
+			onclick={() => (collapsed = !collapsed)}
+		>
+			{#if collapsed}
+				<PanelLeftOpen size={20} />
 			{:else}
-				<div class="avatar-placeholder" aria-hidden="true">
-					{(user?.first_name?.[0] || user?.username?.[0] || 'A').toUpperCase()}
+				<div class="flex w-full items-center gap-3">
+					<PanelLeftClose size={20} />
+					<span class="text-sm font-medium">{m.sidebar_collapse?.() || "Yig'ish"}</span>
 				</div>
 			{/if}
+		</button>
+
+		<div
+			class="relative flex items-center border border-slate-100 bg-slate-50/70 transition-all duration-300
+            {collapsed
+				? 'mx-auto w-[60px] flex-col gap-2 rounded-[32px] p-2'
+				: 'flex-row gap-3 rounded-[24px] p-2.5'}"
+		>
+			<div class="relative flex shrink-0 items-center justify-center">
+				{#if user?.picture}
+					<img
+						src={user.picture}
+						alt="Avatar"
+						class="h-11 w-11 rounded-full object-cover shadow-sm transition-all duration-500"
+					/>
+				{:else}
+					<div
+						class="flex h-11 w-11 items-center justify-center rounded-full bg-linear-to-br from-rose-100 to-rose-200 text-lg font-bold text-[#9b1c48] shadow-sm"
+					>
+						{user?.username?.[0]?.toUpperCase() || 'U'}
+					</div>
+				{/if}
+				<div
+					class="absolute -right-0.5 -bottom-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500"
+				></div>
+			</div>
 
 			{#if !collapsed}
-				<div class="user-info">
-					<span class="user-name">
-						{[user?.first_name, user?.last_name].filter(Boolean).join(' ') ||
-							user?.username ||
-							m.rank_student()}
-					</span>
-					<span class="user-role"
-						>{user?.role === 'student' ? m.role_student() : user?.role || 'student'}</span
-					>
+				<div class="min-w-0 flex-1 transition-all duration-300">
+					<p class="text-[14px] font-bold text-slate-900">
+						{user?.first_name || user?.username || 'Foydalanuvchi'}
+					</p>
+					<p class="text-[11px] font-semibold tracking-wider text-rose-600 uppercase">
+						{user?.role || 'Admin'}
+					</p>
 				</div>
 			{/if}
-		</div>
 
-		<form
-			method="POST"
-			action="/logout"
-			use:enhance={() => {
-				loading = true;
-				return async ({ update }) => {
-					// Serverdan redirect keladi, shuning uchun loading true qolgani yaxshi
-					await update();
-				};
-			}}
-		>
-			<button
-				type="submit"
-				disabled={loading}
-				class="logout-btn"
-				title={m.menu_logout()}
-				aria-label={m.menu_logout()}
+			<form
+				method="POST"
+				action="/logout"
+				class="flex w-full shrink-0 justify-center"
+				use:enhance={() => {
+					loading = true;
+					return async ({ update }) => await update();
+				}}
 			>
-				{#if loading}
-					<span class="spinner" aria-hidden="true"></span>
-				{:else}
-					<LogOut size={16} />
-				{/if}
-			</button>
-		</form>
+				<button
+					type="submit"
+					class="border-slate-150 flex items-center justify-center rounded-[14px] border bg-white text-slate-400 shadow-sm transition-all hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600
+                    {collapsed ? 'h-10 w-10' : 'h-10 w-10'}"
+					title="Chiqish"
+				>
+					{#if loading}
+						<div
+							class="h-4 w-4 animate-spin rounded-full border-2 border-rose-600 border-t-transparent"
+						></div>
+					{:else}
+						<LogOut size={16} strokeWidth={2.5} />
+					{/if}
+				</button>
+			</form>
+		</div>
 	</div>
-
-	<!-- Collapse toggle (faqat desktop) -->
-	<button
-		class="collapse-btn"
-		onclick={() => (collapsed = !collapsed)}
-		aria-label={collapsed ? m.sidebar_expand() : m.sidebar_collapse()}
-	>
-		<span class:rotate-180={!collapsed}>
-			<ChevronRight size={16} />
-		</span>
-	</button>
 </aside>
 
 <style>
-	.sidebar {
-		position: fixed;
-		top: 0;
-		left: 0;
-		bottom: 0;
-		width: 250px;
-		background: #ffffff;
-		border-right: 1px solid rgba(0, 0, 0, 0.05);
-		display: flex;
-		flex-direction: column;
-		padding: 24px 16px;
-		z-index: 1000;
-		transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-		box-shadow: 2px 0 16px rgba(0, 0, 0, 0.02);
-	}
-	.sidebar.collapsed {
-		width: 76px;
-		padding-left: 12px;
-		padding-right: 12px;
-	}
-
-	.logo {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		padding-bottom: 24px;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-		margin-bottom: 20px;
-		position: relative;
-		flex-shrink: 0;
-		transition: padding 0.3s ease;
-	}
-	.logo-icon {
-		width: 40px;
-		height: 40px;
-		background: linear-gradient(135deg, #9b1c48, #e54b7c);
-		border-radius: 12px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		box-shadow: 0 4px 12px rgba(155, 28, 72, 0.25);
-	}
-	.sidebar.collapsed .logo-icon {
-		width: 36px;
-		height: 36px;
-		margin: 0 auto;
-	}
-
-	.logo-icon svg {
-		width: 20px;
-		height: 20px;
-	}
-	.logo-text {
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-		white-space: nowrap;
-		min-width: 0;
-	}
-	.logo-main {
-		font-family: 'Inter', sans-serif;
-		font-size: 18px;
-		font-weight: 800;
-		color: #111827;
-		line-height: 1.1;
-		letter-spacing: -0.5px;
-	}
-	.logo-sub {
-		font-family: 'Inter', sans-serif;
-		font-size: 10px;
-		color: #9b1c48;
-		font-weight: 700;
-		letter-spacing: 2.5px;
-		text-transform: uppercase;
-		margin-top: 2px;
-	}
-
-	.mobile-close-btn {
+	.no-scrollbar::-webkit-scrollbar {
 		display: none;
-		position: absolute;
-		right: 0;
-		background: rgba(243, 244, 246, 0.8);
-		border: none;
-		color: #6b7280;
-		cursor: pointer;
-		padding: 6px;
-		border-radius: 8px;
-		transition: all 0.2s;
 	}
-	.mobile-close-btn:hover {
-		color: #111827;
-		background: #e5e7eb;
-	}
-
-	.nav {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-		overflow-y: auto;
-		overflow-x: hidden;
+	.no-scrollbar {
+		-ms-overflow-style: none;
 		scrollbar-width: none;
 	}
-	.nav::-webkit-scrollbar {
-		display: none;
-	}
 
-	.nav-item {
-		display: flex;
-		align-items: center;
-		gap: 14px;
-		padding: 12px 14px;
-		border-radius: 12px;
-		color: #6b7280;
-		text-decoration: none;
-		font-size: 14.5px;
-		font-weight: 600;
-		font-family: 'Inter', sans-serif;
-		transition: all 0.2s ease;
-		white-space: nowrap;
-		overflow: hidden;
-		position: relative;
-	}
-
-	.nav-divider {
-		margin: 16px 0 4px 0;
-		padding: 0 14px;
-		display: flex;
-		align-items: center;
-	}
-	.nav-divider-text {
-		font-size: 11px;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 1px;
-		color: #9ca3af;
-	}
-	.nav-divider.collapsed {
-		margin: 16px auto 8px auto;
-		width: 24px;
-		height: 1px;
-		background: #f3f4f6;
-	}
-
-	.nav-item:hover {
-		background: #fdf2f6;
-		color: #9b1c48;
-		transform: translateX(4px);
-	}
-
-	.nav-item.active {
-		background: linear-gradient(135deg, #9b1c48, #d73a6a);
-		color: white;
-		box-shadow: 0 6px 14px -4px rgba(155, 28, 72, 0.4);
-	}
-
-	.nav-item.active::before {
-		content: '';
-		position: absolute;
-		left: -16px;
-		top: 15%;
-		bottom: 15%;
-		width: 4px;
-		border-radius: 0 4px 4px 0;
-		background: #e54b7c;
-		display: block;
-	}
-	.sidebar.collapsed .nav-item.active::before {
-		left: -12px;
-	}
-
-	.nav-icon {
-		width: 24px;
-		height: 24px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-	}
-
-	.nav-label {
-		flex: 1;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	:global(.nav-arrow) {
-		opacity: 0.8;
-		flex-shrink: 0;
-		transition: transform 0.2s;
-	}
-	.nav-item.active :global(.nav-arrow) {
-		transform: translateX(2px);
-	}
-
-	.sidebar-bottom {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 10px;
-		padding-top: 20px;
-		border-top: 1px solid rgba(0, 0, 0, 0.04);
-		margin-top: 10px;
-		flex-shrink: 0;
-	}
-
-	.user-card {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		overflow: hidden;
-		flex: 1;
-		min-width: 0;
-		padding: 6px;
-		border-radius: 12px;
-		transition: background 0.2s;
-	}
-	.user-card:hover {
-		background: #f9fafb;
-	}
-	.user-card.centered {
-		justify-content: center;
-		padding: 6px 0;
-		background: transparent;
-	}
-
-	.avatar {
-		width: 38px;
-		height: 38px;
-		border-radius: 10px;
-		object-fit: cover;
-		flex-shrink: 0;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-	}
-	.avatar-placeholder {
-		width: 38px;
-		height: 38px;
-		border-radius: 10px;
-		flex-shrink: 0;
-		background: linear-gradient(135deg, #fce7f0, #f9a8c9);
-		color: #9b1c48;
-		font-size: 15px;
-		font-weight: 800;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 2px 8px rgba(249, 168, 201, 0.4);
-	}
-
-	.user-info {
-		display: flex;
-		flex-direction: column;
-		min-width: 0;
-		justify-content: center;
-	}
-	.user-name {
-		font-size: 14px;
-		font-weight: 700;
-		color: #111827;
-		font-family: 'Inter', sans-serif;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		line-height: 1.2;
-	}
-	.user-role {
-		font-size: 11.5px;
-		color: #9b1c48;
-		text-transform: capitalize;
-		font-weight: 600;
-		margin-top: 2px;
-	}
-
-	.logout-btn {
-		width: 38px;
-		height: 38px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 10px;
-		border: none;
-		background: #fff;
-		color: #9ca3af;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		flex-shrink: 0;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-		border: 1px solid rgba(0, 0, 0, 0.05);
-	}
-	.logout-btn:hover {
-		background: #fee2e2;
-		color: #ef4444;
-		border-color: rgba(239, 68, 68, 0.2);
-		transform: scale(1.05);
-	}
-	.logout-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-		transform: none;
-	}
-
-	.spinner {
-		display: inline-block;
-		width: 16px;
-		height: 16px;
-		border: 2.5px solid currentColor;
-		border-top-color: transparent;
-		border-radius: 50%;
-		animation: spin 0.8s linear infinite;
-	}
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	.collapse-btn {
-		position: absolute;
-		bottom: 28px;
-		right: -16px;
-		width: 32px;
-		height: 32px;
-		background: white;
-		border: 1px solid #f3f4f6;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-		cursor: pointer;
-		color: #6b7280;
-		z-index: 1001;
-		transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-	}
-	.collapse-btn:hover {
-		color: #9b1c48;
-		box-shadow: 0 6px 16px rgba(155, 28, 72, 0.15);
-		transform: scale(1.05);
-	}
-
-	:global(.collapse-btn span.rotate-180) {
-		transform: rotate(180deg);
-		transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-	}
-
-	/* Collapsed state adjustments */
-	.sidebar.collapsed .logo-text,
-	.sidebar.collapsed .nav-label,
-	.sidebar.collapsed .user-info {
-		opacity: 0;
-		width: 0;
-		display: none;
-	}
-	:global(.sidebar.collapsed .nav-arrow) {
-		display: none;
-	}
-
-	.sidebar.collapsed .nav-item {
-		padding: 12px;
-		justify-content: center;
-	}
-	.sidebar.collapsed .nav-item:hover {
-		transform: translateY(-2px);
-	}
-
-	/* Mobile */
-	@media (max-width: 1024px) {
-		.sidebar {
-			transform: translateX(-100%);
-			width: 280px !important;
-		}
-		.sidebar.mobile-open {
-			transform: translateX(0);
-		}
-		.collapse-btn {
-			display: none;
-		}
-		.mobile-close-btn {
-			display: flex;
-		}
-	}
-
-	.mobile-overlay {
-		position: fixed;
-		inset: 0;
-		background: rgba(17, 24, 39, 0.6);
-		backdrop-filter: blur(4px);
-		z-index: 800;
-		animation: fadeIn 0.3s ease-out forwards;
-	}
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-			backdrop-filter: blur(0px);
-		}
-		to {
-			opacity: 1;
-			backdrop-filter: blur(4px);
-		}
+	aside {
+		will-change: width, transform;
 	}
 </style>

@@ -9,8 +9,7 @@ export async function GET({ request, url, fetch: eventFetch, locals }) {
     // 2. Referer Security: Ensure request comes from our domain
     const referer = request.headers.get('referer');
     if (!referer || !referer.includes(url.host)) {
-        // In local development url.host will be localhost, in prod it will be your domain
-        // throw error(403, 'Direct access to video stream is prohibited.');
+        throw error(403, 'Direct access to video stream is prohibited.');
     }
 
     let videoUrl = url.searchParams.get('url');

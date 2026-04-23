@@ -7,8 +7,9 @@
 
 	const courseStyles = [
 		{ color: 'bg-primary', textColor: 'text-white' },
-		{ color: 'bg-primary/90', textColor: 'text-white' },
-		{ color: 'bg-primary/80', textColor: 'text-white' }
+		{ color: 'bg-primary/95', textColor: 'text-white' },
+		{ color: 'bg-primary/90', textColor: 'text-white' }
+
 	];
 
 	let openAccordions = $state({});
@@ -60,8 +61,9 @@
 						<div class="{style.color} {style.textColor} p-6">
 							<div class="mb-3 flex items-center justify-between">
 								<span
-									class="inline-flex items-center rounded-full border border-white/30 bg-white/20 px-2.5 py-0.5 text-xs font-semibold text-white"
+									class="inline-flex items-center rounded-full border border-white/40 bg-white/30 px-2.5 py-0.5 text-xs font-semibold text-white"
 								>
+
 									{course.level || m.level_beginner()}
 								</span>
 								<div class="flex items-center gap-1 text-sm font-medium">
@@ -119,9 +121,10 @@
 									{/if}
 								{/each}
 							{:else}
-								<div class="flex flex-col items-center justify-center py-12 text-slate-400 italic">
+								<div class="flex flex-col items-center justify-center py-12 text-slate-500 italic">
 									<p class="text-sm">{m.text_no_modules()}</p>
 								</div>
+
 							{/if}
 						</div>
 					</div>

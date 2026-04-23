@@ -138,7 +138,7 @@
 			<Menu size={24} />
 		</button>
 
-		{#if page.url.pathname.split('/').filter(Boolean).length > 2 && user.role === 'admin'}
+		{#if page.url.pathname.split('/').filter(Boolean).length > 2}
 			<div class="mr-4 flex items-center">
 				<Breadcrumb inNavbar={true} />
 			</div>
@@ -150,7 +150,7 @@
 				type="text"
 				placeholder={m.admin_search_placeholder ? m.admin_search_placeholder() : 'Qidirish...'}
 				bind:value={searchQuery}
-				class="w-full rounded-xl border border-[#f0f0f0] bg-gray-50 py-2.25 pr-4 pl-10 text-sm text-[#1a0e13] transition-all duration-150 outline-none focus:border-[#C43C66] focus:bg-white focus:ring-[3px] focus:ring-[#C43C66]/10"
+				class="w-full rounded-xl border border-[#f0f0f0] bg-gray-50 py-2.25 pr-4 pl-10 text-sm text-[#1a0e13] transition-all duration-150 outline-none focus:border-primary-light focus:bg-white focus:ring-[3px] focus:ring-primary-light/10"
 			/>
 		</div>
 	</div>
@@ -159,7 +159,7 @@
 		<LanguageSwitcher variant="minimal" />
 
 		<button
-			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-[#9B1C48] lg:hidden"
+			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-primary lg:hidden"
 			aria-label={m.admin_search_label ? m.admin_search_label() : 'Qidirish'}
 		>
 			<Search size={18} />
@@ -179,8 +179,8 @@
 
 		<div>
 			<button
-				class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-[#9B1C48] {isA11yOpen
-					? 'border-[#f5c0cf] bg-[#fdf2f6] text-[#9B1C48]'
+				class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-primary {isA11yOpen
+					? 'border-[#f5c0cf] bg-[#fdf2f6] text-primary'
 					: ''}"
 				onclick={() => (isA11yOpen = !isA11yOpen)}
 				aria-label={m.admin_a11y_label ? m.admin_a11y_label() : 'Maxsus imkoniyatlar'}
@@ -221,7 +221,7 @@
 								>
 									<Minus size={18} />
 								</button>
-								<span class="font-bold text-[#9B1C48]">{Math.round(zoomLevel * 100)}%</span>
+								<span class="font-bold text-primary">{Math.round(zoomLevel * 100)}%</span>
 								<button
 									onclick={() => changeZoom(0.1)}
 									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
@@ -245,7 +245,7 @@
 								>
 									<Minus size={18} />
 								</button>
-								<span class="font-bold text-[#9B1C48]">{lineHeight.toFixed(1)}</span>
+								<span class="font-bold text-primary">{lineHeight.toFixed(1)}</span>
 								<button
 									onclick={() => changeLineHeight(0.1)}
 									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
@@ -260,7 +260,7 @@
 							<button
 								onclick={toggleGrayscale}
 								class="flex w-full items-center justify-between rounded-2xl border p-3 {isGrayscale
-									? 'border-[#9B1C48] bg-[#fdf2f6]'
+									? 'border-primary bg-[#fdf2f6]'
 									: 'border-gray-100 hover:bg-gray-50'}"
 							>
 								<div class="flex items-center gap-3">
@@ -275,7 +275,7 @@
 							<button
 								onclick={toggleHighContrast}
 								class="flex w-full items-center justify-between rounded-2xl border p-3 {isHighContrast
-									? 'border-[#9B1C48] bg-[#fdf2f6]'
+									? 'border-primary bg-[#fdf2f6]'
 									: 'border-gray-100 hover:bg-gray-50'}"
 							>
 								<div class="flex items-center gap-3">
@@ -292,7 +292,7 @@
 							<button
 								onclick={toggleReducedMotion}
 								class="flex w-full items-center justify-between rounded-2xl border p-3 {isReducedMotion
-									? 'border-[#9B1C48] bg-[#fdf2f6]'
+									? 'border-primary bg-[#fdf2f6]'
 									: 'border-gray-100 hover:bg-gray-50'}"
 							>
 								<div class="flex items-center gap-3">
@@ -309,7 +309,7 @@
 							<button
 								onclick={toggleDyslexiaFont}
 								class="flex w-full items-center justify-between rounded-2xl border p-3 {isDyslexiaFont
-									? 'border-[#9B1C48] bg-[#fdf2f6]'
+									? 'border-primary bg-[#fdf2f6]'
 									: 'border-gray-100 hover:bg-gray-50'}"
 							>
 								<div class="flex items-center gap-3">
@@ -329,13 +329,13 @@
 		</div>
 
 		<button
-			class="relative hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-[#9B1C48]"
+			class="relative hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-primary"
 			aria-label={m.admin_notifications_label ? m.admin_notifications_label() : 'Bildirishnomalar'}
 		>
 			<Bell size={18} />
 			{#if notificationCount > 0}
 				<span
-					class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border-2 border-white bg-[#9B1C48] text-[10px] font-bold text-white"
+					class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border-2 border-white bg-primary text-[10px] font-bold text-white"
 				>
 					{notificationCount}
 				</span>
@@ -350,7 +350,7 @@
 			/>
 		{:else}
 			<div
-				class="hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-full border-2 border-[#f0f0f0] bg-linear-to-br from-[#C7A27C] to-[#9B1C48] font-bold text-white"
+				class="hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-full border-2 border-[#f0f0f0] bg-linear-to-br from-[#C7A27C] to-primary font-bold text-white"
 			>
 				{(user?.first_name?.[0] || user?.username?.[0] || 'A').toUpperCase()}
 			</div>

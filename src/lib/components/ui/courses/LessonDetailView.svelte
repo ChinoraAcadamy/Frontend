@@ -142,10 +142,10 @@
 				return 'detector';
 			}
 		});
-		console.log(element);
 
 		// 2. Debugger Trap (Anti-debug loop)
 		const start = performance.now();
+		// eslint-disable-next-line no-debugger
 		debugger;
 		const end = performance.now();
 		if (end - start > 100) {
@@ -1022,7 +1022,7 @@
 <!-- Security Protection Overlay -->
 {#if securityLocked}
 	<div
-		class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-900 px-6 text-center text-white backdrop-blur-xl"
+		class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-slate-900 px-6 text-center text-white backdrop-blur-xl"
 		transition:fade
 	>
 		<div
