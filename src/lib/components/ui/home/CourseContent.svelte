@@ -1,4 +1,6 @@
 <script lang="ts">
+	/* eslint-disable no-unused-vars */
+
 	import { CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
 	import * as m from '$lib/paraglide/messages.js';
@@ -9,7 +11,6 @@
 		{ color: 'bg-primary', textColor: 'text-white' },
 		{ color: 'bg-primary/95', textColor: 'text-white' },
 		{ color: 'bg-primary/90', textColor: 'text-white' }
-
 	];
 
 	let openAccordions = $state({});
@@ -43,13 +44,63 @@
 		</div>
 
 		{#await courses}
-			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
 				{#each Array(3) as _, i (i)}
 					<div
-						class="h-[400px] animate-pulse rounded-[32px] border border-border bg-white/50"
-					></div>
+						class="relative flex h-[480px] flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm"
+						in:fade={{ duration: 300, delay: i * 100 }}
+					>
+						<!-- Shimmer effect -->
+						<div class="shimmer absolute inset-0 z-10"></div>
+
+						<!-- Header Area Skeleton -->
+						<div class="bg-slate-50 p-8 pb-10">
+							<div class="mb-4 flex items-center justify-between">
+								<div class="h-6 w-24 rounded-full bg-slate-200"></div>
+								<div class="h-5 w-16 rounded-lg bg-slate-200"></div>
+							</div>
+							<div class="h-8 w-full rounded-xl bg-slate-200"></div>
+							<div class="mt-2 h-8 w-3/4 rounded-xl bg-slate-200"></div>
+						</div>
+
+						<!-- Content Area Skeleton -->
+						<div class="flex-1 space-y-5 p-8">
+							{#each Array(4) as _, i (i)}
+								<div class="flex items-center gap-4">
+									<div class="h-5 w-5 shrink-0 rounded-full bg-slate-100"></div>
+									<div class="h-4 w-full rounded-lg bg-slate-100"></div>
+								</div>
+							{/each}
+
+							<div class="mt-auto pt-4">
+								<div class="h-14 w-full rounded-2xl bg-slate-100"></div>
+							</div>
+						</div>
+					</div>
 				{/each}
 			</div>
+
+			<style>
+				.shimmer {
+					background: linear-gradient(
+						90deg,
+						rgba(255, 255, 255, 0) 0%,
+						rgba(255, 255, 255, 0.6) 50%,
+						rgba(255, 255, 255, 0) 100%
+					);
+					background-size: 200% 100%;
+					animation: shimmer-anim 2s infinite linear;
+				}
+
+				@keyframes shimmer-anim {
+					0% {
+						background-position: -200% 0;
+					}
+					100% {
+						background-position: 200% 0;
+					}
+				}
+			</style>
 		{:then resolvedCourses}
 			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 				{#each showAll ? resolvedCourses : resolvedCourses.slice(0, 3) as course, i (course.id)}
@@ -63,7 +114,6 @@
 								<span
 									class="inline-flex items-center rounded-full border border-white/40 bg-white/30 px-2.5 py-0.5 text-xs font-semibold text-white"
 								>
-
 									{course.level || m.level_beginner()}
 								</span>
 								<div class="flex items-center gap-1 text-sm font-medium">
@@ -124,7 +174,6 @@
 								<div class="flex flex-col items-center justify-center py-12 text-slate-500 italic">
 									<p class="text-sm">{m.text_no_modules()}</p>
 								</div>
-
 							{/if}
 						</div>
 					</div>

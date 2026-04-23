@@ -28,15 +28,22 @@ export const load = async ({ fetch, locals }) => {
         return await Promise.all(
             courseList.map(async (course) => {
                 try {
-                    // MUHIM: SvelteKit fetch o'rniga global fetch ishlatamiz.
-                    // Chunki bu load funksiyasi qaytganidan keyin ishlashi mumkin (streaming).
-                    // SvelteKit lifecycle warning'ini oldini olish uchun global fetch kerak.
-                    // Lekin handleFetch hook ishlamasligi sababli tilni qo'lda beramiz.
-                    const res = await globalThis.fetch(`${API_URL}/courses/${course.id}/`, {
-                        headers: { 'Accept-Language': lang }
-                    });
+                    // SvelteKit fetch o'rniga global fetch ishlatamiz.
+                    const headers = { 'Accept-Language': lang };
+                    
+                    // 1-urinish: Kurs detallari (modules bilan)
+                    const res = await globalThis.fetch(`${API_URL}/courses/${course.id}/`, { headers });
                     if (res.ok) {
                         return await res.json();
+                    }
+
+                    // 2-urinish: Agar detail 500/404 bersa, faqat modullarni o'zini olamiz (curriculum uchun)
+                    const modulesRes = await globalThis.fetch(`${API_URL}/courses/${course.id}/modules/`, { headers });
+                    if (modulesRes.ok) {
+                        const modulesData = await modulesRes.json();
+                        // Backend list yoki results formatida qaytarishi mumkin
+                        course.modules = modulesData.results || modulesData;
+                        return course;
                     }
                 } catch (e) {
                     console.error(`Course ${course.id} detail fetch error:`, e);
