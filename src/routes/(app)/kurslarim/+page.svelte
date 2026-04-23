@@ -165,7 +165,7 @@
 					<h3 class="mb-2 text-xl font-black tracking-tighter text-slate-800 uppercase">
 						{m.courses_not_found()}
 					</h3>
-					<p class="mb-6 max-w-sm text-[11px] font-black tracking-[0.1em] text-slate-400 uppercase">
+					<p class="mb-6 max-w-sm text-[11px] font-black tracking-widest text-slate-400 uppercase">
 						{m.courses_not_found_desc({ query: searchQuery })}
 					</p>
 					<button
@@ -178,7 +178,7 @@
 					<h3 class="mb-2 text-xl font-black tracking-tighter text-slate-800 uppercase">
 						{m.courses_empty()}
 					</h3>
-					<p class="mb-8 max-w-md text-[11px] font-black tracking-[0.1em] text-slate-400 uppercase">
+					<p class="mb-8 max-w-md text-[11px] font-black tracking-widest text-slate-400 uppercase">
 						{m.courses_empty_desc()}
 					</p>
 					<button

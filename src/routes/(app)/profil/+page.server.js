@@ -27,7 +27,19 @@ export const load = async ({ cookies, fetch, setHeaders }) => {
         }
 
         const profile = await res.json();
-        return { profile };
+
+        // Fetch active devices
+        const devicesRes = await fetch(`${API_URL}/auth/devices/`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept-Language': getLocale()
+            }
+        });
+
+        const devicesData = await devicesRes.json().catch(() => ({ results: [] }));
+        const devices = devicesData.results || [];
+
+        return { profile, devices };
     } catch (err) {
         console.error("[Profile Load] Error:", err);
         if (err.status) throw err;
@@ -37,6 +49,38 @@ export const load = async ({ cookies, fetch, setHeaders }) => {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
+    logoutDevice: async ({ request, cookies, fetch }) => {
+        const token = cookies.get('access_token');
+        if (!token) return { success: false, error: m.err_auth_required ? m.err_auth_required() : 'Avtorizatsiya talab qilinadi' };
+
+        const formData = await request.formData();
+        const sessionId = formData.get('session_id');
+
+        try {
+            const res = await fetch(`${API_URL}/auth/logout-device/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept-Language': getLocale()
+                },
+                body: JSON.stringify({ session_id: sessionId })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                return { success: false, error: translateServerMessage(errData, m) || (m.profile_device_logout_error ? m.profile_device_logout_error() : "Xatolik yuz berdi") };
+            }
+
+            return { 
+                success: true, 
+                message: m.profile_device_logout_success ? m.profile_device_logout_success() : "Qurilma o'chirildi" 
+            };
+        } catch (err) {
+            console.error("[Device Logout] Error:", err);
+            return { success: false, error: m.error_occurred ? m.error_occurred() : 'Server bilan ulanishda xatolik.' };
+        }
+    },
     updateProfile: async ({ request, cookies, fetch }) => {
         const token = cookies.get('access_token');
         if (!token) return { success: false, error: m.err_auth_required ? m.err_auth_required() : 'Avtorizatsiya talab qilinadi' };

@@ -1,10 +1,22 @@
 <script lang="ts">
+	/* eslint-disable no-unused-vars */
 	// import InputField from '@/lib/components/ui/InputField.svelte';
 	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
-	import { User, Shield, Info, Save, Settings as SettingsIcon } from 'lucide-svelte';
+	import {
+		User,
+		Shield,
+		Info,
+		Save,
+		Settings as SettingsIcon,
+		Smartphone,
+		Monitor,
+		Trash2,
+		ChevronRight
+	} from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { fade } from 'svelte/transition';
+	import { page } from '$app/stores';
 	import * as m from '$lib/paraglide/messages.js';
 
 	let { data, form: serverForm } = $props();
@@ -19,6 +31,24 @@
 	});
 
 	let isSubmitting = $state(false);
+	let activeTab = $state('basic'); // 'basic' or 'devices'
+
+	const parseUserAgent = (ua) => {
+		if (!ua) return m.profile_device_unknown();
+		if (ua.includes('iPhone') || ua.includes('Android')) return 'Mobile';
+		if (ua.includes('Macintosh') || ua.includes('Windows') || ua.includes('Linux'))
+			return 'Desktop';
+		return 'Device';
+	};
+
+	const formatDeviceName = (ua) => {
+		if (!ua) return m.profile_device_unknown();
+		if (ua.includes('Chrome')) return 'Chrome';
+		if (ua.includes('Firefox')) return 'Firefox';
+		if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+		if (ua.includes('Edge')) return 'Edge';
+		return ua.split(' ')[0] || m.profile_device_unknown();
+	};
 
 	// Ma'lumotlar kelganda formani to'ldiramiz
 	function syncData(user) {
@@ -26,12 +56,17 @@
 			profileForm.firstName = user['first_name'] || '';
 			profileForm.lastName = user['last_name'] || '';
 			profileForm.phone = user['phone_number'] || '';
-			profileForm.username = user['username'] || (m.profile_unknown ? m.profile_unknown() : "Noma'lum");
+			profileForm.username =
+				user['username'] || (m.profile_unknown ? m.profile_unknown() : "Noma'lum");
 			profileForm.role =
 				user['role'] === 'admin'
-					? (m.profile_role_administrator ? m.profile_role_administrator() : 'Administrator')
+					? m.profile_role_administrator
+						? m.profile_role_administrator()
+						: 'Administrator'
 					: user['role'] === 'superadmin'
-						? (m.profile_role_superadmin ? m.profile_role_superadmin() : 'Super Admin')
+						? m.profile_role_superadmin
+							? m.profile_role_superadmin()
+							: 'Super Admin'
 						: user['role'] || (m.profile_role_admin ? m.profile_role_admin() : 'Admin');
 		}
 	}
@@ -45,7 +80,9 @@
 
 	$effect(() => {
 		if (serverForm?.success) {
-			toast.success(m.profile_update_success ? m.profile_update_success() : 'Profil muvaffaqiyatli saqlandi!');
+			toast.success(
+				m.profile_update_success ? m.profile_update_success() : 'Profil muvaffaqiyatli saqlandi!'
+			);
 			if (serverForm.user) syncData(serverForm.user);
 		} else if (serverForm?.error) {
 			toast.error(serverForm.error);
@@ -75,11 +112,13 @@
 				<User size={24} />
 			</div>
 			<h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">
-				{m.profile_settings_title ? m.profile_settings_title() : "Profil Sozlamalari"}
+				{m.profile_settings_title ? m.profile_settings_title() : 'Profil Sozlamalari'}
 			</h1>
 		</div>
 		<p class="text-sm font-medium text-slate-500">
-			{m.profile_settings_subtitle ? m.profile_settings_subtitle() : "Shaxsiy ma'lumotlaringizni boshqarish va xavfsizlik sozlamalari."}
+			{m.profile_settings_subtitle
+				? m.profile_settings_subtitle()
+				: "Shaxsiy ma'lumotlaringizni boshqarish va xavfsizlik sozlamalari."}
 		</p>
 	</header>
 
@@ -140,7 +179,7 @@
 					<div class="space-y-3 border-t border-slate-50 pt-6">
 						<div class="flex items-center justify-between text-sm">
 							<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-								>{m.profile_role_in_system ? m.profile_role_in_system() : "Tizimdagi roli"}</span
+								>{m.profile_role_in_system ? m.profile_role_in_system() : 'Tizimdagi roli'}</span
 							>
 							<div
 								class="flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-black text-[#9b1c48]"
@@ -151,24 +190,95 @@
 						</div>
 						<div class="flex items-center justify-between text-sm">
 							<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
-								>{m.profile_status_label ? m.profile_status_label() : "Status"}</span
+								>{m.profile_status_label ? m.profile_status_label() : 'Status'}</span
 							>
 							<div
 								class="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-600"
 							>
-								{m.profile_status_active ? m.profile_status_active() : "Faol"}
+								{m.profile_status_active ? m.profile_status_active() : 'Faol'}
 							</div>
 						</div>
 					</div>
 				</div>
 
+				<!-- Navigation Tabs -->
+				<div class="space-y-2">
+					<button
+						onclick={() => (activeTab = 'basic')}
+						class="flex w-full items-center justify-between rounded-2xl border p-4 transition-all {activeTab ===
+						'basic'
+							? 'border-l-4 border-slate-200 border-l-[#9b1c48] bg-white shadow-sm'
+							: 'border-transparent bg-white/50 hover:bg-white'}"
+					>
+						<div class="flex items-center gap-3">
+							<div
+								class="rounded p-2 transition-colors {activeTab === 'basic'
+									? 'bg-rose-50 text-[#9b1c48]'
+									: 'bg-slate-100 text-slate-400'}"
+							>
+								<User size={18} />
+							</div>
+							<span
+								class="text-sm font-bold tracking-wide uppercase transition-colors {activeTab ===
+								'basic'
+									? 'text-slate-900'
+									: 'text-slate-500'}"
+								>{m.profile_basic_info ? m.profile_basic_info() : "Asosiy ma'lumotlar"}</span
+							>
+						</div>
+						<ChevronRight
+							size={18}
+							class="text-slate-300 transition-transform {activeTab === 'basic'
+								? 'translate-x-1 rotate-90 sm:rotate-0'
+								: ''}"
+						/>
+					</button>
+
+					<button
+						onclick={() => (activeTab = 'devices')}
+						class="flex w-full items-center justify-between rounded-2xl border p-4 transition-all {activeTab ===
+						'devices'
+							? 'border-l-4 border-slate-200 border-l-sky-500 bg-white shadow-sm'
+							: 'border-transparent bg-white/50 hover:bg-white'}"
+					>
+						<div class="flex items-center gap-3">
+							<div
+								class="rounded p-2 transition-colors {activeTab === 'devices'
+									? 'bg-sky-50 text-sky-500'
+									: 'bg-slate-100 text-slate-400'}"
+							>
+								<Smartphone size={18} />
+							</div>
+							<span
+								class="text-sm font-bold tracking-wide uppercase transition-colors {activeTab ===
+								'devices'
+									? 'text-slate-900'
+									: 'text-slate-500'}"
+								>{m.profile_devices_title ? m.profile_devices_title() : 'Qurilmalar'}</span
+							>
+						</div>
+						{#await data.lazy.devices}
+							<div class="h-4 w-4 animate-pulse rounded-full bg-slate-100"></div>
+						{:then devices}
+							<span
+								class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-black text-slate-400"
+								>{devices?.length || 0}</span
+							>
+						{/await}
+					</button>
+				</div>
+
 				<div class="rounded-3xl border border-slate-100 bg-[#9b1c48] p-6 text-white shadow-sm">
 					<div class="flex items-center gap-3">
 						<Info size={20} class="opacity-80" />
-						<h3 class="text-sm font-bold tracking-widest uppercase">{m.profile_info_card_title ? m.profile_info_card_title() : "Ma'lumot"}</h3>
+						<h3 class="text-sm font-bold tracking-widest uppercase">
+							{m.profile_info_card_title ? m.profile_info_card_title() : "Ma'lumot"}
+						</h3>
 					</div>
 					<p class="mt-3 text-xs leading-relaxed opacity-80">
-						{m.profile_info_card_desc ? m.profile_info_card_desc() : "Admin profili orqali siz tizimdagi boshqaruv huquqlariga ega bo'lasiz. Statistika va natijalar faqat o'quvchi profili uchun mavjud."}
+						{m.profile_info_card_desc
+							? m.profile_info_card_desc()
+							: "Admin profili orqali siz tizimdagi boshqaruv huquqlariga ega bo'lasiz. Statistika va natijalar faqat o'quvchi profili uchun mavjud."}
 					</p>
 				</div>
 			</div>
@@ -178,109 +288,233 @@
 				class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm sm:p-10"
 				in:fade={{ duration: 400 }}
 			>
-				<div class="mb-8 flex items-center gap-3 border-b border-slate-50 pb-6">
-					<SettingsIcon size={20} class="text-slate-400" />
-					<h3 class="text-sm font-black tracking-widest text-slate-800 uppercase">
-						{m.profile_edit_details_title ? m.profile_edit_details_title() : "Ma'lumotlarni tahrirlash"}
-					</h3>
-				</div>
-
-				<form
-					method="POST"
-					action="?/updateProfile"
-					use:enhance={handleSubmit}
-					class="flex flex-col gap-6"
-				>
-					<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-						<div class="space-y-1.5">
-							<label
-								for="first_name"
-								class="text-[10px] font-black tracking-widest text-slate-400 uppercase">{m.profile_first_name ? m.profile_first_name() : "Ism"}</label
-							>
-							<input
-								type="text"
-								id="first_name"
-								name="first_name"
-								bind:value={profileForm.firstName}
-								placeholder={m.profile_first_name_placeholder ? m.profile_first_name_placeholder() : "Ismingiz"}
-								class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
-							/>
+				{#if activeTab === 'basic'}
+					<div in:fade={{ duration: 200 }}>
+						<div class="mb-8 flex items-center gap-3 border-b border-slate-50 pb-6">
+							<SettingsIcon size={20} class="text-slate-400" />
+							<h3 class="text-sm font-black tracking-widest text-slate-800 uppercase">
+								{m.profile_edit_details_title
+									? m.profile_edit_details_title()
+									: "Ma'lumotlarni tahrirlash"}
+							</h3>
 						</div>
 
-						<div class="space-y-1.5">
-							<label
-								for="last_name"
-								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
-								>{m.profile_last_name ? m.profile_last_name() : "Familiya"}</label
-							>
-							<input
-								type="text"
-								id="last_name"
-								name="last_name"
-								bind:value={profileForm.lastName}
-								placeholder={m.profile_last_name_placeholder ? m.profile_last_name_placeholder() : "Familiyangiz"}
-								class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
-							/>
-						</div>
-
-						<div class="space-y-1.5 sm:col-span-2">
-							<label
-								for="phone_number"
-								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
-								>{m.profile_phone_label ? m.profile_phone_label() : "Telefon raqam"}</label
-							>
-							<PhoneInput
-								id="phone_number"
-								name="phone_number"
-								bind:value={profileForm.phone}
-								placeholder="+998 00 000 00 00"
-							/>
-						</div>
-
-						<div class="space-y-1.5">
-							<label
-								for="username"
-								class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
-								>{m.profile_username_label ? m.profile_username_label() : "Foydalanuvchi nomi"}</label
-							>
-							<div
-								class="flex h-11 items-center rounded-xl bg-slate-100 px-4 text-sm font-bold text-slate-400 select-none"
-							>
-								@{profileForm.username}
-							</div>
-						</div>
-
-						<div class="space-y-1.5">
-							<label
-								for="role_display"
-								class="text-[10px] font-black tracking-widest text-slate-400 uppercase">{m.profile_role_label ? m.profile_role_label() : "Maqom"}</label
-							>
-							<div
-								class="flex h-11 items-center rounded-xl bg-slate-100 px-4 text-sm font-bold text-slate-400 select-none"
-							>
-								{profileForm.role}
-							</div>
-						</div>
-					</div>
-
-					<div class="mt-8 flex justify-end">
-						<button
-							type="submit"
-							disabled={isSubmitting}
-							class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#9b1c48] px-8 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-rose-900/10 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:opacity-50 sm:w-auto"
+						<form
+							method="POST"
+							action="?/updateProfile"
+							use:enhance={handleSubmit}
+							class="flex flex-col gap-6"
 						>
-							{#if isSubmitting}
-								<div
-									class="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white"
-								></div>
-								<span>{m.profile_saving ? m.profile_saving() : "Saqlanmoqda..."}</span>
-							{:else}
-								<Save size={16} />
-								<span>{m.profile_save_changes ? m.profile_save_changes() : "O'zgarishlarni saqlash"}</span>
-							{/if}
-						</button>
+							<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+								<div class="space-y-1.5">
+									<label
+										for="first_name"
+										class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+										>{m.profile_first_name ? m.profile_first_name() : 'Ism'}</label
+									>
+									<input
+										type="text"
+										id="first_name"
+										name="first_name"
+										bind:value={profileForm.firstName}
+										placeholder={m.profile_first_name_placeholder
+											? m.profile_first_name_placeholder()
+											: 'Ismingiz'}
+										class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
+									/>
+								</div>
+
+								<div class="space-y-1.5">
+									<label
+										for="last_name"
+										class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+										>{m.profile_last_name ? m.profile_last_name() : 'Familiya'}</label
+									>
+									<input
+										type="text"
+										id="last_name"
+										name="last_name"
+										bind:value={profileForm.lastName}
+										placeholder={m.profile_last_name_placeholder
+											? m.profile_last_name_placeholder()
+											: 'Familiyangiz'}
+										class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-all outline-none focus:border-rose-200 focus:bg-white focus:ring-4 focus:ring-rose-50"
+									/>
+								</div>
+
+								<div class="space-y-1.5 sm:col-span-2">
+									<label
+										for="phone_number"
+										class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+										>{m.profile_phone_label ? m.profile_phone_label() : 'Telefon raqam'}</label
+									>
+									<PhoneInput
+										id="phone_number"
+										name="phone_number"
+										bind:value={profileForm.phone}
+										placeholder="+998 00 000 00 00"
+									/>
+								</div>
+
+								<div class="space-y-1.5">
+									<label
+										for="username"
+										class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+										>{m.profile_username_label
+											? m.profile_username_label()
+											: 'Foydalanuvchi nomi'}</label
+									>
+									<div
+										class="flex h-11 items-center rounded-xl bg-slate-100 px-4 text-sm font-bold text-slate-400 select-none"
+									>
+										@{profileForm.username}
+									</div>
+								</div>
+
+								<div class="space-y-1.5">
+									<label
+										for="role_display"
+										class="text-[10px] font-black tracking-widest text-slate-400 uppercase"
+										>{m.profile_role_label ? m.profile_role_label() : 'Maqom'}</label
+									>
+									<div
+										class="flex h-11 items-center rounded-xl bg-slate-100 px-4 text-sm font-bold text-slate-400 select-none"
+									>
+										{profileForm.role}
+									</div>
+								</div>
+							</div>
+
+							<div class="mt-8 flex justify-end">
+								<button
+									type="submit"
+									disabled={isSubmitting}
+									class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#9b1c48] px-8 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-rose-900/10 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:opacity-50 sm:w-auto"
+								>
+									{#if isSubmitting}
+										<div
+											class="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white"
+										></div>
+										<span>{m.profile_saving ? m.profile_saving() : 'Saqlanmoqda...'}</span>
+									{:else}
+										<Save size={16} />
+										<span
+											>{m.profile_save_changes
+												? m.profile_save_changes()
+												: "O'zgarishlarni saqlash"}</span
+										>
+									{/if}
+								</button>
+							</div>
+						</form>
 					</div>
-				</form>
+				{:else if activeTab === 'devices'}
+					<div in:fade={{ duration: 200 }}>
+						<div class="mb-8 flex items-center gap-3 border-b border-slate-50 pb-6">
+							<Smartphone size={20} class="text-slate-400" />
+							<h3 class="text-sm font-black tracking-widest text-slate-800 uppercase">
+								{m.profile_devices_title()}
+							</h3>
+						</div>
+
+						<div class="space-y-4">
+							{#await data.lazy.devices}
+								{#each Array(2) as _, i (i)}
+									<div class="h-24 w-full animate-pulse rounded-2xl bg-slate-50"></div>
+								{/each}
+							{:then devices}
+								{#each devices.filter((d) => d.is_active) as device (device.session_id)}
+									<div
+										class="group relative flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-6 transition-all hover:border-[#9b1c48]/30 hover:shadow-xl hover:shadow-rose-900/5 {device.is_current
+											? 'border-l-4 border-l-[#9b1c48] bg-rose-50/10'
+											: ''}"
+									>
+										<div class="flex items-center gap-5">
+											<div
+												class="flex h-12 w-12 items-center justify-center rounded-xl transition-colors {device.is_current
+													? 'bg-[#9b1c48] text-white'
+													: 'bg-slate-100 text-slate-400 group-hover:bg-rose-50 group-hover:text-[#9b1c48]'}"
+											>
+												{#if parseUserAgent(device.device_name) === 'Mobile'}
+													<Smartphone size={22} />
+												{:else}
+													<Monitor size={22} />
+												{/if}
+											</div>
+
+											<div class="flex flex-col">
+												<div class="flex items-center gap-2">
+													<span class="text-sm font-black tracking-wide text-slate-900 uppercase">
+														{formatDeviceName(device.device_name)}
+													</span>
+													{#if device.is_current}
+														<span
+															class="rounded-full bg-[#9b1c48] px-2 py-0.5 text-[8px] font-black tracking-widest text-white uppercase"
+														>
+															{m.profile_device_current()}
+														</span>
+													{:else if device.is_active}
+														<span
+															class="rounded-full bg-emerald-500 px-2 py-0.5 text-[8px] font-black tracking-widest text-white uppercase"
+														>
+															{m.profile_device_active()}
+														</span>
+													{/if}
+												</div>
+												<div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+													<span class="text-[10px] font-bold text-slate-400">
+														{m.profile_device_ip()}
+														<span class="text-slate-600">{device.ip_address}</span>
+													</span>
+													<span class="text-[10px] font-bold text-slate-400">
+														{m.profile_device_last_seen()}
+														<span class="text-slate-600">
+															{new Date(device.last_seen_at).toLocaleDateString(
+																$page?.data?.lang || 'uz',
+																{
+																	month: 'short',
+																	day: 'numeric',
+																	hour: '2-digit',
+																	minute: '2-digit'
+																}
+															)}
+														</span>
+													</span>
+												</div>
+											</div>
+										</div>
+
+										{#if !device.is_current}
+											<form
+												action="?/logoutDevice"
+												method="POST"
+												use:enhance={() => {
+													return async ({ update, result }) => {
+														if (result.type === 'success') {
+															toast.success(result.data?.['message'] || m.profile_device_logout_success());
+														} else if (result.type === 'failure') {
+															toast.error(result.data?.['error'] || m.profile_device_logout_error());
+														}
+														await update();
+													};
+												}}
+											>
+												<input type="hidden" name="session_id" value={device.session_id} />
+												<button
+													type="submit"
+													class="flex h-10 w-10 items-center justify-center rounded-full text-slate-300 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-90"
+													title={m.profile_device_logout()}
+												>
+													<Trash2 size={18} />
+												</button>
+											</form>
+										{/if}
+									</div>
+								{/each}
+							{/await}
+						</div>
+					</div>
+				{/if}
 			</div>
 		{/await}
 	</div>

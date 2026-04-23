@@ -12,9 +12,12 @@
 		Star,
 		Settings,
 		ChevronRight,
-		LogOut
+		LogOut,
+		Smartphone,
+		Monitor,
+		Trash2
 	} from 'lucide-svelte';
-	import { fly } from 'svelte/transition';
+	import { fly, fade } from 'svelte/transition';
 	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
 
 	let { data, form } = $props();
@@ -22,6 +25,7 @@
 	// Use updated profile from form success or default to loaded data
 	let profile = $derived(form?.profile || data.profile);
 	let isSubmitting = $state(false);
+	let activeTab = $state('basic'); // 'basic' or 'devices'
 
 	$effect(() => {
 		if (form) {
@@ -52,6 +56,24 @@
 		} catch {
 			toast.error(m.error_occurred ? m.error_occurred() : 'Xatolik yuz berdi');
 		}
+	};
+
+	const parseUserAgent = (ua) => {
+		if (!ua) return m.profile_device_unknown();
+		if (ua.includes('iPhone') || ua.includes('Android')) return 'Mobile';
+		if (ua.includes('Macintosh') || ua.includes('Windows') || ua.includes('Linux'))
+			return 'Desktop';
+		return 'Device';
+	};
+
+	const formatDeviceName = (ua) => {
+		if (!ua) return m.profile_device_unknown();
+		// Simple parsing logic for common browsers/OS
+		if (ua.includes('Chrome')) return 'Chrome';
+		if (ua.includes('Firefox')) return 'Firefox';
+		if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+		if (ua.includes('Edge')) return 'Edge';
+		return ua.split(' ')[0] || m.profile_device_unknown();
 	};
 </script>
 
@@ -170,19 +192,65 @@
 				</p>
 
 				<nav class="mt-8 flex flex-col gap-2">
-					<div
-						class="flex cursor-pointer items-center justify-between rounded-lg border border-l-4 border-slate-200 border-l-[#FA2E69] bg-white p-4 shadow-sm"
+					<button
+						onclick={() => (activeTab = 'basic')}
+						class="flex w-full items-center justify-between rounded-lg border p-4 transition-all {activeTab ===
+						'basic'
+							? 'border-l-4 border-slate-200 border-l-[#FA2E69] bg-white shadow-sm'
+							: 'border-transparent bg-white/50 hover:bg-white'}"
 					>
 						<div class="flex items-center gap-3">
-							<div class="rounded bg-rose-50 p-2 text-rose-500">
+							<div
+								class="rounded p-2 transition-colors {activeTab === 'basic'
+									? 'bg-rose-50 text-rose-500'
+									: 'bg-slate-100 text-slate-400'}"
+							>
 								<User size={18} />
 							</div>
-							<span class="text-sm font-bold tracking-wide text-slate-900 uppercase"
+							<span
+								class="text-sm font-bold tracking-wide uppercase transition-colors {activeTab ===
+								'basic'
+									? 'text-slate-900'
+									: 'text-slate-500'}"
 								>{m.profile_basic_info ? m.profile_basic_info() : "Asosiy ma'lumotlar"}</span
 							>
 						</div>
-						<ChevronRight size={18} class="text-slate-300" />
-					</div>
+						<ChevronRight
+							size={18}
+							class="text-slate-300 transition-transform {activeTab === 'basic'
+								? 'translate-x-1 rotate-90 sm:rotate-0'
+								: ''}"
+						/>
+					</button>
+
+					<button
+						onclick={() => (activeTab = 'devices')}
+						class="flex w-full items-center justify-between rounded-lg border p-4 transition-all {activeTab ===
+						'devices'
+							? 'border-l-4 border-slate-200 border-l-sky-500 bg-white shadow-sm'
+							: 'border-transparent bg-white/50 hover:bg-white'}"
+					>
+						<div class="flex items-center gap-3">
+							<div
+								class="rounded p-2 transition-colors {activeTab === 'devices'
+									? 'bg-sky-50 text-sky-500'
+									: 'bg-slate-100 text-slate-400'}"
+							>
+								<Smartphone size={18} />
+							</div>
+							<span
+								class="text-sm font-bold tracking-wide uppercase transition-colors {activeTab ===
+								'devices'
+									? 'text-slate-900'
+									: 'text-slate-500'}"
+								>{m.profile_devices_title ? m.profile_devices_title() : 'Qurilmalar'}</span
+							>
+						</div>
+						<span
+							class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-black text-slate-400"
+							>{data.devices?.filter((d) => d.is_active).length || 0}</span
+						>
+					</button>
 
 					<form action="/auth/logout" method="POST" class="mt-4">
 						<button
@@ -199,115 +267,229 @@
 
 			<!-- Right: Form Content -->
 			<div class="p-8 sm:p-12">
-				<form
-					action="?/updateProfile"
-					method="POST"
-					use:enhance={() => {
-						isSubmitting = true;
-						return async ({ update }) => {
-							await update({ reset: false });
-							isSubmitting = false;
-						};
-					}}
-					class="flex flex-col gap-8"
-				>
-					<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-						<!-- Input Field -->
-						<div class="flex flex-col gap-3">
-							<label
-								for="first_name"
-								class="text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase"
-								>{m.profile_first_name_label ? m.profile_first_name_label() : 'ISMINGIZ'}</label
-							>
-							<div class="group relative">
-								<input
-									type="text"
-									id="first_name"
-									name="first_name"
-									value={profile?.first_name || ''}
-									class="w-full border-b-2 border-slate-200 bg-transparent py-3 text-lg font-bold text-slate-900 transition-colors outline-none group-hover:border-slate-300 placeholder:text-slate-300 focus:border-[#FA2E69]"
-									placeholder={m.profile_placeholder_fname ? m.profile_placeholder_fname() : 'Ali'}
-									required
-								/>
-							</div>
-						</div>
-
-						<!-- Input Field -->
-						<div class="flex flex-col gap-3">
-							<label
-								for="last_name"
-								class="text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase"
-								>{m.profile_last_name_label ? m.profile_last_name_label() : 'FAMILIYANGIZ'}</label
-							>
-							<div class="group relative">
-								<input
-									type="text"
-									id="last_name"
-									name="last_name"
-									value={profile?.last_name || ''}
-									class="w-full border-b-2 border-slate-200 bg-transparent py-3 text-lg font-bold text-slate-900 transition-colors outline-none group-hover:border-slate-300 placeholder:text-slate-300 focus:border-[#FA2E69]"
-									placeholder={m.profile_placeholder_lname
-										? m.profile_placeholder_lname()
-										: 'Toirov'}
-									required
-								/>
-							</div>
-						</div>
-					</div>
-
-					<!-- Phone Field -->
-					<div class="flex flex-col gap-3">
-						<label
-							for="phone_number"
-							class="text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase"
-							>{m.profile_phone_label ? m.profile_phone_label() : 'TELEFON RAQAMINGIZ'}</label
+				{#if activeTab === 'basic'}
+					<div in:fade={{ duration: 200 }}>
+						<form
+							action="?/updateProfile"
+							method="POST"
+							use:enhance={() => {
+								isSubmitting = true;
+								return async ({ update }) => {
+									await update({ reset: false });
+									isSubmitting = false;
+								};
+							}}
+							class="flex flex-col gap-8"
 						>
-						<div class="group relative">
-							<PhoneInput
-								id="phone_number"
-								name="phone_number"
-								bind:value={profile.phone_number}
-								placeholder="+998 90 123 45 67"
-								variant="flat"
-							/>
-						</div>
-					</div>
+							<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+								<!-- Input Field -->
+								<div class="flex flex-col gap-3">
+									<label
+										for="first_name"
+										class="text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase"
+										>{m.profile_first_name_label ? m.profile_first_name_label() : 'ISMINGIZ'}</label
+									>
+									<div class="group relative">
+										<input
+											type="text"
+											id="first_name"
+											name="first_name"
+											value={profile?.first_name || ''}
+											class="w-full border-b-2 border-slate-200 bg-transparent py-3 text-lg font-bold text-slate-900 transition-colors outline-none group-hover:border-slate-300 placeholder:text-slate-300 focus:border-[#FA2E69]"
+											placeholder={m.profile_placeholder_fname
+												? m.profile_placeholder_fname()
+												: 'Ali'}
+											required
+										/>
+									</div>
+								</div>
 
-					<div
-						class="mt-6 flex flex-col items-center justify-between gap-6 border-t border-slate-100 pt-10 sm:flex-row"
-					>
-						<div class="flex flex-col">
-							<span class="text-[10px] font-black tracking-widest text-slate-300 uppercase"
-								>{m.profile_membership_date ? m.profile_membership_date() : "A'zolik sanasi"}</span
+								<!-- Input Field -->
+								<div class="flex flex-col gap-3">
+									<label
+										for="last_name"
+										class="text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase"
+										>{m.profile_last_name_label
+											? m.profile_last_name_label()
+											: 'FAMILIYANGIZ'}</label
+									>
+									<div class="group relative">
+										<input
+											type="text"
+											id="last_name"
+											name="last_name"
+											value={profile?.last_name || ''}
+											class="w-full border-b-2 border-slate-200 bg-transparent py-3 text-lg font-bold text-slate-900 transition-colors outline-none group-hover:border-slate-300 placeholder:text-slate-300 focus:border-[#FA2E69]"
+											placeholder={m.profile_placeholder_lname
+												? m.profile_placeholder_lname()
+												: 'Toirov'}
+											required
+										/>
+									</div>
+								</div>
+							</div>
+
+							<!-- Phone Field -->
+							<div class="flex flex-col gap-3">
+								<label
+									for="phone_number"
+									class="text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase"
+									>{m.profile_phone_label ? m.profile_phone_label() : 'TELEFON RAQAMINGIZ'}</label
+								>
+								<div class="group relative">
+									<PhoneInput
+										id="phone_number"
+										name="phone_number"
+										bind:value={profile.phone_number}
+										placeholder="+998 90 123 45 67"
+										variant="flat"
+									/>
+								</div>
+							</div>
+
+							<div
+								class="mt-6 flex flex-col items-center justify-between gap-6 border-t border-slate-100 pt-10 sm:flex-row"
 							>
-							{#if profile?.created_at}
-								<span class="text-sm font-bold text-slate-500"
-									>{new Date(profile.created_at).toLocaleDateString($page?.data?.lang || 'uz', {
-										year: 'numeric',
-										month: 'long',
-										day: 'numeric'
-									})}</span
+								<div class="flex flex-col">
+									<span class="text-[10px] font-black tracking-widest text-slate-300 uppercase"
+										>{m.profile_membership_date
+											? m.profile_membership_date()
+											: "A'zolik sanasi"}</span
+									>
+									{#if profile?.created_at}
+										<span class="text-sm font-bold text-slate-500"
+											>{new Date(profile.created_at).toLocaleDateString($page?.data?.lang || 'uz', {
+												year: 'numeric',
+												month: 'long',
+												day: 'numeric'
+											})}</span
+										>
+									{/if}
+								</div>
+
+								<button
+									type="submit"
+									disabled={isSubmitting}
+									class="w-full rounded-full bg-[#FA2E69] px-12 py-4 text-xs font-black tracking-[0.2em] text-white uppercase shadow-xl shadow-rose-600/20 transition-all hover:scale-105 active:scale-95 disabled:scale-100 disabled:opacity-50 sm:w-auto"
 								>
-							{/if}
+									{#if isSubmitting}
+										<span>{m.profile_saving ? m.profile_saving() : 'Kutilmoqda...'}</span>
+									{:else}
+										<span
+											>{m.profile_save_changes
+												? m.profile_save_changes()
+												: "O'zgarishlarni saqlash"}</span
+										>
+									{/if}
+								</button>
+							</div>
+						</form>
+					</div>
+				{:else if activeTab === 'devices'}
+					<div in:fade={{ duration: 200 }}>
+						<div class="mb-8">
+							<h3 class="text-xl font-black tracking-tight text-slate-900 uppercase">
+								{m.profile_devices_title()}
+							</h3>
+							<p class="mt-2 text-sm font-medium text-slate-500">
+								{m.profile_devices_desc()}
+							</p>
 						</div>
 
-						<button
-							type="submit"
-							disabled={isSubmitting}
-							class="w-full rounded-full bg-[#FA2E69] px-12 py-4 text-xs font-black tracking-[0.2em] text-white uppercase shadow-xl shadow-rose-600/20 transition-all hover:scale-105 active:scale-95 disabled:scale-100 disabled:opacity-50 sm:w-auto"
-						>
-							{#if isSubmitting}
-								<span>{m.profile_saving ? m.profile_saving() : 'Kutilmoqda...'}</span>
-							{:else}
-								<span
-									>{m.profile_save_changes
-										? m.profile_save_changes()
-										: "O'zgarishlarni saqlash"}</span
+						<div class="grid grid-cols-1 gap-4">
+							{#each data.devices.filter((d) => d.is_active) as device (device.session_id)}
+								<div
+									class="group relative flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-6 transition-all hover:border-[#FA2E69]/30 hover:shadow-xl hover:shadow-rose-600/5 {device.is_current
+										? 'border-l-4 border-l-[#FA2E69] bg-rose-50/10'
+										: ''}"
 								>
-							{/if}
-						</button>
+									<div class="flex items-center gap-5">
+										<div
+											class="flex h-12 w-12 items-center justify-center rounded-xl transition-colors {device.is_current
+												? 'bg-[#FA2E69] text-white'
+												: 'bg-slate-100 text-slate-400 group-hover:bg-rose-50 group-hover:text-[#FA2E69]'}"
+										>
+											{#if parseUserAgent(device.device_name) === 'Mobile'}
+												<Smartphone size={22} />
+											{:else}
+												<Monitor size={22} />
+											{/if}
+										</div>
+
+										<div class="flex flex-col">
+											<div class="flex items-center gap-2">
+												<span class="text-sm font-black tracking-wide text-slate-900 uppercase">
+													{formatDeviceName(device.device_name)}
+												</span>
+												{#if device.is_current}
+													<span
+														class="rounded-full bg-[#FA2E69] px-2 py-0.5 text-[8px] font-black tracking-widest text-white uppercase"
+													>
+														{m.profile_device_current()}
+													</span>
+												{:else if device.is_active}
+													<span
+														class="rounded-full bg-emerald-500 px-2 py-0.5 text-[8px] font-black tracking-widest text-white uppercase"
+													>
+														{m.profile_device_active()}
+													</span>
+												{/if}
+											</div>
+											<div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+												<span class="text-[10px] font-bold text-slate-400">
+													{m.profile_device_ip()}
+													<span class="text-slate-600">{device.ip_address}</span>
+												</span>
+												<span class="text-[10px] font-bold text-slate-400">
+													{m.profile_device_last_seen()}
+													<span class="text-slate-600">
+														{new Date(device.last_seen_at).toLocaleDateString(
+															$page?.data?.lang || 'uz',
+															{
+																month: 'short',
+																day: 'numeric',
+																hour: '2-digit',
+																minute: '2-digit'
+															}
+														)}
+													</span>
+												</span>
+											</div>
+										</div>
+									</div>
+
+									{#if !device.is_current}
+										<form
+											action="?/logoutDevice"
+											method="POST"
+											use:enhance={() => {
+												return async ({ update, result }) => {
+													if (result.type === 'success') {
+														toast.success(
+															result.data?.message || m.profile_device_logout_success()
+														);
+													} else if (result.type === 'failure') {
+														toast.error(result.data?.error || m.profile_device_logout_error());
+													}
+													await update();
+												};
+											}}
+										>
+											<input type="hidden" name="session_id" value={device.session_id} />
+											<button
+												type="submit"
+												class="flex h-10 w-10 items-center justify-center rounded-full text-slate-300 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-90"
+												title={m.profile_device_logout()}
+											>
+												<Trash2 size={18} />
+											</button>
+										</form>
+									{/if}
+								</div>
+							{/each}
+						</div>
 					</div>
-				</form>
+				{/if}
 			</div>
 		</div>
 	</main>

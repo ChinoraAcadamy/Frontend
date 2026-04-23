@@ -40,7 +40,7 @@
 	<div
 		class="relative flex items-center justify-center transition-all duration-300 {collapsed
 			? 'py-3'
-			: 'py-2'}"
+			: 'py-4'}"
 	>
 		<a href={resolve('/')} class="group relative flex w-full items-center justify-center">
 			<div

@@ -99,6 +99,13 @@
 					}}
 					class="form-body"
 				>
+					<!-- Device Name Hidden Input -->
+					<input 
+						type="hidden" 
+						name="device_name" 
+						value={browser ? navigator.userAgent : ''} 
+					/>
+
 					<!-- Username field -->
 					<div class="field">
 						<label for="username" class="field-label">

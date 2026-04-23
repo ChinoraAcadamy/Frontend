@@ -33,7 +33,11 @@ export const actions = {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ 
+                    username, 
+                    password,
+                    device_name: formData.get('device_name') || 'Unknown Device'
+                })
             });
 
             result = await response.json();

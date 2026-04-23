@@ -22,14 +22,60 @@ export const load = async ({ fetch, cookies }) => {
         }
     };
 
+    const fetchDevices = async () => {
+        if (!accessToken) return [];
+        try {
+            const response = await fetch(`${API_URL}/auth/devices/`, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                return data.results || [];
+            }
+            return [];
+        } catch (err) {
+            console.error('[Admin Devices Load] Error:', err);
+            return [];
+        }
+    };
+
     return {
         lazy: {
-            profile: fetchProfile()
+            profile: fetchProfile(),
+            devices: fetchDevices()
         }
     };
 };
 
 export const actions = {
+    logoutDevice: async ({ request, fetch, cookies }) => {
+        const accessToken = cookies.get('access_token');
+        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+
+        const formData = await request.formData();
+        const sessionId = formData.get('session_id');
+
+        try {
+            const response = await fetch(`${API_URL}/auth/logout-device/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ session_id: sessionId })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                return fail(400, { error: errData.detail || "Qurilmani o'chirishda xatolik yuz berdi." });
+            }
+
+            return { success: true, message: "Qurilma muvaffaqiyatli o'chirildi" };
+        } catch (err) {
+            console.error('[Admin Device Logout] Error:', err);
+            return fail(500, { error: "Server bilan ulanishda xatolik." });
+        }
+    },
     updateProfile: async ({ request, fetch, cookies }) => {
         const accessToken = cookies.get('access_token');
         if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
