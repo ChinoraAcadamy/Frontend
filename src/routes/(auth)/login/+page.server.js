@@ -4,6 +4,9 @@ import { fail, redirect } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
 import * as m from '$lib/paraglide/messages.js';
 import { translateServerMessage } from '$lib/utils/server-messages.js';
+import DeviceDetector from 'device-detector-js';
+
+const detector = new DeviceDetector();
 
 export const load = async ({ locals }) => {
     if (locals.isAuthenticated && locals.user) {
@@ -30,6 +33,19 @@ export const actions = {
 
         let result;
         try {
+            const ua = request.headers.get('user-agent') || '';
+            const detection = detector.parse(ua);
+
+            // Build a human-readable device name
+            const deviceParts = [
+                detection.device?.vendor,
+                detection.device?.model,
+                detection.os?.name ? `${detection.os.name} ${detection.os.version || ''}` : null,
+                detection.client?.name
+            ].filter(Boolean);
+
+            const detectedDeviceName = deviceParts.join(', ') || 'Unknown Device';
+
             const response = await fetch(`${API_URL}/auth/login/`, {
                 method: 'POST',
                 headers: {
@@ -38,7 +54,7 @@ export const actions = {
                 body: JSON.stringify({
                     username,
                     password,
-                    device_name: formData.get('device_name') || 'Unknown Device'
+                    device_name: detectedDeviceName
                 })
             });
 

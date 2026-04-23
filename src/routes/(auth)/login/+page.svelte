@@ -30,7 +30,7 @@
 	let terminatingSessionId = $state(null);
 
 	$effect(() => {
-		if (form?.isLimitError) {
+		if (form?.['isLimitError']) {
 			showDeviceModal = true;
 		}
 	});
@@ -306,7 +306,7 @@
 
 				<div class="device-list">
 				{console.log(form)}
-					{#each form?.devices || [] as device (device.session_id)}
+					{#each form?.['devices'] || [] as device (device.session_id)}
 						<div class="device-card" class:device-current={device.is_current}>
 							<div class="device-info">
 								<div class="device-icon-wrap">
@@ -355,8 +355,8 @@
 									}}
 								>
 									<input type="hidden" name="session_id" value={device.session_id} />
-									<input type="hidden" name="username" value={form?.username} />
-									<input type="hidden" name="password" value={form?.password} />
+									<input type="hidden" name="username" value={form?.['username']} />
+									<input type="hidden" name="password" value={form?.['password']} />
 									<button
 										type="submit"
 										class="logout-btn"
@@ -629,6 +629,7 @@
 		outline: none;
 		transition: all 0.25s;
 		-webkit-appearance: none;
+		appearance: none;
 	}
 	.input::placeholder {
 		color: #94a3b8;
