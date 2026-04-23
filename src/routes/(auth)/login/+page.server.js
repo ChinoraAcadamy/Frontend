@@ -23,7 +23,9 @@ export const actions = {
         const password = formData.get('password');
 
         if (!username || !password) {
-            return fail(400, { error: m.login_error_required ? m.login_error_required() : "Username va parolni to'ldiring." });
+            return fail(400, {
+                error: m.login_error_required ? m.login_error_required() : "Username va parolni to'ldiring."
+            });
         }
 
         let result;
@@ -33,8 +35,8 @@ export const actions = {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ 
-                    username, 
+                body: JSON.stringify({
+                    username,
                     password,
                     device_name: formData.get('device_name') || 'Unknown Device'
                 })
@@ -43,13 +45,33 @@ export const actions = {
             result = await response.json();
 
             if (!response.ok) {
+                // Handle device limit error using the new API format
+                if (result.code?.includes('device_limit_exceeded') || response.status === 403) {
+                    // Normalize devices: backend might send "True"/"False" strings
+                    // Also, since we are NOT logged in yet, NO device should be "current"
+                    const devices = (result.devices || []).map(d => ({
+                        ...d,
+                        is_current: false // This device is not logged in yet
+                    }));
+
+                    return fail(response.status, {
+                        error: m.login_error_device_limit ? m.login_error_device_limit() : "Siz bir vaqtning o'zida faqat 2 ta qurilmada tizimga kirishingiz mumkin.",
+                        devices,
+                        username,
+                        password,
+                        isLimitError: true
+                    });
+                }
+
                 return fail(response.status, {
                     error: translateServerMessage(result, m)
                 });
             }
         } catch (err) {
             console.error('API xatosi:', err);
-            return fail(500, { error: m.error_occurred ? m.error_occurred() : "Server bilan ulanishda xatolik." });
+            return fail(500, {
+                error: m.error_occurred ? m.error_occurred() : 'Server bilan ulanishda xatolik.'
+            });
         }
 
         const cookieOptions = {
@@ -88,6 +110,41 @@ export const actions = {
             throw redirect(302, '/admin/dashboard');
         } else {
             throw redirect(302, '/dashboard');
+        }
+    },
+    logoutDevice: async ({ request, fetch }) => {
+        const formData = await request.formData();
+        const sessionId = formData.get('session_id');
+        const username = formData.get('username');
+        const password = formData.get('password');
+
+        try {
+            const res = await fetch(`${API_URL}/auth/logout-device/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    username,
+                    password
+                })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                return fail(400, {
+                    error: errData.detail || "Qurilmani o'chirishda xatolik yuz berdi."
+                });
+            }
+
+            return {
+                success: true,
+                message: "Qurilma o'chirildi. Endi kirishingiz mumkin."
+            };
+        } catch (err) {
+            console.error('[Login Device Logout] Error:', err);
+            return fail(500, { error: 'Server bilan ulanishda xatolik.' });
         }
     }
 };

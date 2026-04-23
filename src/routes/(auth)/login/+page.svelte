@@ -13,7 +13,12 @@
 		Send,
 		CreditCard,
 		Eye,
-		EyeOff
+		EyeOff,
+		Smartphone,
+		Monitor,
+		Trash2,
+		AlertTriangle,
+		X
 	} from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
 	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
@@ -21,6 +26,31 @@
 	let { form } = $props();
 	let loading = $state(false);
 	let showPassword = $state(false);
+	let showDeviceModal = $state(false);
+	let terminatingSessionId = $state(null);
+
+	$effect(() => {
+		if (form?.isLimitError) {
+			showDeviceModal = true;
+		}
+	});
+
+	const parseUserAgent = (ua) => {
+		if (!ua) return m.profile_device_unknown();
+		if (ua.includes('iPhone') || ua.includes('Android')) return 'Mobile';
+		if (ua.includes('Macintosh') || ua.includes('Windows') || ua.includes('Linux'))
+			return 'Desktop';
+		return 'Device';
+	};
+
+	const formatDeviceName = (ua) => {
+		if (!ua) return m.profile_device_unknown();
+		if (ua.includes('Chrome')) return 'Chrome';
+		if (ua.includes('Firefox')) return 'Firefox';
+		if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+		if (ua.includes('Edge')) return 'Edge';
+		return ua.split(' ')[0] || m.profile_device_unknown();
+	};
 
 	const currentLocale = $derived(browser ? getLocale() : 'uz');
 
@@ -100,11 +130,7 @@
 					class="form-body"
 				>
 					<!-- Device Name Hidden Input -->
-					<input 
-						type="hidden" 
-						name="device_name" 
-						value={browser ? navigator.userAgent : ''} 
-					/>
+					<input type="hidden" name="device_name" value={browser ? navigator.userAgent : ''} />
 
 					<!-- Username field -->
 					<div class="field">
@@ -247,6 +273,111 @@
 		© {new Date().getFullYear()} Chinora Fashion Academy
 	</footer>
 </div>
+
+{#if showDeviceModal}
+	<div
+		class="modal-backdrop"
+		transition:fade={{ duration: 250 }}
+		onclick={() => (showDeviceModal = false)}
+		onkeydown={(e) => e.key === 'Escape' && (showDeviceModal = false)}
+		role="button"
+		tabindex="-1"
+		aria-label="Close modal"
+	>
+		<div
+			class="modal-content"
+			transition:fly={{ y: 40, duration: 400, opacity: 0 }}
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
+		>
+			<div class="modal-header">
+				<div class="alert-icon-wrap">
+					<AlertTriangle size={32} class="text-amber-500" />
+				</div>
+				<button class="close-btn" onclick={() => (showDeviceModal = false)}>
+					<X size={20} />
+				</button>
+			</div>
+
+			<div class="modal-body">
+				<h2 class="modal-title">{m.login_device_limit_title()}</h2>
+				<p class="modal-desc">{m.login_device_limit_desc()}</p>
+
+				<div class="device-list">
+				{console.log(form)}
+					{#each form?.devices || [] as device (device.session_id)}
+						<div class="device-card" class:device-current={device.is_current}>
+							<div class="device-info">
+								<div class="device-icon-wrap">
+									{#if parseUserAgent(device.device_name) === 'Mobile'}
+										<Smartphone size={20} />
+									{:else}
+										<Monitor size={20} />
+									{/if}
+								</div>
+								<div class="device-text">
+									<h4 class="device-name">
+										{formatDeviceName(device.device_name)}
+										{#if device.is_current}
+											<span class="current-badge">{m.login_device_current_hint()}</span>
+										{/if}
+									</h4>
+									<div class="device-meta">
+										<span>{m.login_device_logged_in_at()}</span>
+										<span class="meta-value">
+											{new Date(device.created_at).toLocaleString(currentLocale, {
+												hour: '2-digit',
+												minute: '2-digit',
+												day: '2-digit',
+												month: '2-digit',
+												year: 'numeric'
+											})}
+										</span>
+									</div>
+								</div>
+							</div>
+
+							{#if !device.is_current}
+								<form
+									method="POST"
+									action="?/logoutDevice"
+									use:enhance={() => {
+										terminatingSessionId = device.session_id;
+										return async ({ update, result }) => {
+											terminatingSessionId = null;
+											if (result.type === 'success') {
+												// Optionally close modal or refresh
+												showDeviceModal = false;
+											}
+											await update();
+										};
+									}}
+								>
+									<input type="hidden" name="session_id" value={device.session_id} />
+									<input type="hidden" name="username" value={form?.username} />
+									<input type="hidden" name="password" value={form?.password} />
+									<button
+										type="submit"
+										class="logout-btn"
+										disabled={terminatingSessionId === device.session_id}
+									>
+										{#if terminatingSessionId === device.session_id}
+											<Loader2 size={16} class="spin" />
+										{:else}
+											<Trash2 size={16} />
+											<span>{m.login_device_logout_btn()}</span>
+										{/if}
+									</button>
+								</form>
+							{/if}
+						</div>
+					{/each}
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	/* ─── Reset & Root ─────────────────────────────────────────────── */
@@ -819,6 +950,209 @@
 	@media (min-width: 641px) and (max-width: 1023px) {
 		.layout {
 			max-width: 500px;
+		}
+	}
+
+	/* ─── Device Modal Styles ──────────────────────────────────────── */
+	.modal-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(15, 23, 42, 0.4);
+		backdrop-filter: blur(8px);
+		z-index: 1000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1.5rem;
+	}
+
+	.modal-content {
+		width: 100%;
+		max-width: 500px;
+		background: #fff;
+		border-radius: 32px;
+		padding: 2.5rem;
+		box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.2);
+		position: relative;
+	}
+
+	.modal-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 1.5rem;
+	}
+
+	.alert-icon-wrap {
+		width: 64px;
+		height: 64px;
+		background: #fffbeb;
+		border-radius: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.close-btn {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 12px;
+		border: none;
+		background: #f8fafc;
+		color: #94a3b8;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.close-btn:hover {
+		background: #f1f5f9;
+		color: #1e293b;
+		transform: scale(1.05);
+	}
+
+	.modal-title {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #0f172a;
+		letter-spacing: -0.02em;
+		line-height: 1.2;
+		margin-bottom: 1rem;
+	}
+
+	.modal-desc {
+		font-size: 0.95rem;
+		color: #64748b;
+		line-height: 1.6;
+		margin-bottom: 2rem;
+	}
+
+	.device-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.device-card {
+		background: #f8fafc;
+		border: 1px solid #f1f5f9;
+		border-radius: 20px;
+		padding: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		transition: all 0.2s;
+	}
+	.device-card:hover {
+		border-color: #e2e8f0;
+		background: #fff;
+		box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.05);
+	}
+
+	.device-info {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.device-icon-wrap {
+		width: 48px;
+		height: 48px;
+		background: #fff;
+		border: 1px solid #f1f5f9;
+		border-radius: 14px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #94a3b8;
+		flex-shrink: 0;
+	}
+
+	.device-text {
+		flex: 1;
+	}
+
+	.device-name {
+		font-size: 1rem;
+		font-weight: 700;
+		color: #1e293b;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.current-badge {
+		font-size: 0.7rem;
+		font-weight: 800;
+		color: #10b981;
+		background: #ecfdf5;
+		padding: 0.2rem 0.6rem;
+		border-radius: 100px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.device-meta {
+		font-size: 0.8rem;
+		color: #94a3b8;
+		margin-top: 0.25rem;
+		display: flex;
+		flex-direction: column;
+	}
+	.meta-value {
+		color: #475569;
+		font-weight: 600;
+	}
+
+	.logout-btn {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.85rem;
+		background: #fff1f2;
+		color: #e11d48;
+		border: none;
+		border-radius: 14px;
+		font-size: 0.85rem;
+		font-weight: 700;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.logout-btn:hover:not(:disabled) {
+		background: #ffe4e6;
+		transform: translateY(-2px);
+	}
+	.logout-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@media (max-width: 480px) {
+		.modal-backdrop {
+			padding: 0;
+			background: #fff;
+		}
+		.modal-content {
+			padding: 1.5rem;
+			border-radius: 0;
+			height: 100%;
+			max-height: 100svh;
+			display: flex;
+			flex-direction: column;
+			box-shadow: none;
+		}
+		.modal-header {
+			margin-bottom: 2rem;
+		}
+		.modal-title {
+			font-size: 1.5rem;
+		}
+		.modal-body {
+			flex: 1;
+			overflow-y: auto;
 		}
 	}
 </style>
