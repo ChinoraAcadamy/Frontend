@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
-	import { LogOut, X, PanelLeftClose, PanelLeftOpen } from 'lucide-svelte';
+	import { LogOut, X, PanelLeftClose, PanelLeftOpen, Loader2 } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
 	let {
@@ -24,71 +24,37 @@
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && (mobileOpen = false)} />
 
+<!-- Mobile backdrop -->
 {#if mobileOpen}
-	<div
-		class="fixed inset-0 z-800 bg-slate-900/30 backdrop-blur-sm lg:hidden"
-		onclick={() => (mobileOpen = false)}
-		aria-hidden="true"
-	></div>
+	<div class="mob-backdrop" onclick={() => (mobileOpen = false)} aria-hidden="true"></div>
 {/if}
 
-<aside
-	class="fixed top-0 bottom-0 left-0 z-1000 flex flex-col border-r border-slate-100 bg-white transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-    {collapsed ? 'w-[90px] px-3' : 'w-[290px] px-5'} 
-    {mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}"
->
-	<div
-		class="relative flex items-center justify-center transition-all duration-300 {collapsed
-			? 'py-3'
-			: 'py-4'}"
-	>
-		<a href={resolve('/')} class="group relative flex w-full items-center justify-center">
-			<div
-				class="relative flex items-center justify-center overflow-hidden transition-all duration-500 ease-in-out
-                {collapsed ? 'h-[52px] w-[52px] rounded-[20px]' : 'h-20 w-full rounded-[28px]'} 
-                bg-linear-to-br from-[#9b1c48] to-[#d73a6a] shadow-lg shadow-rose-900/20"
-			>
-				<div
-					class="absolute inset-0 bg-linear-to-tr from-white/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-				></div>
-
-				<div class="relative z-10 flex items-center justify-center gap-3 px-4">
-					<img
-						src="/logo/chinora-secondary.png"
-						alt="Logo"
-						class="h-9 w-9 object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
-					/>
-					{#if !collapsed}
-						<span class="text-xl font-black tracking-tight text-white transition-all duration-300">
-							CHINORA
-						</span>
-					{/if}
-				</div>
+<aside class="sidebar {collapsed ? 'sidebar--collapsed' : ''} {mobileOpen ? 'sidebar--open' : ''}">
+	<!-- ── Logo ──────────────────────────────────── -->
+	<div class="logo-wrap">
+		<a href={resolve('/')} class="logo-link">
+			<div class="logo-block">
+				<img src="/logo/chinora-secondary.png" alt="Chinora" class="logo-img" />
+				{#if !collapsed}
+					<span class="logo-text">CHINORA</span>
+				{/if}
 			</div>
 		</a>
 
-		<button
-			class="absolute top-8 -right-2 rounded-full bg-white p-2 text-slate-400 shadow-lg lg:hidden"
-			onclick={() => (mobileOpen = false)}
-		>
-			<X size={18} />
+		<button class="close-btn" onclick={() => (mobileOpen = false)} aria-label="Yopish">
+			<X size={16} />
 		</button>
 	</div>
 
-	<nav
-		class="no-scrollbar flex flex-1 flex-col overflow-y-auto pb-4 transition-all {collapsed
-			? 'gap-1'
-			: 'gap-2'}"
-	>
+	<!-- ── Nav ───────────────────────────────────── -->
+	<nav class="nav-scroll">
 		{#each navItems as item (item.href || item.label)}
 			{#if item.divider}
-				<div class="my-3 flex items-center px-4">
+				<div class="nav-divider">
 					{#if !collapsed}
-						<span class="text-[10px] font-bold tracking-[2px] text-slate-400 uppercase"
-							>{item.label}</span
-						>
+						<span class="nav-divider-label">{item.label}</span>
 					{:else}
-						<div class="h-px w-full bg-slate-100"></div>
+						<span class="nav-divider-line"></span>
 					{/if}
 				</div>
 			{:else}
@@ -96,110 +62,80 @@
 				{@const Icon = item.icon}
 				<a
 					href={resolve(item.href)}
-					class="group relative flex items-center justify-center gap-4 rounded-2xl transition-all duration-300
-                    {collapsed ? 'mx-auto h-[52px] w-[52px] p-3' : 'w-full px-4 py-3.5'}
-                    {active
-						? 'bg-[#9b1c48] text-white shadow-lg shadow-rose-900/15'
-						: 'text-slate-500 hover:bg-slate-50 hover:text-[#9b1c48]'}"
+					class="nav-item {active ? 'nav-item--active' : ''} {collapsed
+						? 'nav-item--collapsed'
+						: ''}"
 					onclick={() => (mobileOpen = false)}
 				>
-					<div
-						class="flex shrink-0 items-center justify-center transition-transform duration-300 group-active:scale-90"
-					>
-						<Icon size={22} strokeWidth={active ? 2.5 : 2} />
-					</div>
+					<span class="nav-icon-wrap">
+						<Icon size={19} strokeWidth={active ? 2.5 : 1.8} />
+					</span>
 
 					{#if !collapsed}
-						<span class="flex-1 truncate text-[15px] font-semibold">{item.label}</span>
+						<span class="nav-label">{item.label}</span>
 						{#if active}
-							<div class="h-1.5 w-1.5 rounded-full bg-white/60"></div>
+							<span class="nav-pip"></span>
 						{/if}
 					{/if}
 
 					{#if collapsed}
-						<div
-							class="absolute left-full z-50 ml-4 hidden rounded-md bg-slate-900 px-2 py-1 text-xs font-medium whitespace-nowrap text-white group-hover:block"
-						>
-							{item.label}
-						</div>
+						<span class="nav-tooltip">{item.label}</span>
 					{/if}
 				</a>
 			{/if}
 		{/each}
 	</nav>
 
-	<div class="mt-auto flex flex-col transition-all {collapsed ? 'gap-2 pb-6' : 'gap-4 pb-8'}">
+	<!-- ── Footer ────────────────────────────────── -->
+	<div class="sidebar-footer">
+		<!-- Collapse button -->
 		<button
-			class="flex items-center justify-center gap-3 px-4 py-2 text-slate-400 transition-all hover:text-[#9b1c48]"
+			class="collapse-btn {collapsed ? 'collapse-btn--collapsed' : ''}"
 			onclick={() => (collapsed = !collapsed)}
+			aria-label={collapsed ? 'Kengaytirish' : "Yig'ish"}
 		>
 			{#if collapsed}
-				<PanelLeftOpen size={20} />
+				<PanelLeftOpen size={17} />
 			{:else}
-				<div class="flex w-full items-center gap-3">
-					<PanelLeftClose size={20} />
-					<span class="text-sm font-medium">{m.sidebar_collapse?.() || "Yig'ish"}</span>
-				</div>
+				<PanelLeftClose size={17} />
+				<span class="collapse-label">{m.sidebar_collapse?.() || "Yig'ish"}</span>
 			{/if}
 		</button>
 
-		<div
-			class="relative flex items-center border border-slate-100 bg-slate-50/70 transition-all duration-300
-            {collapsed
-				? 'mx-auto w-[60px] flex-col gap-2 rounded-[32px] p-2'
-				: 'flex-row gap-3 rounded-[24px] p-2.5'}"
-		>
-			<div class="relative flex shrink-0 items-center justify-center">
+		<!-- User card -->
+		<div class="user-card {collapsed ? 'user-card--collapsed' : ''}">
+			<!-- Avatar -->
+			<div class="user-avatar-wrap">
 				{#if user?.picture}
-					<img
-						src={user.picture}
-						alt="Avatar"
-						class="h-11 w-11 rounded-full object-cover shadow-sm transition-all duration-500"
-					/>
+					<img src={user.picture} alt="Avatar" class="user-avatar-img" />
 				{:else}
-					<div
-						class="flex h-11 w-11 items-center justify-center rounded-full bg-linear-to-br from-rose-100 to-rose-200 text-lg font-bold text-[#9b1c48] shadow-sm"
-					>
+					<div class="user-avatar-fallback">
 						{user?.username?.[0]?.toUpperCase() || 'U'}
 					</div>
 				{/if}
-				<div
-					class="absolute -right-0.5 -bottom-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500"
-				></div>
+				<span class="user-status-dot"></span>
 			</div>
 
 			{#if !collapsed}
-				<div class="min-w-0 flex-1 transition-all duration-300">
-					<p class="text-[14px] font-bold text-slate-900">
-						{user?.first_name || user?.username || 'Foydalanuvchi'}
-					</p>
-					<p class="text-[11px] font-semibold tracking-wider text-rose-600 uppercase">
-						{user?.role || 'Admin'}
-					</p>
+				<div class="user-info">
+					<p class="user-name">{user?.first_name || user?.username || 'Foydalanuvchi'}</p>
+					<p class="user-role">{user?.role || 'Admin'}</p>
 				</div>
 			{/if}
 
 			<form
 				method="POST"
 				action="/logout"
-				class="flex w-full shrink-0 justify-center"
 				use:enhance={() => {
 					loading = true;
 					return async ({ update }) => await update();
 				}}
 			>
-				<button
-					type="submit"
-					class="border-slate-150 flex items-center justify-center rounded-[14px] border bg-white text-slate-400 shadow-sm transition-all hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600
-                    {collapsed ? 'h-10 w-10' : 'h-10 w-10'}"
-					title="Chiqish"
-				>
+				<button type="submit" class="logout-btn" title="Chiqish" disabled={loading}>
 					{#if loading}
-						<div
-							class="h-4 w-4 animate-spin rounded-full border-2 border-rose-600 border-t-transparent"
-						></div>
+						<Loader2 size={15} class="spin" />
 					{:else}
-						<LogOut size={16} strokeWidth={2.5} />
+						<LogOut size={15} />
 					{/if}
 				</button>
 			</form>
@@ -208,15 +144,435 @@
 </aside>
 
 <style>
-	.no-scrollbar::-webkit-scrollbar {
-		display: none;
+	/* ── Backdrop ──────────────────────────────────────── */
+	.mob-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 800;
+		background: rgba(10, 8, 6, 0.45);
+		backdrop-filter: blur(3px);
 	}
-	.no-scrollbar {
-		-ms-overflow-style: none;
+
+	/* ── Sidebar shell ─────────────────────────────────── */
+	.sidebar {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1000;
+		display: flex;
+		flex-direction: column;
+		width: 272px;
+		background: var(--bg-sidebar);
+		border-right: 1px solid var(--border-main);
+		transition:
+			width 280ms cubic-bezier(0.4, 0, 0.2, 1),
+			transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
+			background-color 0.3s ease;
+		will-change: width, transform;
+		overflow: hidden;
+	}
+
+	.sidebar--collapsed {
+		width: 76px;
+	}
+
+	/* Mobile: off-canvas by default */
+	@media (max-width: 1023px) {
+		.sidebar {
+			transform: translateX(-100%);
+			width: 272px !important;
+		}
+		.sidebar--open {
+			transform: translateX(0);
+		}
+	}
+
+	/* ── Logo area ─────────────────────────────────────── */
+	.logo-wrap {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.8rem 1rem 0.875rem;
+		border-bottom: 1px solid var(--border-light);
+		flex-shrink: 0;
+	}
+
+	.logo-link {
+		flex: 1;
+		min-width: 0;
+		text-decoration: none;
+	}
+
+	.logo-block {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		overflow: hidden;
+	}
+
+	.logo-img {
+		width: 36px;
+		height: 36px;
+		object-fit: contain;
+		border-radius: 10px;
+		background: #9b1c49;
+		padding: 4px;
+		flex-shrink: 0;
+		transition: transform 0.25s ease;
+	}
+
+	.logo-link:hover .logo-img {
+		transform: rotate(-4deg) scale(1.05);
+	}
+
+	.logo-text {
+		font-size: 15px;
+		font-weight: 800;
+		letter-spacing: 0.12em;
+		color: var(--text-main);
+		white-space: nowrap;
+		overflow: hidden;
+		opacity: 1;
+		transition: opacity 200ms ease;
+	}
+
+	.sidebar--collapsed .logo-text {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.close-btn {
+		width: 30px;
+		height: 30px;
+		border-radius: 8px;
+		border: none;
+		background: var(--bg-input);
+		color: var(--text-muted);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		flex-shrink: 0;
+		transition:
+			background 0.15s,
+			color 0.15s;
+	}
+
+	.close-btn:hover {
+		background: rgba(255, 255, 255, 0.1);
+		color: #fff;
+	}
+
+	@media (min-width: 1024px) {
+		.close-btn {
+			display: none;
+		}
+	}
+
+	/* ── Nav ───────────────────────────────────────────── */
+	.nav-scroll {
+		flex: 1;
+		overflow-y: auto;
+		overflow-x: hidden;
+		padding: 0.75rem 0.625rem;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
 		scrollbar-width: none;
 	}
 
-	aside {
-		will-change: width, transform;
+	.nav-scroll::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* Divider */
+	.nav-divider {
+		padding: 0.75rem 0.625rem 0.25rem;
+		display: flex;
+		align-items: center;
+	}
+
+	.nav-divider-label {
+		font-size: 9.5px;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+		white-space: nowrap;
+		overflow: hidden;
+		opacity: 0.7;
+	}
+
+	.nav-divider-line {
+		display: block;
+		width: 100%;
+		height: 1px;
+		background: var(--border-light);
+	}
+
+	/* Nav item */
+	.nav-item {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 11px;
+		padding: 0 12px;
+		height: 44px;
+		border-radius: 12px;
+		text-decoration: none;
+		color: var(--text-muted);
+		transition:
+			background 0.15s,
+			color 0.15s;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.nav-item:hover {
+		background: var(--border-light);
+		color: var(--primary);
+	}
+
+	.nav-item--active {
+		background: #9b1c48;
+		color: #fff;
+	}
+
+	.nav-item--active:hover {
+		background: #a81f4e;
+		color: #fff;
+	}
+
+	/* Collapsed: center icon */
+	.nav-item--collapsed {
+		justify-content: center;
+		padding: 0;
+		width: 44px;
+		margin: 0 auto;
+	}
+
+	.nav-icon-wrap {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 20px;
+		height: 20px;
+	}
+
+	.nav-label {
+		flex: 1;
+		font-size: 14px;
+		font-weight: 600;
+		letter-spacing: 0.01em;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.nav-pip {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.5);
+		flex-shrink: 0;
+	}
+
+	/* Tooltip for collapsed */
+	.nav-tooltip {
+		position: absolute;
+		left: calc(100% + 12px);
+		top: 50%;
+		transform: translateY(-50%);
+		background: var(--bg-sidebar);
+		border: 1px solid var(--border-main);
+		color: var(--text-main);
+		font-size: 12px;
+		font-weight: 600;
+		padding: 5px 10px;
+		border-radius: 8px;
+		white-space: nowrap;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.15s;
+		box-shadow: var(--shadow-main);
+		z-index: 100;
+	}
+
+	.nav-item--collapsed:hover .nav-tooltip {
+		opacity: 1;
+	}
+
+	/* ── Footer ────────────────────────────────────────── */
+	.sidebar-footer {
+		flex-shrink: 0;
+		padding: 0.5rem 0.625rem 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		border-top: 1px solid var(--border-light);
+	}
+
+	/* Collapse toggle */
+	.collapse-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 9px;
+		height: 38px;
+		padding: 0 12px;
+		color: var(--text-muted);
+		cursor: pointer;
+		transition: all 0.2s;
+		flex: 1;
+		text-align: left;
+	}
+
+	.collapse-btn:hover {
+		border-color: var(--primary);
+		color: var(--primary);
+	}
+
+	.collapse-btn--collapsed {
+		width: 55px;
+		margin: 0 auto;
+		padding: 0;
+	}
+
+	.collapse-label {
+		font-size: 13px;
+		font-weight: 500;
+		flex: 1;
+		color: inherit;
+	}
+
+	/* User card */
+	.user-card {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		background: var(--bg-input);
+		border: 1px solid var(--border-light);
+		border-radius: 16px;
+		padding: 8px 10px;
+		transition: background 0.15s;
+	}
+
+	.user-card:hover {
+		background: rgba(255, 255, 255, 0.06);
+	}
+
+	.user-card--collapsed {
+		flex-direction: column;
+		padding: 10px 6px;
+		gap: 8px;
+		align-items: center;
+	}
+
+	/* Avatar */
+	.user-avatar-wrap {
+		position: relative;
+		flex-shrink: 0;
+	}
+
+	.user-avatar-img,
+	.user-avatar-fallback {
+		width: 38px;
+		height: 38px;
+		border-radius: 12px;
+		display: block;
+	}
+
+	.user-avatar-img {
+		object-fit: cover;
+	}
+
+	.user-avatar-fallback {
+		background: linear-gradient(135deg, rgba(155, 28, 72, 0.5), rgba(155, 28, 72, 0.2));
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 15px;
+		font-weight: 800;
+		color: #e8aabb;
+		border: 1px solid rgba(155, 28, 72, 0.3);
+	}
+
+	.user-status-dot {
+		position: absolute;
+		bottom: -2px;
+		right: -2px;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: #22c55e;
+		border: 2px solid var(--bg-sidebar);
+	}
+
+	/* User info */
+	.user-info {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	.user-name {
+		font-size: 13.5px;
+		font-weight: 700;
+		color: var(--text-main);
+		margin: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.user-role {
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #e8637a;
+		margin: 2px 0 0;
+	}
+
+	/* Logout */
+	.logout-btn {
+		width: 34px;
+		height: 34px;
+		border-radius: 10px;
+		border: 1px solid var(--border-main);
+		background: var(--bg-card);
+		color: var(--text-muted);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: all 0.2s;
+	}
+
+	.logout-btn:hover:not(:disabled) {
+		background: rgba(155, 28, 72, 0.2);
+		border-color: rgba(155, 28, 72, 0.4);
+		color: #e8637a;
+	}
+
+	.logout-btn:disabled {
+		cursor: not-allowed;
+		color: #e8637a;
+	}
+
+	:global(.spin) {
+		animation: spin 0.7s linear infinite;
+	}
+
+	@keyframes spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>

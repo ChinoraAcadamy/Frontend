@@ -79,28 +79,10 @@
 </div>
 
 <style>
-    /* Premium Aesthetic Variables */
-    :root {
-        --primary: #FA2E69;
-        --primary-hover: #D81B53;
-        --success: #10B981;
-        --success-hover: #059669;
-        --text-main: #111827;
-        --text-muted: #6B7280;
-        --bg-color: #F9FAFB;
-        --border-color: #E5E7EB;
-        --card-bg: #FFFFFF;
-        --radius-sm: 8px;
-        --radius-md: 12px;
-        --radius-lg: 16px;
-        --font-poppins: 'Poppins', sans-serif;
-    }
-
     .page-container {
-        font-family: var(--font-poppins);
         max-width: 800px;
         margin: 0 auto;
-        padding: 24px 16px;
+        padding: 40px 20px;
     }
 
     .header {
@@ -109,14 +91,16 @@
     }
 
     .title {
-        font-size: 24px;
-        font-weight: 700;
+        font-size: 32px;
+        font-weight: 900;
+        letter-spacing: -0.02em;
         color: var(--text-main);
         margin: 0 0 8px 0;
     }
 
     .subtitle {
-        font-size: 14px;
+        font-size: 15px;
+        font-weight: 500;
         color: var(--text-muted);
         margin: 0;
     }
@@ -140,24 +124,25 @@
     }
 
     .step-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: var(--card-bg);
-        border: 2px solid var(--border-color);
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: var(--bg-surface);
+        border: 2px solid var(--border-main);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 600;
+        font-weight: 800;
         color: var(--text-muted);
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .step.active .step-circle {
         border-color: var(--primary);
         background: var(--primary);
         color: white;
-        box-shadow: 0 4px 12px rgba(250, 46, 105, 0.25);
+        box-shadow: 0 8px 16px -4px var(--primary/30);
+        transform: translateY(-2px);
     }
 
     .step-label {
@@ -174,7 +159,7 @@
     .step-line {
         flex: 1;
         height: 2px;
-        background: var(--border-color);
+        background: var(--border-main);
         margin: 0 16px;
         transform: translateY(-12px);
         transition: all 0.3s ease;
@@ -186,11 +171,11 @@
 
     /* Form Container styles */
     .form-card {
-        background: var(--card-bg);
-        border-radius: var(--radius-lg);
+        background: var(--bg-card);
+        border-radius: 32px;
         padding: 24px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        border: 1px solid var(--border-main);
+        box-shadow: var(--shadow-sm);
     }
 
     @media (min-width: 640px) {

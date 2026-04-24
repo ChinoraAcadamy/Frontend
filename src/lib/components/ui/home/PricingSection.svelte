@@ -8,7 +8,7 @@
 	import { getLocale } from '@/lib/paraglide/runtime';
 
 	// +page.server.js dan keladi
-	let { courses = [] } = $props();
+	let { courses } = $props();
 
 	// Har bir kursga qo'shimcha UI meta (backend'da yo'q narsalar)
 	const courseMeta = [

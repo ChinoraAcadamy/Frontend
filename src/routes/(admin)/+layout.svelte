@@ -110,12 +110,12 @@
 	.admin-shell {
 		display: flex;
 		min-height: 100vh;
-		background: #f9fafb; /* Orqa fon rangi */
+		background: var(--bg-main); /* Orqa fon rangi */
 	}
 
 	.admin-body {
 		flex: 1;
-		margin-left: 290px;
+		margin-left: 272px;
 		transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 		display: flex;
 		flex-direction: column;
@@ -124,7 +124,7 @@
 
 	/* Collapsed holati */
 	.admin-shell.collapsed .admin-body {
-		margin-left: 90px;
+		margin-left: 76px;
 	}
 
 	/* Mobile ekran */

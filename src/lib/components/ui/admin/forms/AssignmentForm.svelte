@@ -29,17 +29,17 @@
 		<!-- Main Info -->
 		<div class="form-group full-width">
 			<div class="mb-2 flex items-center gap-2">
-				<div class="rounded-lg bg-rose-50 p-1.5 text-[#ed4b72]">
+				<div class="rounded-lg bg-primary/10 p-1.5 text-primary">
 					<FileText size={16} />
 				</div>
-				<h3 class="text-sm font-bold tracking-wider text-slate-400 uppercase">
+				<h3 class="text-sm font-bold tracking-wider text-muted uppercase">
 					{m.section_general_info ? m.section_general_info() : 'Umumiy ma\'lumotlar'}
 				</h3>
 			</div>
 
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="space-y-1.5">
-					<label for="ass_title_uz">{m.label_assignment_title_uz ? m.label_assignment_title_uz() : 'Topshiriq nomi (UZ) *'}</label>
+					<label for="ass_title_uz">{m.label_assignment_title_uz_req ? m.label_assignment_title_uz_req() : 'Topshiriq nomi (UZ) *'}</label>
 					<input
 						type="text"
 						id="ass_title_uz"
@@ -51,7 +51,7 @@
 					/>
 				</div>
 				<div class="space-y-1.5">
-					<label for="ass_title_ru">{m.label_assignment_title_ru ? m.label_assignment_title_ru() : 'Topshiriq nomi (RU) *'}</label>
+					<label for="ass_title_ru">{m.label_assignment_title_ru_req ? m.label_assignment_title_ru_req() : 'Topshiriq nomi (RU) *'}</label>
 					<input
 						type="text"
 						id="ass_title_ru"
@@ -101,7 +101,7 @@
 					<option value="text">{m.option_type_text ? m.option_type_text() : 'Matn kiritish'}</option>
 					<option value="link">{m.option_type_link ? m.option_type_link() : 'Link yuborish'}</option>
 				</select>
-				<div class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-slate-400">
+				<div class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-muted">
 					{#if selectedType === 'file'}
 						<UploadCloud size={18} />
 					{:else if selectedType === 'text'}
@@ -143,9 +143,9 @@
 		<!-- New Info Section -->
 		<div class="form-group full-width pt-2">
 			<div
-				class="flex items-start gap-3 rounded-2xl border border-blue-50 bg-blue-50/30 p-4 text-blue-700"
+				class="flex items-start gap-3 rounded-2xl border border-secondary/20 bg-secondary/5 p-4 text-foreground"
 			>
-				<div class="mt-0.5 rounded-lg bg-white p-1.5 text-blue-500 shadow-sm">
+				<div class="mt-0.5 rounded-lg bg-surface p-1.5 text-secondary-dark shadow-sm">
 					<Info size={16} />
 				</div>
 				<div>
@@ -190,28 +190,28 @@
 	label {
 		font-size: 13px;
 		font-weight: 700;
-		color: #64748b;
+		color: var(--text-muted);
 		margin-left: 2px;
 	}
 
 	.input {
 		width: 100%;
 		padding: 14px 18px;
-		border: 2px solid #f1f5f9;
+		border: 1.5px solid var(--border-main);
 		border-radius: 20px;
 		font-size: 14px;
 		font-weight: 500;
-		color: #1e293b;
-		background: #f8fafc;
+		color: var(--text-main);
+		background: var(--bg-main);
 		font-family: inherit;
 		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.input:focus {
-		border-color: #ed4b72;
-		background: #ffffff;
+		border-color: var(--primary);
+		background: var(--bg-card);
 		outline: none;
-		box-shadow: 0 0 0 4px rgba(237, 75, 114, 0.1);
+		box-shadow: 0 0 0 4px var(--primary/10);
 	}
 
 	.textarea {
@@ -222,9 +222,9 @@
 	/* File Upload Styles */
 	.file-upload-zone {
 		position: relative;
-		border: 2px dashed #e2e8f0;
+		border: 2px dashed var(--border-main);
 		border-radius: 32px;
-		background-color: #f8fafc;
+		background-color: var(--bg-main);
 		transition: all 0.3s ease;
 		overflow: hidden;
 		display: flex;
@@ -234,19 +234,19 @@
 	}
 
 	.file-upload-zone.dragging {
-		border-color: #ed4b72;
-		background-color: rgba(237, 75, 114, 0.05);
+		border-color: var(--primary);
+		background-color: var(--primary/5);
 	}
 
 	.file-upload-zone:hover:not(.has-file) {
-		border-color: #ed4b72;
-		background-color: #fff;
+		border-color: var(--primary);
+		background-color: var(--bg-card);
 	}
 
 	.file-upload-zone.has-file {
 		border-style: solid;
-		border-color: #f1f5f9;
-		background: #ffffff;
+		border-color: var(--border-main);
+		background: var(--bg-card);
 	}
 
 	.actions {
@@ -254,7 +254,7 @@
 		justify-content: flex-end;
 		margin-top: 40px;
 		padding-top: 24px;
-		border-top: 1px solid #f1f5f9;
+		border-top: 1px solid var(--border-main);
 	}
 
 	.btn {
@@ -282,15 +282,15 @@
 	}
 
 	.btn-primary {
-		background: #ed4b72;
+		background: var(--primary);
 		color: white;
-		box-shadow: 0 10px 20px -10px rgba(237, 75, 114, 0.4);
+		box-shadow: 0 10px 20px -10px var(--primary/40);
 	}
 
 	.btn-primary:hover:not(:disabled) {
-		background: #de3c61;
+		background: var(--primary-hover);
 		transform: translateY(-2px);
-		box-shadow: 0 12px 24px -10px rgba(237, 75, 114, 0.5);
+		box-shadow: 0 12px 24px -10px var(--primary/50);
 	}
 
 	@media (min-width: 640px) {

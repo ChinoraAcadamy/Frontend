@@ -146,8 +146,8 @@
 >
 	<div class="flex flex-col gap-5">
 		<!-- Section: General Info -->
-		<FormSection 
-			title={m.section_general_info ? m.section_general_info() : 'Umumiy ma\'lumotlar'} 
+		<FormSection
+			title={m.section_general_info ? m.section_general_info() : "Umumiy ma'lumotlar"}
 			icon={Save}
 		>
 			<div class="grid grid-cols-1 gap-5 sm:grid-cols-[1.5fr_1fr]">
@@ -156,14 +156,14 @@
 				<div class="flex flex-col gap-1.5">
 					<label
 						for="les_order"
-						class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
+						class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
 						>{m.label_order_index ? m.label_order_index() : 'Tartib raqami'}</label
 					>
 					<input
 						type="number"
 						id="les_order"
 						name="order_index"
-						class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 transition-colors outline-none focus:border-[#fa2e69]"
+						class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-primary"
 						value={lessonTarget.order_index ?? 1}
 					/>
 				</div>
@@ -171,8 +171,8 @@
 		</FormSection>
 
 		<!-- Section: Multilingual Content -->
-		<FormSection 
-			title={m.section_lesson_content ? m.section_lesson_content() : 'Dars mazmuni'} 
+		<FormSection
+			title={m.section_lesson_content ? m.section_lesson_content() : 'Dars mazmuni'}
 			icon={CheckCircle2}
 		>
 			{#snippet extra()}
@@ -185,15 +185,19 @@
 					<div class="flex flex-col gap-1.5">
 						<label
 							for="les_title_uz"
-							class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
-							>{m.label_lesson_title_uz ? m.label_lesson_title_uz() : 'Dars nomi (O\'zbekcha)'}</label
+							class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
+							>{m.label_lesson_title_uz
+								? m.label_lesson_title_uz()
+								: "Dars nomi (O'zbekcha)"}</label
 						>
 						<input
 							type="text"
 							id="les_title_uz"
 							name="title_uz"
-							placeholder={m.placeholder_lesson_title_uz ? m.placeholder_lesson_title_uz() : 'Masalan: Kirish qismi'}
-							class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 transition-colors outline-none focus:border-[#fa2e69]"
+							placeholder={m.placeholder_lesson_title_uz
+								? m.placeholder_lesson_title_uz()
+								: 'Masalan: Kirish qismi'}
+							class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-primary"
 							required
 							value={lessonTarget.title_uz || lessonTarget.title || ''}
 						/>
@@ -201,15 +205,17 @@
 					<div class="flex flex-col gap-1.5">
 						<label
 							for="les_desc_uz"
-							class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
-							>{m.label_lesson_desc_uz ? m.label_lesson_desc_uz() : 'Tavsif (O\'zbekcha)'}</label
+							class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
+							>{m.label_lesson_desc_uz ? m.label_lesson_desc_uz() : "Tavsif (O'zbekcha)"}</label
 						>
 						<textarea
 							id="les_desc_uz"
 							name="description_uz"
-							class="min-h-[100px] w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-[#fa2e69]"
+							class="min-h-[100px] w-full resize-none rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-primary"
 							rows="3"
-							placeholder={m.placeholder_lesson_desc_uz ? m.placeholder_lesson_desc_uz() : 'Dars haqida qisqacha ma\'lumot...'}
+							placeholder={m.placeholder_lesson_desc_uz
+								? m.placeholder_lesson_desc_uz()
+								: "Dars haqida qisqacha ma'lumot..."}
 							>{lessonTarget.description_uz || lessonTarget.description || ''}</textarea
 						>
 					</div>
@@ -220,15 +226,17 @@
 					<div class="flex flex-col gap-1.5">
 						<label
 							for="les_title_ru"
-							class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
+							class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
 							>{m.label_lesson_title_ru ? m.label_lesson_title_ru() : 'Название урока (RU)'}</label
 						>
 						<input
 							type="text"
 							id="les_title_ru"
 							name="title_ru"
-							placeholder={m.placeholder_lesson_title_ru ? m.placeholder_lesson_title_ru() : 'Например: Введение'}
-							class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-[#fa2e69]"
+							placeholder={m.placeholder_lesson_title_ru
+								? m.placeholder_lesson_title_ru()
+								: 'Например: Введение'}
+							class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-primary"
 							required
 							value={lessonTarget.title_ru || lessonTarget.title || ''}
 						/>
@@ -236,15 +244,17 @@
 					<div class="flex flex-col gap-1.5">
 						<label
 							for="les_desc_ru"
-							class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
+							class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
 							>{m.label_lesson_desc_ru ? m.label_lesson_desc_ru() : 'Описание (RU)'}</label
 						>
 						<textarea
 							id="les_desc_ru"
 							name="description_ru"
-							class="min-h-[100px] w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-[#fa2e69]"
+							class="min-h-[100px] w-full resize-none rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-primary"
 							rows="3"
-							placeholder={m.placeholder_lesson_desc_ru ? m.placeholder_lesson_desc_ru() : 'Краткое описание урока...'}
+							placeholder={m.placeholder_lesson_desc_ru
+								? m.placeholder_lesson_desc_ru()
+								: 'Краткое описание урока...'}
 							>{lessonTarget.description_ru || lessonTarget.description || ''}</textarea
 						>
 					</div>
@@ -253,16 +263,22 @@
 		</FormSection>
 
 		<!-- Section: Media & Footer -->
-		<FormSection 
-			title={m.section_media_duration ? m.section_media_duration() : 'Video va Davomiylik'} 
+		<FormSection
+			title={m.section_media_duration ? m.section_media_duration() : 'Video va Davomiylik'}
 			icon={Video}
 		>
-			<VideoUploadZone bind:videoFile bind:uploadProgress bind:autoDuration {isSubmitting} />
-			
+			<VideoUploadZone
+				bind:videoFile
+				bind:uploadProgress
+				bind:autoDuration
+				{isSubmitting}
+				currentVideoUrl={lessonTarget.video_url}
+			/>
+
 			<div class="mt-4 flex flex-col gap-1.5">
 				<label
 					for="les_duration"
-					class="pl-0.5 text-[12px] font-bold tracking-wider text-slate-400 uppercase"
+					class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
 					>{m.label_duration_minutes ? m.label_duration_minutes() : 'Davomiyligi (Daqiqa)'}</label
 				>
 				<div class="relative">
@@ -273,10 +289,10 @@
 						step="0.1"
 						min="0"
 						bind:value={autoDuration}
-						class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition-colors outline-none focus:border-[#fa2e69]"
+						class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm font-bold text-foreground transition-colors outline-none focus:border-primary"
 					/>
-					<div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-						<span class="text-xs font-bold text-slate-400 uppercase">min</span>
+					<div class="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+						<span class="text-xs font-bold text-muted uppercase">min</span>
 					</div>
 				</div>
 			</div>
@@ -285,19 +301,23 @@
 			<div class="mt-6 flex items-center justify-end border-t border-slate-50 pt-6">
 				<button
 					type="submit"
-					class="flex items-center justify-center gap-2 rounded-lg bg-rose-50 px-8 py-3 text-sm font-bold tracking-tight text-[#fa2e69] transition-all hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+					class="flex items-center justify-center gap-2 rounded-lg bg-primary/10 px-8 py-3 text-sm font-bold tracking-tight text-primary transition-all hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
 					disabled={isSubmitting}
 				>
 					{#if isSubmitting}
 						<div
-							class="h-4 w-4 animate-spin rounded-full border-2 border-[#fa2e69]/20 border-t-[#fa2e69]"
+							class="h-4 w-4 animate-spin rounded-full border-2 border-primary/20 border-t-primary"
 						></div>
 						<span>{m.text_publishing ? m.text_publishing() : 'Nashr qilinmoqda...'}</span>
 					{:else}
 						<span>
-							{action.includes('create') 
-								? (m.btn_add_lesson ? m.btn_add_lesson() : "Darsni qo'shish") 
-								: (m.profile_save ? m.profile_save() : 'Saqlash')}
+							{action.includes('create')
+								? m.btn_add_lesson
+									? m.btn_add_lesson()
+									: "Darsni qo'shish"
+								: m.profile_save
+									? m.profile_save()
+									: 'Saqlash'}
 						</span>
 						{#if action.includes('create')}
 							<CheckCircle2 size={16} />

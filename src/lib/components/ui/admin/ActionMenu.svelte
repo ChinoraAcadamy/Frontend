@@ -25,11 +25,11 @@
 	<button
 		type="button"
 		onclick={toggleMenu}
-		class="flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-slate-100 active:scale-90 lg:hidden"
+		class="flex h-10 w-10 items-center justify-center rounded-xl transition-all hover:bg-muted/10 active:scale-90 lg:hidden"
 		aria-label={label}
 		aria-expanded={isOpen}
 	>
-		<MoreHorizontal size={20} class="text-slate-500" />
+		<MoreHorizontal size={20} class="text-muted" />
 	</button>
 	<div class="desktop-menu flex items-center gap-1.5 sm:hidden md:hidden lg:flex">
 		{@render children()}
@@ -38,21 +38,21 @@
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm lg:hidden"
+			class="fixed inset-0 z-[1500] bg-black/60 backdrop-blur-sm lg:hidden"
 			transition:fade={{ duration: 200 }}
 			onclick={closeMenu}
 		></div>
 		<div
-			class="fixed right-0 bottom-0 left-0 z-60 rounded-t-[32px] bg-white p-6 pb-12 shadow-2xl lg:hidden"
+			class="fixed right-0 bottom-0 left-0 z-[1501] rounded-t-[32px] bg-surface p-6 pb-12 shadow-2xl ring-1 ring-border lg:hidden"
 			transition:fly={{ y: 300, duration: 300, opacity: 1 }}
 		>
 			<div class="mb-6 flex items-center justify-between">
-				<h4 class="text-lg font-bold text-slate-800">{label}</h4>
+				<h4 class="text-lg font-black text-foreground">{label}</h4>
 				<button
 					onclick={closeMenu}
-					class="rounded-full bg-slate-100 p-2 text-slate-500 transition-colors hover:bg-slate-200"
+					class="rounded-xl bg-muted/10 p-2 text-muted transition-all hover:bg-muted/20 active:scale-95"
 				>
-					<X size={20} />
+					<X size={20} strokeWidth={2.5} />
 				</button>
 			</div>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -72,23 +72,23 @@
 		gap: 12px;
 		padding: 12px 16px;
 		font-size: 14px;
-		font-weight: 600;
-		color: #334155;
+		font-weight: 700;
+		color: var(--text-main);
 		border-radius: 12px;
 		transition: all 0.2s;
 		text-align: left;
 	}
 
 	:global(.action-menu-item:hover) {
-		background-color: #f8fafc;
-		color: #ed4b72;
+		background-color: var(--bg-main);
+		color: var(--primary);
 	}
 
 	@media (max-width: 1023px) {
 		:global(.action-menu-item) {
 			padding: 16px;
 			font-size: 16px;
-			background-color: #f8fafc;
+			background-color: var(--bg-main);
 		}
 		.desktop-menu {
 			display: none;
@@ -109,7 +109,7 @@
 			display: none; /* Yozuvni yashirish */
 		}
 		:global(.action-menu-item:hover) {
-			background-color: #f1f5f9; /* Slate-100 hover effekti */
+			background-color: var(--muted-bg, rgba(0,0,0,0.05)); /* Fallback to light hover */
 		}
 	}
 </style>

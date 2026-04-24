@@ -1,15 +1,6 @@
 <script lang="ts">
-	import { Lock } from 'lucide-svelte';
-
-	interface Props {
-		label?: string;
-		id?: string;
-		value?: string;
-		placeholder?: string;
-		readonly?: boolean;
-		name?: string;
-		variant?: 'default' | 'flat';
-	}
+	import { Lock, Phone } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let {
 		label = '',
@@ -17,27 +8,18 @@
 		value = $bindable(''),
 		placeholder = '+998 __ ___ __ __',
 		readonly = false,
-		name = '',
-		variant = 'default'
-	}: Props = $props();
+		name = ''
+	} = $props();
 
-	function handleInput(e) {
-		const target = e.target;
-		let inputVal = target.value;
+	// Formatlash logikasi alohida funksiyaga olindi,
+	// shunda komponent yuklanganda ham ishlatish mumkin bo'ladi.
+	function formatPhone(inputVal) {
+		if (!inputVal || inputVal === '+') return inputVal;
 
-		if (!inputVal || inputVal === '+') {
-			value = inputVal;
-			return;
-		}
-
-		// Keep only numbers
 		let raw = inputVal.replace(/\D/g, '');
-
-		// Format string
 		let formatted = '';
-		if (raw.length > 0) {
-			formatted = '+';
-		}
+
+		if (raw.length > 0) formatted = '+';
 
 		if (raw.startsWith('998')) {
 			formatted += '998';
@@ -46,14 +28,25 @@
 			if (raw.length > 8) formatted += ' ' + raw.substring(8, 10);
 			if (raw.length > 10) formatted += ' ' + raw.substring(10, 12);
 		} else {
-			// Other countries fallback formatting
 			if (raw.length > 0) formatted += raw.substring(0, Math.min(raw.length, 3));
 			if (raw.length > 3) formatted += ' ' + raw.substring(3, 6);
 			if (raw.length > 6) formatted += ' ' + raw.substring(6, 15);
 		}
 
-		value = formatted;
+		return formatted;
 	}
+
+	function handleInput(e) {
+		const target = e.target;
+		value = formatPhone(target.value);
+	}
+
+	// Serverdan unformatted raqam kelsa, avtomatik to'g'rilaydi
+	$effect(() => {
+		if (value && !value.includes(' ') && value.length > 4) {
+			value = formatPhone(value);
+		}
+	});
 
 	let currentCountry = $derived.by(() => {
 		const val = value || '';
@@ -69,28 +62,30 @@
 	});
 </script>
 
-<div class="flex flex-col gap-1.5 {label ? 'h-18' : ''}">
+<div class="flex flex-col gap-2">
 	{#if label}
-		<label for={id} class="text-sm font-semibold text-slate-700">
+		<label for={id} class="ml-1 text-[13px] font-bold text-main">
 			{label}
-			{#if readonly}<span class="font-normal text-slate-400">(Readonly)</span>{/if}
+			{#if readonly}<span class="ml-1 font-medium text-muted"
+					>({m.readonly ? m.readonly() : "Faqat o'qish uchun"})</span
+				>{/if}
 		</label>
 	{/if}
 
-	<div class="relative flex items-center {variant === 'flat' ? 'group' : ''}">
-		<!-- Flag/Code Indicator -->
+	<div
+		class="group relative flex items-center overflow-hidden rounded-xl border border-main bg-muted/5 transition-all duration-300
+               focus-within:border-primary focus-within:bg-card focus-within:shadow-sm focus-within:ring-4 focus-within:ring-primary/10
+               {readonly ? 'bg-muted/10 opacity-70' : ''}"
+	>
 		<div
-			class="absolute flex items-center justify-center transition-all duration-300
-			{variant === 'default'
-				? 'left-2 h-9 min-w-14 rounded-xl border border-white/40 bg-white/30 px-3 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.05)] backdrop-blur-xl'
-				: 'left-0 h-full bg-transparent px-1'}"
+			class="flex h-[38px] min-w-[46px] shrink-0 items-center justify-center gap-2 px-3
+                   text-[12px] font-bold tracking-wider text-muted transition-colors duration-300
+                   group-focus-within:text-primary"
 		>
 			{#if currentCountry}
-				<span class="text-[12px] font-black tracking-widest text-[#ed4b72] uppercase"
-					>{currentCountry.code}</span
-				>
+				<span>{currentCountry.flag}</span>
 			{:else}
-				<span class="text-slate-400 opacity-70">📞</span>
+				<Phone size={16} strokeWidth={2.5} class="opacity-40" />
 			{/if}
 		</div>
 
@@ -102,25 +97,13 @@
 			{placeholder}
 			{name}
 			disabled={readonly}
-			class="w-full text-slate-800 transition-all duration-200 outline-none
-				{currentCountry
-				? variant === 'default'
-					? 'pl-20'
-					: 'pl-16'
-				: variant === 'default'
-					? 'pl-11'
-					: 'pl-10'}
-				{variant === 'default'
-				? readonly
-					? 'h-11 cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100/70 px-3 text-slate-500'
-					: 'h-11 rounded-xl border border-slate-200 bg-white px-3 shadow-sm hover:border-slate-300 focus:border-[#ed4b72] focus:ring-[3px] focus:ring-[#ed4b72]/15'
-				: readonly
-					? 'block cursor-not-allowed border-b-2 border-slate-200 bg-transparent py-3 text-lg font-bold text-slate-500 placeholder:text-slate-300'
-					: 'block border-b-2 border-slate-200 bg-transparent py-3 text-lg font-bold text-slate-900 transition-colors group-hover:border-slate-300 placeholder:text-slate-300 focus:border-[#FA2E69]'}"
+			class="h-[44px] w-full border-none bg-transparent px-2 text-[15px] font-semibold tracking-wide text-foreground outline-none placeholder:font-medium placeholder:text-muted/40 disabled:cursor-not-allowed"
 		/>
 
 		{#if readonly}
-			<div class="absolute right-3 text-slate-400">
+			<div
+				class="absolute right-4 flex items-center justify-center rounded-lg bg-muted/10 p-1.5 text-muted"
+			>
 				<Lock size={16} strokeWidth={2.5} />
 			</div>
 		{/if}

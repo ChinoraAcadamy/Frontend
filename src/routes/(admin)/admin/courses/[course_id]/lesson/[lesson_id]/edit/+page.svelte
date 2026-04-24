@@ -4,6 +4,7 @@
     import { page } from '$app/stores';
     import LessonForm from '@/lib/components/ui/admin/forms/LessonForm.svelte';
     import { toast } from 'svelte-sonner';
+    import * as m from '$lib/paraglide/messages.js';
 
     let { data, form } = $props();
 
@@ -12,7 +13,7 @@
 
     $effect(() => {
         if (form?.success) {
-            toast.success("Dars muvaffaqiyatli tahrirlandi!");
+            toast.success(m.msg_lesson_updated ? m.msg_lesson_updated() : "Dars muvaffaqiyatli tahrirlandi!");
             // Redirect back to course page
             goto(resolve(`/admin/courses/${$page.params.course_id}`));
         } else if (form?.error) {
@@ -32,9 +33,9 @@
 <div class="page-container">
     <div class="header">
         <h1 class="title">
-            Darsni tahrirlash
+            {m.admin_lesson_edit_title ? m.admin_lesson_edit_title() : "Darsni tahrirlash"}
         </h1>
-        <p class="subtitle">Dars ma'lumotlarini yangilash paneli</p>
+        <p class="subtitle">{m.admin_lesson_edit_subtitle ? m.admin_lesson_edit_subtitle() : "Dars ma'lumotlarini yangilash paneli"}</p>
     </div>
 
     <div class="form-card">
@@ -50,22 +51,10 @@
 </div>
 
 <style>
-    /* Premium Aesthetic Variables */
-    :root {
-        --primary: #fa2e69;
-        --card-bg: #ffffff;
-        --text-main: #111827;
-        --text-muted: #6b7280;
-        --border-color: #e5e7eb;
-        --radius-lg: 16px;
-        --font-poppins: 'Poppins', sans-serif;
-    }
-
     .page-container {
-        font-family: var(--font-poppins);
         max-width: 800px;
         margin: 0 auto;
-        padding: 24px 16px;
+        padding: 40px 20px;
     }
 
     .header {
@@ -74,24 +63,26 @@
     }
 
     .title {
-        font-size: 24px;
-        font-weight: 700;
+        font-size: 32px;
+        font-weight: 900;
+        letter-spacing: -0.02em;
         color: var(--text-main);
         margin: 0 0 8px 0;
     }
 
     .subtitle {
-        font-size: 14px;
+        font-size: 15px;
+        font-weight: 500;
         color: var(--text-muted);
         margin: 0;
     }
 
     .form-card {
-        background: var(--card-bg);
-        border-radius: var(--radius-lg);
+        background: var(--bg-card);
+        border-radius: 32px;
         padding: 24px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        border: 1px solid var(--border-main);
+        box-shadow: var(--shadow-sm);
     }
 
     @media (min-width: 640px) {

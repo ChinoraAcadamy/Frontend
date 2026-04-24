@@ -37,139 +37,139 @@
 		const map = {
 			CREATE: {
 				label: m.admin_logs_act_created ? m.admin_logs_act_created() : 'Yaratildi',
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+				classes: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
 			},
 			UPDATE: {
 				label: m.admin_logs_act_updated ? m.admin_logs_act_updated() : 'Yangilandi',
-				classes: 'bg-blue-50 text-blue-700 ring-blue-600/20'
+				classes: 'bg-blue-500/10 text-blue-600 ring-blue-500/20'
 			},
 			DELETE: {
 				label: m.admin_logs_act_deleted ? m.admin_logs_act_deleted() : "O'chirildi",
-				classes: 'bg-rose-50 text-rose-700 ring-rose-600/20'
+				classes: 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
 			},
 			LOGOUT: {
 				label: m.admin_logs_act_logout ? m.admin_logs_act_logout() : 'Tizimdan chiqish',
-				classes: 'bg-amber-50 text-amber-700 ring-amber-600/20'
+				classes: 'bg-amber-500/10 text-amber-600 ring-amber-500/20'
 			},
 			LOGIN: {
 				label: m.admin_logs_act_login ? m.admin_logs_act_login() : 'Tizimga kirish',
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+				classes: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
 			},
 			SUBMISSION_CREATED: {
 				label: m.admin_logs_act_sub_created ? m.admin_logs_act_sub_created() : 'Topshiriq yubordi',
-				classes: 'bg-indigo-50 text-indigo-700 ring-indigo-600/20'
+				classes: 'bg-indigo-500/10 text-indigo-600 ring-indigo-500/20'
 			},
 			SUBMISSION_GRADED: {
 				label: m.admin_logs_act_sub_graded ? m.admin_logs_act_sub_graded() : 'Topshiriq baholandi',
-				classes: 'bg-purple-50 text-purple-700 ring-purple-600/20'
+				classes: 'bg-purple-500/10 text-purple-600 ring-purple-500/20'
 			},
 			LESSON_COMPLETED: {
 				label: m.admin_logs_act_lesson_comp ? m.admin_logs_act_lesson_comp() : 'Darsni tugatdi',
-				classes: 'bg-teal-50 text-teal-700 ring-teal-600/20'
+				classes: 'bg-teal-500/10 text-teal-600 ring-teal-500/20'
 			},
 			STUDENT_DEACTIVATED: {
 				label: m.admin_logs_act_student_deact
 					? m.admin_logs_act_student_deact()
 					: 'Talaba faolsizlantirildi',
-				classes: 'bg-rose-50 text-rose-700 ring-rose-600/20'
+				classes: 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
 			},
 			PASSWORD_CHANGED: {
 				label: m.admin_logs_act_pwd_changed
 					? m.admin_logs_act_pwd_changed()
 					: "Parol o'zgartirildi",
-				classes: 'bg-amber-50 text-amber-700 ring-amber-600/20'
+				classes: 'bg-amber-500/10 text-amber-600 ring-amber-500/20'
 			},
 			ADMIN_CREATED: {
 				label: m.admin_logs_act_admin_created
 					? m.admin_logs_act_admin_created()
 					: 'Admin yaratildi',
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+				classes: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
 			},
 			ENROLLMENT_BLOCKED: {
 				label: m.admin_logs_act_enroll_blocked
 					? m.admin_logs_act_enroll_blocked()
 					: "A'zo bloklandi",
-				classes: 'bg-rose-50 text-rose-700 ring-rose-600/20'
+				classes: 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
 			},
 			ENROLLMENT_UNBLOCKED: {
 				label: m.admin_logs_act_enroll_unblocked
 					? m.admin_logs_act_enroll_unblocked()
 					: "A'zo blokdan chiqarildi",
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+				classes: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
 			},
 			ENROLLMENT_CREATED: {
 				label: m.admin_logs_act_enroll_created
 					? m.admin_logs_act_enroll_created()
 					: "Kursga a'zo qilindi",
-				classes: 'bg-blue-50 text-blue-700 ring-blue-600/20'
+				classes: 'bg-blue-500/10 text-blue-600 ring-blue-500/20'
 			},
 			LESSON_DELETED: {
 				label: m.admin_logs_act_lesson_deleted
 					? m.admin_logs_act_lesson_deleted()
 					: "Dars o'chirildi",
-				classes: 'bg-rose-50 text-rose-700 ring-rose-600/20'
+				classes: 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
 			},
 			LESSON_CREATED: {
 				label: m.admin_logs_act_lesson_created
 					? m.admin_logs_act_lesson_created()
 					: 'Dars yaratildi',
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+				classes: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
 			},
 			LESSON_EDITED: {
 				label: m.admin_logs_act_lesson_edited
 					? m.admin_logs_act_lesson_edited()
 					: 'Dars tahrirlandi',
-				classes: 'bg-blue-50 text-blue-700 ring-blue-600/20'
+				classes: 'bg-blue-500/10 text-blue-600 ring-blue-500/20'
 			},
 			MODULE_CREATED: {
 				label: m.admin_logs_act_mod_created ? m.admin_logs_act_mod_created() : 'Modul yaratildi',
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+				classes: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
 			},
 			MODULE_EDITED: {
 				label: m.admin_logs_act_mod_edited ? m.admin_logs_act_mod_edited() : 'Modul tahrirlandi',
-				classes: 'bg-blue-50 text-blue-700 ring-blue-600/20'
+				classes: 'bg-blue-500/10 text-blue-600 ring-blue-500/20'
 			},
 			COURSE_EDITED: {
 				label: m.admin_logs_act_course_edited
 					? m.admin_logs_act_course_edited()
 					: 'Kurs tahrirlandi',
-				classes: 'bg-blue-50 text-blue-700 ring-blue-600/20'
+				classes: 'bg-blue-500/10 text-blue-600 ring-blue-500/20'
 			},
 			COURSE_CREATED: {
 				label: m.admin_logs_act_course_created
 					? m.admin_logs_act_course_created()
 					: 'Kurs yaratildi',
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+				classes: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
 			},
 			COURSE_UPDATED: {
 				label: m.admin_logs_act_course_updated
 					? m.admin_logs_act_course_updated()
 					: 'Kurs yangilandi',
-				classes: 'bg-blue-50 text-blue-700 ring-blue-600/20'
+				classes: 'bg-blue-500/10 text-blue-600 ring-blue-500/20'
 			},
 			COURSE_DELETED: {
 				label: m.admin_logs_act_course_deleted
 					? m.admin_logs_act_course_deleted()
 					: "Kurs o'chirildi",
-				classes: 'bg-rose-50 text-rose-700 ring-rose-600/20'
+				classes: 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
 			},
 			ENROLLMENT_DELETED: {
 				label: m.admin_logs_act_enroll_deleted
 					? m.admin_logs_act_enroll_deleted()
 					: "A'zolik o'chirildi",
-				classes: 'bg-rose-50 text-rose-700 ring-rose-600/20'
+				classes: 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
 			},
 			STUDENT_CREATED: {
 				label: m.admin_logs_act_student_created
 					? m.admin_logs_act_student_created()
 					: 'Talaba yaratildi',
-				classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+				classes: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20'
 			},
 			STUDENT_UPDATED: {
 				label: m.admin_logs_act_student_updated
 					? m.admin_logs_act_student_updated()
 					: 'Talaba tahrirlandi',
-				classes: 'bg-blue-50 text-blue-700 ring-blue-600/20'
+				classes: 'bg-blue-500/10 text-blue-600 ring-blue-500/20'
 			}
 		};
 
@@ -183,33 +183,33 @@
 					: m.admin_student_unknown_date
 						? m.admin_student_unknown_date()
 						: "Noma'lum",
-				classes: 'bg-gray-50 text-gray-700 ring-gray-600/20'
+				classes: 'bg-muted/10 text-muted ring-muted/20'
 			}
 		);
 	};
 </script>
 
 {#snippet tableSkeleton()}
-	<div class="animate-pulse space-y-3 rounded-xl border border-gray-200 bg-white p-6">
-		<div class="h-10 w-full rounded-lg bg-gray-100"></div>
+	<div class="border-main bg-card animate-pulse space-y-3 rounded-xl border p-6">
+		<div class="h-10 w-full rounded-lg bg-muted/10"></div>
 		{#each Array(8) as _, i (i)}
-			<div class="mt-2 h-14 w-full rounded-lg bg-gray-50"></div>
+			<div class="mt-2 h-14 w-full rounded-lg bg-muted/5"></div>
 		{/each}
 	</div>
 {/snippet}
 
-<div class="min-h-screen bg-gray-50/50 p-4 font-sans sm:p-6 lg:p-8">
+<div class="bg-main min-h-screen p-4 font-sans sm:p-6 lg:p-8">
 	<div class="mx-auto max-w-7xl">
 		<div class="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
 			<div>
-				<h1 class="flex items-center gap-2 text-2xl font-semibold text-gray-900">
-					<Activity class="text-emerald-600" />
+				<h1 class="text-main flex items-center gap-2 text-2xl font-semibold">
+					<Activity class="text-primary" />
 					{m.admin_logs_activity_title ? m.admin_logs_activity_title() : 'Tizim faoliyati'}
 				</h1>
 				{#await data.lazy.activityData then resolvedData}
-					<p class="mt-1 text-sm text-gray-500">
+					<p class="mt-1 text-sm text-muted">
 						{m.admin_students_total ? m.admin_students_total() : 'Jami'}
-						<span class="font-medium text-gray-900">{resolvedData.count}</span>
+						<span class="text-main font-medium">{resolvedData.count}</span>
 						{m.admin_logs_activity_count_suffix ? m.admin_logs_activity_count_suffix() : 'ta yozuv'}
 					</p>
 				{/await}
@@ -218,7 +218,7 @@
 
 		<form method="GET" class="mb-6 flex flex-col gap-3 md:flex-row">
 			<div class="relative flex-1 md:max-w-md">
-				<Search size={18} class="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
+				<Search size={18} class="absolute top-1/2 left-3.5 -translate-y-1/2 text-muted" />
 				<input
 					type="text"
 					name="search"
@@ -226,14 +226,14 @@
 						? m.admin_logs_activity_search()
 						: 'Foydalanuvchi, harakat yoki obyektni izlash...'}
 					bind:value={searchValue}
-					class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-4 pl-10 text-sm text-gray-900 transition-colors outline-none placeholder:text-gray-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+					class="border-main bg-card text-main h-10 w-full rounded-lg border pr-4 pl-10 text-sm transition-colors outline-none placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
 				/>
 			</div>
 			<select
 				name="ordering"
 				bind:value={orderingValue}
 				onchange={(e) => /** @type {HTMLSelectElement} */ (e.target).form?.submit()}
-				class="h-10 rounded-lg border border-gray-200 bg-white px-4 text-sm text-gray-700 transition-colors outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+				class="border-main bg-card text-main h-10 rounded-lg border px-4 text-sm transition-colors outline-none focus:border-primary focus:ring-1 focus:ring-primary"
 			>
 				<option value="-created_at"
 					>{m.admin_logs_activity_newest
@@ -257,10 +257,10 @@
 			{@const logs = resolvedData.results || []}
 			{@const totalPages = Math.ceil(resolvedData.count / itemsPerPage)}
 
-			<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+			<div class="border-main bg-card overflow-hidden rounded-xl border shadow-sm">
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[1000px] text-left text-sm">
-						<thead class="border-b border-gray-200 bg-gray-50/80">
+						<thead class="border-main border-b bg-muted/5">
 							<tr>
 								<th class="admin-table"
 									>{m.admin_logs_activity_col_user
@@ -290,16 +290,16 @@
 								>
 							</tr>
 						</thead>
-						<tbody class="divide-y divide-gray-100">
+						<tbody class="divide-main/5 divide-y">
 							{#each logs as log (log.id)}
 								{@const config = getActionConfig(log.action)}
-								<tr class="group transition-colors hover:bg-gray-50/50">
+								<tr class="group transition-colors hover:bg-muted/5">
 									<td class="px-6 py-4">
-										<div class="font-medium text-gray-900">
+										<div class="text-main font-medium">
 											{log.user_name}
 										</div>
 										{#if log.user?.role}
-											<div class="text-xs text-gray-500 capitalize">{log.user.role}</div>
+											<div class="text-xs text-muted capitalize">{log.user.role}</div>
 										{/if}
 									</td>
 									<td class="px-6 py-4">
@@ -309,27 +309,27 @@
 											{config.label}
 										</span>
 									</td>
-									<td class="px-6 py-4 text-gray-700">
+									<td class="px-6 py-4 text-muted">
 										{log.target ||
 											(m.admin_logs_activity_system ? m.admin_logs_activity_system() : 'Tizim')}
 									</td>
-									<td class="px-6 py-4 text-gray-500 md:table-cell">
+									<td class="px-6 py-4 text-muted md:table-cell">
 										<div class="max-w-[200px] truncate lg:max-w-xs" title={log.detail}>
 											{log.detail || '—'}
 										</div>
 									</td>
-									<td class="px-6 py-4 font-mono text-xs text-gray-500 sm:table-cell">
+									<td class="px-6 py-4 font-mono text-xs text-muted sm:table-cell">
 										{log.ip_address || '—'}
 									</td>
-									<td class="px-6 py-4 text-right whitespace-nowrap text-gray-600">
+									<td class="px-6 py-4 text-right whitespace-nowrap text-muted">
 										{formatDate(log.created_at)}
 									</td>
 								</tr>
 							{:else}
 								<tr>
-									<td colspan="6" class="py-16 text-center text-gray-500">
-										<AlertCircle class="mx-auto mb-3 h-12 w-12 text-gray-300" strokeWidth={1.5} />
-										<p class="text-base font-medium text-gray-900">
+									<td colspan="6" class="py-16 text-center text-muted">
+										<AlertCircle class="mx-auto mb-3 h-12 w-12 text-muted/30" strokeWidth={1.5} />
+										<p class="text-base font-medium text-main">
 											{m.admin_logs_activity_not_found
 												? m.admin_logs_activity_not_found()
 												: 'Loglar topilmadi'}
@@ -347,13 +347,11 @@
 				</div>
 
 				{#if totalPages > 1}
-					<div
-						class="flex items-center justify-between border-t border-gray-200 bg-white px-6 py-4"
-					>
+					<div class="border-main bg-card flex items-center justify-between border-t px-6 py-4">
 						<a
 							href={resolve('/admin/logs/activity') +
 								`?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`}
-							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 {currentPage ===
+							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 {currentPage ===
 							1
 								? 'pointer-events-none opacity-40'
 								: ''}"
@@ -362,7 +360,7 @@
 							{m.admin_students_prev ? m.admin_students_prev() : 'Ortga'}
 						</a>
 						<div class="flex gap-1">
-							<span class="text-sm font-medium text-gray-600"
+							<span class="text-sm font-medium text-muted"
 								>{m.admin_logs_activity_page ? m.admin_logs_activity_page() : 'Sahifa'}
 								{currentPage} / {totalPages}</span
 							>
@@ -370,7 +368,7 @@
 						<a
 							href={resolve('/admin/logs/activity') +
 								`?page=${Math.min(totalPages, currentPage + 1)}&search=${searchValue}&ordering=${orderingValue}`}
-							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 {currentPage ===
+							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 {currentPage ===
 							totalPages
 								? 'pointer-events-none opacity-40'
 								: ''}"
@@ -393,6 +391,6 @@
 	@reference "tailwindcss";
 
 	.admin-table {
-		@apply px-6 py-3 font-medium whitespace-nowrap text-gray-500;
+		@apply px-6 py-3 font-medium whitespace-nowrap;
 	}
 </style>

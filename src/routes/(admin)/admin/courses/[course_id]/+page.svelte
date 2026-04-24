@@ -88,7 +88,7 @@
 				<a
 					href={resolve(`/admin/courses/create/${$page.params.course_id}`)}
 					title={m.admin_add_module()}
-					class="flex h-10 items-center gap-2 rounded-xl bg-[#ed4b72] px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#d93a5f] active:scale-95"
+					class="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-hover active:scale-95"
 				>
 					<Plus size={18} strokeWidth={3} />
 					<span class="sm:inline">{m.admin_module_label()}</span>
@@ -97,7 +97,7 @@
 					<a
 						href={resolve(`/admin/courses/create/${$page.params.course_id}/lesson`)}
 						title={m.admin_add_lesson()}
-						class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-[#ed4b72] hover:text-[#ed4b72] active:scale-95"
+						class="flex h-10 items-center gap-2 rounded-xl border border-border bg-surface px-4 text-sm font-bold text-foreground shadow-sm transition-all hover:border-primary hover:text-primary active:scale-95"
 					>
 						<BookPlus size={18} />
 						<span class="sm:inline">{m.admin_lesson_label()}</span>
@@ -109,13 +109,13 @@
 
 	{#snippet adminFooterActions()}
 		{#if isAdmin}
-			<div class="mt-4 overflow-hidden rounded-[32px] border border-red-100 bg-white shadow-sm">
-				<div class="border-b border-red-50 bg-red-50/50 p-6">
-					<h3 class="flex items-center gap-2 text-lg font-black text-red-700">
+			<div class="mt-4 overflow-hidden rounded-[32px] border border-red-500/20 bg-surface shadow-sm">
+				<div class="border-b border-red-500/10 bg-red-500/5 p-6">
+					<h3 class="flex items-center gap-2 text-lg font-black text-red-500">
 						<AlertTriangle size={22} />
 						{m.admin_danger_zone_title()}
 					</h3>
-					<p class="mt-2 text-sm font-medium text-red-600/70">
+					<p class="mt-2 text-sm font-medium text-red-500/70">
 						{m.admin_danger_zone_description()}
 					</p>
 				</div>
@@ -129,7 +129,7 @@
 						<button
 							type="submit"
 							disabled={isDeleting}
-							class="flex w-full items-center justify-center gap-3 rounded-2xl bg-red-600 py-4 text-base font-bold text-white shadow-lg shadow-red-200/50 transition-all hover:bg-red-700 active:scale-[0.98] disabled:opacity-50"
+							class="flex w-full items-center justify-center gap-3 rounded-2xl bg-red-500 py-4 text-base font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-600 active:scale-[0.98] disabled:opacity-50"
 						>
 							<Trash2 size={20} />
 							{isDeleting ? m.admin_danger_zone_deleting() : m.admin_danger_zone_delete_btn()}

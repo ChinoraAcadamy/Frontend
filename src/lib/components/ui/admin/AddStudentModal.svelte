@@ -54,17 +54,17 @@
 		transition:fade={{ duration: 200 }}
 	>
 		<div
-			class="flex max-h-[95vh] w-full max-w-2xl flex-col rounded-4xl bg-white shadow-2xl sm:max-h-[90vh]"
+			class="flex max-h-[95vh] w-full max-w-2xl flex-col rounded-4xl border border-main bg-card shadow-2xl sm:max-h-[90vh]"
 			transition:fly={{ y: 50, duration: 300, opacity: 0 }}
 		>
-			<div class="flex shrink-0 items-center justify-between border-b border-slate-100 p-5 sm:p-6">
-				<h2 class="text-xl font-extrabold text-slate-800 sm:text-2xl">
+			<div class="flex shrink-0 items-center justify-between border-b border-main p-5 sm:p-6">
+				<h2 class="text-xl font-extrabold text-main sm:text-2xl">
 					{m.modal_add_student_title ? m.modal_add_student_title() : 'Yangi Student'}
 				</h2>
 				<button
 					type="button"
 					onclick={onClose}
-					class="rounded-full bg-slate-50 p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+					class="rounded-full border border-main bg-card p-2 text-muted transition-colors hover:bg-muted/10 active:scale-95"
 				>
 					<X size={20} strokeWidth={2.5} />
 				</button>
@@ -97,7 +97,7 @@
 				<div class="custom-scrollbar flex-1 overflow-y-auto p-5 sm:p-6">
 					{#if serverError}
 						<div
-							class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-600"
+							class="mb-5 rounded-xl border border-primary/20 bg-primary/10 p-4 text-sm font-medium text-primary"
 						>
 							{serverError}
 						</div>
@@ -105,9 +105,9 @@
 
 					<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 						<div class="space-y-1.5">
-							<label for="firstName" class="text-sm font-bold text-slate-700"
+							<label for="firstName" class="text-sm font-bold text-main"
 								>{m.admin_student_first_name ? m.admin_student_first_name() : 'Ism'}
-								<span class="text-rose-500">*</span></label
+								<span class="text-primary">*</span></label
 							>
 							<input
 								name="firstName"
@@ -116,12 +116,12 @@
 								placeholder={m.placeholder_first_name
 									? m.placeholder_first_name()
 									: 'Masalan: Alisher'}
-								class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
+								class="h-12 w-full rounded-xl border border-main bg-muted/5 px-4 text-sm font-medium text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
 							/>
 						</div>
 
 						<div class="space-y-1.5">
-							<label for="lastName" class="text-sm font-bold text-slate-700">
+							<label for="lastName" class="text-sm font-bold text-main">
 								{m.admin_student_last_name ? m.admin_student_last_name() : 'Familiya'}
 							</label>
 							<input
@@ -131,14 +131,14 @@
 								placeholder={m.placeholder_last_name
 									? m.placeholder_last_name()
 									: 'Masalan: Navoiy'}
-								class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
+								class="h-12 w-full rounded-xl border border-main bg-muted/5 px-4 text-sm font-medium text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
 							/>
 						</div>
 
 						<div class="space-y-1.5">
-							<label for="phone_number" class="text-sm font-bold text-slate-700"
+							<label for="phone_number" class="text-sm font-bold text-main"
 								>{m.admin_student_phone ? m.admin_student_phone() : 'Telefon'}
-								<span class="text-rose-500">*</span></label
+								<span class="text-primary">*</span></label
 							>
 							<PhoneInput
 								name="phone_number"
@@ -148,26 +148,26 @@
 						</div>
 
 						<div class="space-y-1.5">
-							<label for="username" class="text-sm font-bold text-slate-700">
+							<label for="username" class="text-sm font-bold text-main">
 								{m.profile_username ? m.profile_username() : 'Username'}
 							</label>
 							<div
-								class="flex h-12 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition-all focus-within:border-[#ed4b72] focus-within:bg-white focus-within:ring-4 focus-within:ring-[#ed4b72]/10"
+								class="flex h-12 items-center overflow-hidden rounded-xl border border-main bg-muted/5 transition-all focus-within:border-primary focus-within:bg-card focus-within:ring-4 focus-within:ring-primary/10"
 							>
-								<span class="pr-1 pl-4 text-sm font-bold text-slate-400">@</span>
+								<span class="pr-1 pl-4 text-sm font-bold text-muted">@</span>
 								<input
 									id="username"
 									name="username"
 									type="text"
 									placeholder={m.placeholder_username ? m.placeholder_username() : 'login'}
 									autocomplete="off"
-									class="h-full flex-1 bg-transparent pr-4 text-sm font-medium outline-none"
+									class="h-full flex-1 bg-transparent pr-4 text-sm font-medium text-main outline-none"
 								/>
 							</div>
 						</div>
 
 						<div class="space-y-1.5 md:col-span-2">
-							<label for="password" class="text-sm font-bold text-slate-700">
+							<label for="password" class="text-sm font-bold text-main">
 								{m.login_password_label ? m.login_password_label() : 'Parol'}
 							</label>
 							<div class="relative">
@@ -176,12 +176,12 @@
 									id="password"
 									type={showPassword ? 'text' : 'password'}
 									placeholder={m.placeholder_password ? m.placeholder_password() : 'Yashirin parol'}
-									class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pr-12 pl-4 text-sm font-medium transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
+									class="h-12 w-full rounded-xl border border-main bg-muted/5 pr-12 pl-4 text-sm font-medium text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
 								/>
 								<button
 									type="button"
 									onclick={() => (showPassword = !showPassword)}
-									class="absolute top-1/2 right-3 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+									class="absolute top-1/2 right-3 -translate-y-1/2 rounded-lg p-1.5 text-muted transition-colors hover:bg-muted/10 hover:text-main"
 								>
 									{#if showPassword}<Eye size={18} />{:else}<EyeOff size={18} />{/if}
 								</button>
@@ -189,7 +189,7 @@
 						</div>
 
 						<div class="relative space-y-1.5 md:col-span-2">
-							<label for="biriktirish" class="text-sm font-bold text-slate-700">
+							<label for="biriktirish" class="text-sm font-bold text-main">
 								{m.label_attach_courses ? m.label_attach_courses() : 'Kurslarga biriktirish'}
 							</label>
 
@@ -197,7 +197,7 @@
 								<Search
 									size={18}
 									strokeWidth={2.5}
-									class="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-slate-400"
+									class="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-muted"
 								/>
 								<input
 									id="biriktirish"
@@ -209,13 +209,13 @@
 									bind:value={courseSearchQuery}
 									onfocus={() => (showCourseDropdown = true)}
 									onblur={() => (showCourseDropdown = false)}
-									class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pr-4 pl-11 text-sm font-medium text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
+									class="h-12 w-full rounded-xl border border-main bg-muted/5 pr-4 pl-11 text-sm font-medium text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
 								/>
 							</div>
 
 							{#if showCourseDropdown && filteredCourses.length > 0}
 								<div
-									class="custom-scrollbar absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl"
+									class="custom-scrollbar absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-2xl border border-main bg-card p-2 shadow-2xl"
 									tabindex="0"
 									role="listbox"
 									onkeydown={(e) => e.key === 'Escape' && (showCourseDropdown = false)}
@@ -228,15 +228,15 @@
 												type="button"
 												class="flex w-full cursor-pointer items-center justify-between rounded-xl border p-2.5 text-left transition-all
                                                     {isSelected
-													? 'border-[#ed4b72] bg-[#ed4b72]/5'
-													: 'border-transparent hover:bg-slate-50'}"
+													? 'border-primary bg-primary/5'
+													: 'border-transparent hover:bg-muted/5'}"
 												onclick={() => toggleCourse(course.id)}
 											>
 												<div class="flex items-center gap-3">
 													<div
 														class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg {isSelected
-															? 'bg-[#ed4b72] text-white'
-															: 'bg-slate-100 text-slate-500'}"
+															? 'bg-primary text-white'
+															: 'bg-muted/10 text-muted'}"
 													>
 														{#if isSelected}
 															<Check size={16} strokeWidth={3} />
@@ -245,8 +245,8 @@
 														{/if}
 													</div>
 													<div>
-														<h4 class="text-sm font-bold text-slate-800">{course.title}</h4>
-														<p class="text-xs font-medium text-slate-500">
+														<h4 class="text-sm font-bold text-main">{course.title}</h4>
+														<p class="text-xs font-medium text-muted">
 															{course.price
 																? course.price.toLocaleString() + ' UZS'
 																: m.course_free
@@ -271,13 +271,13 @@
 										{@const course = availableCourses.find((c) => c.id === id)}
 										{#if course}
 											<span
-												class="inline-flex items-center gap-1.5 rounded-lg border border-[#ed4b72]/20 bg-[#ed4b72]/10 px-3 py-1.5 text-xs font-bold text-[#ed4b72]"
+												class="inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary"
 											>
 												{course.title}
 												<button
 													type="button"
 													onclick={() => toggleCourse(id)}
-													class="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-[#ed4b72]/20 active:scale-90"
+													class="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-primary/20 active:scale-90"
 												>
 													<X size={14} strokeWidth={2.5} />
 												</button>
@@ -291,19 +291,19 @@
 				</div>
 
 				<div
-					class="flex shrink-0 flex-col-reverse justify-end gap-3 rounded-b-4xl border-t border-slate-100 bg-slate-50/80 p-5 sm:flex-row sm:p-6"
+					class="flex shrink-0 flex-col-reverse justify-end gap-3 rounded-b-4xl border-t border-main bg-muted/5 p-5 sm:flex-row sm:p-6"
 				>
 					<button
 						type="button"
 						onclick={onClose}
-						class="w-full rounded-xl border border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100 sm:w-auto sm:px-6"
+						class="w-full rounded-xl border border-main bg-card py-3.5 text-sm font-bold text-muted transition-colors hover:bg-muted/10 sm:w-auto sm:px-6"
 					>
 						{m.admin_btn_cancel ? m.admin_btn_cancel() : 'Bekor qilish'}
 					</button>
 					<button
 						type="submit"
 						disabled={isSubmitting}
-						class="flex w-full items-center justify-center rounded-xl bg-[#ed4b72] py-3.5 text-sm font-bold text-white shadow-lg shadow-rose-200 transition-all hover:bg-[#de3c61] active:scale-[0.98] disabled:opacity-70 sm:w-auto sm:min-w-[160px]"
+						class="flex w-full items-center justify-center rounded-xl bg-primary py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover active:scale-[0.98] disabled:opacity-70 sm:w-auto sm:min-w-[160px]"
 					>
 						{isSubmitting
 							? m.btn_creating
@@ -328,10 +328,10 @@
 		background: transparent;
 	}
 	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background-color: #cbd5e1;
+		background-color: var(--border-main);
 		border-radius: 20px;
 	}
 	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-		background-color: #94a3b8;
+		background-color: var(--text-muted);
 	}
 </style>

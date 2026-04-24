@@ -3,12 +3,14 @@
 	import { fade } from 'svelte/transition';
 	import { getVideoDuration } from '$lib/utils/lessonForm';
 	import * as m from '$lib/paraglide/messages.js';
+	import { resolve } from '$app/paths';
 
 	let {
 		videoFile = $bindable(null),
 		uploadProgress = $bindable(0),
 		autoDuration = $bindable(0),
-		// isSubmitting = false
+		isSubmitting = false,
+		currentVideoUrl = null
 	} = $props();
 
 	let isDragging = $state(false);
@@ -39,9 +41,10 @@
 	<div
 		class="relative flex min-h-[160px] items-center justify-center overflow-hidden rounded-lg border transition-colors
                {isDragging
-			? 'border-[#fa2e69] bg-slate-50'
-			: 'border-slate-200 bg-white hover:border-slate-300'}
-               {videoFile ? 'min-h-0 border-none p-0' : 'cursor-pointer'}"
+			? 'border-primary bg-muted/5'
+			: 'border-border bg-surface hover:border-primary/30'}
+                {videoFile ? 'min-h-0 border-none p-0' : 'cursor-pointer'}
+                {isSubmitting ? 'pointer-events-none opacity-80' : ''}"
 		ondragenter={(e) => {
 			e.preventDefault();
 			isDragging = true;
@@ -58,55 +61,82 @@
 
 		{#if videoFile}
 			<div
-				class="flex w-full items-center gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4"
+				class="flex w-full items-center gap-4 rounded-lg border border-border bg-muted/5 p-4"
 				in:fade
 			>
 				<div
-					class="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-slate-200 bg-white text-slate-400"
+					class="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-border bg-surface text-muted"
 				>
 					<Video size={20} />
 				</div>
 				<div class="min-w-0 flex-1">
-					<span class="mb-1 block truncate text-sm font-bold text-slate-700">{videoFile.name}</span>
+					<span class="mb-1 block truncate text-sm font-bold text-foreground">{videoFile.name}</span>
 					<div class="flex gap-2">
-						<span class="text-[10px] font-bold tracking-tight text-slate-400 uppercase">
+						<span class="text-[10px] font-bold tracking-tight text-muted uppercase">
 							{(videoFile.size / (1024 * 1024)).toFixed(1)} MB
 						</span>
-						<span class="text-[10px] font-bold tracking-tight text-[#fa2e69] uppercase">
+						<span class="text-[10px] font-bold tracking-tight text-primary uppercase">
 							{autoDuration} min
 						</span>
 					</div>
 				</div>
 				<button
 					type="button"
-					class="flex h-8 w-8 items-center justify-center rounded border border-slate-200 bg-white text-slate-300 transition-colors hover:text-red-500"
+					class="flex h-8 w-8 items-center justify-center rounded border border-border bg-surface text-muted/50 transition-colors hover:text-red-500 disabled:opacity-50"
 					onclick={() => {
+						if (isSubmitting) return;
 						videoFile = null;
 						autoDuration = 0;
 					}}
+					disabled={isSubmitting}
 					title={m.admin_students_delete ? m.admin_students_delete() : 'O\'chirish'}
 				>
 					<X size={14} />
 				</button>
+			</div>
+		{:else if currentVideoUrl}
+			<div
+				class="flex w-full items-center gap-4 rounded-lg border border-border bg-muted/5 p-4"
+				in:fade
+			>
+				<div
+					class="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-border bg-surface text-primary"
+				>
+					<Video size={20} />
+				</div>
+				<div class="min-w-0 flex-1">
+					<span class="mb-0.5 block text-[10px] font-black tracking-widest text-muted uppercase">
+						{m.label_current_video ? m.label_current_video() : 'Mavjud video'}
+					</span>
+					<a href={resolve(currentVideoUrl)} target="_blank" class="block truncate text-sm font-bold text-primary hover:underline">
+						{currentVideoUrl.split('/').pop()}
+					</a>
+				</div>
+				<label
+					for="les_video"
+					class="flex h-8 items-center justify-center rounded border border-border bg-surface px-3 text-[11px] font-bold text-muted transition-colors hover:border-primary/30 hover:text-primary cursor-pointer disabled:opacity-50 {isSubmitting ? 'pointer-events-none' : ''}"
+				>
+					{m.btn_replace_video ? m.btn_replace_video() : 'O\'zgartirish'}
+				</label>
 			</div>
 		{:else}
 			<label
 				for="les_video"
 				class="group flex w-full cursor-pointer flex-col items-center px-5 py-8"
 			>
-				<div class="mb-4 text-slate-300 transition-colors group-hover:text-slate-400">
+				<div class="mb-4 text-muted/30 transition-colors group-hover:text-muted/50">
 					<UploadCloud size={32} />
 				</div>
 				<div class="mb-4 text-center">
-					<span class="mb-0.5 block text-sm font-bold text-slate-600">
+					<span class="mb-0.5 block text-sm font-bold text-foreground">
 						{m.text_upload_video ? m.text_upload_video() : 'Video yuklash'}
 					</span>
-					<span class="text-[11px] font-medium text-slate-400">
+					<span class="text-[11px] font-medium text-muted">
 						{m.text_file_types_hint ? m.text_file_types_hint() : 'MP4, MOV, WEBM (Maks: 2GB)'}
 					</span>
 				</div>
 				<span
-					class="rounded border border-slate-200 bg-white px-4 py-1.5 text-[11px] font-bold tracking-wider text-slate-500 uppercase shadow-sm transition-colors hover:border-slate-300"
+					class="rounded border border-border bg-surface px-4 py-1.5 text-[11px] font-bold tracking-wider text-muted uppercase shadow-sm transition-colors hover:border-primary/30"
 				>
 					{m.btn_select_file ? m.btn_select_file() : 'Faylni tanlash'}
 				</span>
@@ -115,18 +145,18 @@
 
 		{#if uploadProgress > 0}
 			<div
-				class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/95 p-6"
+				class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-surface/95 p-6"
 				in:fade
 			>
 				<div class="mb-4 flex flex-col items-center">
-					<span class="text-2xl leading-none font-black text-slate-700">{uploadProgress}%</span>
-					<span class="mt-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+					<span class="text-2xl leading-none font-black text-foreground">{uploadProgress}%</span>
+					<span class="mt-1 text-[10px] font-bold tracking-widest text-muted uppercase">
 						{m.text_uploading ? m.text_uploading() : 'Yuklanmoqda'}
 					</span>
 				</div>
-				<div class="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-slate-100">
+				<div class="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-muted/10">
 					<div
-						class="h-full bg-[#fa2e69] transition-all duration-300"
+						class="h-full bg-primary transition-all duration-300"
 						style="width: {uploadProgress}%"
 					></div>
 				</div>
@@ -137,11 +167,11 @@
 	{#if !videoFile}
 		<div class="flex items-center gap-2 px-1">
 			<div
-				class="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[9px] font-black text-white"
+				class="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-muted/20 text-[9px] font-black text-foreground"
 			>
 				!
 			</div>
-			<p class="text-[11px] font-medium text-slate-400 italic">
+			<p class="text-[11px] font-medium text-muted italic">
 				{m.text_duration_auto_hint ? m.text_duration_auto_hint() : 'Video davomiyligi avtomatik hisoblanadi'}
 			</p>
 		</div>

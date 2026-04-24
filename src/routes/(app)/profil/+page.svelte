@@ -23,6 +23,7 @@
 	import { fly, fade, scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
+	import { getFriendlyDeviceName } from '$lib/utils/device-names.js';
 
 	let { data, form } = $props();
 
@@ -65,9 +66,21 @@
 	const parseUserAgent = (name) => {
 		if (!name) return m.profile_device_unknown?.() ?? 'Unknown';
 		const lower = name.toLowerCase();
-		if (lower.includes('iphone') || lower.includes('android') || lower.includes('mobile') || lower.includes('samsung') || lower.includes('pixel')) return 'Mobile';
-		if (lower.includes('macintosh') || lower.includes('windows') || lower.includes('linux'))
-			return 'Desktop';
+		if (lower.includes('pc (') || lower.includes('windows') || lower.includes('macintosh') || lower.includes('linux')) return 'Desktop';
+		if (
+			lower.includes('iphone') || 
+			lower.includes('android') || 
+			lower.includes('mobile') || 
+			lower.includes('tablet') || 
+			lower.includes('samsung') || 
+			lower.includes('pixel') || 
+			lower.includes('xiaomi') || 
+			lower.includes('redmi') || 
+			lower.includes('oppo') || 
+			lower.includes('vivo') || 
+			lower.includes('huawei') || 
+			lower.includes('realme')
+		) return 'Mobile';
 		return 'Device';
 	};
 
@@ -80,7 +93,7 @@
 			if (name.includes('Edge')) return 'Edge';
 			return name.split(' ')[0] || (m.profile_device_unknown?.() ?? 'Unknown');
 		}
-		return name;
+		return getFriendlyDeviceName(name);
 	};
 
 	const activeDevices = $derived(data.devices?.filter((d) => d.is_active) ?? []);
@@ -91,7 +104,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
-		href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+		href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
 		rel="stylesheet"
 	/>
 </svelte:head>
@@ -425,33 +438,6 @@
 </div>
 
 <style>
-	/* ─── Tokens ──────────────────────────────────────────────────── */
-	:root {
-		--brand: #fa2e69;
-		--brand-dark: #d41f55;
-		--brand-light: #fff0f5;
-		--brand-mid: #ffd6e5;
-		--ink-900: #0d0d12;
-		--ink-700: #2a2a35;
-		--ink-500: #5c5c70;
-		--ink-300: #9898ac;
-		--ink-100: #ededf5;
-		--ink-50: #f7f7fb;
-		--white: #ffffff;
-		--sky: #0ea5e9;
-		--emerald: #10b981;
-		--amber: #f59e0b;
-		--radius-sm: 10px;
-		--radius-md: 16px;
-		--radius-lg: 24px;
-		--radius-xl: 32px;
-		--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-		--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
-		--shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.06);
-		--font-display: system-ui, sans-serif;
-		--font-body: 'DM Sans', system-ui, sans-serif;
-	}
-
 	/* ─── Reset ─────────────────────────────────────────────────── */
 	*,
 	*::before,
@@ -464,15 +450,15 @@
 	/* ─── Root ───────────────────────────────────────────────────── */
 	.page-root {
 		min-height: 100svh;
-		background: var(--ink-50);
-		font-family: var(--font-body);
-		color: var(--ink-700);
+		background: var(--bg-main);
+		font-family: 'Instrument Sans', sans-serif;
+		color: var(--text-main);
 	}
 
 	/* ─── Hero ───────────────────────────────────────────────────── */
 	.hero {
 		position: relative;
-		background: var(--brand);
+		background: var(--primary);
 		padding: 3.5rem 1.5rem 5rem;
 		overflow: hidden;
 		contain: layout style;
@@ -528,7 +514,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-family: var(--font-display);
+		font-family: 'Outfit', sans-serif;
 		font-size: 1.75rem;
 		font-weight: 800;
 		color: #fff;
@@ -542,8 +528,8 @@
 		width: 22px;
 		height: 22px;
 		border-radius: 50%;
-		background: var(--emerald);
-		border: 2px solid var(--brand);
+		background: #10b981;
+		border: 2px solid var(--primary);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -557,7 +543,7 @@
 		gap: 0.6rem;
 	}
 	.hero-name {
-		font-family: var(--font-display);
+		font-family: 'Outfit', sans-serif;
 		font-size: clamp(1.5rem, 4vw, 2rem);
 		font-weight: 800;
 		color: #fff;
@@ -596,7 +582,7 @@
 		margin-inline: auto;
 		margin-top: -2.25rem;
 		margin-bottom: 0;
-		background: var(--white);
+		background: var(--bg-card);
 		border-radius: var(--radius-lg);
 		box-shadow: var(--shadow-md);
 		display: flex;
@@ -626,36 +612,36 @@
 		margin-bottom: 0.25rem;
 	}
 	.stat-icon-amber {
-		background: #fef3c7;
-		color: var(--amber);
+		background: rgba(245, 158, 11, 0.1);
+		color: #f59e0b;
 	}
 	.stat-icon-sky {
-		background: #e0f2fe;
-		color: var(--sky);
+		background: rgba(14, 165, 233, 0.1);
+		color: #0ea5e9;
 	}
 	.stat-icon-emerald {
-		background: #d1fae5;
-		color: var(--emerald);
+		background: rgba(16, 185, 129, 0.1);
+		color: #10b981;
 	}
 
 	.stat-value {
-		font-family: var(--font-display);
+		font-family: 'Outfit', sans-serif;
 		font-size: 1.75rem;
 		font-weight: 800;
-		color: var(--ink-900);
+		color: var(--text-main);
 		letter-spacing: -0.04em;
 		line-height: 1;
 	}
 	.stat-label {
 		font-size: 0.7rem;
 		font-weight: 600;
-		color: var(--ink-300);
+		color: var(--text-muted);
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
 	}
 	.stat-divider {
 		width: 1px;
-		background: var(--ink-100);
+		background: var(--border-main);
 		align-self: stretch;
 		margin-block: 1rem;
 	}
@@ -680,7 +666,7 @@
 
 	/* ─── Sidebar ────────────────────────────────────────────────── */
 	.sidebar {
-		background: var(--white);
+		background: var(--bg-card);
 		border-radius: var(--radius-lg);
 		box-shadow: var(--shadow-sm);
 		padding: 1.5rem;
@@ -698,7 +684,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.2em;
-		color: var(--ink-300);
+		color: var(--text-muted);
 		padding: 0 0.25rem;
 		margin-bottom: 0.25rem;
 	}
@@ -724,16 +710,16 @@
 		width: 100%;
 	}
 	.nav-item:hover {
-		background: var(--ink-50);
+		background: var(--muted/5);
 	}
 	.nav-item:active {
 		transform: scale(0.98);
 	}
 	.nav-item--active {
-		background: var(--brand-light) !important;
+		background: var(--primary/10) !important;
 	}
 	.nav-item--active-blue {
-		background: #eff6ff !important;
+		background: var(--secondary/10) !important;
 	}
 
 	.nav-icon {
@@ -743,41 +729,41 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 9px;
-		background: var(--ink-100);
-		color: var(--ink-300);
+		background: var(--muted/10);
+		color: var(--text-muted);
 		flex-shrink: 0;
 		transition:
 			background 0.18s,
 			color 0.18s;
 	}
 	.nav-icon--pink {
-		background: var(--brand-mid);
-		color: var(--brand);
+		background: var(--primary/15);
+		color: var(--primary);
 	}
 	.nav-icon--blue {
-		background: #dbeafe;
-		color: #2563eb;
+		background: var(--secondary/15);
+		color: var(--secondary);
 	}
 
 	.nav-label {
 		flex: 1;
 		font-size: 0.85rem;
 		font-weight: 600;
-		color: var(--ink-700);
+		color: var(--text-main);
 	}
 	.nav-item--active .nav-label {
-		color: var(--ink-900);
+		color: var(--text-main);
 	}
 
 	:global(.nav-chevron) {
-		color: var(--ink-100);
+		color: var(--muted/20);
 		transition:
 			color 0.18s,
 			transform 0.18s;
 		flex-shrink: 0;
 	}
 	:global(.nav-chevron--active) {
-		color: var(--brand) !important;
+		color: var(--primary) !important;
 	}
 
 	.nav-badge {
@@ -785,14 +771,14 @@
 		font-weight: 800;
 		padding: 0.15rem 0.5rem;
 		border-radius: 100px;
-		background: var(--ink-100);
-		color: var(--ink-500);
+		background: var(--muted/10);
+		color: var(--text-muted);
 	}
 
 	.sidebar-footer {
 		margin-top: auto;
 		padding-top: 1rem;
-		border-top: 1px solid var(--ink-100);
+		border-top: 1px solid var(--border-main);
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
@@ -802,7 +788,7 @@
 		align-items: center;
 		gap: 0.4rem;
 		font-size: 0.72rem;
-		color: var(--ink-300);
+		color: var(--text-muted);
 		padding-inline: 0.25rem;
 	}
 
@@ -822,12 +808,12 @@
 		transition: background 0.18s;
 	}
 	.logout-btn:hover {
-		background: #fff1f2;
+		background: rgba(225, 29, 72, 0.05);
 	}
 
 	/* ─── Content Panel ──────────────────────────────────────────── */
 	.content-panel {
-		background: var(--white);
+		background: var(--bg-card);
 		border-radius: var(--radius-lg);
 		box-shadow: var(--shadow-sm);
 		padding: 2.25rem 2rem;
@@ -843,16 +829,16 @@
 		margin-bottom: 2rem;
 	}
 	.panel-title {
-		font-family: var(--font-display);
+		font-family: 'Outfit', sans-serif;
 		font-size: 1.2rem;
 		font-weight: 800;
-		color: var(--ink-900);
+		color: var(--text-main);
 		letter-spacing: -0.02em;
 		margin-bottom: 0.35rem;
 	}
 	.panel-desc {
 		font-size: 0.85rem;
-		color: var(--ink-300);
+		color: var(--text-muted);
 		font-weight: 400;
 	}
 
@@ -885,18 +871,18 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.14em;
-		color: var(--ink-300);
+		color: var(--text-muted);
 	}
 	.field-input {
 		width: 100%;
 		padding: 0.85rem 1rem;
-		background: var(--ink-50);
-		border: 1.5px solid var(--ink-100);
+		background: var(--muted/5);
+		border: 1.5px solid var(--border-main);
 		border-radius: var(--radius-md);
-		font-family: var(--font-body);
+		font-family: 'Instrument Sans', sans-serif;
 		font-size: 0.95rem;
 		font-weight: 500;
-		color: var(--ink-900);
+		color: var(--text-main);
 		outline: none;
 		transition:
 			border-color 0.2s,
@@ -906,22 +892,22 @@
 		appearance: none;
 	}
 	.field-input::placeholder {
-		color: var(--ink-100);
+		color: var(--muted/20);
 	}
 	.field-input:hover {
 		border-color: var(--ink-300);
 	}
 	.field-input:focus {
-		background: var(--white);
-		border-color: var(--brand);
-		box-shadow: 0 0 0 3px rgba(250, 46, 105, 0.1);
+		background: var(--bg-card);
+		border-color: var(--primary);
+		box-shadow: 0 0 0 3px var(--primary/10);
 	}
 
 	.form-actions {
 		display: flex;
 		justify-content: flex-end;
 		padding-top: 0.75rem;
-		border-top: 1px solid var(--ink-100);
+		border-top: 1px solid var(--border-main);
 		margin-top: 0.5rem;
 	}
 	.save-btn {
@@ -934,7 +920,7 @@
 		color: #fff;
 		border: none;
 		border-radius: var(--radius-md);
-		font-family: var(--font-display);
+		font-family: 'Outfit', sans-serif;
 		font-size: 0.85rem;
 		font-weight: 700;
 		letter-spacing: 0.04em;
@@ -986,8 +972,8 @@
 		justify-content: space-between;
 		gap: 1rem;
 		padding: 1.1rem 1.25rem;
-		background: var(--ink-50);
-		border: 1.5px solid var(--ink-100);
+		background: var(--muted/5);
+		border: 1.5px solid var(--border-main);
 		border-radius: var(--radius-md);
 		transition:
 			border-color 0.2s,
@@ -998,9 +984,9 @@
 		box-shadow: var(--shadow-sm);
 	}
 	.device-card--current {
-		background: var(--brand-light);
-		border-color: rgba(250, 46, 105, 0.2);
-		border-left: 3px solid var(--brand);
+		background: var(--primary/10);
+		border-color: var(--primary/20);
+		border-left: 3px solid var(--primary);
 	}
 
 	.device-left {
@@ -1015,12 +1001,12 @@
 		width: 42px;
 		height: 42px;
 		border-radius: var(--radius-sm);
-		background: var(--white);
-		border: 1px solid var(--ink-100);
+		background: var(--bg-card);
+		border: 1px solid var(--border-main);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--ink-300);
+		color: var(--text-muted);
 		flex-shrink: 0;
 		transition:
 			background 0.2s,
@@ -1048,7 +1034,7 @@
 	.device-name {
 		font-size: 0.9rem;
 		font-weight: 700;
-		color: var(--ink-900);
+		color: var(--text-main);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -1082,7 +1068,7 @@
 		gap: 0.3rem;
 		font-size: 0.7rem;
 		font-weight: 500;
-		color: var(--ink-300);
+		color: var(--text-muted);
 	}
 
 	.device-remove-btn {
@@ -1094,7 +1080,7 @@
 		border-radius: var(--radius-sm);
 		border: none;
 		background: transparent;
-		color: var(--ink-300);
+		color: var(--text-muted);
 		cursor: pointer;
 		flex-shrink: 0;
 		transition:
@@ -1103,7 +1089,7 @@
 			transform 0.12s;
 	}
 	.device-remove-btn:hover {
-		background: #fff1f2;
+		background: rgba(225, 29, 72, 0.05);
 		color: #e11d48;
 	}
 	.device-remove-btn:active {
@@ -1116,13 +1102,9 @@
 		align-items: center;
 		gap: 0.75rem;
 		padding: 3rem 1rem;
-		color: var(--ink-100);
+		color: var(--muted/20);
 		font-size: 0.85rem;
 		font-weight: 500;
 	}
 
-	/* ─── Global overrides ───────────────────────────────────────── */
-	:global(body) {
-		background-color: var(--ink-50) !important;
-	}
 </style>

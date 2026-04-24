@@ -22,6 +22,7 @@
 	} from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
 	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
+	import { getFriendlyDeviceName } from '$lib/utils/device-names.js';
 
 	let { form } = $props();
 	let loading = $state(false);
@@ -53,9 +54,21 @@
 	const parseUserAgent = (name) => {
 		if (!name) return m.profile_device_unknown();
 		const lower = name.toLowerCase();
-		if (lower.includes('iphone') || lower.includes('android') || lower.includes('mobile') || lower.includes('samsung') || lower.includes('pixel')) return 'Mobile';
-		if (lower.includes('macintosh') || lower.includes('windows') || lower.includes('linux'))
-			return 'Desktop';
+		if (lower.includes('pc (') || lower.includes('windows') || lower.includes('macintosh') || lower.includes('linux')) return 'Desktop';
+		if (
+			lower.includes('iphone') || 
+			lower.includes('android') || 
+			lower.includes('mobile') || 
+			lower.includes('tablet') || 
+			lower.includes('samsung') || 
+			lower.includes('pixel') || 
+			lower.includes('xiaomi') || 
+			lower.includes('redmi') || 
+			lower.includes('oppo') || 
+			lower.includes('vivo') || 
+			lower.includes('huawei') || 
+			lower.includes('realme')
+		) return 'Mobile';
 		return 'Device';
 	};
 
@@ -68,7 +81,7 @@
 			if (name.includes('Edge')) return 'Edge';
 			return name.split(' ')[0] || m.profile_device_unknown();
 		}
-		return name;
+		return getFriendlyDeviceName(name);
 	};
 
 	const currentLocale = $derived(browser ? getLocale() : 'uz');

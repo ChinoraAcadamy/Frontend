@@ -12,6 +12,7 @@
 		EyeOff
 	} from 'lucide-svelte';
 	import LanguageSwitcher from '@/lib/components/ui/LanguageSwitcher.svelte';
+	import ThemeToggle from '@/lib/components/ui/ThemeToggle.svelte';
 	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { page } from '$app/state';
@@ -127,11 +128,11 @@
 </script>
 
 <header
-	class="sticky top-0 z-900 flex h-16 items-center justify-between border-b border-[#f0f0f0] bg-white px-4 lg:px-7"
+	class="sticky top-0 z-900 flex h-16 items-center justify-between border-b border-border bg-surface px-4 lg:px-7"
 >
 	<div class="flex flex-1 items-center gap-4">
 		<button
-			class="shrink-0 cursor-pointer border-none bg-transparent p-1 text-[#1a0e13] lg:hidden"
+			class="shrink-0 cursor-pointer border-none bg-transparent p-1 text-foreground lg:hidden"
 			onclick={() => (mobileOpen = true)}
 			aria-label={m.admin_menu_open ? m.admin_menu_open() : 'Menyuni ochish'}
 		>
@@ -150,16 +151,17 @@
 				type="text"
 				placeholder={m.admin_search_placeholder ? m.admin_search_placeholder() : 'Qidirish...'}
 				bind:value={searchQuery}
-				class="w-full rounded-xl border border-[#f0f0f0] bg-gray-50 py-2.25 pr-4 pl-10 text-sm text-[#1a0e13] transition-all duration-150 outline-none focus:border-primary-light focus:bg-white focus:ring-[3px] focus:ring-primary-light/10"
+				class="w-full rounded-xl border border-border bg-muted/10 py-2.25 pr-4 pl-10 text-sm text-foreground transition-all duration-150 outline-none focus:border-primary-light focus:bg-surface focus:ring-[3px] focus:ring-primary-light/10"
 			/>
 		</div>
 	</div>
 
 	<div class="relative flex shrink-0 items-center gap-3">
+		<ThemeToggle />
 		<LanguageSwitcher variant="minimal" />
 
 		<button
-			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-primary lg:hidden"
+			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-border bg-muted/10 text-muted transition-all duration-150 hover:border-primary/30 hover:bg-primary/5 hover:text-primary lg:hidden"
 			aria-label={m.admin_search_label ? m.admin_search_label() : 'Qidirish'}
 		>
 			<Search size={18} />
@@ -179,8 +181,8 @@
 
 		<div>
 			<button
-				class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-primary {isA11yOpen
-					? 'border-[#f5c0cf] bg-[#fdf2f6] text-primary'
+				class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-border bg-muted/10 text-muted transition-all duration-150 hover:border-primary/30 hover:bg-primary/5 hover:text-primary {isA11yOpen
+					? 'border-primary/30 bg-primary/5 text-primary'
 					: ''}"
 				onclick={() => (isA11yOpen = !isA11yOpen)}
 				aria-label={m.admin_a11y_label ? m.admin_a11y_label() : 'Maxsus imkoniyatlar'}
@@ -197,10 +199,10 @@
 				></div>
 
 				<div
-					class="absolute top-12 right-0 z-50 w-72 rounded-3xl border border-gray-100 bg-white p-5 shadow-2xl"
+					class="absolute top-12 right-0 z-50 w-72 rounded-3xl border border-border bg-surface p-5 shadow-2xl"
 				>
-					<div class="flex items-center justify-between border-b pb-3">
-						<h3 class="text-sm font-bold text-gray-800">
+					<div class="flex items-center justify-between border-b border-border pb-3">
+						<h3 class="text-sm font-bold text-foreground">
 							{m.admin_a11y_title ? m.admin_a11y_title() : 'Maxsus imkoniyatlar'}
 						</h3>
 						<button onclick={resetA11y} class="text-xs text-red-500 hover:underline"
@@ -211,20 +213,20 @@
 					<div class="mt-4 space-y-5">
 						<!-- Matn o'lchami -->
 						<div>
-							<span class="text-xs font-semibold text-gray-500"
+							<span class="text-xs font-semibold text-muted"
 								>{m.admin_a11y_text_size ? m.admin_a11y_text_size() : "Matn o'lchami"}</span
 							>
-							<div class="mt-2 flex items-center justify-between rounded-2xl border bg-gray-50 p-1">
+							<div class="mt-2 flex items-center justify-between rounded-2xl border border-border bg-background p-1">
 								<button
 									onclick={() => changeZoom(-0.1)}
-									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
+									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-surface"
 								>
 									<Minus size={18} />
 								</button>
 								<span class="font-bold text-primary">{Math.round(zoomLevel * 100)}%</span>
 								<button
 									onclick={() => changeZoom(0.1)}
-									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
+									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-surface"
 								>
 									<Plus size={18} />
 								</button>
@@ -233,22 +235,22 @@
 
 						<!-- Qator orasidagi masofa -->
 						<div>
-							<span class="text-xs font-semibold text-gray-500"
+							<span class="text-xs font-semibold text-muted"
 								>{m.admin_a11y_line_height
 									? m.admin_a11y_line_height()
 									: 'Qatorlar orasidagi masofa'}</span
 							>
-							<div class="mt-2 flex items-center justify-between rounded-2xl border bg-gray-50 p-1">
+							<div class="mt-2 flex items-center justify-between rounded-2xl border border-border bg-background p-1">
 								<button
 									onclick={() => changeLineHeight(-0.1)}
-									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
+									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-surface"
 								>
 									<Minus size={18} />
 								</button>
 								<span class="font-bold text-primary">{lineHeight.toFixed(1)}</span>
 								<button
 									onclick={() => changeLineHeight(0.1)}
-									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white"
+									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-surface"
 								>
 									<Plus size={18} />
 								</button>
@@ -260,12 +262,12 @@
 							<button
 								onclick={toggleGrayscale}
 								class="flex w-full items-center justify-between rounded-2xl border p-3 {isGrayscale
-									? 'border-primary bg-[#fdf2f6]'
-									: 'border-gray-100 hover:bg-gray-50'}"
+									? 'border-primary bg-primary/5'
+									: 'border-border hover:bg-muted/5'}"
 							>
 								<div class="flex items-center gap-3">
 									<Palette size={18} />
-									<span class="text-sm"
+									<span class="text-sm text-foreground"
 										>{m.admin_a11y_grayscale ? m.admin_a11y_grayscale() : 'Oq-qora rejim'}</span
 									>
 								</div>
@@ -275,12 +277,12 @@
 							<button
 								onclick={toggleHighContrast}
 								class="flex w-full items-center justify-between rounded-2xl border p-3 {isHighContrast
-									? 'border-primary bg-[#fdf2f6]'
-									: 'border-gray-100 hover:bg-gray-50'}"
+									? 'border-primary bg-primary/5'
+									: 'border-border hover:bg-muted/5'}"
 							>
 								<div class="flex items-center gap-3">
 									<Contrast size={18} />
-									<span class="text-sm"
+									<span class="text-sm text-foreground"
 										>{m.admin_a11y_high_contrast
 											? m.admin_a11y_high_contrast()
 											: 'Yuqori kontrast'}</span
@@ -292,12 +294,12 @@
 							<button
 								onclick={toggleReducedMotion}
 								class="flex w-full items-center justify-between rounded-2xl border p-3 {isReducedMotion
-									? 'border-primary bg-[#fdf2f6]'
-									: 'border-gray-100 hover:bg-gray-50'}"
+									? 'border-primary bg-primary/5'
+									: 'border-border hover:bg-muted/5'}"
 							>
 								<div class="flex items-center gap-3">
 									<EyeOff size={18} />
-									<span class="text-sm"
+									<span class="text-sm text-foreground"
 										>{m.admin_a11y_reduced_motion
 											? m.admin_a11y_reduced_motion()
 											: "Animatsiyalarni o'chirish"}</span
@@ -309,12 +311,12 @@
 							<button
 								onclick={toggleDyslexiaFont}
 								class="flex w-full items-center justify-between rounded-2xl border p-3 {isDyslexiaFont
-									? 'border-primary bg-[#fdf2f6]'
-									: 'border-gray-100 hover:bg-gray-50'}"
+									? 'border-primary bg-primary/5'
+									: 'border-border hover:bg-muted/10'}"
 							>
 								<div class="flex items-center gap-3">
 									<Type size={18} />
-									<span class="text-sm"
+									<span class="text-sm text-foreground"
 										>{m.admin_a11y_dyslexia_font
 											? m.admin_a11y_dyslexia_font()
 											: 'Dyslexia-friendly shrift'}</span
@@ -329,7 +331,7 @@
 		</div>
 
 		<button
-			class="relative hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:border-[#f5c0cf] hover:bg-[#fdf2f6] hover:text-primary"
+			class="relative hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-border bg-muted/10 text-muted transition-all duration-150 hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
 			aria-label={m.admin_notifications_label ? m.admin_notifications_label() : 'Bildirishnomalar'}
 		>
 			<Bell size={18} />
@@ -350,7 +352,7 @@
 			/>
 		{:else}
 			<div
-				class="hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-full border-2 border-[#f0f0f0] bg-linear-to-br from-[#C7A27C] to-primary font-bold text-white"
+				class="hidden h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-full border-2 border-border bg-linear-to-br from-[#C7A27C] to-primary font-bold text-white"
 			>
 				{(user?.first_name?.[0] || user?.username?.[0] || 'A').toUpperCase()}
 			</div>

@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
 	import LanguageSwitcher from '@/lib/components/ui/LanguageSwitcher.svelte';
+	import ThemeToggle from '@/lib/components/ui/ThemeToggle.svelte';
 	import { Menu, X, User, LogIn, ChevronRight } from 'lucide-svelte';
 	import { gsap } from 'gsap';
 
@@ -81,6 +82,8 @@
 			}
 		}
 	});
+
+	const isHomePage = $derived($page.url.pathname === '/');
 </script>
 
 <div
@@ -89,7 +92,7 @@
 	class:pt-1={scrolled}
 >
 	<nav
-		class="relative flex w-full max-w-7xl items-center justify-between rounded-full border border-white/30 bg-white/70 px-6 py-1.5 shadow-[0_8px_32px_rgba(155,28,72,0.15)] backdrop-blur-2xl transition-all duration-500 md:mx-6 md:px-10"
+		class="relative flex w-full max-w-7xl items-center justify-between rounded-full border border-border/30 bg-surface/70 px-6 py-1.5 shadow-main backdrop-blur-2xl transition-all duration-500 md:mx-6 md:px-10"
 		class:bg-primary={scrolled}
 		class:shadow-[0_4px_30px_rgba(155,28,72,0.2)]={scrolled}
 		style="overflow: visible !important;"
@@ -118,7 +121,7 @@
 			{#each navLinks as link (link.id)}
 				<a
 					href="#{link.id}"
-					class="group relative py-1 text-sm font-black tracking-tight text-slate-800 transition-colors hover:text-[#ed4b72]"
+					class="group relative py-1 text-sm font-black tracking-tight text-foreground transition-colors hover:text-primary"
 					onclick={(e) => handleAnchorClick(e, link.id)}
 				>
 					{link.label}
@@ -132,6 +135,9 @@
 		<!-- Right side Actions -->
 		<div class="relative z-50 flex items-center gap-4 md:gap-8" style="overflow: visible;">
 			<div class="desktop-nav" style="overflow: visible;">
+				{#if !isHomePage}
+					<ThemeToggle />
+				{/if}
 				<LanguageSwitcher variant="minimal" />
 			</div>
 
@@ -161,7 +167,7 @@
 					e.stopPropagation();
 					toggleMobileMenu();
 				}}
-				class="mobile-toggle relative z-50 h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-[#ed4b72] transition-all hover:bg-white hover:shadow-md"
+				class="mobile-toggle relative z-50 h-12 w-12 items-center justify-center rounded-2xl bg-surface/50 text-primary transition-all hover:bg-surface hover:shadow-md"
 				aria-label="Toggle Menu"
 			>
 				{#if isMobileMenuOpen}
@@ -177,7 +183,7 @@
 <!-- Mobile Menu Overlay (Always in DOM for GSAP) -->
 <div
 	bind:this={mobileMenuRef}
-	class="invisible fixed inset-0 z-100 flex flex-col overflow-hidden bg-[#EADBCF]"
+	class="invisible fixed inset-0 z-100 flex flex-col overflow-hidden bg-background"
 	style="clip-path: circle(0% at 100% 0%);"
 >
 	<!-- Liquid Decor -->
@@ -204,7 +210,7 @@
 		<button
 			type="button"
 			onclick={closeMenu}
-			class="relative z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 transition-all active:scale-90"
+			class="relative z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all active:scale-90"
 		>
 			<X size={32} />
 		</button>
@@ -217,11 +223,11 @@
 		{#each navLinks as link (link.id)}
 			<a
 				href="#{link.id}"
-				class="group flex items-center justify-between border-b border-slate-50 py-4 transition-all"
+				class="group flex items-center justify-between border-b border-border/50 py-4 transition-all"
 				onclick={(e) => handleAnchorClick(e, link.id)}
 			>
 				<span
-					class="text-2xl font-bold tracking-tighter text-slate-900 transition-colors group-hover:text-[#ed4b72]"
+					class="text-2xl font-bold tracking-tighter text-foreground transition-colors group-hover:text-primary"
 				>
 					{link.label}
 				</span>
@@ -253,7 +259,10 @@
 				</a>
 			{/if}
 
-			<div class="flex justify-center py-4">
+			<div class="flex items-center justify-center gap-4 py-4">
+				{#if !isHomePage}
+					<ThemeToggle />
+				{/if}
 				<LanguageSwitcher variant="minimal" />
 			</div>
 		</div>

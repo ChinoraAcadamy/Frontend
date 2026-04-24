@@ -786,7 +786,25 @@
 	"btn_home": "Bosh sahifa",
 	"err_already_enrolled": "Talaba bu kursga allaqachon biriktirilgan.",
 	"weeks_label": "hafta",
-	"btn_show_all": "Barcha kurslarni ko'rish"
+	"btn_show_all": "Barcha kurslarni ko'rish",
+	"course_completed": "Tugatildi",
+	"course_progress": "Progress",
+	"course_review": "Ko'rish",
+	"lesson_start": "Boshlash",
+	"lessons_total": "Jami darslar",
+	"lessons_watched": "Ko'rilgan",
+	"lessons_remaining": "Qolgan",
+	"course_no_modules": "Bu kursga hali modullar qo'shilmagan.",
+	"admin_lesson_edit_title": "Darsni tahrirlash",
+	"admin_lesson_edit_subtitle": "Dars ma'lumotlarini yangilash paneli",
+	"admin_assignment_create_title": "Yangi topshiriq qo'shish",
+	"admin_assignment_create_subtitle": "Darsga yangi assignment yuklash paneli",
+	"label_assignment_title_uz_req": "Topshiriq nomi (UZ) *",
+	"label_assignment_title_ru_req": "Topshiriq nomi (RU) *",
+	"label_current_video": "Mavjud video",
+	"btn_replace_video": "O'zgartirish",
+	"msg_lesson_updated": "Dars muvaffaqiyatli tahrirlandi!",
+	"admin_courses_count": "{count} ta kurs"
 }
 
 

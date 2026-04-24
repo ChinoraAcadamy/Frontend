@@ -58,15 +58,15 @@
 		class="fixed inset-0 z-9999 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
 	>
 		<div
-			class="animate-in fade-in zoom-in-95 w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl duration-200"
+			class="animate-in fade-in zoom-in-95 w-full max-w-md overflow-hidden rounded-3xl border border-main bg-card shadow-2xl duration-200"
 		>
-			<div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-				<h3 class="text-lg font-bold text-slate-800">
+			<div class="flex items-center justify-between border-b border-main px-6 py-4">
+				<h3 class="text-lg font-bold text-main">
 					{m.modal_change_password_title ? m.modal_change_password_title() : 'Parolni almashtirish'}
 				</h3>
 				<button
 					onclick={onClose}
-					class="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+					class="rounded-full p-1 text-muted transition-colors hover:bg-muted/10 hover:text-main"
 				>
 					<X size={20} />
 				</button>
@@ -78,7 +78,7 @@
 				use:enhance={handleSubmit}
 				class="space-y-5 p-6"
 			>
-				<p class="text-sm text-slate-500">
+				<p class="text-sm text-muted">
 					{m.modal_change_password_subtitle
 						? m.modal_change_password_subtitle({ name: studentName })
 						: `${studentName} uchun yangi parol kiriting.`}
@@ -86,7 +86,7 @@
 
 				{#if errorMessage}
 					<div
-						class="rounded-xl border border-red-100 bg-red-50 p-3 text-sm font-medium text-red-600"
+						class="rounded-xl border border-primary/20 bg-primary/10 p-3 text-sm font-medium text-primary"
 					>
 						{errorMessage}
 					</div>
@@ -94,7 +94,7 @@
 
 				{#if successMessage}
 					<div
-						class="flex items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-sm font-medium text-emerald-600"
+						class="flex items-center gap-2 rounded-xl border border-success/20 bg-success/10 p-3 text-sm font-medium text-success"
 					>
 						<CheckCircle2 size={16} />
 						{successMessage}
@@ -103,7 +103,7 @@
 
 				<div class="space-y-4">
 					<div class="space-y-1.5">
-						<label for="new_password" class="text-sm font-medium text-slate-700">
+						<label for="new_password" class="text-sm font-medium text-main">
 							{m.login_password_label ? m.login_password_label() : 'Parol'} *
 						</label>
 						<input
@@ -112,13 +112,13 @@
 							name="new_password"
 							required
 							minlength="8"
-							class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-1 focus:ring-[#ed4b72]"
+							class="w-full rounded-xl border border-main bg-muted/5 px-4 py-2.5 text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary"
 							placeholder={m.placeholder_min_length ? m.placeholder_min_length() : 'Kamida 8 ta belgi'}
 						/>
 					</div>
 
 					<div class="space-y-1.5">
-						<label for="confirm_password" class="text-sm font-medium text-slate-700">
+						<label for="confirm_password" class="text-sm font-medium text-main">
 							{m.label_confirm_password ? m.label_confirm_password() : 'Parolni tasdiqlash'} *
 						</label>
 						<input
@@ -127,7 +127,7 @@
 							name="confirm_password"
 							required
 							minlength="1"
-							class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-1 focus:ring-[#ed4b72]"
+							class="w-full rounded-xl border border-main bg-muted/5 px-4 py-2.5 text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary"
 							placeholder={m.placeholder_password_confirm ? m.placeholder_password_confirm() : 'Parolni qayta kiriting'}
 						/>
 					</div>
@@ -138,14 +138,14 @@
 						type="button"
 						onclick={onClose}
 						disabled={loading}
-						class="rounded-xl px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800 disabled:opacity-50"
+						class="rounded-xl px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 hover:text-main disabled:opacity-50"
 					>
 						{m.admin_btn_cancel ? m.admin_btn_cancel() : 'Bekor qilish'}
 					</button>
 					<button
 						type="submit"
 						disabled={loading}
-						class="flex items-center gap-2 rounded-xl bg-[#ed4b72] px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-rose-200 transition-colors hover:bg-[#de3c61] disabled:opacity-70"
+						class="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/20 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-70"
 					>
 						{#if loading}
 							<Loader2 size={16} class="animate-spin" />

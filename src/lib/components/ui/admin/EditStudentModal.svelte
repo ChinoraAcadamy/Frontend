@@ -46,19 +46,19 @@
 		aria-modal="true"
 	>
 		<div
-			class="w-full max-w-md overflow-hidden rounded-[24px] bg-white shadow-2xl"
+			class="w-full max-w-md overflow-hidden rounded-[24px] border border-main bg-card shadow-2xl"
 			transition:fly={{ y: 20, duration: 300, opacity: 0 }}
 		>
-			<div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-6">
+			<div class="flex items-center justify-between border-b border-main bg-muted/5 p-6">
 				<div>
-					<h2 class="text-xl font-bold text-slate-800">
+					<h2 class="text-xl font-bold text-main">
 						{m.update_info ? m.update_info() : "Ma'lumotlarni yangilash"}
 					</h2>
-					<p class="mt-1 text-sm font-medium text-slate-500">@{student.username}</p>
+					<p class="mt-1 text-sm font-medium text-muted">@{student.username}</p>
 				</div>
 				<button
 					onclick={onClose}
-					class="rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all hover:border-slate-300 hover:text-slate-600 active:scale-90"
+					class="rounded-full border border-main bg-card p-2 text-muted shadow-sm transition-all hover:bg-muted/10 active:scale-90"
 				>
 					<X size={18} strokeWidth={2.5} />
 				</button>
@@ -82,7 +82,7 @@
 
 				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-2">
-						<label class="ml-1 text-xs font-bold tracking-wide text-slate-500 uppercase"
+						<label class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
 							>{m.profile_first_name ? m.profile_first_name() : 'Ism'}</label
 						>
 						<input
@@ -90,12 +90,12 @@
 							type="text"
 							bind:value={firstName}
 							placeholder={m.enter_first_name ? m.enter_first_name() : 'Ism kiriting'}
-							class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
+							class="h-12 w-full rounded-xl border border-main bg-muted/5 px-4 text-sm font-medium text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
 						/>
 					</div>
 
 					<div class="space-y-2">
-						<label class="ml-1 text-xs font-bold tracking-wide text-slate-500 uppercase"
+						<label class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
 							>{m.profile_last_name ? m.profile_last_name() : 'Familiya'}</label
 						>
 						<input
@@ -103,30 +103,30 @@
 							type="text"
 							bind:value={lastName}
 							placeholder={m.profile_last_name ? m.profile_last_name() : 'Familiya'}
-							class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
+							class="h-12 w-full rounded-xl border border-main bg-muted/5 px-4 text-sm font-medium text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
 						/>
 					</div>
 				</div>
 
 				<div class="space-y-2">
-					<label class="ml-1 text-xs font-bold tracking-wide text-slate-500 uppercase"
+					<label class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
 						>{m.profile_phone ? m.profile_phone() : 'Telefon raqam'}</label
 					>
 					<PhoneInput name="phoneNumber" bind:value={phoneNumber} placeholder={m.placeholder_phone ? m.placeholder_phone() : '+998 90 123 45 67'} />
 				</div>
 
-				<div class="flex gap-3 border-t border-slate-100 pt-4">
+				<div class="flex gap-3 border-t border-main pt-4">
 					<button
 						type="button"
 						onclick={onClose}
-						class="flex-1 rounded-xl bg-slate-100 py-3.5 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
+						class="flex-1 rounded-xl bg-muted/10 py-3.5 font-bold text-muted transition-all hover:bg-muted/20 active:scale-95"
 					>
 						{m.admin_students_cancel ? m.admin_students_cancel() : 'Bekor qilish'}
 					</button>
 					<button
 						type="submit"
 						disabled={isSubmitting}
-						class="flex-1 rounded-xl bg-slate-900 py-3.5 font-bold text-white shadow-lg shadow-slate-900/20 transition-all hover:bg-[#ed4b72] hover:shadow-[#ed4b72]/30 active:scale-95 disabled:opacity-60"
+						class="flex-1 rounded-xl bg-primary py-3.5 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-60"
 					>
 						{isSubmitting
 							? m.profile_saving

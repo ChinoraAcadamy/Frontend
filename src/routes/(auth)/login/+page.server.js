@@ -5,6 +5,7 @@ import { API_URL } from '$env/static/private';
 import * as m from '$lib/paraglide/messages.js';
 import { translateServerMessage } from '$lib/utils/server-messages.js';
 import DeviceDetector from 'device-detector-js';
+import { getFriendlyDeviceName } from '$lib/utils/device-names.js';
 
 const detector = new DeviceDetector();
 
@@ -38,26 +39,41 @@ export const actions = {
             const ua = request.headers.get('user-agent') || '';
             const detection = detector.parse(ua);
 
-            // Build a human-readable device name from server-side detection
-            const deviceParts = [
-                detection.device?.vendor,
-                detection.device?.model,
-                detection.os?.name ? `${detection.os.name} ${detection.os.version || ''}` : null,
-                detection.client?.name
-            ].filter(Boolean);
+            // Build a smart, dynamic name
+            const deviceType = detection.device?.type || 'desktop';
+            const osName = detection.os?.name || '';
+            const clientName = detection.client?.name || '';
+            
+            let finalDeviceName = '';
 
-            const serverDetectedName = deviceParts.join(', ') || 'Unknown Device';
+            if (deviceType === 'desktop') {
+                // For PCs, we show OS and Browser (e.g., "Windows PC (Chrome)")
+                finalDeviceName = `${osName} PC (${clientName})`;
+            } else {
+                // Build a default name from server-side detection
+                const serverDetectedName = [
+                    detection.device?.vendor,
+                    detection.device?.model,
+                    detection.os?.name ? `${detection.os.name} ${detection.os.version || ''}` : null,
+                    detection.client?.name
+                ].filter(Boolean).join(', ') || 'Unknown Device';
 
-            // Prefer client-sent name if it's more specific (not a raw User-Agent)
-            let detectedDeviceName = serverDetectedName;
-            if (
-                clientDeviceName &&
-                typeof clientDeviceName === 'string' &&
-                clientDeviceName.trim() !== '' &&
-                !clientDeviceName.includes('Mozilla/') &&
-                !clientDeviceName.includes('AppleWebKit/')
-            ) {
-                detectedDeviceName = clientDeviceName;
+                // For Mobile/Tablets, we prefer the client-sent model name if available
+                let modelName = serverDetectedName;
+                if (
+                    clientDeviceName &&
+                    typeof clientDeviceName === 'string' &&
+                    clientDeviceName.trim() !== '' &&
+                    !clientDeviceName.includes('Mozilla/')
+                ) {
+                    modelName = getFriendlyDeviceName(clientDeviceName, detection.device?.vendor);
+                }
+
+                if (deviceType === 'tablet') {
+                    finalDeviceName = `${modelName} (Tablet)`;
+                } else {
+                    finalDeviceName = modelName;
+                }
             }
 
             const response = await fetch(`${API_URL}/auth/login/`, {
@@ -68,7 +84,7 @@ export const actions = {
                 body: JSON.stringify({
                     username,
                     password,
-                    device_name: detectedDeviceName
+                    device_name: finalDeviceName
                 })
             });
 

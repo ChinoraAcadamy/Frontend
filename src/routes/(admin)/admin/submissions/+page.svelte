@@ -11,14 +11,14 @@
 		<!-- Loading holatida Skelet ko'rsatamiz -->
 		<div class="mb-8">
 			<div
-				class="mb-1.5 h-4 w-24 animate-pulse rounded-md bg-slate-200 text-[11px] font-bold tracking-[2px] text-[#9b1c48] uppercase"
+				class="mb-1.5 h-4 w-24 animate-pulse rounded-md bg-muted/10 text-[11px] font-bold tracking-[2px] text-primary uppercase"
 			></div>
-			<div class="mb-6 h-10 w-64 animate-pulse rounded-lg bg-slate-200"></div>
+			<div class="mb-6 h-10 w-64 animate-pulse rounded-lg bg-muted/10"></div>
 
-			<div class="inline-flex gap-1 rounded-2xl border border-slate-100 bg-slate-50 p-1.5">
-				<div class="h-10 w-24 animate-pulse rounded-xl bg-slate-200"></div>
-				<div class="h-10 w-24 animate-pulse rounded-xl bg-slate-100"></div>
-				<div class="h-10 w-24 animate-pulse rounded-xl bg-slate-100"></div>
+			<div class="inline-flex gap-1 rounded-2xl border border-border bg-muted/5 p-1.5">
+				<div class="h-10 w-24 animate-pulse rounded-xl bg-muted/10"></div>
+				<div class="h-10 w-24 animate-pulse rounded-xl bg-muted/5"></div>
+				<div class="h-10 w-24 animate-pulse rounded-xl bg-muted/5"></div>
 			</div>
 		</div>
 

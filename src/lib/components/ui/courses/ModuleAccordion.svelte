@@ -5,17 +5,17 @@
     let isOpen = $state(true); // Default holatda ochiq turadi
 </script>
 
-<div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden mb-6">
-    <div class="flex items-center justify-between p-5 sm:p-6 hover:bg-slate-50 transition-colors">
+<div class="bg-surface rounded-3xl border border-border shadow-sm overflow-hidden mb-6">
+    <div class="flex items-center justify-between p-5 sm:p-6 hover:bg-muted/10 transition-colors">
         <button 
             onclick={() => isOpen = !isOpen} 
             class="flex items-center gap-3 text-left flex-1"
         >
             <ChevronDown 
                 size={20} 
-                class="text-slate-400 transition-transform duration-300 {isOpen ? 'rotate-180' : ''}" 
+                class="text-muted transition-transform duration-300 {isOpen ? 'rotate-180' : ''}" 
             />
-            <h3 class="font-bold text-slate-800 text-lg">{title}</h3>
+            <h3 class="font-bold text-foreground text-lg">{title}</h3>
         </button>
 
         {#if adminActions}

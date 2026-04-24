@@ -132,27 +132,28 @@
 
     label {
         font-size: 13px;
-        font-weight: 600;
-        color: var(--text-main, #111827);
+        font-weight: 700;
+        color: var(--text-muted);
     }
 
     .input {
         width: 100%;
-        padding: 12px 16px;
-        border: 1.5px solid var(--border-color, #E5E7EB);
-        border-radius: var(--radius-md, 12px);
+        padding: 14px 18px;
+        border: 1.5px solid var(--border-main);
+        border-radius: 20px;
         font-size: 14px;
-        color: var(--text-main, #111827);
-        background: var(--bg-color, #F9FAFB);
+        font-weight: 500;
+        color: var(--text-main);
+        background: var(--bg-main);
         font-family: inherit;
-        transition: all 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .input:focus {
-        border-color: var(--primary, #FA2E69);
-        background: var(--card-bg, #FFFFFF);
+        border-color: var(--primary);
+        background: var(--bg-card);
         outline: none;
-        box-shadow: 0 0 0 3px rgba(250, 46, 105, 0.1);
+        box-shadow: 0 0 0 4px var(--primary/10);
     }
 
     .textarea {
@@ -166,28 +167,30 @@
         align-items: center;
         justify-content: center;
         gap: 12px;
-        padding: 32px;
-        border: 2px dashed var(--border-color, #E5E7EB);
-        border-radius: var(--radius-md, 12px);
-        background: var(--bg-color, #F9FAFB);
-        color: var(--text-muted, #6B7280);
+        padding: 40px;
+        border: 2px dashed var(--border-main);
+        border-radius: 32px;
+        background: var(--bg-main);
+        color: var(--text-muted);
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
         position: relative;
     }
 
     .file-upload:hover {
-        border-color: var(--primary, #FA2E69);
-        background: rgba(250, 46, 105, 0.02);
+        border-color: var(--primary);
+        background: var(--bg-card);
+        transform: translateY(-2px);
     }
 
     .file-upload.has-image {
         padding: 0;
-        border: none;
-        height: 200px;
+        border-style: solid;
+        border-color: var(--border-main);
+        height: 240px;
     }
 
     .preview-img {
@@ -197,29 +200,30 @@
     }
 
     .upload-icon {
-        color: var(--text-muted, #6B7280);
+        color: var(--text-muted);
+        opacity: 0.5;
     }
 
     .actions {
         display: flex;
         justify-content: flex-end;
-        margin-top: 32px;
+        margin-top: 40px;
         padding-top: 24px;
-        border-top: 1px solid var(--border-color, #E5E7EB);
+        border-top: 1px solid var(--border-main);
     }
 
     .btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        padding: 12px 28px;
-        border-radius: var(--radius-md, 12px);
+        gap: 10px;
+        padding: 16px 32px;
+        border-radius: 20px;
         font-size: 15px;
-        font-weight: 600;
+        font-weight: 800;
         cursor: pointer;
         border: none;
-        transition: 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         font-family: inherit;
     }
 
@@ -229,12 +233,15 @@
     }
 
     .btn-primary {
-        background: var(--primary, #FA2E69);
+        background: var(--primary);
         color: white;
+        box-shadow: 0 10px 20px -10px var(--primary/40);
     }
 
     .btn-primary:hover:not(:disabled) {
-        background: var(--primary-hover, #D81B53);
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px -10px var(--primary/50);
     }
     
     @media (min-width: 640px) {

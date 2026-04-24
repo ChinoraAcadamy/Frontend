@@ -31,6 +31,10 @@
 	];
 
 	const isProfilePage = $derived(page.url.pathname.includes('/profil'));
+	// Check if it's exactly the courses list page (ignoring locale prefix if any)
+	const isCourseListPage = $derived(
+		page.url.pathname.endsWith('/kurslarim') || page.url.pathname.endsWith('/kurslarim/')
+	);
 </script>
 
 <SeoMeta title="Student Dashboard - Chinora Academy" robots="noindex, nofollow" />
@@ -47,7 +51,7 @@
 			</div>
 		{/if}
 
-		<main class={isProfilePage ? '' : 'md:admin-content md:p-6'}>
+		<main class={isProfilePage || isCourseListPage ? '' : 'md:admin-content md:p-6'}>
 			{@render children()}
 		</main>
 	</div>
@@ -57,12 +61,12 @@
 	.admin-shell {
 		display: flex;
 		min-height: 100vh;
-		background: #f9fafb; /* Orqa fon rangi */
+		background: var(--bg-main); /* Orqa fon rangi */
 	}
 
 	.admin-body {
 		flex: 1;
-		margin-left: 290px;
+		margin-left: 272px;
 		transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 		display: flex;
 		flex-direction: column;
@@ -71,7 +75,7 @@
 
 	/* Collapsed holati */
 	.admin-shell.collapsed .admin-body {
-		margin-left: 90px;
+		margin-left: 76px;
 	}
 
 	/* Mobile ekran */
@@ -87,10 +91,10 @@
 		top: 4rem;
 		z-index: 40;
 		padding: 0.5rem 1.5rem;
-		background: rgba(255, 255, 255, 0.6);
+		background: var(--bg-card);
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
-		border-bottom: 1px solid rgba(240, 240, 240, 0.5);
+		border-bottom: 1px solid var(--border-main);
 	}
 
 	@media (max-width: 1023px) {

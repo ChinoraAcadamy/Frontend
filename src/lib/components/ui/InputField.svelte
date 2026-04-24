@@ -13,33 +13,35 @@
     } = $props();
 </script>
 
-<div class="flex flex-col gap-1.5 h-18"> <label for={id} class="text-sm font-semibold text-slate-700">
-        {label} {#if readonly}<span class="text-slate-400 font-normal">(Readonly)</span>{/if}
-    </label>
+<div class="h-18 flex flex-col gap-1.5">
+	<label for={id} class="text-sm font-semibold text-main">
+		{label}
+		{#if readonly}<span class="font-normal text-muted">(Readonly)</span>{/if}
+	</label>
     
-    <div class="relative flex items-center">
-        {#if prefix}
-            <span class="absolute left-3 text-slate-800 font-medium">{prefix}</span>
-        {/if}
+	<div class="relative flex items-center">
+		{#if prefix}
+			<span class="absolute left-3 font-medium text-main">{prefix}</span>
+		{/if}
         
-        <input
-            {id}
-            {type}
-            bind:value
-            {placeholder}
-            {name}
-            disabled={readonly}
-            class="w-full h-11 rounded-xl border px-3 text-slate-800 transition-all duration-200 outline-none
+		<input
+			{id}
+			{type}
+			bind:value
+			{placeholder}
+			{name}
+			disabled={readonly}
+			class="h-11 w-full rounded-xl border px-3 text-main transition-all duration-200 outline-none
                    {prefix ? 'pl-16' : ''}
-                   {readonly 
-                       ? 'bg-slate-100/70 border-slate-200 text-slate-500 cursor-not-allowed' 
-                       : 'bg-white border-slate-200 hover:border-slate-300 focus:border-[#ed4b72] focus:ring-[3px] focus:ring-[#ed4b72]/15 shadow-sm'}"
-        />
+                   {readonly
+						? 'border-main bg-muted/5 text-muted cursor-not-allowed'
+						: 'border-main bg-card shadow-sm hover:border-primary/30 focus:border-primary focus:ring-[3px] focus:ring-primary/10'}"
+		/>
         
-        {#if readonly}
-            <div class="absolute right-3 text-slate-400">
-                <Lock size={16} strokeWidth={2.5} />
-            </div>
-        {/if}
+		{#if readonly}
+			<div class="absolute right-3 text-muted">
+				<Lock size={16} strokeWidth={2.5} />
+			</div>
+		{/if}
     </div>
 </div>

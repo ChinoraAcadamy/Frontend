@@ -436,11 +436,11 @@
 
 	// --- Multi-type Assignment UI Logic ---
 	const getScoreColor = (score, maxScore) => {
-		if (!maxScore) return 'text-slate-400';
+		if (!maxScore) return 'text-muted';
 		const percentage = (score / maxScore) * 100;
-		if (percentage >= 80) return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-		if (percentage >= 50) return 'text-amber-600 bg-amber-50 border-amber-100';
-		return 'text-rose-600 bg-rose-50 border-rose-100';
+		if (percentage >= 80) return 'text-success bg-success/10 border-success/20';
+		if (percentage >= 50) return 'text-warning bg-warning/10 border-warning/20';
+		return 'text-error bg-error/10 border-error/20';
 	};
 </script>
 
@@ -455,19 +455,17 @@
 	<div class="mb-4 block lg:hidden">
 		<button
 			onclick={() => (showMobileSidebar = !showMobileSidebar)}
-			class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+			class="border-main bg-card text-main flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-sm font-bold shadow-sm transition-colors hover:bg-muted/5"
 		>
 			<div class="flex items-center gap-2.5">
-				<div class="flex items-center justify-center rounded-lg bg-rose-50 p-1.5 text-[#ed4b72]">
+				<div class="flex items-center justify-center rounded-lg bg-primary/10 p-1.5 text-primary">
 					<List size={18} />
 				</div>
 				<span>{m.lesson_module_lessons ? m.lesson_module_lessons() : 'Modul darslari'}</span>
 			</div>
 			<ChevronDown
 				size={18}
-				class="text-slate-400 transition-transform duration-200 {showMobileSidebar
-					? 'rotate-180'
-					: ''}"
+				class="text-muted transition-transform duration-200 {showMobileSidebar ? 'rotate-180' : ''}"
 			/>
 		</button>
 	</div>
@@ -479,28 +477,26 @@
 		>
 			{#await moduleData}
 				<div
-					class="flex h-64 flex-col items-center justify-center rounded-3xl border border-slate-100 bg-white shadow-sm"
+					class="border-main bg-card flex h-64 flex-col items-center justify-center rounded-3xl border shadow-sm"
 				>
 					<div
-						class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#ed4b72]"
+						class="h-8 w-8 animate-spin rounded-full border-2 border-muted/20 border-t-primary"
 					></div>
 				</div>
 			{:then module}
 				{#if module}
 					<div
-						class="flex max-h-[calc(100vh-120px)] flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm"
+						class="border-main bg-card flex max-h-[calc(100vh-120px)] flex-col overflow-hidden rounded-3xl border shadow-sm"
 					>
 						<!-- Sidebar Header -->
-						<div class="border-b border-slate-100 bg-slate-50/50 p-5">
-							<h3 class="line-clamp-2 text-base font-black text-slate-800">{module.title}</h3>
+						<div class="border-main border-b bg-muted/5 p-5">
+							<h3 class="line-clamp-2 text-base font-black text-foreground">{module.title}</h3>
 
 							{#if $page.data.user?.role !== 'admin' && $page.data.user?.role !== 'superadmin'}
 								<div class="mt-3 flex flex-col gap-1.5">
-									<div
-										class="flex items-center justify-between text-[11px] font-bold text-slate-400"
-									>
+									<div class="flex items-center justify-between text-[11px] font-bold text-muted">
 										<span class="tracking-wider uppercase">{m.progress()}</span>
-										<span class="text-[#ed4b72]"
+										<span class="text-primary"
 											>{Math.round(
 												(module.lessons.filter((l) => l.is_completed).length /
 													module.lessons.length) *
@@ -508,9 +504,9 @@
 											) || 0}%</span
 										>
 									</div>
-									<div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+									<div class="h-1.5 w-full overflow-hidden rounded-full bg-muted/20">
 										<div
-											class="h-full bg-[#ed4b72] transition-all duration-500"
+											class="h-full bg-primary transition-all duration-500"
 											style="width: {(module.lessons.filter((l) => l.is_completed).length /
 												module.lessons.length) *
 												100}%"
@@ -528,17 +524,17 @@
 										$page.data.user?.role === 'admin' || $page.data.user?.role === 'superadmin'}
 									{#if l.can_access === false && !isAdmin}
 										<div
-											class="flex cursor-not-allowed items-center justify-between gap-3 rounded-2xl border border-slate-100/50 bg-slate-50 p-3 opacity-60"
+											class="border-main/50 flex cursor-not-allowed items-center justify-between gap-3 rounded-2xl border bg-muted/5 p-3 opacity-60"
 										>
 											<div class="flex min-w-0 items-start gap-3">
 												<div class="mt-0.5 shrink-0">
-													<Lock size={18} class="text-slate-400" />
+													<Lock size={18} class="text-muted" />
 												</div>
 												<div class="flex min-w-0 flex-col">
-													<span class="line-clamp-2 text-sm font-bold text-slate-500">
+													<span class="line-clamp-2 text-sm font-bold text-muted">
 														{l.title}
 													</span>
-													<span class="mt-0.5 text-xs font-semibold text-slate-400"
+													<span class="mt-0.5 text-xs font-semibold text-muted"
 														>{l.duration || 0}
 														{m.assignment_type_text
 															? getLocale() === 'uz'
@@ -550,7 +546,7 @@
 											</div>
 
 											<div class="shrink-0 pl-2">
-												<div class="h-2 w-2 rounded-full bg-slate-200"></div>
+												<div class="h-2 w-2 rounded-full bg-muted/20"></div>
 											</div>
 										</div>
 									{:else}
@@ -562,29 +558,29 @@
 											)}
 											class="group flex items-center justify-between gap-3 rounded-2xl p-3 transition-colors {l.id ===
 											lesson.id
-												? 'bg-rose-50/80 shadow-sm ring-1 shadow-rose-100/50 ring-rose-100'
-												: 'hover:bg-slate-50'}"
+												? 'bg-primary/10 shadow-sm ring-1 shadow-primary/20 ring-primary/20'
+												: 'hover:bg-muted/5'}"
 										>
 											<div class="flex min-w-0 items-start gap-3">
 												<div class="mt-0.5 shrink-0">
 													{#if l.id === lesson.id}
-														<PlayCircle size={18} class="fill-[#ed4b72] text-rose-100" />
+														<PlayCircle size={18} class="fill-primary text-primary/10" />
 													{:else}
 														<PlayCircle
 															size={18}
-															class="text-slate-300 transition-colors group-hover:text-slate-400"
+															class="text-muted/40 transition-colors group-hover:text-muted"
 														/>
 													{/if}
 												</div>
 												<div class="flex min-w-0 flex-col">
 													<span
 														class="line-clamp-2 text-sm font-bold {l.id === lesson.id
-															? 'text-[#9b1c48]'
-															: 'text-slate-700'}"
+															? 'text-primary'
+															: 'text-muted'}"
 													>
 														{l.title}
 													</span>
-													<span class="mt-0.5 text-xs font-semibold text-slate-400"
+													<span class="mt-0.5 text-xs font-semibold text-muted"
 														>{l.duration || 0}
 														{m.assignment_type_text
 															? getLocale() === 'uz'
@@ -598,21 +594,21 @@
 											<div class="shrink-0 pl-2">
 												{#if l.is_completed}
 													<div
-														class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100"
+														class="flex h-5 w-5 items-center justify-center rounded-full bg-success/10"
 													>
-														<CheckCircle2 size={12} class="text-emerald-600" />
+														<CheckCircle2 size={12} class="text-success" />
 													</div>
 												{:else if l.id === lesson.id}
 													<div
-														class="h-2 w-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50"
+														class="h-2 w-2 rounded-full bg-warning shadow-sm shadow-warning/50"
 													></div>
 												{:else if isAdmin}
 													<div
-														class="h-2 w-2 rounded-full bg-slate-200 transition-colors group-hover:bg-slate-300"
+														class="h-2 w-2 rounded-full bg-muted/20 transition-colors group-hover:bg-muted/30"
 													></div>
 												{:else}
 													<div
-														class="h-2 w-2 rounded-full bg-slate-200 transition-colors group-hover:bg-slate-300"
+														class="h-2 w-2 rounded-full bg-muted/20 transition-colors group-hover:bg-muted/30"
 													></div>
 												{/if}
 											</div>
@@ -630,15 +626,15 @@
 		<div class="flex min-w-0 flex-col gap-6">
 			<!-- Video Player -->
 			<div
-				class="relative aspect-video w-full overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 shadow-sm"
+				class="border-main bg-main relative aspect-video w-full overflow-hidden rounded-3xl border shadow-sm"
 			>
 				{#if !player}
 					<div
-						class="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
+						class="bg-main/50 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-sm"
 						transition:fade
 					>
 						<div
-							class="h-8 w-8 animate-spin rounded-full border-2 border-[#ed4b72] border-t-transparent"
+							class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
 						></div>
 					</div>
 				{/if}
@@ -675,13 +671,13 @@
 
 			<!-- Lesson Metadata -->
 			<div class="flex flex-col gap-2 px-1">
-				<span class="text-[11px] font-black tracking-widest text-[#ed4b72] uppercase"
+				<span class="text-[11px] font-black tracking-widest text-primary uppercase"
 					>{m.lesson_info_title()}</span
 				>
-				<h1 class="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
+				<h1 class="text-2xl font-black tracking-tight text-foreground md:text-3xl">
 					{lesson.title}
 				</h1>
-				<p class="mt-2 text-sm leading-relaxed text-slate-600">{lesson.description}</p>
+				<p class="mt-2 text-sm leading-relaxed text-muted">{lesson.description}</p>
 			</div>
 
 			<!-- Completion Action -->
@@ -689,21 +685,21 @@
 				<div class="flex flex-col gap-3">
 					{#if !isVideoFinished}
 						<div
-							class="flex items-center gap-3 rounded-2xl border border-amber-200/60 bg-amber-50/50 p-4 text-sm font-bold text-amber-700"
+							class="flex items-center gap-3 rounded-2xl border border-warning/20 bg-warning/5 p-4 text-sm font-bold text-warning"
 							transition:slide
 						>
-							<div class="flex items-center justify-center rounded-xl bg-amber-100 p-2">
-								<Lock size={16} class="text-amber-600" />
+							<div class="flex items-center justify-center rounded-xl bg-warning/10 p-2">
+								<Lock size={16} class="text-warning" />
 							</div>
 							<span>{m.lesson_video_lock()}</span>
 						</div>
 					{:else}
 						<div
-							class="flex items-center gap-3 rounded-2xl border border-emerald-200/60 bg-emerald-50/50 p-4 text-sm font-bold text-emerald-700"
+							class="flex items-center gap-3 rounded-2xl border border-success/20 bg-success/5 p-4 text-sm font-bold text-success"
 							transition:slide
 						>
-							<div class="flex items-center justify-center rounded-xl bg-emerald-100 p-2">
-								<CheckCircle2 size={16} class="text-emerald-600" />
+							<div class="flex items-center justify-center rounded-xl bg-success/10 p-2">
+								<CheckCircle2 size={16} class="text-success" />
 							</div>
 							<span>{m.lesson_video_watched()}</span>
 						</div>
@@ -712,9 +708,9 @@
 					<button
 						onclick={markComplete}
 						disabled={isSubmittingComplete || !isVideoFinished}
-						class="flex w-full items-center justify-center gap-2 rounded-2xl border py-4 text-sm font-bold shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] disabled:scale-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 {isVideoFinished
-							? 'border-[#FA2E69] bg-[#FA2E69] text-white shadow-md hover:bg-[#D81B53] hover:shadow-[#fa2e69]/20'
-							: 'border-slate-200 bg-white text-slate-400'}"
+						class="disabled:border-main flex w-full items-center justify-center gap-2 rounded-2xl border py-4 text-sm font-bold shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] disabled:scale-100 disabled:cursor-not-allowed disabled:bg-muted/10 disabled:text-muted {isVideoFinished
+							? 'hover:bg-primary-hover border-primary bg-primary text-white shadow-md hover:shadow-primary/20'
+							: 'border-main bg-card text-muted'}"
 					>
 						{#if isSubmittingComplete}
 							<div
@@ -736,15 +732,15 @@
 			<!-- Assignments (Now stacked below) -->
 			{#if hasAssignments}
 				<div
-					class="mt-4 flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+					class="border-main bg-card mt-4 flex flex-col overflow-hidden rounded-3xl border shadow-sm"
 				>
 					{#key currentAssignmentIndex}
 						<div in:fly={{ x: 20, duration: 400 }} class="flex flex-col">
 							<!-- Assignment Header -->
-							<div class="bg-white p-5 pb-2 sm:p-6">
+							<div class="bg-card p-5 pb-2 sm:p-6">
 								<div class="mb-4 flex items-center justify-between">
 									<span
-										class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[11px] font-bold tracking-wider text-slate-600 uppercase"
+										class="border-main rounded border bg-muted/5 px-2 py-1 text-[11px] font-bold tracking-wider text-muted uppercase"
 									>
 										{lesson.assignments.length > 1
 											? `${currentAssignmentIndex + 1}-${m.assignment_title_n()}`
@@ -757,28 +753,26 @@
 											{m.assignment_type_file()}
 										{/if}
 									</span>
-									<Upload size={18} class="text-slate-400" />
+									<Upload size={18} class="text-muted" />
 								</div>
-								<h2 class="s-idpCsxdjyqUy text-xl font-bold tracking-tight text-slate-900">
+								<h2 class="text-main text-xl font-bold tracking-tight">
 									{assignment.title}
 								</h2>
-								<p class="mt-2 text-sm text-slate-600">{assignment.description}</p>
+								<p class="mt-2 text-sm text-muted">{assignment.description}</p>
 
-								<div class="mt-4 flex items-center gap-6 border-t border-slate-100 pt-4">
+								<div class="border-main mt-4 flex items-center gap-6 border-t pt-4">
 									<div class="flex flex-col">
-										<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+										<span class="text-[10px] font-bold tracking-wider text-muted uppercase"
 											>{m.assignment_max_score()}</span
 										>
-										<span class="text-base font-black text-slate-900">{assignment.max_score}</span>
+										<span class="text-main text-base font-black">{assignment.max_score}</span>
 									</div>
-									<div class="h-8 w-px bg-slate-200"></div>
+									<div class="bg-main h-8 w-px"></div>
 									<div class="flex flex-col">
-										<span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+										<span class="text-[10px] font-bold tracking-wider text-muted uppercase"
 											>{m.assignment_attempts()}</span
 										>
-										<span class="text-base font-black text-slate-900"
-											>{assignment.max_attempts}</span
-										>
+										<span class="text-main text-base font-black">{assignment.max_attempts}</span>
 									</div>
 								</div>
 							</div>
@@ -789,15 +783,15 @@
 								action="?/uploadAssignment"
 								use:enhance={submitAssignment}
 								enctype="multipart/form-data"
-								class="flex flex-col gap-5 bg-white p-5 sm:p-6"
+								class="bg-card flex flex-col gap-5 p-5 sm:p-6"
 							>
 								<input type="hidden" name="assignment" value={assignment.id} />
 
 								{#if assignment.type === 'file'}
 									<label
 										class="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed p-6 transition-colors {isDragging
-											? 'border-[#FA2E69] bg-[#FA2E69]/5'
-											: 'border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-slate-100'}"
+											? 'border-primary bg-primary/5'
+											: 'border-main bg-muted/5 hover:border-muted/50 hover:bg-muted/10'}"
 										ondragover={handleDragOver}
 										ondragleave={handleDragLeave}
 										ondrop={handleFileDrop}
@@ -811,26 +805,24 @@
 											required
 										/>
 										{#if selectedFile}
-											<FileIcon size={24} class="mb-2 text-[#FA2E69]" />
-											<span class="line-clamp-1 text-center text-sm font-bold text-slate-800"
+											<FileIcon size={24} class="mb-2 text-primary" />
+											<span class="text-main line-clamp-1 text-center text-sm font-bold"
 												>{selectedFile.name}</span
 											>
-											<span class="text-xs text-slate-500"
+											<span class="text-xs text-muted"
 												>{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</span
 											>
 										{:else}
-											<Upload size={24} class="mb-2 text-slate-400" />
-											<span class="text-sm font-bold text-slate-800"
-												>{m.assignment_upload_file()}</span
-											>
-											<span class="text-xs text-slate-500">{m.assignment_drop_file()}</span>
+											<Upload size={24} class="mb-2 text-muted" />
+											<span class="text-main text-sm font-bold">{m.assignment_upload_file()}</span>
+											<span class="text-xs text-muted">{m.assignment_drop_file()}</span>
 										{/if}
 									</label>
 								{:else if assignment.type === 'text'}
 									<div class="flex flex-col gap-1.5">
 										<label
 											for="text_answer"
-											class="text-xs font-bold tracking-wider text-slate-600 uppercase"
+											class="text-xs font-bold tracking-wider text-muted uppercase"
 											>{m.assignment_type_text()}</label
 										>
 										<textarea
@@ -840,7 +832,7 @@
 											placeholder={m.assignment_placeholder_text
 												? m.assignment_placeholder_text()
 												: 'Topshiriq yuzasidan batafsilroq yozing...'}
-											class="w-full rounded-2xl border-none bg-slate-100 p-4 text-sm font-bold transition-all outline-none focus:bg-white focus:ring-4 focus:ring-rose-50"
+											class="focus:bg-card w-full rounded-2xl border-none bg-muted/5 p-4 text-sm font-bold transition-all outline-none focus:ring-4 focus:ring-primary/10"
 											required
 										></textarea>
 									</div>
@@ -848,7 +840,7 @@
 									<div class="flex flex-col gap-1.5">
 										<label
 											for="text_answer"
-											class="text-xs font-bold tracking-wider text-slate-600 uppercase"
+											class="text-xs font-bold tracking-wider text-muted uppercase"
 											>{m.assignment_type_link()}</label
 										>
 										<input
@@ -856,7 +848,7 @@
 											id="text_answer"
 											name="text_answer"
 											placeholder="https://example.com/your-work"
-											class="w-full rounded-2xl border-none bg-slate-100 p-4 text-sm font-bold transition-all outline-none focus:bg-white focus:ring-4 focus:ring-rose-50"
+											class="focus:bg-card w-full rounded-2xl border-none bg-muted/5 p-4 text-sm font-bold transition-all outline-none focus:ring-4 focus:ring-primary/10"
 											required
 										/>
 									</div>
@@ -866,7 +858,7 @@
 									<div class="flex flex-col gap-1.5">
 										<label
 											for="desc_answer"
-											class="text-xs font-bold tracking-wider text-slate-600 uppercase"
+											class="text-xs font-bold tracking-wider text-muted uppercase"
 											>{m.assignment_desc_label()}</label
 										>
 										<textarea
@@ -874,7 +866,7 @@
 											name="desc_answer"
 											rows="2"
 											placeholder={m.assignment_desc_placeholder()}
-											class="w-full rounded-2xl border-none bg-slate-100 p-4 text-sm font-bold transition-all outline-none focus:bg-white focus:ring-4 focus:ring-rose-50"
+											class="focus:bg-card w-full rounded-2xl border-none bg-muted/5 p-4 text-sm font-bold transition-all outline-none focus:ring-4 focus:ring-primary/10"
 										></textarea>
 									</div>
 								{/if}
@@ -882,11 +874,11 @@
 								<button
 									type="submit"
 									disabled={isSubmitting || (assignment.type === 'file' && !selectedFile)}
-									class="flex w-full items-center justify-center gap-2 rounded-2xl bg-rose-50 py-4 text-sm font-bold text-[#ed4b72] transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+									class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary/10 py-4 text-sm font-bold text-primary transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:bg-muted/5 disabled:text-muted"
 								>
 									{#if isSubmitting}
 										<div
-											class="h-5 w-5 animate-spin rounded-full border-2 border-slate-200 border-t-[#ed4b72]"
+											class="h-5 w-5 animate-spin rounded-full border-2 border-muted/20 border-t-primary"
 										></div>
 										<span>{m.lesson_submitting()}</span>
 									{:else}
@@ -898,26 +890,24 @@
 
 							<!-- Submissions History -->
 							{#if assignment.submissions && assignment.submissions.length > 0}
-								<div class="flex flex-col border-t border-slate-200 bg-slate-50 p-5 sm:p-6">
-									<h3 class="mb-4 text-sm font-bold text-slate-900">
+								<div class="border-main flex flex-col border-t bg-muted/5 p-5 sm:p-6">
+									<h3 class="text-main mb-4 text-sm font-bold">
 										{m.assignment_prev_attempts()}
 									</h3>
 									<div class="flex flex-col gap-3">
 										{#each assignment.submissions as sub (sub.id)}
 											<div
-												class="flex flex-col gap-3 rounded-md border border-slate-200 bg-white p-4"
+												class="border-main bg-card flex flex-col gap-3 rounded-md border p-4"
 												transition:slide
 											>
 												<div class="flex items-center justify-between">
-													<div
-														class="flex items-center gap-2 text-[11px] font-medium text-slate-500"
-													>
+													<div class="flex items-center gap-2 text-[11px] font-medium text-muted">
 														<span
 															>{new Date(sub.submitted_at || Date.now()).toLocaleDateString(
 																'uz'
 															)}</span
 														>
-														<span class="h-1 w-1 rounded-full bg-slate-300"></span>
+														<span class="h-1 w-1 rounded-full bg-muted/30"></span>
 														<span
 															>{new Date(sub.submitted_at || Date.now()).toLocaleTimeString(
 																'uz'
@@ -926,7 +916,7 @@
 													</div>
 													{#if sub.status === 'Graded' || sub.status === 'graded'}
 														<span
-															class="rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[10px] font-bold tracking-wider text-slate-600 uppercase"
+															class="border-main rounded border bg-muted/10 px-2 py-1 text-[10px] font-bold tracking-wider text-muted uppercase"
 															>{m.assignment_graded()}</span
 														>
 													{:else}
@@ -952,19 +942,19 @@
 																assignment.max_score
 															).split(' ')[0]}">{sub.score}</span
 														>
-														<span class="text-sm font-bold text-slate-400"
+														<span class="text-sm font-bold text-muted"
 															>/ {assignment.max_score}</span
 														>
 													</div>
 												{/if}
 
 												{#if sub.feedback}
-													<div class="mt-1 border-l-2 border-[#FA2E69] bg-slate-50/80 p-3">
+													<div class="mt-1 border-l-2 border-primary bg-muted/5 p-3">
 														<span
-															class="mb-1 block text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+															class="mb-1 block text-[10px] font-bold tracking-wider text-muted uppercase"
 															>{m.assignment_mentor()}</span
 														>
-														<p class="text-[13px] font-medium text-slate-700 italic">
+														<p class="text-main text-[13px] font-medium italic">
 															"{sub.feedback}"
 														</p>
 													</div>
@@ -979,11 +969,11 @@
 
 					<!-- Pagination Controls -->
 					{#if lesson.assignments.length > 1}
-						<div class="flex items-center justify-between border-t border-slate-200 bg-white p-4">
+						<div class="border-main bg-card flex items-center justify-between border-t p-4">
 							<button
 								onclick={() => (currentAssignmentIndex = Math.max(0, currentAssignmentIndex - 1))}
 								disabled={currentAssignmentIndex === 0}
-								class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-[#FA2E69] disabled:opacity-30"
+								class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary disabled:opacity-30"
 							>
 								<ChevronLeft size={16} />
 								<span>{m.pagination_prev_short()}</span>
@@ -993,8 +983,8 @@
 								{#each lesson.assignments as _, i (i)}
 									<div
 										class="h-1.5 w-1.5 rounded-full transition-colors {i === currentAssignmentIndex
-											? 'bg-[#FA2E69]'
-											: 'bg-slate-200'}"
+											? 'bg-primary'
+											: 'bg-muted/20'}"
 									></div>
 								{/each}
 							</div>
@@ -1006,7 +996,7 @@
 										currentAssignmentIndex + 1
 									))}
 								disabled={currentAssignmentIndex === lesson.assignments.length - 1}
-								class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-[#FA2E69] disabled:opacity-30"
+								class="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary disabled:opacity-30"
 							>
 								<span>{m.pagination_next_short()}</span>
 								<ChevronRight size={16} />
@@ -1022,11 +1012,11 @@
 <!-- Security Protection Overlay -->
 {#if securityLocked}
 	<div
-		class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-slate-900 px-6 text-center text-white backdrop-blur-xl"
+		class="bg-main text-main fixed inset-0 z-9999 flex flex-col items-center justify-center px-6 text-center backdrop-blur-xl"
 		transition:fade
 	>
 		<div
-			class="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-pink-500/20 text-pink-500 shadow-2xl shadow-pink-500/20"
+			class="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-primary/20 text-primary shadow-2xl shadow-primary/20"
 		>
 			<Lock size={48} strokeWidth={2.5} />
 		</div>
@@ -1035,7 +1025,7 @@
 			{m.security_lock_title ? m.security_lock_title() : 'Xavfsizlik tizimi faollashdi'}
 		</h2>
 
-		<p class="mx-auto max-w-lg text-lg font-medium text-slate-400">
+		<p class="mx-auto max-w-lg text-lg font-medium text-muted">
 			{m.security_lock_desc
 				? m.security_lock_desc()
 				: "Dars materiallarini ko'rish uchun DevTools (inspektor) panelini yoping va sahifani yangilang."}
@@ -1044,15 +1034,13 @@
 		<div class="mt-10 flex flex-col items-center gap-4">
 			<button
 				onclick={() => window.location.reload()}
-				class="rounded-2xl bg-white px-8 py-3.5 text-sm font-black tracking-widest text-slate-900 uppercase transition-all hover:scale-105 active:scale-95"
+				class="bg-card text-main rounded-2xl px-8 py-3.5 text-sm font-black tracking-widest uppercase transition-all hover:scale-105 active:scale-95"
 			>
 				{m.refresh_page ? m.refresh_page() : 'Sahifani yangilash'}
 			</button>
 
-			<div
-				class="flex items-center gap-3 text-xs font-bold tracking-widest text-slate-500 uppercase"
-			>
-				<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-pink-500"></span>
+			<div class="flex items-center gap-3 text-xs font-bold tracking-widest text-muted uppercase">
+				<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-primary"></span>
 				Chinora Academy Security Guard
 			</div>
 		</div>
@@ -1076,7 +1064,7 @@
 
 	/* Plyr Custom Styles */
 	:global(.plyr) {
-		--plyr-color-main: #ed4b72;
+		--plyr-color-main: var(--primary);
 		--plyr-video-background: #0f172a;
 		--plyr-font-family: inherit;
 		height: 100% !important;

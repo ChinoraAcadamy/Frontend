@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
 
-export async function load({ params, cookies, url }) {
+export async function load({ params, cookies, url, locals }) {
     const token = cookies.get('access_token');
     const moduleId = url.searchParams.get('module_id');
     const lessonId = params.lesson_id; // Use path parameter
@@ -12,7 +12,10 @@ export async function load({ params, cookies, url }) {
 
     try {
         const res = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/lessons/${lessonId}/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept-Language': locals.lang
+            }
         });
 
         if (!res.ok) throw error(res.status, 'Dars topilmadi');
@@ -20,7 +23,7 @@ export async function load({ params, cookies, url }) {
 
         // Modul darslarini fetching (Sidebar uchun)
         const moduleRes = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 'Authorization': `Bearer ${token}`, 'Accept-Language': locals.lang }
         });
         const moduleData = moduleRes.ok ? await moduleRes.json() : null;
 
@@ -28,12 +31,12 @@ export async function load({ params, cookies, url }) {
         let nextLesson = null;
         try {
             const courseRes = await fetch(`${API_URL}/courses/${params.course_id}/`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${token}`, 'Accept-Language': locals.lang }
             });
             if (courseRes.ok) {
                 const courseData = await courseRes.json();
                 const modules = courseData.modules || [];
-                
+
                 const allLessons = [];
                 modules.forEach(m => {
                     if (m.lessons) {

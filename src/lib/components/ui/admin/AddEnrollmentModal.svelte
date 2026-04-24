@@ -60,19 +60,19 @@
 		<div class="absolute inset-0" onclick={onClose}></div>
 
 		<div
-			class="relative z-10 flex h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-4xl bg-white shadow-2xl"
+			class="relative z-10 flex h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-4xl border border-main bg-card shadow-2xl"
 			transition:fly={{ y: 20, duration: 300, opacity: 0 }}
 		>
-			<div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-6">
+			<div class="flex items-center justify-between border-b border-main bg-muted/5 p-6">
 				<div>
-					<h2 class="text-xl font-bold text-slate-800">
+					<h2 class="text-xl font-bold text-main">
 						{m.admin_student_add_course ? m.admin_student_add_course() : "Kurs qo'shish"}
 					</h2>
-					<p class="mt-1 text-sm font-medium text-slate-500">{studentName}</p>
+					<p class="mt-1 text-sm font-medium text-muted">{studentName}</p>
 				</div>
 				<button
 					onclick={onClose}
-					class="rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all hover:border-slate-300 hover:text-slate-600 active:scale-90"
+					class="rounded-full border border-main bg-card p-2 text-muted shadow-sm transition-all hover:bg-muted/10 active:scale-90"
 				>
 					<X size={18} strokeWidth={2.5} />
 				</button>
@@ -114,21 +114,21 @@
 			>
 				<div class="mb-4">
 					<div class="relative flex items-center">
-						<Search class="absolute left-4 text-slate-400" size={18} />
+						<Search class="absolute left-4 text-muted" size={18} />
 						<input
 							type="text"
 							bind:value={searchQuery}
 							placeholder={m.courses_search_placeholder
 								? m.courses_search_placeholder()
 								: 'Kurslarni qidirish...'}
-							class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 pr-4 pl-11 text-sm font-medium text-slate-800 transition-all outline-none focus:border-[#ed4b72] focus:bg-white focus:ring-4 focus:ring-[#ed4b72]/10"
+							class="h-12 w-full rounded-2xl border border-main bg-muted/5 pr-4 pl-11 text-sm font-medium text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
 						/>
 					</div>
 				</div>
 
 				<div class="custom-scrollbar flex-1 overflow-y-auto pr-2">
 					{#if filteredCourses.length === 0}
-						<div class="flex h-full flex-col items-center justify-center text-slate-400">
+						<div class="flex h-full flex-col items-center justify-center text-muted">
 							<BookOpen size={48} class="mb-4 opacity-20" />
 							<p>{m.admin_courses_not_found ? m.admin_courses_not_found() : 'Kurslar topilmadi'}</p>
 						</div>
@@ -140,16 +140,16 @@
 									type="button"
 									class="flex w-full items-center justify-between rounded-[20px] border p-4 text-left transition-all
 										{isSelected
-											? 'cursor-pointer border-[#ed4b72] bg-[#ed4b72]/5 shadow-sm'
-											: 'cursor-pointer border-slate-100 hover:border-slate-200 hover:bg-slate-50'}"
+											? 'cursor-pointer border-primary bg-primary/5 shadow-sm'
+											: 'cursor-pointer border-main hover:bg-muted/5'}"
 									onclick={() => toggleCourse(course.id)}
 								>
 									<div class="flex items-center gap-3">
 										<div
 											class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors
 												{isSelected
-													? 'bg-[#ed4b72] text-white'
-													: 'bg-slate-100 text-slate-500'}"
+													? 'bg-primary text-white'
+													: 'bg-muted/10 text-muted'}"
 										>
 											{#if isSelected}
 												<Check size={18} strokeWidth={3} />
@@ -158,10 +158,10 @@
 											{/if}
 										</div>
 										<div>
-											<h4 class="font-bold text-slate-800">
+											<h4 class="font-bold text-main">
 												{course.title}
 											</h4>
-											<p class="text-xs text-slate-500">
+											<p class="text-xs text-muted">
 												{course.price
 													? course.price.toLocaleString() +
 														' ' +
@@ -183,18 +183,18 @@
 					<input type="hidden" name="courseIds[]" value={id} />
 				{/each}
 
-				<div class="mt-6 flex gap-3 border-t border-slate-100 pt-5">
+				<div class="mt-6 flex gap-3 border-t border-main pt-5">
 					<button
 						type="button"
 						onclick={onClose}
-						class="flex-1 rounded-2xl bg-slate-100 py-4 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
+						class="flex-1 rounded-2xl bg-muted/10 py-4 font-bold text-muted transition-all hover:bg-muted/20 active:scale-95"
 					>
 						{m.admin_students_cancel ? m.admin_students_cancel() : 'Bekor qilish'}
 					</button>
 					<button
 						type="submit"
 						disabled={isSubmitting || selectedCourseIds.length === 0}
-						class="flex-1 rounded-2xl bg-[#ed4b72] py-4 font-bold text-white shadow-xl shadow-rose-200 transition-all hover:bg-[#de3c61] active:scale-95 disabled:opacity-60"
+						class="flex-1 rounded-2xl bg-primary py-4 font-bold text-white shadow-xl shadow-primary/20 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-60"
 					>
 						{isSubmitting
 							? m.enrolling
@@ -216,7 +216,7 @@
 		background: transparent;
 	}
 	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background-color: #cbd5e1;
+		background-color: var(--border-main);
 		border-radius: 20px;
 	}
 </style>

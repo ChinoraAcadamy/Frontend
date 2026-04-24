@@ -1,4 +1,5 @@
 <script>
+	/* eslint-disable no-unused-vars */
 	import { ChevronLeft, ChevronRight, Trophy, Crown, Medal } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -34,17 +35,17 @@
 	};
 </script>
 
-<div class="flex h-full flex-col rounded-3xl border border-white/70 bg-white p-6 shadow-sm">
+<div class="flex h-full flex-col rounded-3xl border border-main bg-card p-6 shadow-sm">
 	<!-- Header -->
 	<div class="mb-6 flex items-center justify-between">
-		<h2 class="text-xl font-bold text-slate-800">{m.dashboard_leaderboard()}</h2>
+		<h2 class="text-xl font-bold text-main">{m.dashboard_leaderboard()}</h2>
 	</div>
 
 	<!-- Table -->
 	<div class="min-h-[380px] flex-1 overflow-x-auto">
 		<table class="w-full border-collapse text-left">
 			<thead>
-				<tr class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
+				<tr class="text-[11px] font-bold tracking-widest text-muted uppercase">
 					<th class="px-2 pb-3">{m.rank_pos()}</th>
 					<th class="px-2 pb-3">{m.rank_student()}</th>
 					<th class="px-2 pb-3">{m.rank_course()}</th>
@@ -63,7 +64,7 @@
 					{/each}
 				{:else if results.length === 0}
 					<tr>
-						<td colspan="4" class="py-8 text-center text-sm font-semibold text-slate-400">
+						<td colspan="4" class="py-8 text-center text-sm font-semibold text-muted">
 							{m.no_data_found ? m.no_data_found() : "Ma'lumot topilmadi..."}
 						</td>
 					</tr>
@@ -76,7 +77,7 @@
 						<tr
 							class="group border-b border-transparent transition-all duration-200 last:border-0 {isAdmin
 								? 'cursor-pointer'
-								: ''} {isMe ? 'relative z-10 bg-rose-50/40' : 'hover:bg-slate-50/80'}"
+								: ''} {isMe ? 'relative z-10 bg-primary/5' : 'hover:bg-muted/5'}"
 							onclick={() => isAdmin && (window.location.href = `/admin/students/${user.id}`)}
 						>
 							<td class="px-2 py-3.5 first:rounded-l-2xl last:rounded-r-2xl">
@@ -89,7 +90,7 @@
 										</div>
 									{:else}
 										<div
-											class="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-[11px] font-black text-slate-400"
+											class="flex h-8 w-8 items-center justify-center rounded-xl border border-main bg-muted/10 text-[11px] font-black text-muted"
 										>
 											{rank}
 										</div>
@@ -108,8 +109,8 @@
 										{:else}
 											<div
 												class="flex h-10 w-10 items-center justify-center rounded-xl {isMe
-													? 'bg-rose-100 text-rose-600'
-													: 'bg-slate-100 text-slate-500'} text-xs font-black tracking-wider uppercase shadow-sm ring-2 ring-white"
+													? 'bg-primary/20 text-primary'
+													: 'bg-muted/20 text-muted'} text-xs font-black tracking-wider uppercase shadow-sm ring-2 ring-card"
 											>
 												{user.first_name?.[0] || user.username[0] || '?'}
 											</div>
@@ -121,19 +122,19 @@
 										{/if}
 									</div>
 									<div class="flex flex-col">
-										<span class="leading-none font-black text-slate-800">
+										<span class="leading-none font-black text-main">
 											{user.first_name && user.last_name
 												? `${user.first_name} ${user.last_name}`
 												: user.username}
 											{#if isMe}
 												<span
-													class="ml-1.5 inline-flex items-center rounded-md bg-rose-100 px-1.5 py-0.5 text-[10px] font-black tracking-wider text-rose-600 uppercase ring-1 ring-rose-200"
+													class="ml-1.5 inline-flex items-center rounded-md bg-primary/20 px-1.5 py-0.5 text-[10px] font-black tracking-wider text-primary uppercase ring-1 ring-primary/30"
 												>
 													{m.you ? m.you() : 'Siz'}
 												</span>
 											{/if}
 										</span>
-										<span class="mt-1 text-[10px] font-bold tracking-tight text-slate-400 uppercase"
+										<span class="mt-1 text-[10px] font-bold tracking-tight text-muted uppercase"
 											>ID: {user.username || user.id}</span
 										>
 									</div>
@@ -141,9 +142,9 @@
 							</td>
 							<td class="px-2 py-3.5">
 								<div
-									class="flex w-fit items-center gap-1.5 rounded-lg border border-slate-100/50 bg-slate-50/50 px-2 py-1 text-xs font-bold text-slate-500"
+									class="flex w-fit items-center gap-1.5 rounded-lg border border-main bg-muted/10 px-2 py-1 text-xs font-bold text-muted"
 								>
-									<span class="text-slate-700">{user.courses_count || 0}</span>
+									<span class="text-main">{user.courses_count || 0}</span>
 									<span class="text-[10px] uppercase opacity-70"
 										>{m.unit_ta ? m.unit_ta() : 'TA'}</span
 									>
@@ -152,13 +153,11 @@
 							<td class="px-2 py-3.5 text-right">
 								<div class="inline-flex flex-col items-end">
 									<span
-										class="text-base font-black {rank <= 3
-											? 'text-slate-900'
-											: 'text-slate-800'} leading-none"
+										class="text-base font-black text-main leading-none"
 									>
 										{user.total_score || 0}
 									</span>
-									<span class="mt-1 text-[10px] font-black tracking-widest text-[#ed4b72] uppercase"
+									<span class="mt-1 text-[10px] font-black tracking-widest text-primary uppercase"
 										>{m.unit_ball ? m.unit_ball() : 'BALL'}</span
 									>
 								</div>
@@ -172,7 +171,7 @@
 
 	<!-- Pagination Controls -->
 	{#if rankingData && totalPages > 1}
-		<div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
+		<div class="mt-6 flex items-center justify-between border-t border-main pt-5">
 			<div class="flex items-center gap-2">
 				<div class="flex -space-x-1.5">
 					{#each results.slice(0, 3) as u (u)}
@@ -191,7 +190,7 @@
 						</div>
 					{/each}
 				</div>
-				<span class="ml-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+				<span class="ml-1 text-[10px] font-black tracking-widest text-muted uppercase">
 					{m.pagination_total_people ? m.pagination_total_people({ count }) : `Jami ${count} kishi`}
 				</span>
 			</div>
@@ -200,23 +199,23 @@
 				<button
 					onclick={() => changePage(currentPage - 1)}
 					disabled={currentPage === 1}
-					class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30"
+					class="flex h-9 w-9 items-center justify-center rounded-xl border border-main bg-card text-muted shadow-sm transition-all hover:bg-muted/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30"
 				>
 					<ChevronLeft size={18} strokeWidth={3} />
 				</button>
 
 				<div
-					class="flex items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50 px-3 py-1.5 shadow-inner"
+					class="flex items-center gap-1.5 rounded-xl border border-main bg-muted/5 px-3 py-1.5 shadow-inner"
 				>
-					<span class="text-xs font-black text-slate-700">{currentPage}</span>
-					<span class="text-[10px] font-black text-slate-300 uppercase">/</span>
-					<span class="text-xs font-black text-slate-400">{totalPages}</span>
+					<span class="text-xs font-black text-main">{currentPage}</span>
+					<span class="text-[10px] font-black text-muted uppercase">/</span>
+					<span class="text-xs font-black text-muted">{totalPages}</span>
 				</div>
 
 				<button
 					onclick={() => changePage(currentPage + 1)}
 					disabled={currentPage === totalPages}
-					class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30"
+					class="flex h-9 w-9 items-center justify-center rounded-xl border border-main bg-card text-muted shadow-sm transition-all hover:bg-muted/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30"
 				>
 					<ChevronRight size={18} strokeWidth={3} />
 				</button>

@@ -32,7 +32,7 @@
 	};
 </script>
 
-<section id="course-content" class="min-h-screen bg-muted/30 py-24">
+<section id="course-content" class="min-h-screen bg-background py-24">
 	<div class="container mx-auto px-6">
 		<div class="mb-16 text-center">
 			<h2 class="mb-6 text-3xl font-bold text-foreground md:text-5xl">
@@ -106,7 +106,7 @@
 				{#each showAll ? resolvedCourses : resolvedCourses.slice(0, 3) as course, i (course.id)}
 					{@const style = courseStyles[i % courseStyles.length]}
 					<div
-						class="bg-card text-card-foreground flex w-full flex-col overflow-hidden rounded-xl border border-border shadow-none transition-all duration-300 hover:shadow-sm"
+						class="text-card-foreground flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-none transition-all duration-300 hover:shadow-sm"
 						in:fade={{ duration: 400, delay: i * 50 }}
 					>
 						<div class="{style.color} {style.textColor} p-6">

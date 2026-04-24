@@ -56,7 +56,7 @@
 {#if isOpen}
 	<!-- Background Overlay -->
 	<div
-		class="fixed inset-0 z-9999999 flex items-end justify-center bg-slate-900/60 p-4 backdrop-blur-sm md:items-center md:p-6"
+		class="fixed inset-0 z-2000 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm md:items-center md:p-6"
 		transition:fade={{ duration: 300 }}
 		onclick={handleClose}
 		onkeydown={(e) => e.key === 'Escape' && handleClose()}
@@ -65,7 +65,7 @@
 	>
 		<!-- Modal Content -->
 		<div
-			class="relative flex max-h-[90vh] w-full max-w-[550px] flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl outline-none md:rounded-[24px]"
+			class="relative flex max-h-[90vh] w-full max-w-[550px] flex-col overflow-hidden rounded-[32px] bg-surface shadow-2xl outline-none md:rounded-[24px]"
 			transition:fly={{ y: 100, duration: 400, opacity: 1 }}
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
@@ -76,7 +76,7 @@
 		>
 			<!-- Decorative Header Gradient -->
 			<div
-				class="h-2 shrink-0 bg-linear-to-r from-[#9b1c48] via-[#c43c66] to-[#9b1c48] opacity-80"
+				class="h-2 shrink-0 bg-primary opacity-80"
 			></div>
 
 			<div class="flex flex-col overflow-hidden">
@@ -86,17 +86,17 @@
 						<div>
 							<h2
 								id="modal-title"
-								class="mb-1 text-2xl font-extrabold tracking-tight text-[#1a0e13]"
+								class="mb-1 text-2xl font-extrabold tracking-tight text-foreground"
 							>
 								{m.submission_grade ? m.submission_grade() : 'Baholash'}
 							</h2>
-							<p class="text-[13px] font-bold tracking-wider text-slate-500 uppercase">
+							<p class="text-[13px] font-bold tracking-wider text-muted uppercase">
 								{submission?.student?.first_name}
 								{submission?.student?.last_name}
 							</p>
 						</div>
 						<button
-							class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-all duration-200 hover:bg-slate-100 hover:text-slate-600"
+							class="flex h-10 w-10 items-center justify-center rounded-full bg-muted/10 text-muted transition-all duration-200 hover:bg-muted/20 hover:text-foreground"
 							onclick={handleClose}
 						>
 							<X size={20} />
@@ -104,8 +104,8 @@
 					</div>
 
 					<!-- Submission Content Preview -->
-					<div class="mb-8 rounded-2xl border border-slate-100 bg-slate-50/50 p-5">
-						<span class="mb-3 block text-[10px] font-black tracking-widest text-slate-400 uppercase"
+					<div class="mb-8 rounded-2xl border border-border bg-muted/5 p-5">
+						<span class="mb-3 block text-[10px] font-black tracking-widest text-muted/40 uppercase"
 							>{m.label_submission_content
 								? m.label_submission_content()
 								: 'Topshiriq mazmuni'}</span
@@ -114,20 +114,20 @@
 						{#if submission?.assignment_type === 'text' || (!submission?.file && submission?.text_answer)}
 							<div class="custom-scrollbar max-h-40 overflow-y-auto pr-2">
 								<p
-									class="border-l-4 border-[#9b1c48]/20 py-1 pl-4 text-[15px] leading-relaxed font-medium text-slate-700 italic"
+									class="border-l-4 border-primary/20 py-1 pl-4 text-[15px] leading-relaxed font-medium text-muted italic"
 								>
 									"{submission?.text_answer}"
 								</p>
 							</div>
 						{:else if submission?.assignment_type === 'link'}
 							<div class="flex flex-col gap-3">
-								<p class="text-sm font-bold text-slate-600">
+								<p class="text-sm font-bold text-muted">
 									{m.label_student_link ? m.label_student_link() : 'Talaba yuborgan havola:'}
 								</p>
 								<a
 									href={resolve(submission?.text_answer)}
 									target="_blank"
-									class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 font-bold text-[#9b1c48] shadow-sm transition-all hover:border-[#9b1c48]/30 hover:shadow-md"
+									class="flex items-center gap-3 rounded-xl border border-border bg-surface p-4 font-bold text-primary shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
 								>
 									<svg
 										class="h-5 w-5"
@@ -145,18 +145,18 @@
 							</div>
 						{:else}
 							<div
-								class="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+								class="flex items-center gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm"
 							>
 								<div
-									class="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-400"
+									class="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-muted/5 text-muted/40"
 								>
 									<AlertCircle size={24} />
 								</div>
 								<div class="flex-1 overflow-hidden">
-									<span class="mb-0.5 block text-xs font-bold text-slate-400 uppercase"
+									<span class="mb-0.5 block text-xs font-bold text-muted/40 uppercase"
 										>{m.label_submitted_file ? m.label_submitted_file() : 'Yuborilgan fayl'}</span
 									>
-									<span class="block truncate text-sm font-bold text-slate-700"
+									<span class="block truncate text-sm font-bold text-muted"
 										>{submission?.file?.split('/').pop()}</span
 									>
 								</div>
@@ -171,9 +171,9 @@
 						<div class="group">
 							<label
 								for="score"
-								class="mb-2.5 ml-1 flex items-center gap-2 text-[13px] font-bold tracking-wider text-slate-500 uppercase"
+								class="mb-2.5 ml-1 flex items-center gap-2 text-[13px] font-bold tracking-wider text-muted uppercase"
 							>
-								<Star size={14} class="text-[#9b1c48]" />
+								<Star size={14} class="text-primary" />
 								{m.label_score_range
 									? m.label_score_range({ max: maxScore })
 									: `Baho (0-${maxScore})`}
@@ -188,11 +188,11 @@
 									step="1"
 									bind:value={score}
 									oninput={(e) => validateScore(Number(e.currentTarget.value))}
-									class="w-full appearance-none rounded-2xl border-2 border-slate-100 bg-slate-50 px-5 py-4 text-2xl font-black text-[#1a0e13] outline-hidden transition-all focus:border-[#9b1c48]/30 focus:bg-white focus:ring-4 focus:ring-[#9b1c48]/5"
+									class="w-full appearance-none rounded-2xl border-2 border-border bg-muted/5 px-5 py-4 text-2xl font-black text-foreground outline-hidden transition-all focus:border-primary/30 focus:bg-surface focus:ring-4 focus:ring-primary/5"
 									required
 								/>
 								<div
-									class="pointer-events-none absolute top-1/2 right-5 -translate-y-1/2 font-black text-slate-300"
+									class="pointer-events-none absolute top-1/2 right-5 -translate-y-1/2 font-black text-muted/20"
 								>
 									/ {maxScore}
 								</div>
@@ -203,9 +203,9 @@
 						<div>
 							<label
 								for="feedback"
-								class="mb-2.5 ml-1 flex items-center gap-2 text-[13px] font-bold tracking-wider text-slate-500 uppercase"
+								class="mb-2.5 ml-1 flex items-center gap-2 text-[13px] font-bold tracking-wider text-muted uppercase"
 							>
-								<MessageSquare size={14} class="text-[#9b1c48]" />
+								<MessageSquare size={14} class="text-primary" />
 								{m.assignment_desc_label ? m.assignment_desc_label() : 'Izoh (ixtiyoriy)'}
 							</label>
 							<textarea
@@ -215,13 +215,13 @@
 								placeholder={m.submission_feedback_placeholder
 									? m.submission_feedback_placeholder()
 									: 'Talaba uchun maslahat yoki xulosa yozing...'}
-								class="min-h-[120px] w-full resize-none rounded-2xl border-2 border-slate-100 bg-slate-50 px-5 py-4 text-[15px] font-medium text-slate-700 outline-hidden transition-all focus:border-[#9b1c48]/30 focus:bg-white focus:ring-4 focus:ring-[#9b1c48]/5"
+								class="min-h-[120px] w-full resize-none rounded-2xl border-2 border-border bg-muted/5 px-5 py-4 text-[15px] font-medium text-muted outline-hidden transition-all focus:border-primary/30 focus:bg-surface focus:ring-4 focus:ring-primary/5"
 							></textarea>
 						</div>
 
 						{#if error}
 							<div
-								class="animate-shake flex items-start gap-3 rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm font-semibold text-rose-600"
+								class="animate-shake flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm font-semibold text-primary"
 								transition:fade
 							>
 								<AlertCircle size={18} class="mt-0.5 shrink-0" />
@@ -233,7 +233,8 @@
 						<button
 							type="submit"
 							disabled={loading}
-							class="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-linear-to-r from-[#9b1c48] to-[#c43c66] py-4.5 text-base font-bold text-white shadow-[0_10px_25px_rgba(155,28,72,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_15px_35px_rgba(155,28,72,0.35)] active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
+							class="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary py-4.5 text-base font-bold text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-hover active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
+						>
 						>
 							{#if loading}
 								<div
@@ -249,15 +250,15 @@
 				</div>
 
 				<!-- Bottom Note -->
-				<div class="flex shrink-0 items-center gap-3 border-t border-slate-100 bg-slate-50 p-6">
-					<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm">
-						<AlertCircle size={16} class="text-slate-400" />
+				<div class="flex shrink-0 items-center gap-3 border-t border-border bg-muted/5 p-6">
+					<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-surface shadow-sm">
+						<AlertCircle size={16} class="text-muted/40" />
 					</div>
-					<p class="text-[12px] leading-tight font-bold text-slate-500">
+					<p class="text-[12px] leading-tight font-bold text-muted">
 						{m.msg_grade_auto_status
 							? m.msg_grade_auto_status()
 							: "Baholashdan so'ng topshiriq holati avtomatik ravishda"}{' '}
-						<span class="text-[#9b1c48]"
+						<span class="text-primary"
 							>"{m.assignment_graded ? m.assignment_graded() : 'Baholandi'}"</span
 						>{' '}
 						{m.msg_grade_auto_status_suffix ? m.msg_grade_auto_status_suffix() : "ga o'zgaradi."}
