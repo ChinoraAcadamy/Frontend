@@ -28,6 +28,21 @@
 	let showPassword = $state(false);
 	let showDeviceModal = $state(false);
 	let terminatingSessionId = $state(null);
+	let clientDeviceName = $state(browser ? navigator.userAgent : '');
+
+	$effect(() => {
+		if (browser) {
+			// @ts-ignore - userAgentData is an experimental API
+			const uaData = navigator.userAgentData;
+			if (uaData?.getHighEntropyValues) {
+				uaData.getHighEntropyValues(['model']).then((hints) => {
+					if (hints.model) {
+						clientDeviceName = hints.model;
+					}
+				});
+			}
+		}
+	});
 
 	$effect(() => {
 		if (form?.['isLimitError']) {
@@ -35,21 +50,25 @@
 		}
 	});
 
-	const parseUserAgent = (ua) => {
-		if (!ua) return m.profile_device_unknown();
-		if (ua.includes('iPhone') || ua.includes('Android')) return 'Mobile';
-		if (ua.includes('Macintosh') || ua.includes('Windows') || ua.includes('Linux'))
+	const parseUserAgent = (name) => {
+		if (!name) return m.profile_device_unknown();
+		const lower = name.toLowerCase();
+		if (lower.includes('iphone') || lower.includes('android') || lower.includes('mobile') || lower.includes('samsung') || lower.includes('pixel')) return 'Mobile';
+		if (lower.includes('macintosh') || lower.includes('windows') || lower.includes('linux'))
 			return 'Desktop';
 		return 'Device';
 	};
 
-	const formatDeviceName = (ua) => {
-		if (!ua) return m.profile_device_unknown();
-		if (ua.includes('Chrome')) return 'Chrome';
-		if (ua.includes('Firefox')) return 'Firefox';
-		if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
-		if (ua.includes('Edge')) return 'Edge';
-		return ua.split(' ')[0] || m.profile_device_unknown();
+	const formatDeviceName = (name) => {
+		if (!name) return m.profile_device_unknown();
+		if (name.includes('Mozilla/')) {
+			if (name.includes('Chrome')) return 'Chrome';
+			if (name.includes('Firefox')) return 'Firefox';
+			if (name.includes('Safari') && !name.includes('Chrome')) return 'Safari';
+			if (name.includes('Edge')) return 'Edge';
+			return name.split(' ')[0] || m.profile_device_unknown();
+		}
+		return name;
 	};
 
 	const currentLocale = $derived(browser ? getLocale() : 'uz');
@@ -130,7 +149,7 @@
 					class="form-body"
 				>
 					<!-- Device Name Hidden Input -->
-					<input type="hidden" name="device_name" value={browser ? navigator.userAgent : ''} />
+					<input type="hidden" name="device_name" value={clientDeviceName} />
 
 					<!-- Username field -->
 					<div class="field">

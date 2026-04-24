@@ -62,21 +62,25 @@
 		}
 	};
 
-	const parseUserAgent = (ua) => {
-		if (!ua) return m.profile_device_unknown?.() ?? 'Unknown';
-		if (ua.includes('iPhone') || ua.includes('Android')) return 'Mobile';
-		if (ua.includes('Macintosh') || ua.includes('Windows') || ua.includes('Linux'))
+	const parseUserAgent = (name) => {
+		if (!name) return m.profile_device_unknown?.() ?? 'Unknown';
+		const lower = name.toLowerCase();
+		if (lower.includes('iphone') || lower.includes('android') || lower.includes('mobile') || lower.includes('samsung') || lower.includes('pixel')) return 'Mobile';
+		if (lower.includes('macintosh') || lower.includes('windows') || lower.includes('linux'))
 			return 'Desktop';
 		return 'Device';
 	};
 
-	const formatDeviceName = (ua) => {
-		if (!ua) return m.profile_device_unknown?.() ?? 'Unknown';
-		if (ua.includes('Chrome')) return 'Chrome';
-		if (ua.includes('Firefox')) return 'Firefox';
-		if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
-		if (ua.includes('Edge')) return 'Edge';
-		return ua.split(' ')[0] || (m.profile_device_unknown?.() ?? 'Unknown');
+	const formatDeviceName = (name) => {
+		if (!name) return m.profile_device_unknown?.() ?? 'Unknown';
+		if (name.includes('Mozilla/')) {
+			if (name.includes('Chrome')) return 'Chrome';
+			if (name.includes('Firefox')) return 'Firefox';
+			if (name.includes('Safari') && !name.includes('Chrome')) return 'Safari';
+			if (name.includes('Edge')) return 'Edge';
+			return name.split(' ')[0] || (m.profile_device_unknown?.() ?? 'Unknown');
+		}
+		return name;
 	};
 
 	const activeDevices = $derived(data.devices?.filter((d) => d.is_active) ?? []);
@@ -313,6 +317,7 @@
 								class="device-card {device.is_current ? 'device-card--current' : ''}"
 								in:scale={{ duration: 200, start: 0.97, easing: cubicOut }}
 							>
+							{console.log(device)}
 								<div class="device-left">
 									<div
 										class="device-icon-wrap {device.is_current ? 'device-icon-wrap--active' : ''}"
@@ -599,7 +604,6 @@
 		overflow: hidden;
 		position: relative;
 		z-index: 10;
-		mx: 1.5rem;
 		margin-left: max(1.5rem, calc((100% - 960px) / 2));
 		margin-right: max(1.5rem, calc((100% - 960px) / 2));
 	}

@@ -31,12 +31,14 @@ export const actions = {
             });
         }
 
+        const clientDeviceName = formData.get('device_name');
+
         let result;
         try {
             const ua = request.headers.get('user-agent') || '';
             const detection = detector.parse(ua);
 
-            // Build a human-readable device name
+            // Build a human-readable device name from server-side detection
             const deviceParts = [
                 detection.device?.vendor,
                 detection.device?.model,
@@ -44,7 +46,19 @@ export const actions = {
                 detection.client?.name
             ].filter(Boolean);
 
-            const detectedDeviceName = deviceParts.join(', ') || 'Unknown Device';
+            const serverDetectedName = deviceParts.join(', ') || 'Unknown Device';
+
+            // Prefer client-sent name if it's more specific (not a raw User-Agent)
+            let detectedDeviceName = serverDetectedName;
+            if (
+                clientDeviceName &&
+                typeof clientDeviceName === 'string' &&
+                clientDeviceName.trim() !== '' &&
+                !clientDeviceName.includes('Mozilla/') &&
+                !clientDeviceName.includes('AppleWebKit/')
+            ) {
+                detectedDeviceName = clientDeviceName;
+            }
 
             const response = await fetch(`${API_URL}/auth/login/`, {
                 method: 'POST',
