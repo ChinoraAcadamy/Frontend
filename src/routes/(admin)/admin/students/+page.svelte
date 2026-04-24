@@ -394,6 +394,6 @@
 	@reference "tailwindcss";
 
 	.admin-table {
-		@apply px-6 py-4 text-xs font-bold uppercase tracking-widest text-muted;
+		@apply px-6 py-4 text-xs font-bold uppercase tracking-widest;
 	}
 </style>
