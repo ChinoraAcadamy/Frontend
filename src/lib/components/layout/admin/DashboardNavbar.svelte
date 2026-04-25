@@ -1,6 +1,5 @@
 <script>
 	import {
-		Search,
 		Bell,
 		Menu,
 		Accessibility,
@@ -19,8 +18,6 @@
 	// import { onMount } from 'svelte';
 
 	let { user = null, notificationCount = 0, mobileOpen = $bindable(false) } = $props();
-
-	let searchQuery = $state('');
 
 	// --- A11y (Maxsus imkoniyatlar) Holatlari ---
 	let isA11yOpen = $state(false);
@@ -144,28 +141,18 @@
 				<Breadcrumb inNavbar={true} />
 			</div>
 		{/if}
-
-		<div class="relative hidden max-w-sm flex-1 items-center lg:flex">
-			<Search size={16} class="pointer-events-none absolute left-3.5 text-gray-400" />
-			<input
-				type="text"
-				placeholder={m.admin_search_placeholder ? m.admin_search_placeholder() : 'Qidirish...'}
-				bind:value={searchQuery}
-				class="w-full rounded-xl border border-border bg-muted/10 py-2.25 pr-4 pl-10 text-sm text-foreground transition-all duration-150 outline-none focus:border-primary-light focus:bg-surface focus:ring-[3px] focus:ring-primary-light/10"
-			/>
-		</div>
 	</div>
 
 	<div class="relative flex shrink-0 items-center gap-3">
 		<ThemeToggle />
 		<LanguageSwitcher variant="minimal" />
 
-		<button
+		<!-- <button
 			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-border bg-muted/10 text-muted transition-all duration-150 hover:border-primary/30 hover:bg-primary/5 hover:text-primary lg:hidden"
 			aria-label={m.admin_search_label ? m.admin_search_label() : 'Qidirish'}
 		>
 			<Search size={18} />
-		</button>
+		</button> -->
 
 		<!-- <button
 			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-[#f0f0f0] bg-gray-50 text-gray-500 transition-all duration-150 hover:bg-[#fdf2f6] hover:text-[#9B1C48] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-[#f5c0cf]"
@@ -216,7 +203,9 @@
 							<span class="text-xs font-semibold text-muted"
 								>{m.admin_a11y_text_size ? m.admin_a11y_text_size() : "Matn o'lchami"}</span
 							>
-							<div class="mt-2 flex items-center justify-between rounded-2xl border border-border bg-background p-1">
+							<div
+								class="mt-2 flex items-center justify-between rounded-2xl border border-border bg-background p-1"
+							>
 								<button
 									onclick={() => changeZoom(-0.1)}
 									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-surface"
@@ -240,7 +229,9 @@
 									? m.admin_a11y_line_height()
 									: 'Qatorlar orasidagi masofa'}</span
 							>
-							<div class="mt-2 flex items-center justify-between rounded-2xl border border-border bg-background p-1">
+							<div
+								class="mt-2 flex items-center justify-between rounded-2xl border border-border bg-background p-1"
+							>
 								<button
 									onclick={() => changeLineHeight(-0.1)}
 									class="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-surface"

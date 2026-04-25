@@ -1,27 +1,25 @@
 <script>
 	import { resolve } from '$app/paths';
-	import { page } from '$app/state'; // Use Svelte 5 state
+	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
+	import { Home } from 'lucide-svelte';
 
 	let { inNavbar = false } = $props();
 
-	// Barcha mavjud sahifalarni olish (Vite build-time magic)
 	const pages = import.meta.glob('/src/routes/**/+page.svelte');
 
-	// Sahifa yo'llarini pattern ko'rinishiga o'tkazish
 	const validRoutePatterns = new Set(
 		Object.keys(pages).map((path) => {
 			return (
 				path
 					.replace('/src/routes', '')
 					.replace('/+page.svelte', '')
-					.replace(/\/\([^)]+\)/g, '') // (app), (admin) kabi group'larni olib tashlash
+					.replace(/\/\([^)]+\)/g, '')
 					.replace(/\/index$/, '') || '/'
 			);
 		})
 	);
 
-	// segmentni chiroyli qilish uchun fallback
 	function formatLabel(segment) {
 		const key = `breadcrumb_${segment.toLowerCase()}`;
 		if (m[key]) return m[key]();
@@ -30,7 +28,6 @@
 
 	let segments = $derived(page.url.pathname.split('/').filter(Boolean));
 
-	// Route ID segmentlarini tayyorlash (group'larni olib tashlab)
 	let routeSegments = $derived(
 		(page.route.id || '')
 			.replace(/\/\([^)]+\)/g, '')
@@ -44,175 +41,267 @@
 				const href = '/' + segments.slice(0, i + 1).join('/');
 				const routePattern = '/' + routeSegments.slice(0, i + 1).join('/');
 
-				// Dinamik label aniqlash
 				let label = formatLabel(seg);
-
-				// Agar bu segment parametr bo'lsa (masalan [id] yoki [lesson_id])
 				const isParam = routeSegments[i]?.startsWith('[') && routeSegments[i]?.endsWith(']');
 
 				if (isParam) {
 					const paramName = routeSegments[i].slice(1, -1).replace('...', '');
 
-					// 1. Agar dars bo'lsa
-					if (
-						(paramName.includes('lesson') || paramName === 'lesson_id') &&
-						page.data.lesson?.title
-					) {
+					if ((paramName.includes('lesson') || paramName === 'lesson_id') && page.data.lesson?.title) {
 						label = page.data.lesson.title;
-					}
-					// 2. Agar modul bo'lsa (parametr sifatida)
-					else if (
-						(paramName.includes('module') || paramName === 'module_id') &&
-						(page.data.module?.title || page.data.moduleData?.title)
-					) {
+					} else if ((paramName.includes('module') || paramName === 'module_id') && (page.data.module?.title || page.data.moduleData?.title)) {
 						label = page.data.module?.title || page.data.moduleData?.title;
-					}
-					// 3. Agar kurs bo'lsa
-					else if (
-						(paramName === 'id' || paramName.includes('course') || paramName === 'course_id') &&
-						page.data.course?.title
-					) {
+					} else if ((paramName === 'id' || paramName.includes('course') || paramName === 'course_id') && page.data.course?.title) {
 						label = page.data.course.title;
-					}
-					// 4. Agar student bo'lsa
-					else if (paramName.includes('student') || paramName === 'student_id') {
+					} else if (paramName.includes('student') || paramName === 'student_id') {
 						if (page.data.student) {
-							label = `${page.data.student.first_name || ''} ${page.data.student.last_name || ''}`.trim();
-							if (!label) label = page.data.student.username;
+							label = `${page.data.student.first_name || ''} ${page.data.student.last_name || ''}`.trim() || page.data.student.username;
 						}
-					}
-					// 5. Fallback: Agar page.data da title bo'lsa va bu oxirgi segment bo'lsa
-					else if (i === segments.length - 1 && page.data.title) {
+					} else if (i === segments.length - 1 && page.data.title) {
 						label = page.data.title;
 					}
 				} else {
-					// Segment parametr bo'lmasa ham (masalan "lessons" static segmenti)
-					// Uni modul nomi bilan almashtirishimiz mumkin, agar modul ma'lumotlari bo'lsa
-					if (
-						(seg.toLowerCase() === 'lessons' || seg.toLowerCase() === 'lesson') &&
-						(page.data.module?.title || page.data.moduleData?.title)
-					) {
+					if ((seg.toLowerCase() === 'lessons' || seg.toLowerCase() === 'lesson') && (page.data.module?.title || page.data.moduleData?.title)) {
 						label = page.data.module?.title || page.data.moduleData?.title;
 					}
 				}
 
-				return {
-					label,
-					href,
-					isClickable: validRoutePatterns.has(routePattern)
-				};
+				return { label, href, isClickable: validRoutePatterns.has(routePattern) };
 			})
 			.filter((item) => item.href !== '/admin')
 	);
+
+	// Dinamik home link (admin vs student)
+	let homeHref = $derived(
+		page.data.user?.role === 'admin' || page.data.user?.role === 'superadmin'
+			? '/admin/dashboard'
+			: '/dashboard'
+	);
+
+	// Mobile: faqat oxirgi 2 elementni ko'rsatish
+	let mobileItems = $derived(items.slice(-2));
+	let hasMore = $derived(items.length > 2);
 </script>
 
-<!-- Blury background -->
-<nav class="breadcrumb backdrop-blur-sm {inNavbar ? 'in-navbar' : ''}">
-	{#if items.length === 0}
-		<span class="current truncate-item"
-			>{m.breadcrumb_dashboard ? m.breadcrumb_dashboard() : 'Dashboard'}</span
-		>
-	{/if}
-	{#each items as item, i (item.href)}
-		{#if i > 0 && item.isClickable}
-			<span class="separator">
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2.5"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					class="h-3 w-3"><path d="m9 18 6-6-6-6"></path></svg
-				>
+<!-- Desktop: inNavbar holati -->
+{#if inNavbar}
+	<nav class="bc-desktop" aria-label="Breadcrumb">
+		<a href={resolve(/** @type {any} */ (homeHref))} class="bc-home" aria-label="Dashboard">
+			<Home size={13} strokeWidth={2.5} />
+		</a>
+		{#each items as item, i (item.href)}
+			<span class="bc-sep" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
+					<path d="m9 18 6-6-6-6"/>
+				</svg>
 			</span>
-		{/if}
+			{#if i !== items.length - 1}
+				{#if item.isClickable}
+					<a href={resolve(/** @type {any} */(item.href))} class="bc-link">{item.label}</a>
+				{/if}
+			{:else}
+				<span class="bc-current" title={item.label}>{item.label}</span>
+			{/if}
+		{/each}
+	</nav>
 
-		{#if i !== items.length - 1}
-			{#if item.isClickable}
-				<a href={resolve(/** @type {any} */ (item.href))} class="link truncate-item">
-					{item.label}
+<!-- Mobile: sticky bar holati -->
+{:else}
+	<nav class="bc-mobile" aria-label="Breadcrumb">
+		<div class="bc-mobile-inner">
+			<!-- Agar oldin ko'proq element bo'lsa, orqaga o'tish uchun -->
+			{#if hasMore}
+				{@const backItem = items[items.length - 2]}
+				{#if backItem?.isClickable}
+					<a href={resolve(/** @type {any} */(backItem.href))} class="bc-back-btn" aria-label="Back">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+							<path d="m15 18-6-6 6-6"/>
+						</svg>
+					</a>
+				{/if}
+			{:else}
+				<a href={resolve(/** @type {any} */(homeHref))} class="bc-back-btn" aria-label="Dashboard">
+					<Home size={14} strokeWidth={2.5} />
 				</a>
 			{/if}
-		{:else}
-			<span class="current truncate-item" title={item.label}>
-				{item.label}
-			</span>
-		{/if}
-	{/each}
-</nav>
+
+			<!-- Trail -->
+			<div class="bc-trail">
+				{#if hasMore}
+					<span class="bc-trail-dots" aria-hidden="true">···</span>
+					<span class="bc-trail-sep" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
+							<path d="m9 18 6-6-6-6"/>
+						</svg>
+					</span>
+				{/if}
+
+				{#each mobileItems as item, i (item.href)}
+					{#if i > 0}
+						<span class="bc-trail-sep" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
+								<path d="m9 18 6-6-6-6"/>
+							</svg>
+						</span>
+					{/if}
+
+					{#if i !== mobileItems.length - 1 && item.isClickable}
+						<a href={resolve(/** @type {any} */(item.href))} class="bc-trail-link">{item.label}</a>
+					{:else if i === mobileItems.length - 1}
+						<span class="bc-trail-current" title={item.label}>{item.label}</span>
+					{/if}
+				{/each}
+			</div>
+		</div>
+	</nav>
+{/if}
 
 <style>
-	.breadcrumb {
+	/* ─── Desktop (inNavbar) ────────────────────────────────────── */
+	.bc-desktop {
 		display: flex;
 		align-items: center;
-		gap: 4px;
-		font-size: 13px;
-		font-weight: 500;
-		color: #64748b;
+		gap: 2px;
+		max-width: 450px;
+		flex-wrap: nowrap;
+		overflow: hidden;
 	}
 
-	.in-navbar {
-		margin-bottom: 0;
-		background: transparent;
-		box-shadow: none;
-		border: none;
-		padding: 0;
-		max-width: 450px; /* Desktop limitation */
-	}
-
-	/* Logic for mobile hide in Navbar */
 	@media (max-width: 1023px) {
-		.in-navbar {
-			display: none !important;
+		.bc-desktop {
+			display: none;
 		}
 	}
 
-	.truncate-item {
-		max-width: 160px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		vertical-align: middle;
+	.bc-home {
+		display: flex;
+		align-items: center;
+		color: #94a3b8;
+		padding: 4px;
+		border-radius: 6px;
+		transition: color 0.15s;
+		flex-shrink: 0;
+		text-decoration: none;
 	}
+	.bc-home:hover { color: #9b1c48; }
 
-	.separator {
+	.bc-sep {
 		color: #cbd5e1;
 		display: flex;
 		align-items: center;
-		opacity: 0.7;
+		flex-shrink: 0;
+		opacity: 0.6;
+	}
+
+	.bc-link {
+		font-size: 13px;
+		font-weight: 500;
+		color: #64748b;
+		text-decoration: none;
+		padding: 3px 6px;
+		border-radius: 6px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 140px;
+		transition: color 0.15s, background 0.15s;
+	}
+	.bc-link:hover { color: #9b1c48; background: rgba(155, 28, 72, 0.05); }
+
+	.bc-current {
+		font-size: 13px;
+		font-weight: 700;
+		color: #1e293b;
+		padding: 3px 6px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 160px;
+		letter-spacing: -0.01em;
+	}
+
+	/* ─── Mobile bar ────────────────────────────────────────────── */
+	.bc-mobile {
+		width: 100%;
+	}
+
+	.bc-mobile-inner {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		height: 44px;
+		padding-inline: 1rem;
+	}
+
+	/* Back / Home button */
+	.bc-back-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 10px;
+		background: rgba(155, 28, 72, 0.07);
+		color: #9b1c48;
+		text-decoration: none;
+		flex-shrink: 0;
+		transition: background 0.15s, transform 0.12s;
+		margin-right: 10px;
+	}
+	.bc-back-btn:hover { background: rgba(155, 28, 72, 0.12); }
+	.bc-back-btn:active { transform: scale(0.93); }
+
+	/* Trail */
+	.bc-trail {
+		display: flex;
+		align-items: center;
+		gap: 3px;
+		overflow: hidden;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.bc-trail-dots {
+		font-size: 13px;
+		font-weight: 700;
+		color: #94a3b8;
+		letter-spacing: 0.05em;
+		flex-shrink: 0;
+		line-height: 1;
+	}
+
+	.bc-trail-sep {
+		display: flex;
+		align-items: center;
+		color: #cbd5e1;
 		flex-shrink: 0;
 	}
 
-	.link {
+	.bc-trail-link {
+		font-size: 13px;
+		font-weight: 500;
 		color: #64748b;
 		text-decoration: none;
-		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-		padding: 4px 6px;
-		border-radius: 8px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 100px;
 		flex-shrink: 1;
+		padding: 2px 4px;
+		border-radius: 5px;
+		transition: color 0.15s;
 	}
+	.bc-trail-link:hover { color: #9b1c48; }
 
-	.link:hover {
-		color: #9b1c48;
-		background: rgba(155, 28, 72, 0.05);
-	}
-
-	.current {
-		color: #1e293b;
+	.bc-trail-current {
+		font-size: 13px;
 		font-weight: 700;
-		padding: 4px 6px;
+		color: #0f172a;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		flex: 1;
+		min-width: 0;
 		letter-spacing: -0.01em;
-		flex-shrink: 1;
-	}
-
-	@media (max-width: 640px) {
-		.breadcrumb {
-			font-size: 12px;
-			gap: 2px;
-		}
-		.truncate-item {
-			max-width: 120px;
-		}
 	}
 </style>

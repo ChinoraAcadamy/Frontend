@@ -9,7 +9,8 @@
 		Settings,
 		ShieldCheck,
 		Activity,
-		KeyRound
+		KeyRound,
+		Megaphone
 	} from 'lucide-svelte';
 	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
 	import Breadcrumb from '@/lib/components/ui/Breadcrumb.svelte';
@@ -20,7 +21,6 @@
 	let collapsed = $state(false);
 	let mobileOpen = $state(false);
 
-	// no scroll when menu is open on mobile, and enable it back when menu is closed
 	$effect(() => {
 		if (mobileOpen) {
 			document.body.style.overflow = 'hidden';
@@ -28,6 +28,9 @@
 			document.body.style.overflow = 'auto';
 		}
 	});
+
+	// Nested route ekanligini tekshirish (2 dan chuqur)
+	let isNestedRoute = $derived(page.url.pathname.split('/').filter(Boolean).length > 2);
 
 	let adminNavItems = $derived([
 		{
@@ -78,6 +81,12 @@
 			label: m.admin_nav_settings_divider ? m.admin_nav_settings_divider() : 'Settings'
 		},
 		{
+			href: '/admin/masterclass',
+			label: m.admin_nav_masterclass ? m.admin_nav_masterclass() : 'Masterklass',
+			icon: Megaphone,
+			exact: false
+		},
+		{
 			href: '/admin/profile',
 			label: m.admin_nav_settings ? m.admin_nav_settings() : 'Sozlamalar',
 			icon: Settings,
@@ -94,8 +103,8 @@
 	<div class="admin-body">
 		<DashboardNavbar notificationCount={3} bind:mobileOpen user={data.user} />
 
-		{#if page.url.pathname.split('/').filter(Boolean).length > 2}
-			<div class="mobile-breadcrumb-container">
+		{#if isNestedRoute}
+			<div class="mobile-bc bg-background">
 				<Breadcrumb inNavbar={false} />
 			</div>
 		{/if}
@@ -110,7 +119,7 @@
 	.admin-shell {
 		display: flex;
 		min-height: 100vh;
-		background: var(--bg-main); /* Orqa fon rangi */
+		background: var(--bg-main);
 	}
 
 	.admin-body {
@@ -119,36 +128,44 @@
 		transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 		display: flex;
 		flex-direction: column;
-		min-width: 0; /* Overflow muammolarini oldini oladi */
+		min-width: 0;
 	}
 
-	/* Collapsed holati */
 	.admin-shell.collapsed .admin-body {
 		margin-left: 76px;
 	}
 
-	/* Mobile ekran */
 	@media (max-width: 1024px) {
 		.admin-body {
 			margin-left: 0 !important;
 		}
 	}
 
-	.mobile-breadcrumb-container {
+	/* Mobile breadcrumb bar */
+	.mobile-bc {
 		display: none;
 		position: sticky;
-		top: 4rem;
+		top: 64px; /* navbar height */
 		z-index: 40;
-		padding: 0.5rem 1.5rem;
-		background: rgba(255, 255, 255, 0.6);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border-bottom: 1px solid rgba(240, 240, 240, 0.5);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+		/* Yuqori chetda ingichka brand chizig'i */
+		box-shadow: inset 0 -1px 0 rgba(250, 46, 105, 0.12);
 	}
 
 	@media (max-width: 1023px) {
-		.mobile-breadcrumb-container {
-			display: block !important;
+		.mobile-bc {
+			display: block;
+		}
+	}
+
+	.admin-content {
+		flex: 1;
+		padding: 1.5rem;
+	}
+
+	@media (max-width: 640px) {
+		.admin-content {
+			padding: 1rem;
 		}
 	}
 </style>

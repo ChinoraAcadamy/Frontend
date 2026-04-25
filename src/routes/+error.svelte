@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { ArrowLeft, Home, AlertTriangle, ShieldAlert, SearchX, ServerCrash } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { resolve } from '$app/paths';
 
 	// Xatolik turiga qarab mos ikonkalar va matnlar
 	const errorConfig = {
@@ -66,9 +67,9 @@
 	>
 		<div class="mb-10 flex justify-center">
 			<div
-				class={`flex h-24 w-24 items-center justify-center rounded-[32px] ${info.bg} shadow-xl ring-[12px] shadow-slate-200/50 ring-white`}
+				class={`flex h-24 w-24 items-center justify-center rounded-[32px] ${info.bg} shadow-xl ring-12 shadow-slate-200/50 ring-white`}
 			>
-				<svelte:component this={info.icon} class={`h-12 w-12 ${info.color}`} strokeWidth={1.5} />
+				<info.icon class={`h-12 w-12 ${info.color}`} strokeWidth={1.5} />
 			</div>
 		</div>
 
@@ -116,7 +117,7 @@
 			</button>
 
 			<button
-				onclick={() => goto('/')}
+				onclick={() => goto(resolve('/'))}
 				class="group flex items-center justify-center gap-3 rounded-2xl bg-[#ed4b72] px-8 py-4 font-bold text-white shadow-xl shadow-rose-500/25 transition-all hover:bg-[#d93a5f] active:scale-95"
 			>
 				<Home size={20} class="transition-transform group-hover:scale-110" />

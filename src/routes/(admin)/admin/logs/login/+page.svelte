@@ -134,7 +134,7 @@
 
 			<div class="overflow-hidden rounded-xl border border-main bg-card shadow-sm">
 				<div class="overflow-x-auto">
-					<table class="w-full min-w-[1000px] text-left text-sm">
+					<table class="w-full min-w-[300px] text-left text-sm">
 						<thead class="border-b border-main bg-muted/5">
 							<tr>
 								<th class="admin-table"
@@ -232,8 +232,11 @@
 				{#if totalPages > 1}
 					<div class="flex items-center justify-between border-t border-main bg-card px-6 py-4">
 						<a
-							href={resolve('/admin/logs/login') +
-								`?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`}
+							href={resolve(
+								/** @type {any} */ (
+									`/admin/logs/login?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`
+								)
+							)}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 {currentPage ===
 							1
 								? 'pointer-events-none opacity-40'
@@ -249,8 +252,14 @@
 							>
 						</div>
 						<a
-							href={resolve('/admin/logs/login') +
-								`?page=${Math.min(totalPages, currentPage + 1)}&search=${searchValue}&ordering=${orderingValue}`}
+							href={resolve(
+								/** @type {any} */ (
+									`/admin/logs/login?page=${Math.min(
+										totalPages,
+										currentPage + 1
+									)}&search=${searchValue}&ordering=${orderingValue}`
+								)
+							)}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 {currentPage ===
 							totalPages
 								? 'pointer-events-none opacity-40'

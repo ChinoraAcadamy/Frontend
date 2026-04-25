@@ -33,38 +33,56 @@ export const actions = {
         const rawFormData = await request.formData();
         const cleanFormData = new FormData();
 
-        for (const [key, value] of rawFormData.entries()) {
-            if (key === 'img') {
-                // Rasm yuborilganini tekshirish (agar bo'sh bo'lsa yoki fayl bo'lmasa e'tibor bermaydi, joriy rasm o'zgarmas qoladi)
-                if (value instanceof File && value.size > 0) {
-                    cleanFormData.append(key, value);
-                }
-            } else if (['duration', 'price', 'old_price'].includes(key)) {
-                // Raqamli maydonlar bo'sh qolsa ularni ignore qilamiz, backend'ga noto'g'ri string bormasligi uchun
-                if (value && value.toString().trim() !== '') {
-                    cleanFormData.append(key, value);
-                }
-            } else if (key === 'is_published') {
-                cleanFormData.append(key, value === 'true' ? 'true' : 'false');
-            } else {
-                cleanFormData.append(key, value);
-            }
-        }
+		for (const [key, value] of rawFormData.entries()) {
+			if (key === 'img') {
+				// Rasm yuborilganini tekshirish (agar bo'sh bo'lsa yoki fayl bo'lmasa e'tibor bermaydi, joriy rasm o'zgarmas qoladi)
+				if (value instanceof File && value.size > 0) {
+					let fileName = value.name;
+					// Backend'da 100 belgilik cheklov borligi sababli nomni qisqartiramiz
+					if (fileName.length > 100) {
+						const parts = fileName.split('.');
+						const extension = parts.pop();
+						const baseName = parts.join('.').substring(0, 95);
+						fileName = `${baseName}.${extension}`;
+					}
+					const renamedFile = new File([value], fileName, { type: value.type });
+					cleanFormData.append(key, renamedFile);
+				}
+			} else if (['duration', 'price', 'old_price'].includes(key)) {
+				// Raqamli maydonlar bo'sh qolsa ularni ignore qilamiz, 0 bo'lsa yuboramiz
+				if (value !== null && value !== undefined && value.toString().trim() !== '') {
+					cleanFormData.append(key, value);
+				}
+			} else if (key === 'is_published') {
+				cleanFormData.append(key, value === 'true' ? 'true' : 'false');
+			} else if (value !== null && value !== undefined) {
+				cleanFormData.append(key, value);
+			}
+		}
 
-        try {
-            const response = await fetch(`${API_URL}/courses/${params.course_id}/`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                    // 'Content-Type' yo'q qilinadi, chunki formData avtomat qo'shadi (multipart/form-data; boundary=...)
-                },
-                body: cleanFormData
-            });
+		try {
+			const response = await fetch(`${API_URL}/courses/${params.course_id}/`, {
+				method: 'PATCH',
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+					// 'Content-Type' yo'q qilinadi, chunki formData avtomat qo'shadi (multipart/form-data; boundary=...)
+				},
+				body: cleanFormData
+			});
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                return fail(400, { error: errorData.detail || "Kursni yangilashda xatolik yuz berdi." });
-            }
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				let errorMessage = errorData.detail || "Kursni yangilashda xatolik yuz berdi.";
+				
+				// Agar field-specific xatoliklar bo'lsa, ularni birlashtiramiz
+				if (typeof errorData === 'object' && !errorData.detail) {
+					errorMessage = Object.entries(errorData)
+						.map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(' ') : v}`)
+						.join(' | ');
+				}
+				
+				return fail(400, { error: errorMessage });
+			}
         } catch (err) {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }

@@ -35,6 +35,9 @@
 	const isCourseListPage = $derived(
 		page.url.pathname.endsWith('/kurslarim') || page.url.pathname.endsWith('/kurslarim/')
 	);
+
+	// Nested route ekanligini tekshirish (2 dan chuqur)
+	let isNestedRoute = $derived(page.url.pathname.split('/').filter(Boolean).length > 1);
 </script>
 
 <SeoMeta title="Student Dashboard - Chinora Academy" robots="noindex, nofollow" />
@@ -45,8 +48,8 @@
 	<div class="admin-body">
 		<DashboardNavbar notificationCount={3} bind:mobileOpen user={data.user} />
 
-		{#if page.url.pathname.split('/').filter(Boolean).length > 1}
-			<div class="mobile-breadcrumb-container">
+		{#if isNestedRoute}
+			<div class="mobile-bc bg-background">
 				<Breadcrumb inNavbar={false} />
 			</div>
 		{/if}
@@ -85,21 +88,20 @@
 		}
 	}
 
-	.mobile-breadcrumb-container {
+	/* Mobile breadcrumb bar */
+	.mobile-bc {
 		display: none;
 		position: sticky;
-		top: 4rem;
+		top: 64px; /* navbar height */
 		z-index: 40;
-		padding: 0.5rem 1.5rem;
-		background: var(--bg-card);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border-bottom: 1px solid var(--border-main);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+		/* Yuqori chetda ingichka brand chizig'i */
+		box-shadow: inset 0 -1px 0 rgba(250, 46, 105, 0.12);
 	}
 
 	@media (max-width: 1023px) {
-		.mobile-breadcrumb-container {
-			display: block !important;
+		.mobile-bc {
+			display: block;
 		}
 	}
 </style>
