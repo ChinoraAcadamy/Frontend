@@ -24,6 +24,8 @@
 		ToggleRight
 	} from 'lucide-svelte';
 	import { resolve } from '$app/paths';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getLocale } from '$lib/paraglide/runtime.js';
 
 	let { data, form: serverForm } = $props();
 
@@ -95,7 +97,7 @@
 	// ── Effects ────────────────────────────────────────
 	$effect(() => {
 		if (serverForm?.success) {
-			toast.success(serverForm.message ?? 'Muvaffaqiyatli saqlandi!');
+			toast.success(serverForm.message ?? m.admin_mc_saved_success());
 		} else if (serverForm?.error) {
 			toast.error(serverForm.error);
 		}
@@ -159,16 +161,16 @@
 	}
 
 	const sections = [
-		{ id: 'event', label: "Tadbir ma'lumotlari", icon: Calendar },
-		{ id: 'instructor', label: "O'qituvchi", icon: Users },
-		{ id: 'benefits', label: "Nima o'rganiladi", icon: BookOpen },
-		{ id: 'content', label: 'Kontent', icon: Megaphone },
-		{ id: 'registrations', label: "Ro'yxatlar", icon: Settings }
+		{ id: 'event', label: m.admin_mc_sec_event(), icon: Calendar },
+		{ id: 'instructor', label: m.admin_mc_sec_instructor(), icon: Users },
+		{ id: 'benefits', label: m.admin_mc_sec_benefits(), icon: BookOpen },
+		{ id: 'content', label: m.admin_mc_sec_content(), icon: Megaphone },
+		{ id: 'registrations', label: m.admin_mc_sec_registrations(), icon: Settings }
 	];
 </script>
 
 <svelte:head>
-	<title>Masterklass Boshqarish — Admin</title>
+	<title>{m.admin_mc_title()} — Admin</title>
 </svelte:head>
 
 <div class="mp-root">
@@ -177,9 +179,9 @@
 		<div class="mp-topbar-left">
 			<div class="mp-topbar-eyebrow">
 				<span class="mp-eyebrow-rule"></span>
-				<span>Landing Page</span>
+				<span>{m.admin_mc_subtitle()}</span>
 			</div>
-			<h1 class="mp-topbar-title">Masterklass Boshqaruvi</h1>
+			<h1 class="mp-topbar-title">{m.admin_mc_title()}</h1>
 		</div>
 
 		<div class="mp-topbar-actions">
@@ -190,17 +192,17 @@
 			>
 				{#if lp.is_active}
 					<ToggleRight size={20} />
-					<span>Sahifa faol</span>
+					<span>{m.admin_mc_active()}</span>
 				{:else}
 					<ToggleLeft size={20} />
-					<span>Sahifa o'chiq</span>
+					<span>{m.admin_mc_inactive()}</span>
 				{/if}
 			</button>
 
 			<!-- Preview -->
 			<a href={resolve('/masterclass')} target="_blank" class="mp-preview-btn">
 				<ExternalLink size={15} />
-				Ko'rish
+				{m.admin_mc_view()}
 			</a>
 
 			<!-- Save -->
@@ -212,10 +214,10 @@
 				<button type="submit" disabled={saving} class="mp-save-btn">
 					{#if saving}
 						<Loader2 size={15} class="spin" />
-						Saqlanmoqda...
+						{m.admin_mc_saving()}
 					{:else}
 						<Save size={15} />
-						Saqlash
+						{m.admin_mc_save()}
 					{/if}
 				</button>
 			</form>
@@ -246,35 +248,35 @@
 				<div class="mp-section" in:fade={{ duration: 160 }}>
 					<div class="mp-section-header">
 						<div class="mp-section-icon"><Calendar size={16} /></div>
-						<h2 class="mp-section-title">Tadbir ma'lumotlari</h2>
+						<h2 class="mp-section-title">{m.admin_mc_sec_event()}</h2>
 					</div>
 
 					<!-- Banner -->
 					<div class="mp-card">
-						<h3 class="mp-card-title">Banner matni</h3>
+						<h3 class="mp-card-title">{m.admin_mc_banner_title()}</h3>
 						<div class="mp-field">
-							<label class="mp-label" for="banner_text">Yuqori banner</label>
+							<label class="mp-label" for="banner_text">{m.admin_mc_banner_label()}</label>
 							<input
 								id="banner_text"
 								class="mp-input"
 								bind:value={lp.banner_text}
-								placeholder="Banner matni..."
+								placeholder={m.admin_mc_banner_label()}
 							/>
 						</div>
 						<div class="mp-field">
-							<label class="mp-label" for="eyebrow_text">Eyebrow (badge matni)</label>
+							<label class="mp-label" for="eyebrow_text">{m.admin_mc_eyebrow_label()}</label>
 							<input
 								id="eyebrow_text"
 								class="mp-input"
 								bind:value={lp.eyebrow_text}
-								placeholder="Eksklyuziv masterklass"
+								placeholder={m.admin_mc_eyebrow_label()}
 							/>
 						</div>
 					</div>
 
 					<!-- Title -->
 					<div class="mp-card">
-						<h3 class="mp-card-title">Sahifa sarlavhasi</h3>
+						<h3 class="mp-card-title">{m.admin_mc_title_section()}</h3>
 						<div class="mp-preview-title">
 							<span>{lp.title_line1}</span>
 							<em>{lp.title_accent}</em>
@@ -283,39 +285,39 @@
 						</div>
 						<div class="mp-grid-2">
 							<div class="mp-field">
-								<label class="mp-label" for="title_line1">1-qator</label>
+								<label class="mp-label" for="title_line1">{m.admin_mc_line1()}</label>
 								<input
 									id="title_line1"
 									class="mp-input"
 									bind:value={lp.title_line1}
-									placeholder="3 kunda"
+									placeholder={m.admin_mc_line1()}
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="title_accent">Aksent (qizil, kursiv)</label>
+								<label class="mp-label" for="title_accent">{m.admin_mc_accent()}</label>
 								<input
 									id="title_accent"
 									class="mp-input mp-input--accent"
 									bind:value={lp.title_accent}
-									placeholder="professional"
+									placeholder={m.admin_mc_accent()}
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="title_line2">2-qator</label>
+								<label class="mp-label" for="title_line2">{m.admin_mc_line2()}</label>
 								<input
 									id="title_line2"
 									class="mp-input"
 									bind:value={lp.title_line2}
-									placeholder="tikuvchilik"
+									placeholder={m.admin_mc_line2()}
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="title_sub">Kichik sarlavha</label>
+								<label class="mp-label" for="title_sub">{m.admin_mc_sub()}</label>
 								<input
 									id="title_sub"
 									class="mp-input"
 									bind:value={lp.title_sub}
-									placeholder="sirlarini oching"
+									placeholder={m.admin_mc_sub()}
 								/>
 							</div>
 						</div>
@@ -323,50 +325,48 @@
 
 					<!-- Lead text -->
 					<div class="mp-card">
-						<h3 class="mp-card-title">Qo'shimcha matn (lead)</h3>
+						<h3 class="mp-card-title">{m.admin_mc_lead_title()}</h3>
 						<div class="mp-field">
-							<label class="mp-label" for="lead_text">Qisqacha tavsif</label>
+							<label class="mp-label" for="lead_text">{m.admin_mc_lead_label()}</label>
 							<textarea
 								id="lead_text"
 								class="mp-textarea"
 								bind:value={lp.lead_text}
 								rows={4}
-								placeholder="Hisob-kitobli asos andozani 0 dan chizish..."
+								placeholder={m.admin_mc_lead_label()}
 							></textarea>
-							<span class="mp-hint"
-								>HTML teglari ishlatilishi mumkin: &lt;strong&gt;, &lt;em&gt;</span
-							>
+							<span class="mp-hint">{m.admin_mc_lead_hint()}</span>
 						</div>
 					</div>
 
 					<!-- Schedule -->
 					<div class="mp-card">
-						<h3 class="mp-card-title">Jadval va narx</h3>
+						<h3 class="mp-card-title">{m.admin_mc_schedule_title()}</h3>
 						<div class="mp-grid-2">
 							<div class="mp-field">
-								<label class="mp-label" for="event_days">Sanalar</label>
+								<label class="mp-label" for="event_days">{m.admin_mc_dates_label()}</label>
 								<input
 									id="event_days"
 									class="mp-input"
 									bind:value={lp.event_days}
-									placeholder="28–29–30 Noyabr"
+									placeholder={m.admin_mc_dates_label()}
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="event_time">Vaqt</label>
+								<label class="mp-label" for="event_time">{m.admin_mc_time_label()}</label>
 								<input id="event_time" class="mp-input" type="time" bind:value={lp.event_time} />
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="event_timezone">Vaqt mintaqasi</label>
+								<label class="mp-label" for="event_timezone">{m.admin_mc_timezone_label()}</label>
 								<input
 									id="event_timezone"
 									class="mp-input"
 									bind:value={lp.event_timezone}
-									placeholder="Toshkent"
+									placeholder={m.admin_mc_timezone_label()}
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="original_price">Asl narx (so'm)</label>
+								<label class="mp-label" for="original_price">{m.admin_mc_price_label()}</label>
 								<input
 									id="original_price"
 									class="mp-input"
@@ -379,20 +379,20 @@
 
 						<label class="mp-checkbox-row" for="is_free">
 							<input id="is_free" type="checkbox" bind:checked={lp.is_free} class="mp-checkbox" />
-							<span class="mp-checkbox-label">Bepul tadbir</span>
+							<span class="mp-checkbox-label">{m.admin_mc_free_label()}</span>
 						</label>
 					</div>
 
 					<!-- Countdown -->
 					<div class="mp-card">
-						<h3 class="mp-card-title">Countdown sanasi</h3>
+						<h3 class="mp-card-title">{m.admin_mc_countdown_title()}</h3>
 						<div class="mp-countdown-hint">
 							<Clock size={14} />
-							<span>Countdown har oyda avtomatik belgilangan kunlarga ko'ra yangilanadi.</span>
+							<span>{m.admin_mc_countdown_hint()}</span>
 						</div>
 						<div class="mp-grid-3">
 							<div class="mp-field">
-								<label class="mp-label" for="countdown_hour">Soat</label>
+								<label class="mp-label" for="countdown_hour">{m.admin_mc_hour()}</label>
 								<input
 									id="countdown_hour"
 									class="mp-input"
@@ -403,7 +403,7 @@
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="countdown_minute">Daqiqa</label>
+								<label class="mp-label" for="countdown_minute">{m.admin_mc_minute()}</label>
 								<input
 									id="countdown_minute"
 									class="mp-input"
@@ -415,7 +415,7 @@
 							</div>
 						</div>
 						<div class="mp-field" style="margin-top: 0.75rem;">
-							<label class="mp-label" for="countdown_days">Kun raqamlari (vergul bilan)</label>
+							<label class="mp-label" for="countdown_days">{m.admin_mc_days_list()}</label>
 							<input
 								id="countdown_days"
 								class="mp-input"
@@ -433,10 +433,10 @@
 
 					<!-- Seats -->
 					<div class="mp-card">
-						<h3 class="mp-card-title">Joylar</h3>
+						<h3 class="mp-card-title">{m.admin_mc_seats_title()}</h3>
 						<div class="mp-grid-2">
 							<div class="mp-field">
-								<label class="mp-label" for="seats_total">Jami joylar</label>
+								<label class="mp-label" for="seats_total">{m.admin_mc_seats_total()}</label>
 								<input
 									id="seats_total"
 									class="mp-input"
@@ -446,7 +446,7 @@
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="seats_left">Qolgan joylar (ko'rsatiladi)</label>
+								<label class="mp-label" for="seats_left">{m.admin_mc_seats_left()}</label>
 								<input
 									id="seats_left"
 									class="mp-input"
@@ -468,16 +468,19 @@
 								></div>
 							</div>
 							<span class="mp-seats-label">
-								{lp.seats_total - lp.seats_left} / {lp.seats_total} band
+								{m.admin_mc_seats_booked({
+									booked: lp.seats_total - lp.seats_left,
+									total: lp.seats_total
+								})}
 							</span>
 						</div>
 					</div>
 
 					<!-- Telegram link -->
 					<div class="mp-card">
-						<h3 class="mp-card-title">Telegram kanali</h3>
+						<h3 class="mp-card-title">{m.admin_mc_tg_title()}</h3>
 						<div class="mp-field">
-							<label class="mp-label">Telegram invite link</label>
+							<label class="mp-label">{m.admin_mc_tg_label()}</label>
 							<input
 								class="mp-input"
 								bind:value={lp.telegram_link}
@@ -492,80 +495,92 @@
 				<div class="mp-section" in:fade={{ duration: 160 }}>
 					<div class="mp-section-header">
 						<div class="mp-section-icon"><Users size={16} /></div>
-						<h2 class="mp-section-title">O'qituvchi ma'lumotlari</h2>
+						<h2 class="mp-section-title">{m.admin_mc_instructor_title()}</h2>
 					</div>
 
 					<div class="mp-card">
-						<h3 class="mp-card-title">Asosiy ma'lumotlar</h3>
+						<h3 class="mp-card-title">{m.admin_mc_instructor_main()}</h3>
 						<div class="mp-grid-2">
 							<div class="mp-field">
-								<label class="mp-label" for="instructor_name">To'liq ism</label>
+								<label class="mp-label" for="instructor_name">{m.admin_mc_instructor_name()}</label>
 								<input
 									id="instructor_name"
 									class="mp-input"
 									bind:value={lp.instructor_name}
-									placeholder="Ibodullayeva Chinora"
+									placeholder={m.admin_mc_instructor_name()}
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label" for="instructor_role">Lavozim / unvon</label>
+								<label class="mp-label" for="instructor_role">{m.admin_mc_instructor_role()}</label>
 								<input
 									id="instructor_role"
 									class="mp-input"
 									bind:value={lp.instructor_role}
-									placeholder="Asoschisi & Master Dizayner"
+									placeholder={m.admin_mc_instructor_role()}
 								/>
 							</div>
 						</div>
 						<div class="mp-field" style="margin-top:0.75rem">
-							<label class="mp-label" for="instructor_bio">Qisqacha bio</label>
+							<label class="mp-label" for="instructor_bio">{m.admin_mc_instructor_bio()}</label>
 							<textarea
 								id="instructor_bio"
 								class="mp-textarea"
 								bind:value={lp.instructor_bio}
 								rows={4}
-								placeholder="10 yildan ortiq tajriba..."
+								placeholder={m.admin_mc_instructor_bio()}
 							></textarea>
 						</div>
 					</div>
 
 					<div class="mp-card">
-						<h3 class="mp-card-title">Rasm</h3>
+						<h3 class="mp-card-title">{m.admin_mc_instructor_image()}</h3>
 						<div class="mp-img-preview-wrap">
 							{#if lp.instructor_image}
 								<img src={lp.instructor_image} alt="Instructor" class="mp-img-preview" />
 							{:else}
 								<div class="mp-img-placeholder">
 									<ImageIcon size={28} />
-									<span>Rasm yo'q</span>
+									<span>{m.admin_mc_no_image()}</span>
 								</div>
 							{/if}
 						</div>
 						<div class="mp-field" style="margin-top:0.875rem">
-							<label class="mp-label" for="instructor_image">Rasm URL yoki yo'li</label>
+							<label class="mp-label" for="instructor_image">{m.admin_mc_image_url()}</label>
 							<input
 								id="instructor_image"
 								class="mp-input"
 								bind:value={lp.instructor_image}
-								placeholder="/images/hero_compressed.jpg"
+								placeholder={m.admin_mc_instructor_image()}
 							/>
 						</div>
 					</div>
 
 					<div class="mp-card">
-						<h3 class="mp-card-title">Statistika (kartada ko'rsatiladi)</h3>
+						<h3 class="mp-card-title">{m.admin_mc_stats_title()}</h3>
 						<div class="mp-grid-3">
 							<div class="mp-field">
-								<label class="mp-label">Shogirdlar soni</label>
-								<input class="mp-input" bind:value={lp.stat_students} placeholder="5000+" />
+								<label class="mp-label">{m.admin_mc_stat_students()}</label>
+								<input
+									class="mp-input"
+									bind:value={lp.stat_students}
+									placeholder={m.admin_mc_stat_students()}
+								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label">Tajriba</label>
-								<input class="mp-input" bind:value={lp.stat_experience} placeholder="10 yil" />
+								<label class="mp-label">{m.admin_mc_stat_experience()}</label>
+								<input
+									class="mp-input"
+									bind:value={lp.stat_experience}
+									placeholder={m.admin_mc_stat_experience()}
+								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label">Amaliy %</label>
-								<input class="mp-input" bind:value={lp.stat_practical} placeholder="100%" />
+								<label class="mp-label">{m.admin_mc_stat_practical()}</label>
+								<input
+									class="mp-input"
+									bind:value={lp.stat_practical}
+									placeholder={m.admin_mc_stat_practical()}
+								/>
 							</div>
 						</div>
 					</div>
@@ -576,23 +591,23 @@
 				<div class="mp-section" in:fade={{ duration: 160 }}>
 					<div class="mp-section-header">
 						<div class="mp-section-icon"><BookOpen size={16} /></div>
-						<h2 class="mp-section-title">Nima o'rganiladi (Benefits)</h2>
+						<h2 class="mp-section-title">{m.admin_mc_benefits_title()}</h2>
 					</div>
 
 					<div class="mp-card">
 						<div class="mp-field" style="margin-bottom:0.75rem">
-							<label class="mp-label" for="benefits_title">Bo'lim sarlavhasi</label>
+							<label class="mp-label" for="benefits_title">{m.admin_mc_benefits_sec_title()}</label>
 							<input
 								id="benefits_title"
 								class="mp-input"
 								bind:value={lp.benefits_title}
-								placeholder="Masterklassda nimalarni o'rganasiz?"
+								placeholder={m.admin_mc_benefits_title()}
 							/>
 						</div>
 
-						<h3 class="mp-card-title" style="margin-top:1.25rem">Ro'yxat</h3>
+						<h3 class="mp-card-title" style="margin-top:1.25rem">{m.admin_mc_benefits_list()}</h3>
 						<p class="mp-hint" style="margin-bottom:1rem">
-							Tartibni o'zgartirish uchun ushlab suring yoki yuqori/quyi tugmalarini bosing.
+							{m.admin_mc_benefits_hint()}
 						</p>
 
 						<ul class="mp-benefit-list">
@@ -614,7 +629,7 @@
 									<input
 										class="mp-benefit-input"
 										bind:value={benefits[i]}
-										placeholder="Benefit matni..."
+										placeholder={m.admin_mc_benefits_list()}
 									/>
 									<div class="mp-benefit-controls">
 										<button
@@ -653,7 +668,7 @@
 							<input
 								class="mp-input"
 								bind:value={newBenefit}
-								placeholder="Yangi benefit qo'shish..."
+								placeholder={m.admin_mc_add_benefit_placeholder()}
 								onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
 							/>
 							<button
@@ -663,7 +678,7 @@
 								disabled={!newBenefit.trim()}
 							>
 								<Plus size={15} />
-								Qo'shish
+								{m.admin_mc_btn_add()}
 							</button>
 						</div>
 					</div>
@@ -674,31 +689,29 @@
 				<div class="mp-section" in:fade={{ duration: 160 }}>
 					<div class="mp-section-header">
 						<div class="mp-section-icon"><Megaphone size={16} /></div>
-						<h2 class="mp-section-title">Kontent bloklari</h2>
+						<h2 class="mp-section-title">{m.admin_mc_content_title()}</h2>
 					</div>
 
 					<!-- Why section -->
 					<div class="mp-card">
-						<h3 class="mp-card-title">"Nega aynan bu masterklass?" bo'limi</h3>
+						<h3 class="mp-card-title">{m.admin_mc_why_section()}</h3>
 						<div class="mp-field">
-							<label class="mp-label" for="why_title"
-								>Sarlavha (HTML italic mumkin: &lt;em&gt;tayyor tizim&lt;/em&gt;)</label
-							>
+							<label class="mp-label" for="why_title">{m.admin_mc_why_title_label()}</label>
 							<input
 								id="why_title"
 								class="mp-input"
 								bind:value={lp.why_title}
-								placeholder="Nazariya emas — tayyor tizim"
+								placeholder={m.admin_mc_why_title_label()}
 							/>
 						</div>
 						<div class="mp-field" style="margin-top:0.75rem">
-							<label class="mp-label" for="why_desc">Tavsif matni</label>
+							<label class="mp-label" for="why_desc">{m.admin_mc_why_desc_label()}</label>
 							<textarea
 								id="why_desc"
 								class="mp-textarea"
 								bind:value={lp.why_desc}
 								rows={5}
-								placeholder="Ushbu 3 kunlik dars davomida..."
+								placeholder={m.admin_mc_why_desc_label()}
 							></textarea>
 						</div>
 					</div>
@@ -709,14 +722,14 @@
 				<div class="mp-section" in:fade={{ duration: 160 }}>
 					<div class="mp-section-header">
 						<div class="mp-section-icon"><Settings size={16} /></div>
-						<h2 class="mp-section-title">Ro'yxatga olganlar</h2>
+						<h2 class="mp-section-title">{m.admin_mc_regs_title()}</h2>
 					</div>
 
 					{#await data.lazy?.registrations}
 						<div class="mp-card">
 							<div class="mp-reg-loading">
 								<Loader2 size={22} class="spin" />
-								<span>Yuklanmoqda...</span>
+								<span>{m.admin_mc_loading()}</span>
 							</div>
 						</div>
 					{:then registrations}
@@ -726,17 +739,17 @@
 						<div class="mp-reg-summary">
 							<div class="mp-reg-stat">
 								<span class="mp-reg-stat-val">{regs.length}</span>
-								<span class="mp-reg-stat-lbl">Jami ro'yxat</span>
+								<span class="mp-reg-stat-lbl">{m.admin_mc_total_regs()}</span>
 							</div>
 							<div class="mp-reg-stat">
 								<span class="mp-reg-stat-val">{lp.seats_left}</span>
-								<span class="mp-reg-stat-lbl">Bo'sh joy</span>
+								<span class="mp-reg-stat-lbl">{m.admin_mc_empty_seats()}</span>
 							</div>
 							<div class="mp-reg-stat">
 								<span class="mp-reg-stat-val"
 									>{Math.round((regs.length / Math.max(lp.seats_total, 1)) * 100)}%</span
 								>
-								<span class="mp-reg-stat-lbl">To'lganlik</span>
+								<span class="mp-reg-stat-lbl">{m.admin_mc_fill_rate()}</span>
 							</div>
 						</div>
 
@@ -744,18 +757,18 @@
 							{#if regs.length === 0}
 								<div class="mp-reg-empty">
 									<Users size={28} />
-									<p>Hali ro'yxatga olganlar yo'q</p>
+									<p>{m.admin_mc_no_regs()}</p>
 								</div>
 							{:else}
 								<div class="mp-reg-table-wrap">
 									<table class="mp-reg-table">
 										<thead>
 											<tr>
-												<th>#</th>
-												<th>Ism</th>
-												<th>Telefon</th>
-												<th>Sana</th>
-												<th>Holat</th>
+												<th>{m.admin_mc_table_num()}</th>
+												<th>{m.admin_mc_table_name()}</th>
+												<th>{m.admin_mc_table_phone()}</th>
+												<th>{m.admin_mc_table_date()}</th>
+												<th>{m.admin_mc_table_status()}</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -766,7 +779,7 @@
 													<td class="mp-reg-phone">{reg.phone ?? '—'}</td>
 													<td class="mp-reg-date">
 														{reg.created_at
-															? new Date(reg.created_at).toLocaleDateString('uz', {
+															? new Date(reg.created_at).toLocaleDateString(getLocale(), {
 																	day: 'numeric',
 																	month: 'short',
 																	hour: '2-digit',
@@ -780,7 +793,9 @@
 																? 'mp-reg-badge--joined'
 																: 'mp-reg-badge--pending'}"
 														>
-															{reg.joined_telegram ? "Qo'shilgan" : 'Kutilmoqda'}
+															{reg.joined_telegram
+																? m.admin_mc_status_joined()
+																: m.admin_mc_status_pending()}
 														</span>
 													</td>
 												</tr>
@@ -794,7 +809,7 @@
 						<!-- Export button -->
 						{#if regs.length > 0}
 							<form method="POST" action="?/exportCsv">
-								<button type="submit" class="mp-export-btn"> Ro'yxatni CSV yuklab olish → </button>
+								<button type="submit" class="mp-export-btn"> {m.admin_mc_export()} </button>
 							</form>
 						{/if}
 					{/await}

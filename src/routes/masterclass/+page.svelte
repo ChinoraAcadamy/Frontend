@@ -19,6 +19,8 @@
 	import { fade, scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 	import PhoneInput from '$lib/components/ui/PhoneInput.svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import SwitchLang from '@/lib/components/ui/SwitchLang.svelte';
 
 	let isModalOpen = $state(false);
 	let isSubmitted = $state(false);
@@ -69,51 +71,39 @@
 	async function handleSubmit(e) {
 		e.preventDefault();
 		if (!name.trim() || phone.length < 12) {
-			toast.error("Iltimos, barcha maydonlarni to'g'ri to'ldiring");
+			toast.error(m.toast_validation_error());
 			return;
 		}
 		isLoading = true;
 		await new Promise((r) => setTimeout(r, 1500));
 		isLoading = false;
 		isSubmitted = true;
-		toast.success("Muvaffaqiyatli ro'yxatdan o'tdingiz!");
+		toast.success(m.toast_success());
 	}
 
 	const benefits = [
-		{ icon: Award, text: 'Myuller metodikasi — asos andazani 0 dan professional qurish' },
-		{
-			icon: Sparkles,
-			text: 'Avtorlik "Anor" assimetriya fasonini boshidan oxirigacha modellashtirish'
-		},
-		{
-			icon: TrendingUp,
-			text: "Daromadingizni 5x gacha oshirish: narx qo'yish va mijozlar jalb qilish"
-		},
-		{
-			icon: CheckCircle2,
-			text: "Raqobatchilardan 10 qadam oldinga o'tadigan konstruksiya sirlari"
-		},
-		{ icon: Star, text: "Brend uslubida libos tikish va o'z imzoyingizni yaratish" }
+		{ icon: Award },
+		{ icon: Sparkles },
+		{ icon: TrendingUp },
+		{ icon: CheckCircle2 },
+		{ icon: Star }
 	];
 
 	const stats = [
-		{ value: '5000+', label: 'Muvaffaqiyatli shogird' },
-		{ value: '10 yil', label: 'Professional tajriba' },
-		{ value: '100%', label: 'Amaliy darslar' }
+		{ valueKey: 'stat_students_value', labelKey: 'stat_students_label' },
+		{ valueKey: 'stat_experience_value', labelKey: 'stat_experience_label' },
+		{ valueKey: 'stat_practical_value', labelKey: 'stat_practical_label' }
 	];
+
+	// Helper to access dynamic message keys safely in template
+	const getM = (key) => m[key]?.() ?? '';
 </script>
 
 <svelte:head>
-	<title>Bepul Masterklass | Chinora Academy</title>
-	<meta
-		name="description"
-		content="3 kunda professional tikuvchilik sirlarini o'rganing. Bepul masterklass Ibodullayeva Chinora bilan."
-	/>
-	<meta property="og:title" content="Bepul Masterklass — Chinora Academy" />
-	<meta
-		property="og:description"
-		content="3 kunda professional tikuvchilik. Bepul. Faqat 50 ta joy."
-	/>
+	<title>{m.meta_title()}</title>
+	<meta name="description" content={m.meta_description()} />
+	<meta property="og:title" content={m.og_title()} />
+	<meta property="og:description" content={m.og_description()} />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
@@ -125,26 +115,41 @@
 <div class="lp-root" id="offer-page">
 	<!-- ── Urgency Banner ──────────────────────────────── -->
 	<div class="lp-banner">
-		<span class="lp-banner-dot"></span>
-		<span>BEPUL MASTERKLASS — Tikuvchilikda professional yondashuv</span>
-		<span class="lp-banner-badge">Faqat 50 joy</span>
+		<div class="lp-banner-track">
+			<span class="lp-banner-dot"></span>
+			<span>{m.banner_text()}</span>
+			<span class="lp-banner-badge">{m.banner_seats()}</span>
+			<!-- Uzluksiz aylanish uchun dublikat -->
+			<span class="lp-banner-dot"></span>
+			<span>{m.banner_text()}</span>
+			<span class="lp-banner-badge">{m.banner_seats()}</span>
+		</div>
 	</div>
 
 	<!-- ── Sticky Nav ──────────────────────────────────── -->
 	<header class="lp-nav">
 		<div class="lp-nav-inner">
 			<span class="lp-logo">
-				<span class="lp-logo-icon"><Star size={18} fill="currentColor" /></span>
-				<span>CHINORA<em>ACADEMY</em></span>
+				<span class="lp-logo-icon">
+					<img src="/logo/chinora-secondary.png" alt="Chinora Academy logo" />
+				</span>
+				<span class="lp-logo-text">
+					<span class="lp-logo-top">CHINORA</span>
+					<span class="lp-logo-bottom">ACADEMY</span>
+				</span>
 			</span>
-			<button onclick={openModal} class="lp-nav-cta"> Joyni band qilish → </button>
+			<div class="lp-nav-right">
+				<SwitchLang />
+				<button onclick={openModal} class="lp-nav-cta">
+					{m.nav_cta()}
+				</button>
+			</div>
 		</div>
 	</header>
 
 	<main>
 		<!-- ── Hero ────────────────────────────────────────── -->
 		<section class="lp-hero">
-			<!-- Background texture layers -->
 			<div class="lp-hero-noise" aria-hidden="true"></div>
 			<div class="lp-hero-grid" aria-hidden="true"></div>
 			<div class="lp-hero-glow" aria-hidden="true"></div>
@@ -154,21 +159,18 @@
 				<div class="lp-content {mounted ? 'lp-content--visible' : ''}">
 					<div class="lp-eyebrow">
 						<ShieldCheck size={14} />
-						Eksklyuziv masterklass
+						{m.eyebrow()}
 					</div>
 
 					<h1 class="lp-h1">
-						<span class="lp-h1-line">3 kunda</span>
-						<span class="lp-h1-accent">professional</span>
-						<span class="lp-h1-line">tikuvchilik</span>
-						<span class="lp-h1-sub">sirlarini oching</span>
+						<span class="lp-h1-line">{m.h1_line1()}</span>
+						<span class="lp-h1-accent">{m.h1_accent()}</span>
+						<span class="lp-h1-line">{m.h1_line2()}</span>
+						<span class="lp-h1-sub">{m.h1_sub()}</span>
 					</h1>
 
-					<p class="lp-lead">
-						Hisob-kitobli asos andozani <strong>0 dan chizish</strong>, noodatiy fasonlar,
-						modellashtirish sirlari va brend uslubida libos tikish — bularning barchasini ushbu
-						<strong>bepul</strong> masterklassda bosqichma-bosqich o'rganasiz.
-					</p>
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+					<p class="lp-lead">{@html m.lead()}</p>
 
 					<!-- Instructor card -->
 					<div class="lp-instructor">
@@ -181,7 +183,7 @@
 							/>
 							<span class="lp-online-badge">
 								<span class="lp-online-dot"></span>
-								Online hozir
+								{m.instructor_online()}
 							</span>
 						</div>
 						<div class="lp-instructor-info">
@@ -191,12 +193,11 @@
 								10 yildan ortiq tajriba, 5000+ muvaffaqiyatli shogirdlar, o'zining avtorlik
 								metodikasi bilan tikuvchilik olamida yangi davr boshlagan mutaxassis.
 							</p>
-							<!-- Stats inline -->
 							<div class="lp-stats-row">
-								{#each stats as s (s)}
+								{#each stats as s (s.labelKey)}
 									<div class="lp-stat">
-										<span class="lp-stat-val">{s.value}</span>
-										<span class="lp-stat-lbl">{s.label}</span>
+										<span class="lp-stat-val">{getM(s.valueKey)}</span>
+										<span class="lp-stat-lbl">{getM(s.labelKey)}</span>
 									</div>
 								{/each}
 							</div>
@@ -204,40 +205,40 @@
 					</div>
 
 					<!-- Date/Time/Price chips -->
-					<div class="lp-chips">
+					<div class="lp-chips my-2">
 						<div class="lp-chip">
 							<Calendar size={16} class="lp-chip-icon" />
 							<div>
-								<span class="lp-chip-label">Sana</span>
+								<span class="lp-chip-label">{m.chip_date_label()}</span>
 								<span class="lp-chip-val">28–29–30 Noyabr</span>
 							</div>
 						</div>
 						<div class="lp-chip">
 							<Clock size={16} class="lp-chip-icon" />
 							<div>
-								<span class="lp-chip-label">Vaqt</span>
+								<span class="lp-chip-label">{m.chip_time_label()}</span>
 								<span class="lp-chip-val">20:30 Toshkent</span>
 							</div>
 						</div>
 						<div class="lp-chip lp-chip--free">
 							<Tag size={16} class="lp-chip-icon" />
 							<div>
-								<span class="lp-chip-label"><s>999 000 so'm</s></span>
-								<span class="lp-chip-val lp-chip-val--free">BEPUL</span>
+								<span class="lp-chip-label"><s>{m.chip_price_label()}</s></span>
+								<span class="lp-chip-val lp-chip-val--free">{m.chip_price_free()}</span>
 							</div>
 						</div>
 					</div>
 
 					<!-- Benefits -->
 					<div class="lp-benefits">
-						<h2 class="lp-benefits-title">Masterklassda nimalarni o'rganasiz?</h2>
+						<h2 class="lp-benefits-title">{m.benefits_title()}</h2>
 						<ul class="lp-benefit-list">
 							{#each benefits as b, i (i)}
 								<li class="lp-benefit" style="animation-delay: {i * 80}ms">
 									<span class="lp-benefit-icon">
 										<b.icon size={14} />
 									</span>
-									<span>{b.text}</span>
+									<span>{getM(`benefit_${i + 1}`)}</span>
 								</li>
 							{/each}
 						</ul>
@@ -246,7 +247,7 @@
 					<!-- Mobile CTA -->
 					<button onclick={openModal} class="lp-cta-btn lp-cta-btn--mobile">
 						<Play size={18} fill="currentColor" />
-						RO'YXATDAN O'TISH — BEPUL
+						{m.mobile_cta()}
 					</button>
 				</div>
 
@@ -257,7 +258,8 @@
 						<div class="lp-seats">
 							<div class="lp-seats-left">
 								<Users size={14} />
-								<span>Faqat <strong>50 ta</strong> joy qoldi</span>
+								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+								<span>{@html m.seats_left({ n: '50' })}</span>
 							</div>
 							<div class="lp-avatars">
 								{#each [11, 12, 13, 14] as i (i)}
@@ -271,13 +273,13 @@
 						<div class="lp-timer">
 							<div class="lp-timer-label">
 								<Timer size={15} />
-								Masterklass boshlanishiga:
+								{m.timer_label()}
 							</div>
 							{#if done}
-								<p class="lp-timer-live">🔴 Efir hozir boshlanmoqda!</p>
+								<p class="lp-timer-live">{m.timer_live()}</p>
 							{:else}
 								<div class="lp-timer-grid">
-									{#each [{ v: td, l: 'Kun' }, { v: th, l: 'Soat' }, { v: tm, l: 'Daq' }, { v: ts, l: 'Son' }] as unit (unit.l)}
+									{#each [{ v: td, l: m.timer_days() }, { v: th, l: m.timer_hours() }, { v: tm, l: m.timer_minutes() }, { v: ts, l: m.timer_seconds() }] as unit (unit.l)}
 										<div class="lp-timer-unit">
 											<span class="lp-timer-val">{String(unit.v).padStart(2, '0')}</span>
 											<span class="lp-timer-lbl">{unit.l}</span>
@@ -291,23 +293,21 @@
 						<div class="lp-price-block">
 							<div class="lp-price-row">
 								<div>
-									<p class="lp-price-was">Odatdagi narx: <s>999 000 so'm</s></p>
-									<p class="lp-price-now">BEPUL</p>
+									<p class="lp-price-was">{m.price_was()} <s>{m.chip_price_label()}</s></p>
+									<p class="lp-price-now">{m.price_now()}</p>
 								</div>
 								<span class="lp-discount-badge">-100%</span>
 							</div>
-							<p class="lp-price-note">Faqat bugungi taklif — 24 soatdan keyin tugaydi</p>
+							<p class="lp-price-note">{m.price_note()}</p>
 						</div>
 
 						<!-- CTA -->
 						<button onclick={openModal} class="lp-cta-btn">
 							<Play size={18} fill="currentColor" />
-							RO'YXATDAN O'TISH
+							{m.cta_register()}
 						</button>
 
-						<p class="lp-card-note">
-							Ro'yxatdan o'tishdan so'ng yopiq Telegram chatga taklif yuboramiz
-						</p>
+						<p class="lp-card-note">{m.card_note()}</p>
 
 						<!-- Trust logos -->
 						<div class="lp-trust">
@@ -323,26 +323,23 @@
 		<!-- ── Why Section ─────────────────────────────────── -->
 		<section class="lp-why">
 			<div class="lp-why-inner">
-				<div class="lp-section-eyebrow">Nega aynan ushbu masterklass?</div>
-				<h2 class="lp-why-title">Nazariya emas — <em>tayyor tizim</em></h2>
-				<p class="lp-why-desc">
-					Ushbu 3 kunlik dars davomida siz tikuvchilikni shunchaki sevimli mashg'ulotdan
-					<strong>professional biznesga aylantirish yo'lini</strong> ko'rasiz. Konstruksiya, texnologiya
-					va dizaynni bir tizimda o'rganib, raqobatchilardan 10 qadam oldinga o'tib ketasiz.
-				</p>
+				<div class="lp-section-eyebrow">{m.why_eyebrow()}</div>
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				<h2 class="lp-why-title">{@html m.why_title()}</h2>
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				<p class="lp-why-desc">{@html m.why_desc()}</p>
 				<div class="lp-why-stats">
-					{#each stats as s (s)}
+					{#each stats as s (s.labelKey)}
 						<div class="lp-why-stat">
-							<span class="lp-why-stat-val">{s.value}</span>
-							<span class="lp-why-stat-lbl">{s.label}</span>
+							<span class="lp-why-stat-val">{getM(s.valueKey)}</span>
+							<span class="lp-why-stat-lbl">{getM(s.labelKey)}</span>
 						</div>
 					{/each}
 				</div>
 			</div>
-			<!-- Bottom CTA -->
 			<div class="lp-why-cta">
 				<button onclick={openModal} class="lp-cta-btn lp-cta-btn--outline">
-					Joyni bepul band qilish →
+					{m.why_cta()}
 				</button>
 			</div>
 		</section>
@@ -356,7 +353,7 @@
 				<span>CHINORA<em>ACADEMY</em></span>
 			</div>
 			<p class="lp-footer-copy">
-				© {new Date().getFullYear()} Chinora Academy. Barcha huquqlar himoyalangan.
+				{m.footer_copy({ year: String(new Date().getFullYear()) })}
 			</p>
 			<nav class="lp-footer-links">
 				<a href="https://instagram.com">Instagram</a>
@@ -386,7 +383,11 @@
 				aria-labelledby="modal-title"
 				tabindex="-1"
 			>
-				<button onclick={() => (isModalOpen = false)} class="lp-modal-close" aria-label="Yopish">
+				<button
+					onclick={() => (isModalOpen = false)}
+					class="lp-modal-close"
+					aria-label={m.modal_close_aria()}
+				>
 					<X size={18} />
 				</button>
 
@@ -395,33 +396,31 @@
 						<div class="lp-modal-icon">
 							<Users size={26} />
 						</div>
-						<h2 class="lp-modal-title" id="modal-title">Ro'yxatdan o'tish</h2>
-						<p class="lp-modal-sub">
-							Ma'lumotlaringizni qoldiring va yopiq Telegram kanalimizga qo'shiling!
-						</p>
+						<h2 class="lp-modal-title" id="modal-title">{m.modal_register_title()}</h2>
+						<p class="lp-modal-sub">{m.modal_sub()}</p>
 					</div>
 
 					<form onsubmit={handleSubmit} class="lp-form">
 						<div class="lp-field">
-							<label for="reg-name" class="lp-field-label">To'liq ismingiz</label>
+							<label for="reg-name" class="lp-field-label">{m.field_name_label()}</label>
 							<input
 								id="reg-name"
 								type="text"
 								bind:value={name}
-								placeholder="Ismingizni kiriting"
+								placeholder={m.field_name_placeholder()}
 								required
 								class="lp-input"
 							/>
 						</div>
 						<div class="lp-field">
-							<PhoneInput label="Telefon raqamingiz" id="reg-phone" bind:value={phone} />
+							<PhoneInput label={m.field_phone_label()} id="reg-phone" bind:value={phone} />
 						</div>
 						<button type="submit" disabled={isLoading} class="lp-submit-btn">
 							{#if isLoading}
 								<span class="lp-spinner"></span>
-								YUBORILMOQDA...
+								{m.submit_loading()}
 							{:else}
-								YUBORISH
+								{m.submit_idle()}
 							{/if}
 						</button>
 					</form>
@@ -430,11 +429,8 @@
 						<div class="lp-success-icon">
 							<CheckCircle2 size={42} />
 						</div>
-						<h2 class="lp-modal-title" id="modal-title">Muvaffaqiyatli!</h2>
-						<p class="lp-modal-sub">
-							Siz muvaffaqiyatli ro'yxatdan o'tdingiz. Endi barcha dars materiallari va havolalar
-							joylangan kanalimizga a'zo bo'ling.
-						</p>
+						<h2 class="lp-modal-title" id="modal-title">{m.success_title()}</h2>
+						<p class="lp-modal-sub">{m.success_sub()}</p>
 						<a
 							href="https://t.me/+ZlMsl6Ool8k4Zjdi"
 							target="_blank"
@@ -446,7 +442,7 @@
 									d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.014 9.49c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.48 14.39l-2.95-.924c-.642-.2-.655-.642.136-.953l11.527-4.448c.536-.194 1.006.13.369.183z"
 								/>
 							</svg>
-							TELEGRAMGA QO'SHILISH
+							{m.success_tg_btn()}
 						</a>
 					</div>
 				{/if}
@@ -456,7 +452,7 @@
 </div>
 
 <style>
-	/* ── Fonts & Reset ─────────────────────────────────── */
+	/* ── Root ──────────────────────────────────────────── */
 	.lp-root {
 		font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
 		background: #faf7f2;
@@ -467,21 +463,54 @@
 	}
 
 	/* ── Banner ────────────────────────────────────────── */
+	/* ── Banner ─────────────────────────────────────────── */
 	.lp-banner {
 		background: #9b1c48;
 		color: #fff;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		overflow: hidden; /* marquee uchun shart */
+		position: relative;
+	}
+
+	/* Desktop: statik, markazda */
+	.lp-banner-track {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 10px;
-		padding: 10px 16px;
+		width: 100%;
 		font-size: 12.5px;
 		font-weight: 600;
 		letter-spacing: 0.03em;
-		text-align: center;
-		flex-wrap: wrap;
+		white-space: nowrap;
+		padding-inline: 1rem;
+		animation: lp-marquee 18s linear infinite;
 	}
 
+	/* Mobile: marquee */
+	@media (max-width: 768px) {
+		.lp-banner-track {
+			width: max-content;
+			justify-content: flex-start;
+			padding-inline: 0;
+		}
+
+		/* Hover pausa */
+		.lp-banner:hover .lp-banner-track {
+			animation-play-state: paused;
+		}
+	}
+
+	@keyframes lp-marquee {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(-50%);
+		} /* 50% = bitta dublikat */
+	}
 	.lp-banner-dot {
 		width: 7px;
 		height: 7px;
@@ -507,7 +536,7 @@
 		position: sticky;
 		top: 0;
 		z-index: 50;
-		background: rgba(250, 247, 242, 0.88);
+		background: rgba(250, 247, 242, 0.92);
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
 		border-bottom: 1px solid rgba(155, 28, 72, 0.1);
@@ -516,11 +545,30 @@
 	.lp-nav-inner {
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 0 1.5rem;
+		padding: 0 1.25rem;
 		height: 64px;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 12px;
+	}
+
+	.lp-nav-right {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.lp-banner {
+		/* flex-wrap: wrap  →  o'chiriladi */
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 480px) {
+		.lp-banner-badge {
+			display: none;
+		}
 	}
 
 	.lp-logo {
@@ -532,6 +580,7 @@
 		font-weight: 800;
 		letter-spacing: 0.08em;
 		color: #1a0f0a;
+		flex-shrink: 0;
 	}
 
 	.lp-logo em {
@@ -555,6 +604,67 @@
 		flex-shrink: 0;
 	}
 
+	.lp-logo {
+		display: flex;
+		align-items: center;
+		gap: 11px;
+		text-decoration: none;
+		flex-shrink: 0;
+		cursor: default;
+	}
+
+	.lp-logo-icon {
+		width: 52px;
+		height: 52px;
+		border-radius: 14px;
+		overflow: hidden;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.lp-logo-icon img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.lp-logo-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0px;
+		line-height: 1;
+	}
+
+	.lp-logo-top {
+		font-size: 15px;
+		font-weight: 900;
+		letter-spacing: 0.12em;
+		color: #1a0f0a;
+	}
+
+	.lp-logo-bottom {
+		font-size: 15px;
+		font-weight: 900;
+		letter-spacing: 0.12em;
+		color: #9b1c48;
+	}
+
+	/* Mobile: biroz kichikroq */
+	@media (max-width: 480px) {
+		.lp-logo-icon {
+			width: 44px;
+			height: 44px;
+			border-radius: 12px;
+		}
+		.lp-logo-top,
+		.lp-logo-bottom {
+			font-size: 13px;
+		}
+	}
+
 	.lp-nav-cta {
 		display: none;
 		align-items: center;
@@ -572,6 +682,7 @@
 			background 0.15s,
 			transform 0.1s;
 		font-family: inherit;
+		white-space: nowrap;
 	}
 
 	.lp-nav-cta:hover {
@@ -579,7 +690,7 @@
 		transform: scale(1.02);
 	}
 
-	@media (min-width: 640px) {
+	@media (min-width: 600px) {
 		.lp-nav-cta {
 			display: flex;
 		}
@@ -644,7 +755,7 @@
 		}
 	}
 
-	/* ── Content (left) ────────────────────────────────── */
+	/* ── Content entrance ──────────────────────────────── */
 	.lp-content > * {
 		opacity: 0;
 		transform: translateY(18px);
@@ -720,7 +831,6 @@
 		color: #9b1c48;
 		letter-spacing: -0.02em;
 		display: block;
-		position: relative;
 	}
 
 	.lp-h1-sub {
@@ -741,7 +851,7 @@
 		margin: 0;
 	}
 
-	.lp-lead strong {
+	:global(.lp-lead strong) {
 		color: #1a0f0a;
 	}
 
@@ -825,7 +935,6 @@
 		font-weight: 700;
 		color: #9b1c48;
 		margin: 0 0 8px;
-		letter-spacing: 0.01em;
 	}
 
 	.lp-instructor-bio {
@@ -885,7 +994,6 @@
 	.lp-chip:hover {
 		border-color: rgba(155, 28, 72, 0.3);
 	}
-
 	.lp-chip--free {
 		border-color: rgba(22, 163, 74, 0.25);
 	}
@@ -910,7 +1018,6 @@
 		font-weight: 700;
 		color: #1a0f0a;
 	}
-
 	.lp-chip-val--free {
 		color: #16a34a;
 		font-weight: 800;
@@ -1117,7 +1224,7 @@
 		border-radius: 999px;
 	}
 
-	.lp-seats-left strong {
+	:global(.lp-seats-left strong) {
 		font-weight: 800;
 	}
 
@@ -1203,7 +1310,6 @@
 		width: 100%;
 		text-align: center;
 		letter-spacing: -0.02em;
-		transition: background 0.3s;
 	}
 
 	.lp-timer-lbl {
@@ -1341,7 +1447,7 @@
 		letter-spacing: -0.02em;
 	}
 
-	.lp-why-title em {
+	:global(.lp-why-title em) {
 		font-style: italic;
 		color: #9b1c48;
 	}
@@ -1354,7 +1460,7 @@
 		max-width: 640px;
 	}
 
-	.lp-why-desc strong {
+	:global(.lp-why-desc strong) {
 		color: rgba(255, 255, 255, 0.85);
 	}
 
@@ -1695,12 +1801,163 @@
 		}
 	}
 
-	/* ── Global overrides ──────────────────────────────── */
 	:global(#offer-page *) {
 		box-sizing: border-box;
 	}
-
 	:global(html) {
 		scroll-behavior: smooth;
+	}
+
+	/* ── Card: mobile padding ───────────────────────────── */
+	.lp-card {
+		padding: 1.25rem;
+		gap: 1rem;
+	}
+
+	@media (min-width: 480px) {
+		.lp-card {
+			padding: 1.75rem;
+			gap: 1.25rem;
+		}
+	}
+
+	/* ── Seats: wrap ────────────────────────────────────── */
+	.lp-seats {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	/* ── Timer: compact on mobile ───────────────────────── */
+	.lp-timer {
+		padding: 1rem 1.125rem;
+		border-radius: 14px;
+	}
+
+	.lp-timer-grid {
+		gap: 6px;
+	}
+
+	.lp-timer-val {
+		font-size: 1.375rem;
+		padding: 8px 4px;
+		border-radius: 10px;
+	}
+
+	.lp-timer-lbl {
+		font-size: 8.5px;
+	}
+
+	@media (min-width: 400px) {
+		.lp-timer-val {
+			font-size: 1.625rem;
+			padding: 9px 5px;
+		}
+		.lp-timer-lbl {
+			font-size: 9px;
+		}
+	}
+
+	@media (min-width: 480px) {
+		.lp-timer {
+			padding: 1.25rem 1.375rem;
+			border-radius: 18px;
+		}
+		.lp-timer-val {
+			font-size: 1.875rem;
+			padding: 10px 6px;
+			border-radius: 12px;
+		}
+		.lp-timer-lbl {
+			font-size: 9.5px;
+		}
+	}
+
+	/* ── Price: mobile scale ────────────────────────────── */
+	.lp-price-now {
+		font-size: 1.75rem;
+	}
+
+	@media (min-width: 400px) {
+		.lp-price-now {
+			font-size: 2rem;
+		}
+	}
+
+	@media (min-width: 480px) {
+		.lp-price-now {
+			font-size: 2.25rem;
+		}
+	}
+
+	/* ── CTA button: mobile height ──────────────────────── */
+	.lp-cta-btn {
+		height: 52px;
+		font-size: 14px;
+		border-radius: 14px;
+	}
+
+	@media (min-width: 400px) {
+		.lp-cta-btn {
+			height: 54px;
+			font-size: 14.5px;
+		}
+	}
+
+	@media (min-width: 480px) {
+		.lp-cta-btn {
+			height: 58px;
+			font-size: 15px;
+			border-radius: 16px;
+		}
+	}
+
+	/* ── Trust logos: scale ─────────────────────────────── */
+	.lp-trust {
+		gap: 8px;
+	}
+
+	.lp-trust-logo {
+		height: 16px;
+	}
+
+	@media (min-width: 400px) {
+		.lp-trust-logo {
+			height: 18px;
+		}
+	}
+
+	@media (min-width: 480px) {
+		.lp-trust-logo {
+			height: 20px;
+		}
+	}
+
+	/* ── Avatars: smaller on mobile ─────────────────────── */
+	.lp-avatar {
+		width: 26px;
+		height: 26px;
+	}
+
+	@media (min-width: 400px) {
+		.lp-avatar {
+			width: 28px;
+			height: 28px;
+		}
+	}
+
+	@media (min-width: 480px) {
+		.lp-avatar {
+			width: 30px;
+			height: 30px;
+		}
+	}
+
+	/* ── Sidebar: mobile full width ─────────────────────── */
+	@media (max-width: 1023px) {
+		.lp-sidebar {
+			width: 100%;
+			max-width: 520px;
+			margin-inline: auto;
+		}
 	}
 </style>
