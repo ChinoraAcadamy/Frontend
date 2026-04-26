@@ -349,8 +349,7 @@
 				{#if totalPages > 1}
 					<div class="border-main bg-card flex items-center justify-between border-t px-6 py-4">
 						<a
-							href={resolve('/admin/logs/activity') +
-								`?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`}
+							href={resolve(/** @type {any} */ (`/admin/logs/activity?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`))}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 {currentPage ===
 							1
 								? 'pointer-events-none opacity-40'
@@ -366,8 +365,7 @@
 							>
 						</div>
 						<a
-							href={resolve('/admin/logs/activity') +
-								`?page=${Math.min(totalPages, currentPage + 1)}&search=${searchValue}&ordering=${orderingValue}`}
+							href={resolve(/** @type {any} */ (`/admin/logs/activity?page=${Math.min(totalPages, currentPage + 1)}&search=${searchValue}&ordering=${orderingValue}`))}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 {currentPage ===
 							totalPages
 								? 'pointer-events-none opacity-40'
