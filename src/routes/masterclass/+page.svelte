@@ -877,7 +877,7 @@
 	.lp-instructor-img-wrap {
 		position: relative;
 		width: 100%;
-		height: 200px;
+		height: 280px;
 		border-radius: 14px;
 		overflow: hidden;
 		flex-shrink: 0;
@@ -894,6 +894,7 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		object-position: top center;
 	}
 
 	.lp-online-badge {
