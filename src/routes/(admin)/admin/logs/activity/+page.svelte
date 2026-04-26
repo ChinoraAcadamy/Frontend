@@ -109,6 +109,12 @@
 					: "Dars o'chirildi",
 				classes: 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
 			},
+			MODULE_DELETED: {
+				label: m.admin_logs_act_module_deleted
+					? m.admin_logs_act_module_deleted()
+					: "Modul o'chirildi",
+				classes: 'bg-rose-500/10 text-rose-600 ring-rose-500/20'
+			},
 			LESSON_CREATED: {
 				label: m.admin_logs_act_lesson_created
 					? m.admin_logs_act_lesson_created()

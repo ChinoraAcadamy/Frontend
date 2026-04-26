@@ -36,6 +36,7 @@
 	let deletingBenefitIdx = $state(null);
 
 	// Form state synced from server data
+	// svelte-ignore state_referenced_locally
 	let lp = $state({
 		// Event info
 		is_active: data?.lp?.is_active ?? true,
@@ -80,6 +81,7 @@
 		benefits_title: data?.lp?.benefits_title ?? "Masterklassda nimalarni o'rganasiz?"
 	});
 
+	// svelte-ignore state_referenced_locally
 	let benefits = $state(
 		data?.lp?.benefits ?? [
 			'Myuller metodikasi — asos andazani 0 dan professional qurish',
@@ -480,8 +482,9 @@
 					<div class="mp-card">
 						<h3 class="mp-card-title">{m.admin_mc_tg_title()}</h3>
 						<div class="mp-field">
-							<label class="mp-label">{m.admin_mc_tg_label()}</label>
+							<label class="mp-label" for="telegram_link">{m.admin_mc_tg_label()}</label>
 							<input
+								id="telegram_link"
 								class="mp-input"
 								bind:value={lp.telegram_link}
 								placeholder="https://t.me/+..."
@@ -559,24 +562,27 @@
 						<h3 class="mp-card-title">{m.admin_mc_stats_title()}</h3>
 						<div class="mp-grid-3">
 							<div class="mp-field">
-								<label class="mp-label">{m.admin_mc_stat_students()}</label>
+								<label class="mp-label" for="stat_students">{m.admin_mc_stat_students()}</label>
 								<input
+									id="stat_students"
 									class="mp-input"
 									bind:value={lp.stat_students}
 									placeholder={m.admin_mc_stat_students()}
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label">{m.admin_mc_stat_experience()}</label>
+								<label class="mp-label" for="stat_experience">{m.admin_mc_stat_experience()}</label>
 								<input
+									id="stat_experience"
 									class="mp-input"
 									bind:value={lp.stat_experience}
 									placeholder={m.admin_mc_stat_experience()}
 								/>
 							</div>
 							<div class="mp-field">
-								<label class="mp-label">{m.admin_mc_stat_practical()}</label>
+								<label class="mp-label" for="stat_practical">{m.admin_mc_stat_practical()}</label>
 								<input
+									id="stat_practical"
 									class="mp-input"
 									bind:value={lp.stat_practical}
 									placeholder={m.admin_mc_stat_practical()}

@@ -298,7 +298,7 @@
 	}
 
 	/* Optional: Paper texture support */
-	.fixed[bind\:this='mobileMenuRef'] {
+	/* .fixed[bind\:this='mobileMenuRef'] {
 		background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
-	}
+	} */
 </style>
