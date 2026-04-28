@@ -21,7 +21,8 @@
 		ExternalLink,
 		Settings,
 		ToggleLeft,
-		ToggleRight
+		ToggleRight,
+		UploadCloud
 	} from 'lucide-svelte';
 	import { resolve } from '$app/paths';
 	import * as m from '$lib/paraglide/messages.js';
@@ -38,52 +39,56 @@
 	// Form state synced from server data
 	// svelte-ignore state_referenced_locally
 	let lp = $state({
-		// Event info
+		id: data?.lp?.id ?? null,
+		slug: data?.lp?.slug ?? '',
 		is_active: data?.lp?.is_active ?? true,
 		title_line1: data?.lp?.title_line1 ?? '3 kunda',
-		title_accent: data?.lp?.title_accent ?? 'professional',
+		title_accent: data?.lp?.title_line1_italic ?? 'professional',
 		title_line2: data?.lp?.title_line2 ?? 'tikuvchilik',
-		title_sub: data?.lp?.title_sub ?? 'sirlarini oching',
+		title_sub: data?.lp?.title_subtitle ?? 'sirlarini oching',
 		lead_text: data?.lp?.lead_text ?? '',
-		banner_text:
-			data?.lp?.banner_text ?? 'BEPUL MASTERKLASS — Tikuvchilikda professional yondashuv',
-		seats_total: data?.lp?.seats_total ?? 50,
-		seats_left: data?.lp?.seats_left ?? 50,
+		banner_text: data?.lp?.banner_top ?? 'BEPUL MASTERKLASS — Tikuvchilikda professional yondashuv',
+		seats_total: data?.lp?.total_seats ?? 50,
+		seats_left: data?.lp?.remaining_seats ?? 50,
 
 		// Event schedule
-		event_days: data?.lp?.event_days ?? '28–29–30 Noyabr',
-		event_time: data?.lp?.event_time ?? '20:30',
-		event_timezone: data?.lp?.event_timezone ?? 'Toshkent',
+		event_days: data?.lp?.dates ?? '28–29–30 Noyabr',
+		event_time: data?.lp?.time ?? '20:30',
+		event_timezone: data?.lp?.timezone ?? 'Toshkent',
 		original_price: data?.lp?.original_price ?? 999000,
 		is_free: data?.lp?.is_free ?? true,
 
 		// Countdown target
-		countdown_days: data?.lp?.countdown_days ?? [28, 29, 30],
+		countdown_days: data?.lp?.countdown_days ?? '28, 29, 30',
+		countdown_month: data?.lp?.countdown_month ?? new Date().getMonth() + 1,
+		countdown_year: data?.lp?.countdown_year ?? new Date().getFullYear(),
 		countdown_hour: data?.lp?.countdown_hour ?? 20,
 		countdown_minute: data?.lp?.countdown_minute ?? 30,
 
 		// Instructor
 		instructor_name: data?.lp?.instructor_name ?? 'Ibodullayeva Chinora',
-		instructor_role: data?.lp?.instructor_role ?? 'Chinora Academy asoschisi & Master Dizayner',
-		instructor_bio: data?.lp?.instructor_bio ?? '',
-		instructor_image: data?.lp?.instructor_image ?? '/images/hero_compressed.jpg',
+		instructor_role: data?.lp?.instructor_title ?? "Asoschi va Bosh o'qituvchi",
+		instructor_bio:
+			data?.lp?.instructor_bio ??
+			"15 yillik tajribaga ega bo'lgan mutaxassis, 1000 dan ortiq muvaffaqiyatli shogirdlar ustozi.",
+		instructor_photo: data?.lp?.instructor_photo ?? '/images/hero_compressed.jpg',
 		stat_students: data?.lp?.stat_students ?? '5000+',
 		stat_experience: data?.lp?.stat_experience ?? '10 yil',
 		stat_practical: data?.lp?.stat_practical ?? '100%',
 
 		// Why section
 		why_title: data?.lp?.why_title ?? 'Nazariya emas — tayyor tizim',
-		why_desc: data?.lp?.why_desc ?? '',
+		why_desc: data?.lp?.why_description ?? '',
 
 		// CTA
-		telegram_link: data?.lp?.telegram_link ?? 'https://t.me/+ZlMsl6Ool8k4Zjdi',
-		eyebrow_text: data?.lp?.eyebrow_text ?? 'Eksklyuziv masterklass',
-		benefits_title: data?.lp?.benefits_title ?? "Masterklassda nimalarni o'rganasiz?"
+		telegram_link: data?.lp?.telegram_invite_link ?? 'https://t.me/+ZlMsl6Ool8k4Zjdi',
+		eyebrow_text: data?.lp?.eyebrow_badge ?? 'Eksklyuziv masterklass',
+		benefits_title: data?.lp?.benefits_section_title ?? "Masterklassda nimalarni o'rganasiz?"
 	});
 
 	// svelte-ignore state_referenced_locally
 	let benefits = $state(
-		data?.lp?.benefits ?? [
+		data?.lp?.benefits?.map((b) => b.text) ?? [
 			'Myuller metodikasi — asos andazani 0 dan professional qurish',
 			'Avtorlik "Anor" assimetriya fasonini boshidan oxirigacha modellashtirish',
 			"Daromadingizni 5x gacha oshirish: narx qo'yish va mijozlar jalb qilish",
@@ -95,6 +100,17 @@
 	let newBenefit = $state('');
 	let dragIdx = $state(null);
 	let dragOverIdx = $state(null);
+
+	let photoFile = $state(null);
+	let photoPreview = $state(null);
+
+	function handlePhotoChange(e) {
+		const file = e.target.files?.[0];
+		if (file) {
+			photoFile = file;
+			photoPreview = URL.createObjectURL(file);
+		}
+	}
 
 	// ── Effects ────────────────────────────────────────
 	$effect(() => {
@@ -156,10 +172,92 @@
 
 	function handleSubmit() {
 		saving = true;
-		return async ({ update }) => {
+		return async ({ update, result }) => {
 			saving = false;
-			await update();
+			if (result.type === 'success') {
+				await update();
+			}
 		};
+	}
+
+	function selectMasterclass(mc) {
+		lp = {
+			id: mc.id,
+			slug: mc.slug,
+			is_active: mc.is_active,
+			title_line1: mc.title_line1,
+			title_accent: mc.title_line1_italic,
+			title_line2: mc.title_line2,
+			title_sub: mc.title_subtitle,
+			lead_text: mc.lead_text,
+			banner_text: mc.banner_top,
+			seats_total: mc.total_seats,
+			seats_left: mc.remaining_seats,
+			event_days: mc.dates,
+			event_time: mc.time,
+			event_timezone: mc.timezone,
+			original_price: mc.original_price,
+			is_free: mc.is_free,
+			countdown_hour: mc.countdown_hour,
+			countdown_minute: mc.countdown_minute,
+			countdown_month: mc.countdown_month ?? new Date().getMonth() + 1,
+			countdown_year: mc.countdown_year ?? new Date().getFullYear(),
+			countdown_days: mc.countdown_days,
+			instructor_name: mc.instructor_name,
+			instructor_role: mc.instructor_title,
+			instructor_bio: mc.instructor_bio,
+			instructor_photo: mc.instructor_photo,
+			why_title: mc.why_title,
+			why_desc: mc.why_description,
+			telegram_link: mc.telegram_invite_link,
+			eyebrow_text: mc.eyebrow_badge,
+			benefits_title: mc.benefits_section_title,
+			stat_students: mc.stat_students ?? '5000+',
+			stat_experience: mc.stat_experience ?? '10 yil',
+			stat_practical: mc.stat_practical ?? '100%'
+		};
+		benefits = mc.benefits?.map((b) => b.text) ?? [];
+		photoFile = null;
+		photoPreview = null;
+	}
+
+	function createNew() {
+		lp = {
+			id: null,
+			slug: '',
+			is_active: true,
+			title_line1: '',
+			title_accent: '',
+			title_line2: '',
+			title_sub: '',
+			lead_text: '',
+			banner_text: '',
+			seats_total: 50,
+			seats_left: 50,
+			event_days: '',
+			event_time: '20:00',
+			event_timezone: 'Toshkent',
+			original_price: 0,
+			is_free: true,
+			countdown_hour: 20,
+			countdown_minute: 0,
+			countdown_month: new Date().getMonth() + 1,
+			countdown_year: new Date().getFullYear(),
+			countdown_days: '',
+			instructor_name: '',
+			instructor_role: '',
+			instructor_bio: '',
+			instructor_photo: '',
+			why_title: '',
+			why_desc: '',
+			telegram_link: '',
+			eyebrow_text: '',
+			benefits_title: '',
+			stat_students: '0',
+			stat_experience: '0',
+			stat_practical: '0'
+		};
+		benefits = [];
 	}
 
 	const sections = [
@@ -183,7 +281,32 @@
 				<span class="mp-eyebrow-rule"></span>
 				<span>{m.admin_mc_subtitle()}</span>
 			</div>
-			<h1 class="mp-topbar-title">{m.admin_mc_title()}</h1>
+			<div class="mp-topbar-title-row">
+				<h1 class="mp-topbar-title">{m.admin_mc_title()}</h1>
+
+				{#if data.masterclasses?.length > 0}
+					<div class="mp-mc-selector">
+						<select
+							class="mp-select"
+							onchange={(e) => {
+								const mc = data.masterclasses.find((m) => m.slug === e.currentTarget.value);
+								if (mc) selectMasterclass(mc);
+							}}
+							value={lp.slug}
+						>
+							<option value="" disabled>{m.admin_mc_select_placeholder?.() ?? 'Tanlang...'}</option>
+							{#each data.masterclasses as mc (mc.slug)}
+								<option value={mc.slug}>{mc.title_line1} {mc.title_line2}</option>
+							{/each}
+						</select>
+					</div>
+				{/if}
+
+				<button onclick={createNew} class="mp-new-btn" title="Yangi yaratish">
+					<Plus size={16} />
+					<span>{m.admin_mc_btn_new?.() ?? 'Yangi'}</span>
+				</button>
+			</div>
 		</div>
 
 		<div class="mp-topbar-actions">
@@ -202,13 +325,20 @@
 			</button>
 
 			<!-- Preview -->
-			<a href={resolve('/masterclass')} target="_blank" class="mp-preview-btn">
-				<ExternalLink size={15} />
-				{m.admin_mc_view()}
-			</a>
+			{#if lp.slug}
+				<a href={resolve(`/masterclass/${lp.slug}`)} target="_blank" class="mp-preview-btn">
+					<ExternalLink size={15} />
+					{m.admin_mc_view()}
+				</a>
+			{/if}
 
 			<!-- Save -->
-			<form method="POST" action="?/saveLanding" use:enhance={handleSubmit}>
+			<form
+				method="POST"
+				action="?/saveLanding"
+				use:enhance={handleSubmit}
+				enctype="multipart/form-data"
+			>
 				<!-- Hidden fields for all data -->
 				<input type="hidden" name="lp_data" value={JSON.stringify(lp)} />
 				<input type="hidden" name="benefits" value={JSON.stringify(benefits)} />
@@ -272,6 +402,16 @@
 								class="mp-input"
 								bind:value={lp.eyebrow_text}
 								placeholder={m.admin_mc_eyebrow_label()}
+							/>
+						</div>
+						<div class="mp-field">
+							<label class="mp-label" for="mc_slug">Slug (URL)</label>
+							<input
+								id="mc_slug"
+								class="mp-input mp-input--slug"
+								bind:value={lp.slug}
+								placeholder="masterclass-slug"
+								required
 							/>
 						</div>
 					</div>
@@ -394,6 +534,38 @@
 						</div>
 						<div class="mp-grid-3">
 							<div class="mp-field">
+								<label class="mp-label" for="countdown_year">Yil</label>
+								<input
+									id="countdown_year"
+									class="mp-input"
+									type="number"
+									bind:value={lp.countdown_year}
+									min={2024}
+								/>
+							</div>
+							<div class="mp-field">
+								<label class="mp-label" for="countdown_month">Oy</label>
+								<select id="countdown_month" class="mp-input" bind:value={lp.countdown_month}>
+									{#each Array.from({ length: 12 }, (_, i) => i + 1) as mNum (mNum)}
+										<option value={mNum}>
+											{new Date(2024, mNum - 1).toLocaleString('uz', { month: 'long' })}
+										</option>
+									{/each}
+								</select>
+							</div>
+							<div class="mp-field">
+								<label class="mp-label" for="countdown_days">{m.admin_mc_days_list()}</label>
+								<input
+									id="countdown_days"
+									class="mp-input"
+									bind:value={lp.countdown_days}
+									placeholder="28, 29, 30"
+								/>
+							</div>
+						</div>
+
+						<div class="mp-grid-2" style="margin-top: 0.75rem;">
+							<div class="mp-field">
 								<label class="mp-label" for="countdown_hour">{m.admin_mc_hour()}</label>
 								<input
 									id="countdown_hour"
@@ -415,21 +587,6 @@
 									max={59}
 								/>
 							</div>
-						</div>
-						<div class="mp-field" style="margin-top: 0.75rem;">
-							<label class="mp-label" for="countdown_days">{m.admin_mc_days_list()}</label>
-							<input
-								id="countdown_days"
-								class="mp-input"
-								value={lp.countdown_days.join(', ')}
-								oninput={(e) => {
-									lp.countdown_days = e.currentTarget.value
-										.split(',')
-										.map((v) => parseInt(v.trim()))
-										.filter((n) => !isNaN(n));
-								}}
-								placeholder="28, 29, 30"
-							/>
 						</div>
 					</div>
 
@@ -538,8 +695,12 @@
 					<div class="mp-card">
 						<h3 class="mp-card-title">{m.admin_mc_instructor_image()}</h3>
 						<div class="mp-img-preview-wrap">
-							{#if lp.instructor_image}
-								<img src={lp.instructor_image} alt="Instructor" class="mp-img-preview" />
+							{#if photoPreview || lp.instructor_photo}
+								<img
+									src={photoPreview || lp.instructor_photo}
+									alt="Instructor"
+									class="mp-img-preview"
+								/>
 							{:else}
 								<div class="mp-img-placeholder">
 									<ImageIcon size={28} />
@@ -548,13 +709,21 @@
 							{/if}
 						</div>
 						<div class="mp-field" style="margin-top:0.875rem">
-							<label class="mp-label" for="instructor_image">{m.admin_mc_image_url()}</label>
-							<input
-								id="instructor_image"
-								class="mp-input"
-								bind:value={lp.instructor_image}
-								placeholder={m.admin_mc_instructor_image()}
-							/>
+							<label class="mp-label" for="instructor_photo_file"
+								>{m.admin_mc_instructor_image()}</label
+							>
+							<label class="mp-file-upload">
+								<input
+									type="file"
+									id="instructor_photo_file"
+									name="instructor_photo"
+									accept="image/*"
+									class="mp-hidden-input"
+									onchange={handlePhotoChange}
+								/>
+								<UploadCloud size={20} />
+								<span>{m.admin_mc_upload_btn?.() ?? 'Rasm yuklash'}</span>
+							</label>
 						</div>
 					</div>
 
@@ -1471,6 +1640,32 @@
 		cursor: not-allowed;
 	}
 
+	.mp-file-upload {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		height: 48px;
+		border: 1.5px dashed var(--border-main, #ede8e3);
+		border-radius: 13px;
+		background: var(--bg-main, #fcfaf8);
+		cursor: pointer;
+		transition: all 0.2s;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--text-muted, #7a6e65);
+	}
+
+	.mp-file-upload:hover {
+		border-color: #9b1c48;
+		background: #fffafa;
+		color: #9b1c48;
+	}
+
+	.mp-hidden-input {
+		display: none;
+	}
+
 	/* ── Registrations ──────────────────────────────────── */
 	.mp-reg-summary {
 		display: grid;
@@ -1635,6 +1830,82 @@
 	@keyframes spin {
 		to {
 			transform: rotate(360deg);
+		}
+	}
+	/* ── Masterclass selection & management ──────────────── */
+	.mp-topbar-title-row {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.mp-mc-selector {
+		position: relative;
+		min-width: 220px;
+	}
+
+	.mp-select {
+		width: 100%;
+		height: 40px;
+		padding: 0 34px 0 14px;
+		border-radius: 11px;
+		border: 1.5px solid var(--border-main, #ede9e4);
+		background: var(--bg-card, #fff);
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--text-main, #1a1816);
+		outline: none;
+		appearance: none;
+		cursor: pointer;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a09890' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: right 10px center;
+		transition:
+			border-color 0.15s,
+			box-shadow 0.15s;
+	}
+
+	.mp-select:focus {
+		border-color: #9b1c48;
+		box-shadow: 0 0 0 3px rgba(155, 28, 72, 0.08);
+	}
+
+	.mp-new-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		height: 38px;
+		padding: 0 14px;
+		border-radius: 9px;
+		border: 1.5px solid #9b1c48;
+		background: transparent;
+		color: #9b1c48;
+		font-size: 12px;
+		font-weight: 700;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.mp-new-btn:hover {
+		background: #9b1c48;
+		color: #fff;
+	}
+
+	.mp-input--slug {
+		font-family: monospace;
+		font-size: 12px;
+		color: #9b1c48;
+		letter-spacing: 0.02em;
+	}
+
+	@media (max-width: 640px) {
+		.mp-topbar-title-row {
+			gap: 0.75rem;
+		}
+		.mp-mc-selector {
+			min-width: 100%;
+			order: 3;
 		}
 	}
 </style>
