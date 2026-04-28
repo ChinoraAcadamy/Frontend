@@ -77,8 +77,16 @@ export const actions = {
 			apiFormData.append('eyebrow_badge', lpData.eyebrow_text || '');
 			apiFormData.append('slug', lpData.slug || 'masterclass-' + Date.now());
 			
-			// Benefits as JSON string (most DRF setups accept this for nested data in multipart)
-			apiFormData.append('benefits', JSON.stringify(benefits));
+			// Stats
+			apiFormData.append('stat_students', lpData.stat_students || '5000+');
+			apiFormData.append('stat_experience', lpData.stat_experience || '10 yil');
+			apiFormData.append('stat_practical', lpData.stat_practical || '100%');
+			
+			// Benefits - Flattened for multipart/form-data compatibility
+			benefits.forEach((benefit, index) => {
+				apiFormData.append(`benefits[${index}]order`, String(benefit.order));
+				apiFormData.append(`benefits[${index}]text`, benefit.text);
+			});
 
 			// File upload
 			if (instructorPhoto instanceof File && instructorPhoto.size > 0) {

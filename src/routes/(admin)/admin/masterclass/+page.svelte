@@ -170,8 +170,18 @@
 		dragOverIdx = null;
 	}
 
-	function handleSubmit() {
+	function handleSubmit({ formData }) {
 		saving = true;
+
+		// Manually append the photo file if selected
+		if (photoFile) {
+			formData.set('instructor_photo', photoFile);
+		}
+
+		// Ensure the latest state is sent using $state.snapshot for Svelte 5 proxies
+		formData.set('lp_data', JSON.stringify($state.snapshot(lp)));
+		formData.set('benefits', JSON.stringify($state.snapshot(benefits)));
+
 		return async ({ update, result }) => {
 			saving = false;
 			if (result.type === 'success') {
