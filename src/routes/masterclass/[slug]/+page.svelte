@@ -9,18 +9,14 @@
 		Timer,
 		Play,
 		ShieldCheck,
-		X,
-		Sparkles,
-		TrendingUp,
-		Award,
-		Star,
-		ArrowRight
+		X
 	} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { fade, scale, fly } from 'svelte/transition';
 	import { backOut, cubicOut } from 'svelte/easing';
 	import PhoneInput from '$lib/components/ui/PhoneInput.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 	const mc = $derived(data.masterclass);
@@ -96,11 +92,15 @@
 		toast.success(m.toast_success());
 	}
 
-	const benefitIcons = [Award, Sparkles, TrendingUp, CheckCircle2, Star];
+	// const benefitIcons = [Award, Sparkles, TrendingUp, CheckCircle2, Star];
 
 	const stats = $derived([
-		{ value: mc.stat_students ?? '5000+', labelKey: 'stat_students_label' },
-		{ value: mc.stat_experience ?? '10 yil', labelKey: 'stat_experience_label' },
+		{ value: data.memberCount ?? '5000+', labelKey: 'stat_students_label' },
+		{
+			value: mc.stat_experience ?? `${new Date().getFullYear() - 2018}+ yil`,
+			labelKey: 'stat_experience_label'
+		},
+
 		{ value: mc.stat_practical ?? '100%', labelKey: 'stat_practical_label' }
 	]);
 
@@ -144,7 +144,7 @@
 	<!-- ── Nav ────────────────────────────────────── -->
 	<header class="nav">
 		<div class="nav-inner">
-			<a href="/" class="logo" aria-label="Chinora Academy">
+			<a href={resolve('/')} class="logo" aria-label="Chinora Academy">
 				<div class="logo-text">
 					<span class="logo-top">CHINORA</span>
 					<span class="logo-btm">ACADEMY</span>
