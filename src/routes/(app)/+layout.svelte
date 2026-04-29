@@ -16,7 +16,7 @@
 
 	// no scroll when menu is open on mobile, and enable it back when menu is closed
 	$effect(() => {
-		if (mobileOpen) {
+		if (!collapsed && mobileOpen) {
 			document.body.style.overflow = 'hidden';
 		} else {
 			document.body.style.overflow = 'auto';

@@ -25,21 +25,21 @@
 <svelte:window onkeydown={(e) => e.key === 'Escape' && (mobileOpen = false)} />
 
 <!-- Mobile backdrop -->
-{#if mobileOpen}
+{#if mobileOpen && !collapsed}
 	<div class="mob-backdrop" onclick={() => (mobileOpen = false)} aria-hidden="true"></div>
 {/if}
 
 <aside class="sidebar {collapsed ? 'sidebar--collapsed' : ''} {mobileOpen ? 'sidebar--open' : ''}">
 	<!-- ── Logo ──────────────────────────────────── -->
-	<div class="logo-wrap">
-		<a href={resolve('/')} class="logo-link">
-			<div class="logo-block">
-				<img src="/logo/chinora-secondary.png" alt="Chinora" class="logo-img" />
-				{#if !collapsed}
+	<div class={`logo-wrap ${collapsed ? 'mx-auto' : ''}`}>
+		{#if !collapsed}
+			<a href={resolve('/')} class="logo-link">
+				<div class="logo-block">
+					<img src="/logo/chinora-secondary.png" alt="Chinora" class="logo-img" />
 					<span class="logo-text">CHINORA</span>
-				{/if}
-			</div>
-		</a>
+				</div>
+			</a>
+		{/if}
 
 		<button class="close-btn" onclick={() => (mobileOpen = false)} aria-label="Yopish">
 			<X size={16} />
@@ -181,7 +181,7 @@
 	@media (max-width: 1023px) {
 		.sidebar {
 			transform: translateX(-100%);
-			width: 272px !important;
+			/* width: 272px !important; */
 		}
 		.sidebar--open {
 			transform: translateX(0);
