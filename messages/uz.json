@@ -581,6 +581,7 @@
 	"admin_admin_create_label_password": "Parol *",
 	"admin_admin_create_hint": "* Username kamida 4 ta belgidan iborat bo'lishi va faqat harf yoki raqamlarni o'z ichiga olishi tavsiya etiladi.",
 	"admin_admin_create_success": "Yangi admin muvaffaqiyatli yaratildi!",
+	"msg_course_created": "Kurs muvaffaqiyatli yaratildi!",
 	"admin_btn_save_admin": "Adminni saqlash",
 	"admin_btn_saving": "Yaratilmoqda...",
 	"breadcrumb_dashboard": "Dashboard",

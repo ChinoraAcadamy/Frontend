@@ -3,20 +3,17 @@ import { API_URL } from '$env/static/private';
 import { getLocale } from '@/lib/paraglide/runtime';
 import * as m from '$lib/paraglide/messages.js';
 import { translateServerMessage } from '$lib/utils/server-messages.js';
+import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
-
-export async function load({ params, cookies, url, fetch, setHeaders }) {
+export async function load({ params, cookies, url, locals }) {
     const token = cookies.get('access_token');
     const moduleId = url.searchParams.get('module_id');
+    /** @type {any} */
+    const user = locals.user;
 
     if (!moduleId) {
         throw error(400, m.error_occurred ? m.error_occurred() : 'Module ID kiritilmadi');
     }
-
-    // Prefetching tezlik bersa-da, HTTP cache ham yuklamani kamaytiradi (ayniqsa video orasida navigate qilganda)
-    setHeaders({
-        'cache-control': 'private, max-age=60'
-    });
 
     const headers = {
         'Authorization': `Bearer ${token}`,
@@ -24,32 +21,33 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
     };
 
     try {
-        // Parallelizing the fetches
-        const lessonPromise = fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/lessons/${params.lesson_id}/`, { headers })
-            .then(async (res) => {
-                if (!res.ok) {
-                    const errData = await res.json().catch(() => ({}));
-                    throw error(res.status, translateServerMessage(errData, m));
-                }
-                return res.json();
-            });
+        const fetchLessonData = async () => {
+            const res = await globalThis.fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/lessons/${params.lesson_id}/`, { headers });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw error(res.status, translateServerMessage(errData, m));
+            }
+            return res.json();
+        };
 
-        const coursePromise = fetch(`${API_URL}/courses/${params.id}/`, { headers: { 'Authorization': `Bearer ${token}` } })
-            .then(async (res) => (res.ok ? res.json() : null))
-            .catch(() => null);
+        const fetchCourseDataForNextLesson = async () => {
+            const res = await globalThis.fetch(`${API_URL}/courses/${params.id}/`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return null;
+            return res.json();
+        };
 
-        // Await primary content for breadcrumbs and rendering
-        const lessonData = await lessonPromise;
-        const courseData = await coursePromise;
-
+        // Dars va CourseData (nextLesson uchun) keshlanadi
+        const lessonDataPromise = fetchWithCache(generateCacheKey('student_lesson_detail', user?.id, params.lesson_id), fetchLessonData);
+        
         const nextLessonPromise = (async () => {
+            const courseData = await fetchWithCache(generateCacheKey('student_course_base', user?.id, params.id), fetchCourseDataForNextLesson);
             if (!courseData) return null;
             const modules = courseData.modules || [];
             const allLessons = [];
-            modules.forEach(m => {
-                if (m.lessons) {
-                    m.lessons.forEach(l => {
-                        allLessons.push({ ...l, moduleId: m.id });
+            modules.forEach(singleModule => {
+                if (singleModule.lessons) {
+                    singleModule.lessons.forEach(l => {
+                        allLessons.push({ ...l, moduleId: singleModule.id });
                     });
                 }
             });
@@ -58,17 +56,10 @@ export async function load({ params, cookies, url, fetch, setHeaders }) {
             return (currentIndex !== -1 && currentIndex < allLessons.length - 1) ? allLessons[currentIndex + 1] : null;
         })();
 
-        // Modulni alohida fetch qilamiz, chunki backendda faqat modul/lesson API'si user_progress va can_access beradi
-        const moduleDataPromise = fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/`, { headers })
-            .then(res => res.ok ? res.json() : null);
-
         return {
-            lesson: lessonData,
-            course: courseData,
-            module: await moduleDataPromise,
+            lesson: await lessonDataPromise,
             lazy: {
-                nextLesson: nextLessonPromise,
-                moduleData: moduleDataPromise
+                nextLesson: nextLessonPromise
             }
         };
 
@@ -114,6 +105,10 @@ export const actions = {
             }
 
             const result = await res.json();
+            
+            // Xotirani tozalash: yangi baho qo'shildi, dars progressi o'zgarishi mumkin
+            invalidateCache('student_');
+            
             return { success: true, result };
         } catch (err) {
             console.error("[uploadAssignment] System error:", err);

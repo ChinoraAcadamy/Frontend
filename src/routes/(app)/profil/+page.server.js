@@ -3,41 +3,49 @@ import { API_URL } from '$env/static/private';
 import { getLocale } from '@/lib/paraglide/runtime';
 import * as m from '$lib/paraglide/messages.js';
 import { translateServerMessage } from '$lib/utils/server-messages.js';
+import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ cookies, fetch, setHeaders }) => {
+export const load = async ({ cookies, fetch, setHeaders, locals }) => {
     // Cache the profile page securely for this user for 60 seconds
     setHeaders({
         'Cache-Control': 'private, max-age=60'
     });
 
     const token = cookies.get('access_token');
-    
+    const user = locals.user;
+
     try {
-        const res = await fetch(`${API_URL}/auth/students/me/`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept-Language': getLocale()
+        const fetchProfile = async () => {
+            const res = await fetch(`${API_URL}/auth/students/me/`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept-Language': getLocale()
+                }
+            });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw error(res.status, translateServerMessage(errData, m));
             }
-        });
+            return await res.json();
+        };
 
-        if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw error(res.status, translateServerMessage(errData, m));
-        }
+        const fetchDevices = async () => {
+            const res = await fetch(`${API_URL}/auth/devices/`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept-Language': getLocale()
+                }
+            });
+            const data = await res.json().catch(() => ({ results: [] }));
+            return data.results || [];
+        };
 
-        const profile = await res.json();
-
-        // Fetch active devices
-        const devicesRes = await fetch(`${API_URL}/auth/devices/`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept-Language': getLocale()
-            }
-        });
-
-        const devicesData = await devicesRes.json().catch(() => ({ results: [] }));
-        const devices = devicesData.results || [];
+        const [profile, devices] = await Promise.all([
+            fetchWithCache(generateCacheKey('student_profile', user.id), fetchProfile),
+            fetchWithCache(generateCacheKey('student_devices', user.id), fetchDevices)
+        ]);
 
         return { profile, devices };
     } catch (err) {
@@ -72,9 +80,11 @@ export const actions = {
                 return { success: false, error: translateServerMessage(errData, m) || (m.profile_device_logout_error ? m.profile_device_logout_error() : "Xatolik yuz berdi") };
             }
 
-            return { 
-                success: true, 
-                message: m.profile_device_logout_success ? m.profile_device_logout_success() : "Qurilma o'chirildi" 
+            invalidateCache('student_');
+
+            return {
+                success: true,
+                message: m.profile_device_logout_success ? m.profile_device_logout_success() : "Qurilma o'chirildi"
             };
         } catch (err) {
             console.error("[Device Logout] Error:", err);
@@ -84,7 +94,7 @@ export const actions = {
     updateProfile: async ({ request, cookies, fetch }) => {
         const token = cookies.get('access_token');
         if (!token) return { success: false, error: m.err_auth_required ? m.err_auth_required() : 'Avtorizatsiya talab qilinadi' };
-        
+
         const formData = await request.formData();
         const data = {
             first_name: formData.get('first_name') || '',
@@ -115,7 +125,7 @@ export const actions = {
             const profileRes = await fetch(`${API_URL}/auth/profile/`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             const fullUserData = profileRes.ok ? await profileRes.json() : updatedProfile;
 
             // ✅ user_data kuki-ni to'liq ma'lumot bilan yangilaymiz, shunda header/sidebar ham o'zgaradi
@@ -126,6 +136,8 @@ export const actions = {
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: 60 * 20 // 20 minut
             });
+
+            invalidateCache('student_');
 
             return { success: true, profile: fullUserData };
         } catch (err) {

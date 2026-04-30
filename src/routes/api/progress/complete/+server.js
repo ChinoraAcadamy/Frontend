@@ -2,6 +2,7 @@ import { API_URL } from '$env/static/private';
 import { error, json } from '@sveltejs/kit';
 import * as m from '$lib/paraglide/messages.js';
 import { translateServerMessage } from '$lib/utils/server-messages.js';
+import { invalidateCache } from '@/lib/server/cache.js';
 
 export async function POST({ request, cookies }) {
     const token = cookies.get('access_token');
@@ -42,6 +43,10 @@ export async function POST({ request, cookies }) {
 
         const data = await response.json();
         console.log('Lesson completed successfully:', data);
+
+        // O'quvchi keshini tozalaymiz (Progress o'zgardi, sidebar va dashboard yangilanishi kerak)
+        invalidateCache('student_');
+
         return json({ success: true, data });
     } catch (err) {
         console.error('Error completing lesson:', err);

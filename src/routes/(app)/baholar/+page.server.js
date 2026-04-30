@@ -1,4 +1,5 @@
 import { getSubmissions } from '@/lib/server/submissions.js';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 export const load = async (event) => {
     // Optimizatsiya: 1 daqiqalik kesh
@@ -6,7 +7,8 @@ export const load = async (event) => {
         'cache-control': 'private, max-age=60'
     });
 
-    const { url } = event;
+    const { url, locals } = event;
+    const user = locals.user;
 
     // URL'dan parametrlarni o'qiymiz
     const search = url.searchParams.get('search') ?? '';
@@ -17,9 +19,9 @@ export const load = async (event) => {
     // Streaming (Lazy Loading) uchun promise ni await qilinmasdan qaytaramiz
     return {
         streamed: {
-            submissionsData: getSubmissions(event, { search, page, ordering })
+            submissionsData: fetchWithCache(generateCacheKey('student_submissions', user.id, `page=${page}&search=${search}&o=${ordering}&s=${status}`), () => getSubmissions(event, { search, page, ordering }))
         },
         currentPage: parseInt(page),
         filters: { search, status }
     };
-};
+};

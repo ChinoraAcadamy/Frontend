@@ -582,6 +582,7 @@
 	"admin_admin_create_desc": "Создайте новую учетную запись администратора для управления платформой.",
 	"admin_admin_create_placeholder_username": "Например: a.navoiy",
 	"admin_btn_cancel": "Отмена",
+	"msg_module_created": "Модуль успешно создан!",
 	"admin_student_phone": "Номер телефона",
 	"admin_admin_create_card_personal": "Личные данные",
 	"admin_admin_create_card_account": "Настройки аккаунта",

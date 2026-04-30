@@ -9,4 +9,4 @@
 	<title>{data.lesson.title}</title>
 </svelte:head>
 
-<LessonDetailView lesson={data.lesson} nextLesson={data.lazy.nextLesson} moduleData={data.lazy.moduleData} />
+<LessonDetailView lesson={data.lesson} nextLesson={data.lazy.nextLesson} />

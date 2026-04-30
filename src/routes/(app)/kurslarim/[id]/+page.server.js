@@ -1,13 +1,14 @@
 import { API_URL } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 import { enrichCourseWithProgress } from '@/lib/server/courseService.js';
-import { getLocale } from '@/lib/paraglide/runtime';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ params, cookies, fetch, locals }) => {
+export const load = async ({ params, cookies, locals }) => {
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw redirect(303, '/login');
     const lang = locals.lang || 'uz';
+    const user = locals.user;
 
     const getCourseDetail = async () => {
         const headers = { 'Authorization': `Bearer ${accessToken}`, 'Accept-Language': lang };
@@ -55,7 +56,7 @@ export const load = async ({ params, cookies, fetch, locals }) => {
 
     return {
         lazy: {
-            courseData: getCourseDetail()
+            courseData: fetchWithCache(generateCacheKey('student_course_detail', user.id, params.id), getCourseDetail)
         }
     };
 }
