@@ -108,7 +108,7 @@
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 		<!-- Ranking Leaderboard dynamically imported -->
 		<div class="h-full">
-			{#await data.lazy.ranking}
+			{#await data.lazy.rankInfo}
 				<div
 					class="border-main bg-card flex h-96 flex-col items-center justify-center rounded-3xl border p-6 shadow-sm"
 				>
@@ -116,8 +116,8 @@
 						class="h-8 w-8 animate-spin rounded-full border-2 border-muted/20 border-t-primary"
 					></div>
 				</div>
-			{:then ranking}
-				<LeaderboardTable rankingData={ranking} isAdmin={false} currentUserId={data.user?.id} />
+			{:then rankInfo}
+				<LeaderboardTable rankingData={rankInfo.ranking} isAdmin={false} currentUserId={data.user?.id} />
 			{/await}
 		</div>
 
@@ -224,7 +224,11 @@
 						{:else if config.key === 'total_score'}
 							{data.userScore}
 						{:else if config.key === 'rank'}
-							{data.myRank ?? '—'}
+							{#await data.lazy.rankInfo}
+								<span class="animate-pulse text-muted">...</span>
+							{:then rankInfo}
+								{rankInfo.myRank ?? '—'}
+							{/await}
 						{:else}
 							0
 						{/if}

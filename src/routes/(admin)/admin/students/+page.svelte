@@ -158,7 +158,7 @@
 					{m.admin_students_title ? m.admin_students_title() : "Studentlar ro'yxati"}
 				</h1>
 				{#if isLoading}
-					<p class="mt-1 animate-pulse text-sm text-muted">Yuklanmoqda...</p>
+					<p class="mt-1 animate-pulse text-sm text-muted">{m.admin_btn_refreshing()}</p>
 				{:else if resolvedData && resolvedData.totalCount !== undefined}
 					<p class="mt-1 text-sm font-medium text-muted">
 						{m.admin_students_total ? m.admin_students_total() : 'Jami'}
@@ -280,12 +280,12 @@
 									</td>
 									<td class="px-6 py-4">
 										<span
-											class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-black tracking-wider uppercase {student.is_active
-												? 'bg-primary/10 text-primary'
+											class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] tracking-wider uppercase {student.is_active
+												? 'bg-vibrant/10 text-vibrant'
 												: 'bg-muted/10 text-muted'}"
 										>
 											{#if student.is_active}
-												<span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+												<span class="h-1.5 w-1.5 rounded-full bg-vibrant"></span>
 											{:else}
 												<span class="h-1.5 w-1.5 rounded-full bg-muted"></span>
 											{/if}

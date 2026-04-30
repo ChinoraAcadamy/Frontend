@@ -1,10 +1,12 @@
 import { API_URL } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ cookies, fetch, url, setHeaders }) => {
+export const load = async ({ cookies, fetch, url, setHeaders, locals }) => {
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw redirect(303, '/login');
+    const userId = locals.user?.id || 'admin';
 
     // Optimizatsiya: keshlash
     setHeaders({
@@ -46,9 +48,11 @@ export const load = async ({ cookies, fetch, url, setHeaders }) => {
         }
     };
 
+    const cacheKey = generateCacheKey('admin_login_logs', userId, params.toString());
+
     return {
         lazy: {
-            loginData: getLoginLogs()
+            loginData: fetchWithCache(cacheKey, getLoginLogs)
         },
         filters: { search, ordering },
         currentPage: parseInt(page)

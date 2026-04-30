@@ -1,15 +1,18 @@
 // src/routes/(admin)/admin/submissions/+page.server.js
 import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
-export const load = async ({ cookies, fetch, url, setHeaders }) => {
-    // Submissionlar doimo yangi bo'lishi kerak
+export const load = async ({ cookies, fetch, url, setHeaders, locals }) => {
+    // Submissionlar doimo yangi bo'lishi kerak, shuning uchun brauzer keshlamaydi, 
+    // lekin SPA o'tishlar uchun qisqa muddatli server kesh (1 daqiqa)
     setHeaders({
         'cache-control': 'private, no-cache, must-revalidate'
     });
 
 
     const accessToken = cookies.get('access_token');
+    const userId = locals.user?.id || 'admin';
 
     // URL parametrlarini o'qish
     const search = url.searchParams.get('search') ?? '';
@@ -64,9 +67,11 @@ export const load = async ({ cookies, fetch, url, setHeaders }) => {
         }
     };
 
+    const cacheKey = generateCacheKey('admin_submissions', userId, params.toString());
+
     return {
         streamed: {
-            submissionsData: getSubmissions()
+            submissionsData: fetchWithCache(cacheKey, getSubmissions, 60) // qisqa kesh (60 soniya)
         },
         currentPage: parseInt(page),
         filters: { search, status }

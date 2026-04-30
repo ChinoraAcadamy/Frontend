@@ -1,9 +1,11 @@
 import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ fetch, cookies, url, setHeaders }) => {
+export const load = async ({ fetch, cookies, url, setHeaders, locals }) => {
     const accessToken = cookies.get('access_token');
+    const userId = locals.user?.id || 'admin';
     
     const search   = url.searchParams.get('search')    ?? '';
     const isActive = url.searchParams.get('is_active') ?? '';
@@ -60,10 +62,13 @@ export const load = async ({ fetch, cookies, url, setHeaders }) => {
         }
     };
 
+    const studentsCacheKey = generateCacheKey('admin_students', userId, `page=${page}&s=${search}&a=${isActive}&o=${ordering}`);
+    const coursesCacheKey = generateCacheKey('admin_courses_list', userId);
+
     return { 
         lazy: {
-            studentsData: getStudentsData(),
-            courses: getCourses()
+            studentsData: fetchWithCache(studentsCacheKey, getStudentsData),
+            courses: fetchWithCache(coursesCacheKey, getCourses)
         },
         currentPage: parseInt(page), 
         filters: { search, isActive, ordering } 

@@ -11,18 +11,22 @@ export async function load(event) {
 
     const user = event.locals.user || {};
     
-    // We fetch all ranking here to find the rank AND pass to leaderboard
-    const rankingData = await getRanking(event);
-    const myRank = await getMyRank({ ranking: rankingData.results, myId: user.id });
+    // Create a promise for rank info to be streamed
+    const rankInfoPromise = getRanking(event).then(async (rankingData) => {
+        const myRank = await getMyRank({ ranking: rankingData.results, myId: user.id });
+        return {
+            ranking: rankingData.results,
+            myRank
+        };
+    });
 
     return {
         user,
         userScore: user.total_score || 0,
-        myRank: myRank,
         // Hammasini lazy (streaming) qilamiz
         lazy: {
             courses: getMyCourses(event).then(data => data.courses),
-            ranking: rankingData.results, // Already fetched
+            rankInfo: rankInfoPromise,
             recentSubmissions: getRecentSubmissions(event, 3)
         }
     };

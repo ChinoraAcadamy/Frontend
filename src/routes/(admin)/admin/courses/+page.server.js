@@ -1,10 +1,12 @@
 import { API_URL } from '$env/static/private';
 import { getLocale } from '@/lib/paraglide/runtime';
 import { error } from '@sveltejs/kit';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
-export const load = async ({ fetch, cookies, setHeaders }) => {
+export const load = async ({ fetch, cookies, setHeaders, locals }) => {
     const accessToken = cookies.get('access_token');
     if (!accessToken) throw error(401, 'Avtorizatsiya talab qilinadi');
+    const userId = locals.user?.id || 'admin';
 
     // Optimizatsiya: 10 daqiqalik kesh (Keshlanadi, lekin o'chirishlar reactiv ishlaydi)
     setHeaders({
@@ -32,7 +34,7 @@ export const load = async ({ fetch, cookies, setHeaders }) => {
 
     return {
         lazy: {
-            courses: getCourses()
+            courses: fetchWithCache(generateCacheKey('admin_courses', userId, getLocale()), getCourses)
         }
     };
 };

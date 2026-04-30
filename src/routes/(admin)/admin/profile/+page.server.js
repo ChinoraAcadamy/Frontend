@@ -1,8 +1,10 @@
 import { fail } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
-export const load = async ({ fetch, cookies }) => {
+export const load = async ({ fetch, cookies, locals }) => {
     const accessToken = cookies.get('access_token');
+    const userId = locals.user?.id || 'admin';
     
     // Lazy loading: profile ma'lumotlarini promise ko'rinishida qaytaramiz
     // Bu sahifaning qobig'ini (shell) tezroq yuklanishini ta'minlaydi
@@ -41,8 +43,8 @@ export const load = async ({ fetch, cookies }) => {
 
     return {
         lazy: {
-            profile: fetchProfile(),
-            devices: fetchDevices()
+            profile: fetchWithCache(generateCacheKey('admin_profile', userId), fetchProfile, 60),
+            devices: fetchWithCache(generateCacheKey('admin_devices', userId), fetchDevices, 60)
         }
     };
 };

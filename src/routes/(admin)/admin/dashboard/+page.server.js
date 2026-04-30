@@ -1,9 +1,10 @@
 import { API_URL } from '$env/static/private';
 import { getRanking } from '@/lib/server/api.js';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async (event) => {
-    const { cookies, fetch, setHeaders } = event;
+    const { cookies, fetch, setHeaders, locals } = event;
     // 10 daqiqa kesh (600 soniya)
     setHeaders({
         'cache-control': 'private, max-age=600'
@@ -11,6 +12,7 @@ export const load = async (event) => {
 
     const accessToken = cookies.get('access_token');
     const headers = { 'Authorization': `Bearer ${accessToken}` };
+    const userId = locals.user?.id || 'admin';
 
     const fetchStats = async () => {
         const [studentsRes, coursesRes] = await Promise.all([
@@ -45,16 +47,13 @@ export const load = async (event) => {
         return [];
     };
 
-    // Await ranking upfront to avoid lifecycle issues and provide instant data
-    const rankingData = await getRanking(event);
-
     return {
-        user: event.locals.user,
-        // Bular promise ko'rinishida qaytadi (streaming)
+        user: locals.user,
+        // Bular promise ko'rinishida qaytadi (streaming), keshdan esa tezda resolve bo'ladi
         lazy: {
-            stats: fetchStats(),
-            ranking: rankingData.results,
-            newStudents: fetchNewStudents()
+            stats: fetchWithCache(generateCacheKey('admin_stats', userId), fetchStats),
+            ranking: fetchWithCache(generateCacheKey('admin_ranking', userId), () => getRanking(event).then(d => d.results)),
+            newStudents: fetchWithCache(generateCacheKey('admin_new_students', userId), fetchNewStudents)
         }
     };
 };

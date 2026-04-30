@@ -1,13 +1,19 @@
 import { error } from '@sveltejs/kit';
 import * as masterclassService from '$lib/server/masterclassService';
+import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ fetch, cookies }) => {
+export const load = async ({ fetch, cookies, locals }) => {
 	const accessToken = cookies.get('access_token');
 	if (!accessToken) throw error(401, 'Avtorizatsiya talab qilinadi');
+	const userId = locals.user?.id || 'admin';
 
-	const masterclasses = await masterclassService.getMasterclasses(fetch, accessToken);
-	const results = masterclasses.results || [];
+	const getMasterclasses = async () => {
+		const res = await masterclassService.getMasterclasses(fetch, accessToken);
+		return res.results || [];
+	};
+
+	const results = await fetchWithCache(generateCacheKey('admin_masterclasses', userId), getMasterclasses);
 
 	return {
 		masterclasses: results,

@@ -42,21 +42,28 @@
 	const parseUserAgent = (name) => {
 		if (!name) return m.profile_device_unknown();
 		const lower = name.toLowerCase();
-		if (lower.includes('pc (') || lower.includes('windows') || lower.includes('macintosh') || lower.includes('linux')) return 'Desktop';
 		if (
-			lower.includes('iphone') || 
-			lower.includes('android') || 
-			lower.includes('mobile') || 
-			lower.includes('tablet') || 
-			lower.includes('samsung') || 
-			lower.includes('pixel') || 
-			lower.includes('xiaomi') || 
-			lower.includes('redmi') || 
-			lower.includes('oppo') || 
-			lower.includes('vivo') || 
-			lower.includes('huawei') || 
+			lower.includes('pc (') ||
+			lower.includes('windows') ||
+			lower.includes('macintosh') ||
+			lower.includes('linux')
+		)
+			return 'Desktop';
+		if (
+			lower.includes('iphone') ||
+			lower.includes('android') ||
+			lower.includes('mobile') ||
+			lower.includes('tablet') ||
+			lower.includes('samsung') ||
+			lower.includes('pixel') ||
+			lower.includes('xiaomi') ||
+			lower.includes('redmi') ||
+			lower.includes('oppo') ||
+			lower.includes('vivo') ||
+			lower.includes('huawei') ||
 			lower.includes('realme')
-		) return 'Mobile';
+		)
+			return 'Mobile';
 		return 'Device';
 	};
 
@@ -143,9 +150,7 @@
 	<!-- Decorative pattern (absolute but within container) -->
 	<div class="pointer-events-none absolute inset-0 overflow-hidden opacity-40" aria-hidden="true">
 		<div class="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl"></div>
-		<div
-			class="absolute -right-24 -bottom-24 h-96 w-96 rounded-full bg-muted/10 blur-3xl"
-		></div>
+		<div class="absolute -right-24 -bottom-24 h-96 w-96 rounded-full bg-muted/10 blur-3xl"></div>
 	</div>
 
 	<div class="relative mx-auto max-w-6xl">
@@ -180,7 +185,9 @@
 					</div>
 				</aside>
 				<!-- Skeleton Main Content -->
-				<div class="animate-pulse rounded-2xl border border-border bg-surface p-8 shadow-sm lg:p-12">
+				<div
+					class="animate-pulse rounded-2xl border border-border bg-surface p-8 shadow-sm lg:p-12"
+				>
 					<div class="mb-8 h-8 w-48 rounded-lg bg-muted/10"></div>
 					<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 						{#each Array(4) as _, i (i)}
@@ -282,10 +289,12 @@
 								{#await data.lazy.devices}
 									<div class="h-4 w-6 animate-pulse rounded-full bg-muted/10"></div>
 								{:then devices}
+									{@const activeDevices = devices?.filter((d) => d.is_active) || []}
 									<span
 										class="rounded-full bg-muted/10 px-2.5 py-0.5 text-[10px] font-bold text-muted"
-										>{devices?.length || 0}</span
 									>
+										{activeDevices.length}
+									</span>
 								{/await}
 								<ChevronRight
 									size={14}
@@ -448,9 +457,7 @@
 									<h3 class="text-lg font-bold tracking-tight text-foreground">
 										{m.profile_devices_title ? m.profile_devices_title() : 'Qurilmalar'}
 									</h3>
-									<p class="text-sm font-medium text-muted">
-										Faol sessiyalaringizni boshqaring.
-									</p>
+									<p class="text-sm font-medium text-muted">Faol sessiyalaringizni boshqaring.</p>
 								</div>
 							</div>
 
