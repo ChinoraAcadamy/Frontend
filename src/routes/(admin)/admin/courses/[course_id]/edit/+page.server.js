@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
+import { invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ parent }) => {
     // Parent `load` function in `[course_id]/+layout.server.js` 
@@ -51,6 +52,7 @@ export const actions = {
             return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });
         }
 
+        invalidateCache('admin_');
         // Tahrirlash muvaffaqiyatli yakunlangach, kurs darslari sahifasiga qaytamiz
         return { success: true };
     },

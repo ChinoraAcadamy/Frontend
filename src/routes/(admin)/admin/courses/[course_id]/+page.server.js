@@ -1,5 +1,6 @@
 import { API_URL } from "$env/static/private";
 import { fail, redirect } from "@sveltejs/kit";
+import { invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ parent }) => {
     const { modules } = await parent();
@@ -23,6 +24,7 @@ export const actions = {
             return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });
         }
 
+        invalidateCache('admin_');
         throw redirect(303, `/admin/courses?deleted_course=${params.course_id}`);
     },
 
@@ -87,6 +89,7 @@ export const actions = {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }
 
+        invalidateCache('admin_');
         return { success: true };
     },
 
@@ -108,6 +111,7 @@ export const actions = {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }
         
+        invalidateCache('admin_');
         return { success: true };
     },
 
@@ -141,6 +145,7 @@ export const actions = {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }
 
+        invalidateCache('admin_');
         return { success: true };
     },
 
@@ -163,6 +168,7 @@ export const actions = {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }
 
+        invalidateCache('admin_');
         return { success: true };
     }
 };

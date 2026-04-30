@@ -1,7 +1,7 @@
 // src/routes/(admin)/admin/submissions/+page.server.js
 import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
-import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
+import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ cookies, fetch, url, setHeaders, locals }) => {
     // Submissionlar doimo yangi bo'lishi kerak, shuning uchun brauzer keshlamaydi, 
@@ -111,6 +111,7 @@ export const actions = {
                 });
             }
 
+            invalidateCache('admin_');
             return { success: true, updatedSubmission: await response.json() };
         } catch (err) {
             console.error('[gradeSubmission] Error:', err);

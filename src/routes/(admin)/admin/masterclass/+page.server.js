@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import * as masterclassService from '$lib/server/masterclassService';
-import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
+import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ fetch, cookies, locals }) => {
@@ -114,6 +114,7 @@ export const actions = {
 				return { success: false, error: errData.detail || "Saqlashda xatolik yuz berdi" };
 			}
 
+			invalidateCache('admin_');
 			return {
 				success: true,
 				message: 'Muvaffaqiyatli saqlandi!'
@@ -134,6 +135,7 @@ export const actions = {
 
 		const res = await masterclassService.deleteMasterclass(slug, fetch, accessToken);
 		if (res.ok) {
+			invalidateCache('admin_');
 			return { success: true, message: "O'chirildi" };
 		}
 		return { success: false, error: "O'chirishda xatolik" };

@@ -43,7 +43,7 @@
 	<title>{m.admin_courses_head_title?.() ?? "Kurslar ro'yxati - Admin Panel"}</title>
 	<meta
 		name="description"
-		content={m.admin_courses_head_desc?.() ?? "Barcha kurslarni boshqarish."}
+		content={m.admin_courses_head_desc?.() ?? 'Barcha kurslarni boshqarish.'}
 	/>
 </svelte:head>
 
@@ -55,8 +55,10 @@
 				<span class="acp-eyebrow-rule"></span>
 				<span class="acp-eyebrow-text">Admin Panel</span>
 			</div>
-			<h1 class="acp-title">{m.admin_courses_title?.() ?? "Kurslar"}</h1>
-			<p class="acp-subtitle">{m.admin_courses_subtitle?.() ?? 'Barcha kurslarni boshqarish va tahrirlash.'}</p>
+			<h1 class="acp-title">{m.admin_courses_title?.() ?? 'Kurslar'}</h1>
+			<p class="acp-subtitle">
+				{m.admin_courses_subtitle?.() ?? 'Barcha kurslarni boshqarish va tahrirlash.'}
+			</p>
 		</div>
 
 		<div class="acp-controls">
@@ -95,10 +97,16 @@
 			</div>
 
 			<!-- Add -->
-			<a href={resolve('/admin/courses/create')} class="acp-add-btn">
-				<Plus size={15} strokeWidth={2.5} />
-				<span class="acp-add-label">{m.admin_courses_btn_add?.() ?? "Kurs qo'shish"}</span>
-			</a>
+			<div style="display: flex; gap: 8px;">
+				<a href={resolve('/admin/courses/create')} class="acp-add-btn">
+					<Plus size={15} strokeWidth={2.5} />
+					<span class="acp-add-label">{m.admin_courses_btn_add?.() ?? "Kurs qo'shish"}</span>
+				</a>
+				<!-- <a href={resolve('/admin/courses/create-spa')} class="acp-add-btn" style="background: var(--primary);">
+					<Plus size={15} strokeWidth={2.5} />
+					<span class="acp-add-label">Tezkor qo'shish (SPA)</span>
+				</a> -->
+			</div>
 		</div>
 	</header>
 
@@ -117,7 +125,10 @@
 				{:else}
 					<div class="acp-skel-row">
 						<div class="acp-skel-row-thumb"></div>
-						<div class="acp-skel-body" style="flex:1; display:flex; flex-direction:column; gap:7px;">
+						<div
+							class="acp-skel-body"
+							style="flex:1; display:flex; flex-direction:column; gap:7px;"
+						>
 							<div class="acp-skel-line w-48"></div>
 							<div class="acp-skel-line w-28"></div>
 						</div>
@@ -127,7 +138,6 @@
 				{/if}
 			{/each}
 		</div>
-
 	{:then courses}
 		{@const activeCourses = courses
 			.filter((c) => !deletedCourseIds.includes(c.id.toString()))
@@ -153,10 +163,20 @@
 						Barcha kurslarni ko'rish
 					</button>
 				{:else}
-					<a href={resolve('/admin/courses/create')} class="acp-empty-btn">
-						<Plus size={14} />
-						{m.admin_courses_btn_add?.() ?? "Kurs qo'shish"}
-					</a>
+					<div style="display: flex; gap: 12px; margin-top: 8px;">
+						<a href={resolve('/admin/courses/create')} class="acp-empty-btn">
+							<Plus size={14} />
+							{m.admin_courses_btn_add?.() ?? "Kurs qo'shish"}
+						</a>
+						<a
+							href={resolve('/admin/courses/create-spa')}
+							class="acp-empty-btn"
+							style="background: var(--primary);"
+						>
+							<Plus size={14} />
+							Tezkor (SPA)
+						</a>
+					</div>
 				{/if}
 			</div>
 		{:else}
@@ -212,11 +232,15 @@
 	}
 
 	@media (min-width: 640px) {
-		.acp-root { padding: 2.5rem 1.75rem 4rem; }
+		.acp-root {
+			padding: 2.5rem 1.75rem 4rem;
+		}
 	}
 
 	@media (min-width: 1024px) {
-		.acp-root { padding: 3rem 2.5rem 5rem; }
+		.acp-root {
+			padding: 3rem 2.5rem 5rem;
+		}
 	}
 
 	/* ── Header ────────────────────────────────────────── */
@@ -275,7 +299,9 @@
 	}
 
 	@media (max-width: 500px) {
-		.acp-controls { width: 100%; }
+		.acp-controls {
+			width: 100%;
+		}
 	}
 
 	/* Toggle */
@@ -301,7 +327,9 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: background 140ms, color 140ms;
+		transition:
+			background 140ms,
+			color 140ms;
 	}
 
 	.acp-toggle-btn:hover:not(.acp-toggle-btn--on) {
@@ -324,7 +352,9 @@
 	}
 
 	@media (max-width: 500px) {
-		.acp-search-wrap { max-width: 100%; }
+		.acp-search-wrap {
+			max-width: 100%;
+		}
 	}
 
 	:global(.acp-search-icon) {
@@ -347,12 +377,17 @@
 		font-weight: 500;
 		color: var(--text-main);
 		outline: none;
-		transition: border-color 150ms, box-shadow 150ms;
+		transition:
+			border-color 150ms,
+			box-shadow 150ms;
 		font-family: inherit;
 		box-sizing: border-box;
 	}
 
-	.acp-search::placeholder { color: var(--text-muted); opacity: 0.6; }
+	.acp-search::placeholder {
+		color: var(--text-muted);
+		opacity: 0.6;
+	}
 
 	.acp-search:focus {
 		border-color: #9b1c48;
@@ -374,7 +409,9 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: background 130ms, color 130ms;
+		transition:
+			background 130ms,
+			color 130ms;
 	}
 
 	.acp-search-clear:hover {
@@ -397,7 +434,10 @@
 		letter-spacing: 0.04em;
 		text-decoration: none;
 		box-shadow: 0 3px 14px rgba(155, 28, 72, 0.22);
-		transition: background 140ms, box-shadow 140ms, transform 100ms;
+		transition:
+			background 140ms,
+			box-shadow 140ms,
+			transform 100ms;
 		white-space: nowrap;
 		flex-shrink: 0;
 	}
@@ -408,11 +448,19 @@
 		transform: translateY(-1px);
 	}
 
-	.acp-add-btn:active { transform: scale(0.97); }
+	.acp-add-btn:active {
+		transform: scale(0.97);
+	}
 
 	@media (max-width: 400px) {
-		.acp-add-label { display: none; }
-		.acp-add-btn { width: 42px; padding: 0; justify-content: center; }
+		.acp-add-label {
+			display: none;
+		}
+		.acp-add-btn {
+			width: 42px;
+			padding: 0;
+			justify-content: center;
+		}
 	}
 
 	/* ── Grid ──────────────────────────────────────────── */
@@ -423,11 +471,17 @@
 	}
 
 	@media (min-width: 860px) {
-		.acp-grid { grid-template-columns: repeat(3, 1fr); gap: 1.125rem; }
+		.acp-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1.125rem;
+		}
 	}
 
 	@media (min-width: 1180px) {
-		.acp-grid { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+		.acp-grid {
+			grid-template-columns: repeat(4, 1fr);
+			gap: 1.25rem;
+		}
 	}
 
 	/* ── List ──────────────────────────────────────────── */
@@ -444,14 +498,24 @@
 	}
 
 	@keyframes acp-in {
-		from { opacity: 0; transform: translateY(8px); }
-		to   { opacity: 1; transform: translateY(0); }
+		from {
+			opacity: 0;
+			transform: translateY(8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	/* ── Skeleton ──────────────────────────────────────── */
 	@keyframes shimmer {
-		0%   { background-position: -500px 0; }
-		100% { background-position:  500px 0; }
+		0% {
+			background-position: -500px 0;
+		}
+		100% {
+			background-position: 500px 0;
+		}
 	}
 
 	.acp-skel-card {
@@ -463,7 +527,12 @@
 
 	.acp-skel-thumb {
 		aspect-ratio: 16/9;
-		background: linear-gradient(90deg, var(--bg-main) 25%, var(--border-main) 50%, var(--bg-main) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--bg-main) 25%,
+			var(--border-main) 50%,
+			var(--bg-main) 75%
+		);
 		background-size: 500px 100%;
 		animation: shimmer 1.5s infinite;
 	}
@@ -482,7 +551,12 @@
 		width: 96px;
 		height: 62px;
 		border-radius: 10px;
-		background: linear-gradient(90deg, var(--bg-main) 25%, var(--border-main) 50%, var(--bg-main) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--bg-main) 25%,
+			var(--border-main) 50%,
+			var(--bg-main) 75%
+		);
 		background-size: 500px 100%;
 		animation: shimmer 1.5s infinite;
 		flex-shrink: 0;
@@ -498,7 +572,12 @@
 	.acp-skel-line {
 		height: 11px;
 		border-radius: 6px;
-		background: linear-gradient(90deg, var(--bg-main) 25%, var(--border-main) 50%, var(--bg-main) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--bg-main) 25%,
+			var(--border-main) 50%,
+			var(--bg-main) 75%
+		);
 		background-size: 500px 100%;
 		animation: shimmer 1.5s infinite;
 	}
@@ -508,17 +587,34 @@
 		height: 34px;
 		border-radius: 9px;
 		flex-shrink: 0;
-		background: linear-gradient(90deg, var(--bg-main) 25%, var(--border-main) 50%, var(--bg-main) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--bg-main) 25%,
+			var(--border-main) 50%,
+			var(--bg-main) 75%
+		);
 		background-size: 500px 100%;
 		animation: shimmer 1.5s infinite;
 	}
 
-	.w-full   { width: 100%; }
-	.w-2-3    { width: 68%; }
-	.w-48     { width: 11rem; }
-	.w-28     { width: 7rem; }
-	.w-24     { width: 6rem; }
-	.self-center { align-self: center; }
+	.w-full {
+		width: 100%;
+	}
+	.w-2-3 {
+		width: 68%;
+	}
+	.w-48 {
+		width: 11rem;
+	}
+	.w-28 {
+		width: 7rem;
+	}
+	.w-24 {
+		width: 6rem;
+	}
+	.self-center {
+		align-self: center;
+	}
 
 	/* ── Empty ─────────────────────────────────────────── */
 	.acp-empty {
@@ -591,7 +687,10 @@
 		letter-spacing: 0.04em;
 		text-decoration: none;
 		box-shadow: 0 3px 14px rgba(155, 28, 72, 0.22);
-		transition: background 140ms, box-shadow 140ms, transform 100ms;
+		transition:
+			background 140ms,
+			box-shadow 140ms,
+			transform 100ms;
 	}
 
 	.acp-empty-btn:hover {

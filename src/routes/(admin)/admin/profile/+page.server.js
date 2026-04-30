@@ -1,6 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
-import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
+import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ fetch, cookies, locals }) => {
     const accessToken = cookies.get('access_token');
@@ -72,6 +72,7 @@ export const actions = {
                 return fail(400, { error: errData.detail || "Qurilmani o'chirishda xatolik yuz berdi." });
             }
 
+            invalidateCache('admin_');
             return { success: true, message: "Qurilma muvaffaqiyatli o'chirildi" };
         } catch (err) {
             console.error('[Admin Device Logout] Error:', err);
@@ -125,6 +126,7 @@ export const actions = {
                 maxAge: 60 * 20 // 20 minut
             });
 
+            invalidateCache('admin_');
             return { success: true, user: fullUserData };
 
         } catch (err) {

@@ -46,6 +46,8 @@
 			if (browser) document.body.style.overflow = '';
 		};
 	});
+
+	console.log(availableCourses);
 </script>
 
 {#if isOpen}
@@ -140,16 +142,14 @@
 									type="button"
 									class="flex w-full items-center justify-between rounded-[20px] border p-4 text-left transition-all
 										{isSelected
-											? 'cursor-pointer border-primary bg-primary/5 shadow-sm'
-											: 'cursor-pointer border-main hover:bg-muted/5'}"
+										? 'cursor-pointer border-primary bg-primary/5 shadow-sm'
+										: 'cursor-pointer border-main hover:bg-muted/5'}"
 									onclick={() => toggleCourse(course.id)}
 								>
 									<div class="flex items-center gap-3">
 										<div
 											class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors
-												{isSelected
-													? 'bg-primary text-white'
-													: 'bg-muted/10 text-muted'}"
+												{isSelected ? 'bg-primary text-white' : 'bg-muted/10 text-muted'}"
 										>
 											{#if isSelected}
 												<Check size={18} strokeWidth={3} />
@@ -194,7 +194,7 @@
 					<button
 						type="submit"
 						disabled={isSubmitting || selectedCourseIds.length === 0}
-						class="flex-1 rounded-2xl bg-primary py-4 font-bold text-white shadow-xl shadow-primary/20 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-60"
+						class="hover:bg-primary-hover flex-1 rounded-2xl bg-primary py-4 font-bold text-white shadow-xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-60"
 					>
 						{isSubmitting
 							? m.enrolling

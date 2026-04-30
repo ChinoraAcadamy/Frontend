@@ -1,6 +1,6 @@
 import { API_URL } from '$env/static/private';
 import { fail } from '@sveltejs/kit';
-import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
+import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ fetch, cookies, url, setHeaders, locals }) => {
@@ -109,6 +109,7 @@ export const actions = {
             return fail(res.status, { createError: errorMsg });
         }
 
+        invalidateCache('admin_');
         return { createSuccess: true };
     },
 
@@ -146,6 +147,7 @@ export const actions = {
             return fail(res.status, { updateError: errorMsg });
         }
 
+        invalidateCache('admin_');
         return { updateSuccess: true };
     },
 
@@ -167,6 +169,7 @@ export const actions = {
             return fail(res.status, { deleteError: "O'chirishda xatolik yuz berdi." });
         }
 
+        invalidateCache('admin_');
         return { deleteSuccess: true };
     }
 };
