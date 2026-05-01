@@ -52,11 +52,11 @@
 	};
 </script>
 
-<div class="bg-main mx-auto min-h-screen max-w-7xl space-y-8 p-4 font-sans md:p-8">
+<div class="mx-auto min-h-screen max-w-7xl space-y-8 bg-main p-4 font-sans">
 	<!-- Mening kurslarim -->
 	<section>
 		<div class="mb-4 flex items-center justify-between">
-			<h2 class="text-main text-xl font-bold">{m.menu_my_courses()}</h2>
+			<h2 class="text-xl font-bold text-main">{m.menu_my_courses()}</h2>
 			<a
 				href={resolve('/kurslarim')}
 				class="group flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
@@ -110,21 +110,25 @@
 		<div class="h-full">
 			{#await data.lazy.rankInfo}
 				<div
-					class="border-main bg-card flex h-96 flex-col items-center justify-center rounded-3xl border p-6 shadow-sm"
+					class="flex h-96 flex-col items-center justify-center rounded-3xl border border-main bg-card p-6 shadow-sm"
 				>
 					<div
 						class="h-8 w-8 animate-spin rounded-full border-2 border-muted/20 border-t-primary"
 					></div>
 				</div>
 			{:then rankInfo}
-				<LeaderboardTable rankingData={rankInfo.ranking} isAdmin={false} currentUserId={data.user?.id} />
+				<LeaderboardTable
+					rankingData={rankInfo.ranking}
+					isAdmin={false}
+					currentUserId={data.user?.id}
+				/>
 			{/await}
 		</div>
 
 		<!-- Recent Submissions -->
-		<div class="border-main bg-card rounded-3xl border p-6 shadow-sm">
+		<div class="rounded-3xl border border-main bg-card p-6 shadow-sm">
 			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-main text-xl font-bold">{m.dashboard_recent_submissions()}</h2>
+				<h2 class="text-xl font-bold text-main">{m.dashboard_recent_submissions()}</h2>
 				<a
 					href={resolve('/baholar')}
 					class="group flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
@@ -143,7 +147,7 @@
 					{#if submissions && submissions.length > 0}
 						{#each submissions as sub (sub.id)}
 							<div
-								class="group border-main/5 bg-main/5 relative flex items-center gap-4 rounded-2xl border p-4 transition-all hover:bg-muted/5 hover:shadow-sm"
+								class="group relative flex items-center gap-4 rounded-2xl border border-main/5 bg-main/5 p-4 transition-all hover:bg-muted/5 hover:shadow-sm"
 							>
 								<div
 									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted/10 text-muted group-hover:bg-primary/5 group-hover:text-primary"
@@ -152,7 +156,7 @@
 								</div>
 
 								<div class="min-w-0 flex-1">
-									<h4 class="text-main truncate text-sm font-bold tracking-tight">
+									<h4 class="truncate text-sm font-bold tracking-tight text-main">
 										{sub.assignment_title || sub.assignment?.title || 'Assignment'}
 									</h4>
 									<div class="mt-0.5 flex items-center gap-2 text-xs font-medium text-muted">
@@ -166,7 +170,7 @@
 
 								<div class="text-right">
 									{#if sub.status === 'graded'}
-										<div class="text-main text-sm font-bold">
+										<div class="text-sm font-bold text-main">
 											{sub.score}<span class="text-[10px] text-muted">/{sub.max_score || 10}</span>
 										</div>
 									{/if}
@@ -201,7 +205,7 @@
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 		{#await data.lazy.courses}
 			{#each statConfig as _ (_.title)}
-				<div class="border-main bg-card animate-pulse rounded-3xl border p-7 shadow-sm">
+				<div class="animate-pulse rounded-3xl border border-main bg-card p-7 shadow-sm">
 					<div class="mb-6 flex items-center justify-between">
 						<div class="h-12 w-12 rounded-2xl bg-muted/10"></div>
 						<div class="h-4 w-12 rounded bg-muted/5"></div>
@@ -212,13 +216,13 @@
 			{/each}
 		{:then courses}
 			{#each statConfig as config (config.title)}
-				<div class="border-main bg-card rounded-3xl border p-7 shadow-sm">
+				<div class="rounded-3xl border border-main bg-card p-7 shadow-sm">
 					<div class="flex items-center justify-between">
 						<div class="{config.bg} flex h-12 w-12 items-center justify-center rounded-2xl">
 							<config.icon class="h-6 w-6 {config.color}" />
 						</div>
 					</div>
-					<p class="text-main mt-6 text-4xl font-bold">
+					<p class="mt-6 text-4xl font-bold text-main">
 						{#if config.key === 'courses_count'}
 							{courses?.length ?? 0}
 						{:else if config.key === 'total_score'}

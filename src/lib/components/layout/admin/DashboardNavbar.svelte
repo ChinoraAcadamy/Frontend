@@ -144,8 +144,8 @@
 	</div>
 
 	<div class="relative flex shrink-0 items-center gap-3">
-		<ThemeToggle />
 		<LanguageSwitcher variant="minimal" />
+		<ThemeToggle />
 
 		<!-- <button
 			class="relative flex h-9.5 w-9.5 cursor-pointer items-center justify-center rounded-[10px] border border-border bg-muted/10 text-muted transition-all duration-150 hover:border-primary/30 hover:bg-primary/5 hover:text-primary lg:hidden"

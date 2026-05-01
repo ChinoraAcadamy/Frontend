@@ -47,13 +47,23 @@ export const load = async (event) => {
         return [];
     };
 
+    const getActivityLogs = async () => {
+        const res = await fetch(`${API_URL}/logs/activity/?page_size=5`, { headers });
+        if (res.ok) {
+            const data = await res.json();
+            return data.results ?? [];
+        }
+        return [];
+    };
+
     return {
         user: locals.user,
         // Bular promise ko'rinishida qaytadi (streaming), keshdan esa tezda resolve bo'ladi
         lazy: {
             stats: fetchWithCache(generateCacheKey('admin_stats', userId), fetchStats),
             ranking: fetchWithCache(generateCacheKey('admin_ranking', userId), () => getRanking(event).then(d => d.results)),
-            newStudents: fetchWithCache(generateCacheKey('admin_new_students', userId), fetchNewStudents)
+            newStudents: fetchWithCache(generateCacheKey('admin_new_students', userId), fetchNewStudents),
+            activityLogs: fetchWithCache(generateCacheKey('admin_activity_logs_short', userId), getActivityLogs)
         }
     };
 };

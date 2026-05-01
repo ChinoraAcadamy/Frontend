@@ -171,26 +171,30 @@
 
 	<!-- Pagination Controls -->
 	{#if rankingData && totalPages > 1}
-		<div class="mt-6 flex items-center justify-between border-t border-main pt-5">
+		<div
+			class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-main pt-5 sm:flex-row sm:gap-0"
+		>
 			<div class="flex items-center gap-2">
-				<div class="flex -space-x-1.5">
-					{#each results.slice(0, 3) as u (u)}
-						<div
-							class="h-6 w-6 overflow-hidden rounded-full border-2 border-white ring-1 ring-slate-100"
-						>
-							{#if u.picture}
-								<img src={u.picture} alt="" class="h-full w-full object-cover" />
-							{:else}
-								<div
-									class="flex h-full w-full items-center justify-center bg-slate-50 text-[8px] font-black text-slate-300 uppercase"
-								>
-									{u.first_name?.[0] || u.username[0]}
-								</div>
-							{/if}
-						</div>
-					{/each}
+				<div class="hidden flex-row-reverse items-center sm:flex">
+					<div class="flex -space-x-1.5">
+						{#each results.slice(0, 3) as u (u)}
+							<div
+								class="h-6 w-6 overflow-hidden rounded-full border-2 border-white ring-1 ring-slate-100"
+							>
+								{#if u.picture}
+									<img src={u.picture} alt="" class="h-full w-full object-cover" />
+								{:else}
+									<div
+										class="flex h-full w-full items-center justify-center bg-slate-50 text-[8px] font-black text-slate-300 uppercase"
+									>
+										{u.first_name?.[0] || u.username[0]}
+									</div>
+								{/if}
+							</div>
+						{/each}
+					</div>
 				</div>
-				<span class="ml-1 text-[10px] font-black tracking-widest text-muted uppercase">
+				<span class="text-[10px] font-black tracking-widest text-muted uppercase sm:ml-1">
 					{m.pagination_total_people ? m.pagination_total_people({ count }) : `Jami ${count} kishi`}
 				</span>
 			</div>
