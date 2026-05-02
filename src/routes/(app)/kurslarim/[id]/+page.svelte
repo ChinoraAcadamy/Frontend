@@ -2,7 +2,7 @@
 	/* eslint-disable no-unused-vars */
 
 	import { page } from '$app/stores';
-	import CourseDetailView from '@/lib/components/ui/courses/CourseDetailView.svelte';
+	import CourseDetailView from '$lib/components/courses/CourseDetailView.svelte';
 
 	/** @type {{ data: import('./$types').PageData }} */
 	let { data } = $props();

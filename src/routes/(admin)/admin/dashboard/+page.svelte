@@ -28,7 +28,7 @@
 		UserPlus,
 		CheckSquare
 	} from 'lucide-svelte';
-	import LeaderboardTable from '@/lib/components/ui/dashboard/LeaderboardTable.svelte';
+	import LeaderboardTable from '$lib/components/dashboard/LeaderboardTable.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();

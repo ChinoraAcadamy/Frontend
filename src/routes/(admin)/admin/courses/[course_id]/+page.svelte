@@ -4,9 +4,9 @@
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import AdminCourseDetailView from '@/lib/components/ui/admin/AdminCourseDetailView.svelte';
-	import ModuleEditModal from '@/lib/components/ui/admin/ModuleEditModal.svelte';
-	import ActionMenu from '@/lib/components/ui/admin/ActionMenu.svelte';
+	import AdminCourseDetailView from '$lib/components/admin/AdminCourseDetailView.svelte';
+	import ModuleEditModal from '$lib/components/admin/ModuleEditModal.svelte';
+	import ActionMenu from '$lib/components/admin/ActionMenu.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
 	const { data } = $props();

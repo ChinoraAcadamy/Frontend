@@ -1,6 +1,6 @@
 <script>
-	import SubmissionList from '@/lib/components/ui/submissions/SubmissionList.svelte';
-	import SubmissionSkeleton from '@/lib/components/ui/submissions/SubmissionSkeleton.svelte';
+	import SubmissionList from '$lib/components/submissions/SubmissionList.svelte';
+	import SubmissionSkeleton from '$lib/components/submissions/SubmissionSkeleton.svelte';
 
 	let { data } = $props();
 </script>

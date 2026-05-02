@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import { toast } from 'svelte-sonner';
-	import CourseForm from '@/lib/components/ui/admin/forms/CourseForm.svelte';
+	import CourseForm from '$lib/components/admin/forms/CourseForm.svelte';
 
 	let { data, form } = $props();
 

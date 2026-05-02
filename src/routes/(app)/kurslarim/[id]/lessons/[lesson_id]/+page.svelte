@@ -1,5 +1,5 @@
 <script>
-	import LessonDetailView from '@/lib/components/ui/courses/LessonDetailView.svelte';
+	import LessonDetailView from '$lib/components/courses/LessonDetailView.svelte';
 
 	let { data } = $props();
 

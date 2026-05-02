@@ -2,8 +2,8 @@
 	// @ts-nocheck
 
 	import * as m from '$lib/paraglide/messages.js';
-	import LessonsRow from '@/lib/components/ui/courses/LessonsRow.svelte';
-	import ModuleAccordion from '@/lib/components/ui/courses/ModuleAccordion.svelte';
+	import LessonsRow from '$lib/components/courses/LessonsRow.svelte';
+	import ModuleAccordion from '$lib/components/courses/ModuleAccordion.svelte';
 	import { Lock } from 'lucide-svelte';
 
 	let {

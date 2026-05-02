@@ -5,7 +5,7 @@
     import { CheckCircle2 } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
-	import ModuleForm from '@/lib/components/ui/admin/forms/ModuleForm.svelte';
+	import ModuleForm from '$lib/components/admin/forms/ModuleForm.svelte';
 
     // Svelte 5 State'lar
     let coursePk = $state(page.params.course_id);

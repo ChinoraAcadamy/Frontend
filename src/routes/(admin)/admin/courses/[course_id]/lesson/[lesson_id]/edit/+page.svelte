@@ -2,7 +2,7 @@
     import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
     import { page } from '$app/stores';
-    import LessonForm from '@/lib/components/ui/admin/forms/LessonForm.svelte';
+    import LessonForm from '$lib/components/admin/forms/LessonForm.svelte';
     import { toast } from 'svelte-sonner';
     import * as m from '$lib/paraglide/messages.js';
 

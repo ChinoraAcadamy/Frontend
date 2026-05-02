@@ -11,10 +11,10 @@
 		Unlock,
 		Loader2
 	} from 'lucide-svelte';
-	import ChangePasswordModal from '@/lib/components/ui/admin/ChangePasswordModal.svelte';
+	import ChangePasswordModal from '$lib/components/admin/ChangePasswordModal.svelte';
 	import { enhance } from '$app/forms';
-	import EditStudentModal from '@/lib/components/ui/admin/EditStudentModal.svelte';
-	import AddEnrollmentModal from '@/lib/components/ui/admin/AddEnrollmentModal.svelte';
+	import EditStudentModal from '$lib/components/admin/EditStudentModal.svelte';
+	import AddEnrollmentModal from '$lib/components/admin/AddEnrollmentModal.svelte';
 	import { showToast } from '@/lib/utils/toast.js';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale } from '@/lib/paraglide/runtime';

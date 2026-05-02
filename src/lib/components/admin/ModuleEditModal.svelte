@@ -2,7 +2,7 @@
 	import { fade, scale } from 'svelte/transition';
 	import { browser } from '$app/environment';
 	import { X } from 'lucide-svelte';
-	import ModuleForm from '@/lib/components/ui/admin/forms/ModuleForm.svelte';
+	import ModuleForm from '$lib/components/admin/forms/ModuleForm.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
 	let { isOpen = $bindable(false), moduleTarget = null, coursePk = null } = $props();

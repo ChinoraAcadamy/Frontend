@@ -4,8 +4,8 @@
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import CourseGridCard from '@/lib/components/ui/courses/CourseGridCard.svelte';
-	import CourseListRow from '@/lib/components/ui/courses/CourseListRow.svelte';
+	import CourseGridCard from '$lib/components/courses/CourseGridCard.svelte';
+	import CourseListRow from '$lib/components/courses/CourseListRow.svelte';
 	import { Search, BookOpen, LayoutGrid, List, X } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 

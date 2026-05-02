@@ -16,8 +16,8 @@
 	import { resolve } from '$app/paths';
 	import * as m from '$lib/paraglide/messages.js';
 
-	import AddStudentModal from '@/lib/components/ui/admin/AddStudentModal.svelte';
-	import EditStudentModal from '@/lib/components/ui/admin/EditStudentModal.svelte';
+	import AddStudentModal from '$lib/components/admin/AddStudentModal.svelte';
+	import EditStudentModal from '$lib/components/admin/EditStudentModal.svelte';
 
 	let { data, form } = $props();
 

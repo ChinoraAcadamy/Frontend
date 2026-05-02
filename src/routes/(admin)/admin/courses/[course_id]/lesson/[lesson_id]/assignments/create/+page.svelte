@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
-	import AssignmentForm from '@/lib/components/ui/admin/forms/AssignmentForm.svelte';
+	import AssignmentForm from '$lib/components/admin/forms/AssignmentForm.svelte';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
 

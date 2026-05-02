@@ -2,15 +2,15 @@
 
 <script>
 	import Navbar from "@/lib/components/layout/Navbar.svelte";
-	import HeroSection from "@/lib/components/ui/home/HeroSection.svelte";
+	import HeroSection from "$lib/components/home/HeroSection.svelte";
 
   // Komponentlarni import qilamiz
-  import WhoIsThisFor from '@/lib/components/ui/home/WhoIsThisFor.svelte';
-	import AboutInstruction from "@/lib/components/ui/home/AboutInstruction.svelte";
-  import CourseContent from "@/lib/components/ui/home/CourseContent.svelte"
-  import PricingSection from "@/lib/components/ui/home/PricingSection.svelte";
-	import Faq from "@/lib/components/ui/home/Faq.svelte";
-  import Footer from "@/lib/components/ui/home/Footer.svelte";
+  import WhoIsThisFor from '$lib/components/home/WhoIsThisFor.svelte';
+	import AboutInstruction from "$lib/components/home/AboutInstruction.svelte";
+  import CourseContent from "$lib/components/home/CourseContent.svelte"
+  import PricingSection from "$lib/components/home/PricingSection.svelte";
+	import Faq from "$lib/components/home/Faq.svelte";
+  import Footer from "$lib/components/layout/Footer.svelte";
   import SeoMeta from "@/lib/components/ui/SeoMeta.svelte";
 
   export let data; // +page.server.js dan keladi

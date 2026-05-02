@@ -6,7 +6,7 @@
 
 	let { data, form } = $props();
 
-	import LessonForm from '@/lib/components/ui/admin/forms/LessonForm.svelte';
+	import LessonForm from '$lib/components/admin/forms/LessonForm.svelte';
 
 	let isSubmitting = $state(false);
 	let modulePk = $state(null);

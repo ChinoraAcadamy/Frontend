@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import CourseForm from '@/lib/components/ui/admin/forms/CourseForm.svelte';
+	import CourseForm from '$lib/components/admin/forms/CourseForm.svelte';
     import { CheckCircle2 } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 

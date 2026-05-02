@@ -3,8 +3,8 @@
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import CourseAdminCard from '@/lib/components/ui/courses/CourseAdminCard.svelte';
-	import CourseAdminListRow from '@/lib/components/ui/courses/CourseAdminListRow.svelte';
+	import CourseAdminCard from '$lib/components/courses/CourseAdminCard.svelte';
+	import CourseAdminListRow from '$lib/components/courses/CourseAdminListRow.svelte';
 	import { Plus, Search, LayoutGrid, List, BookOpen, X } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 

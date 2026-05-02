@@ -3,8 +3,8 @@
 
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
-	import CourseCard from '@/lib/components/ui/courses/CourseCard.svelte';
-	import LeaderboardTable from '@/lib/components/ui/dashboard/LeaderboardTable.svelte';
+	import CourseCard from '$lib/components/courses/CourseCard.svelte';
+	import LeaderboardTable from '$lib/components/dashboard/LeaderboardTable.svelte';
 	import { BookOpen, Award, TrendingUp, ChevronRight, FileCheck } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale } from '$lib/paraglide/runtime.js';
