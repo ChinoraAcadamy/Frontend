@@ -142,10 +142,6 @@
 		opacity: 0.6;
 	}
 
-	.mx-2 {
-		margin: 0 4px;
-	}
-
 	/* Avatar */
 	.avatar-link {
 		position: relative;
