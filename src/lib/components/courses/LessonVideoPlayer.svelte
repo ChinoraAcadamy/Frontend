@@ -147,11 +147,11 @@
 	let touchStartX = 0;
 	let touchStartY = 0;
 	let lastTapTime = 0;
-	let singleTapTimeout = null;
 	let longPressTimeout = null;
 	let isLongPressing = false;
 	let initialVolume = 0;
 	let initialCurrentTime = 0;
+	let shellElement;
 
 	function showIndicator(text, icon) {
 		gestureText = text;
@@ -166,6 +166,13 @@
 	function handleTouchStart(e) {
 		if (!player) return;
 		if (e.touches && e.touches.length > 1) return;
+
+		const ignoredClasses = [
+			'.plyr__controls',
+			'.plyr__menu__container',
+			'.plyr__control--overlaid'
+		];
+		if (ignoredClasses.some((c) => e.target.closest(c))) return;
 
 		const touch = e.touches ? e.touches[0] : e;
 		touchStartX = touch.clientX;
@@ -182,6 +189,14 @@
 
 	function handleTouchMove(e) {
 		if (!player || isLongPressing) return;
+
+		const ignoredClasses = [
+			'.plyr__controls',
+			'.plyr__menu__container',
+			'.plyr__control--overlaid'
+		];
+		if (ignoredClasses.some((c) => e.target.closest(c))) return;
+
 		const touch = e.touches ? e.touches[0] : e;
 		const deltaX = touch.clientX - touchStartX;
 		const deltaY = touch.clientY - touchStartY;
@@ -190,7 +205,8 @@
 			if (longPressTimeout) clearTimeout(longPressTimeout);
 		}
 
-		const rect = e.currentTarget.getBoundingClientRect();
+		if (!shellElement) return;
+		const rect = shellElement.getBoundingClientRect();
 		const isRightHalf = touchStartX > rect.left + rect.width / 2;
 
 		if (Math.abs(deltaY) > Math.abs(deltaX) && isRightHalf && Math.abs(deltaY) > 20) {
@@ -209,11 +225,19 @@
 	}
 
 	function handleTouchEnd(e) {
+		const ignoredClasses = [
+			'.plyr__controls',
+			'.plyr__menu__container',
+			'.plyr__control--overlaid'
+		];
+		if (ignoredClasses.some((c) => e.target.closest(c))) return;
+
 		if (longPressTimeout) clearTimeout(longPressTimeout);
 		if (isLongPressing) {
 			isLongPressing = false;
 			player.speed = 1;
 			showGestureIndicator = false;
+			if (e.cancelable) e.preventDefault();
 			return;
 		}
 
@@ -221,11 +245,12 @@
 		const tapLength = currentTime - lastTapTime;
 
 		const touch = e.changedTouches ? e.changedTouches[0] : e;
-		const rect = e.currentTarget.getBoundingClientRect();
+		if (!shellElement) return;
+		const rect = shellElement.getBoundingClientRect();
 		const isRightHalf = touch.clientX > rect.left + rect.width / 2;
 
 		if (tapLength < 300 && tapLength > 0) {
-			if (singleTapTimeout) clearTimeout(singleTapTimeout);
+			if (e.cancelable) e.preventDefault();
 			const seekAmount = 10;
 			if (isRightHalf) {
 				player.forward(seekAmount);
@@ -234,19 +259,9 @@
 				player.rewind(seekAmount);
 				showIndicator(`-${seekAmount}s`, Rewind);
 			}
-		} else {
-			if (singleTapTimeout) clearTimeout(singleTapTimeout);
-			singleTapTimeout = setTimeout(() => {
-				player?.togglePlay();
-			}, 310);
 		}
-		lastTapTime = currentTime;
-	}
 
-	function handleOverlayClick(e) {
-		if (e.pointerType === 'mouse') {
-			player?.togglePlay();
-		}
+		lastTapTime = currentTime;
 	}
 
 	// --- Lifecycle & Effects ---
@@ -284,7 +299,9 @@
 				},
 				captions: { active: true, update: true, language: 'uz' },
 				speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] },
-				keyboard: { focused: true, global: false }
+				keyboard: { focused: true, global: false },
+				clickToPlay: false, // Disable default play on video click
+				fullscreen: { enabled: true, fallback: true, iosNative: false, container: '.vp-shell' }
 			});
 
 			player.on('ready', () => {
@@ -421,7 +438,13 @@
 <svelte:window on:contextmenu={(e) => e.preventDefault()} />
 
 <!-- ── Video Shell ─────────────────────────────────── -->
-<div class="vp-shell">
+<div
+	class="vp-shell"
+	bind:this={shellElement}
+	ontouchstart={handleTouchStart}
+	ontouchmove={handleTouchMove}
+	ontouchend={handleTouchEnd}
+>
 	<!-- ── Skeleton loader ─────────────────────────────── -->
 	{#if !playerReady}
 		<div class="vp-skeleton" transition:fade={{ duration: 200 }}>
@@ -436,25 +459,16 @@
 		playsinline
 		crossorigin="anonymous"
 	>
-		{m.video_not_supported ? m.video_not_supported() : "Brauzeringiz videoni qo'llab-quvvatlamaydi."}
+		{m.video_not_supported
+			? m.video_not_supported()
+			: "Brauzeringiz videoni qo'llab-quvvatlamaydi."}
 	</video>
-
-	<!-- ── Gesture overlay (mobile only, top 70%) ─────── -->
-	<button
-		type="button"
-		class="vp-gesture-overlay"
-		ontouchstart={handleTouchStart}
-		ontouchmove={handleTouchMove}
-		ontouchend={handleTouchEnd}
-		onclick={handleOverlayClick}
-		aria-label="Video controls"
-	></button>
 
 	<!-- ── Gesture indicator bubble ───────────────────── -->
 	{#if showGestureIndicator}
 		<div class="vp-gesture-bubble" transition:fade={{ duration: 120 }}>
 			{#if gestureIcon}
-				<gestureIcon size={28} />
+				<gestureIcon size={28}></gestureIcon>
 			{/if}
 			<span>{gestureText}</span>
 		</div>
@@ -462,10 +476,7 @@
 
 	<!-- ── Watermark ───────────────────────────────────── -->
 	{#if showWatermark}
-		<div
-			class="vp-watermark"
-			style="top: {watermarkPos.top}%; left: {watermarkPos.left}%;"
-		>
+		<div class="vp-watermark" style="top: {watermarkPos.top}%; left: {watermarkPos.left}%;">
 			{userIdent}
 		</div>
 	{/if}
@@ -500,12 +511,11 @@
 		aspect-ratio: 16 / 9;
 		background: #000;
 		border-radius: 16px;
-		overflow: hidden;
 		/* Native app shadow */
 		box-shadow:
-			0 2px 4px rgba(0,0,0,0.12),
-			0 8px 24px rgba(0,0,0,0.18),
-			0 24px 48px rgba(0,0,0,0.12);
+			0 2px 4px rgba(0, 0, 0, 0.12),
+			0 8px 24px rgba(0, 0, 0, 0.18),
+			0 24px 48px rgba(0, 0, 0, 0.12);
 	}
 
 	/* No rounded corners on fullscreen */
@@ -547,29 +557,6 @@
 		opacity: 1;
 	}
 
-	/* ── Gesture overlay ───────────────────────────────── */
-	.vp-gesture-overlay {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 70%;
-		z-index: 2;
-		background: transparent;
-		border: none;
-		outline: none;
-		cursor: pointer;
-		touch-action: none;
-		pointer-events: none; /* desktop: off by default */
-	}
-
-	/* Mobile: enable touch */
-	@media (pointer: coarse) {
-		.vp-gesture-overlay {
-			pointer-events: auto;
-		}
-	}
-
 	/* ── Gesture bubble ────────────────────────────────── */
 	.vp-gesture-bubble {
 		position: absolute;
@@ -606,7 +593,9 @@
 		color: rgba(255, 255, 255, 0.15);
 		pointer-events: none;
 		user-select: none;
-		transition: top 1.2s ease, left 1.2s ease;
+		transition:
+			top 1.2s ease,
+			left 1.2s ease;
 		letter-spacing: 0.06em;
 	}
 
@@ -649,7 +638,7 @@
 	.vp-lock-desc {
 		font-size: 1rem;
 		line-height: 1.65;
-		color: var(--text-muted, rgba(255,255,255,0.5));
+		color: var(--text-muted, rgba(255, 255, 255, 0.5));
 		max-width: 420px;
 		margin: 0 0 2rem;
 	}
@@ -659,19 +648,25 @@
 		padding: 0 2rem;
 		border-radius: 14px;
 		border: none;
-		background: var(--bg-card, rgba(255,255,255,0.08));
+		background: var(--bg-card, rgba(255, 255, 255, 0.08));
 		color: var(--text-main, #fff);
 		font-size: 13px;
 		font-weight: 800;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		cursor: pointer;
-		transition: background 0.15s, transform 0.1s;
+		transition:
+			background 0.15s,
+			transform 0.1s;
 		font-family: inherit;
 	}
 
-	.vp-lock-btn:hover { background: rgba(155, 28, 72, 0.2); }
-	.vp-lock-btn:active { transform: scale(0.97); }
+	.vp-lock-btn:hover {
+		background: rgba(155, 28, 72, 0.2);
+	}
+	.vp-lock-btn:active {
+		transform: scale(0.97);
+	}
 
 	.vp-lock-brand {
 		margin-top: 1.25rem;
@@ -679,7 +674,7 @@
 		font-weight: 700;
 		letter-spacing: 0.16em;
 		text-transform: uppercase;
-		color: var(--text-muted, rgba(255,255,255,0.2));
+		color: var(--text-muted, rgba(255, 255, 255, 0.2));
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -720,22 +715,22 @@
 		--plyr-range-track-height: 4px;
 		--plyr-range-thumb-height: 16px;
 		--plyr-range-thumb-width: 16px;
-		--plyr-range-thumb-shadow: 0 2px 8px rgba(0,0,0,0.5);
+		--plyr-range-thumb-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 		--plyr-range-thumb-background: #fff;
-		--plyr-video-range-track-background: rgba(255,255,255,0.22);
-		--plyr-video-progress-buffered-background: rgba(255,255,255,0.32);
+		--plyr-video-range-track-background: rgba(255, 255, 255, 0.22);
+		--plyr-video-progress-buffered-background: rgba(255, 255, 255, 0.32);
 
 		/* Tooltip */
-		--plyr-tooltip-background: rgba(0,0,0,0.85);
+		--plyr-tooltip-background: rgba(0, 0, 0, 0.85);
 		--plyr-tooltip-color: #fff;
 		--plyr-tooltip-radius: 8px;
 		--plyr-tooltip-padding: 5px 10px;
 		--plyr-tooltip-arrow-size: 5px;
 
 		/* Menu */
-		--plyr-menu-background: rgba(10,10,10,0.96);
-		--plyr-menu-border-color: rgba(255,255,255,0.08);
-		--plyr-menu-color: rgba(255,255,255,0.85);
+		--plyr-menu-background: rgba(10, 10, 10, 0.96);
+		--plyr-menu-border-color: rgba(255, 255, 255, 0.08);
+		--plyr-menu-color: rgba(255, 255, 255, 0.85);
 
 		width: 100% !important;
 		height: 100% !important;
@@ -783,13 +778,19 @@
 	:global(.plyr__progress input[type='range']::-webkit-slider-thumb) {
 		width: 16px !important;
 		height: 16px !important;
-		box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 3px rgba(155,28,72,0.3) !important;
-		transition: transform 0.15s ease, box-shadow 0.15s ease;
+		box-shadow:
+			0 2px 8px rgba(0, 0, 0, 0.5),
+			0 0 0 3px rgba(155, 28, 72, 0.3) !important;
+		transition:
+			transform 0.15s ease,
+			box-shadow 0.15s ease;
 	}
 
 	:global(.plyr__progress input[type='range']:active::-webkit-slider-thumb) {
 		transform: scale(1.3) !important;
-		box-shadow: 0 3px 12px rgba(0,0,0,0.6), 0 0 0 5px rgba(155,28,72,0.4) !important;
+		box-shadow:
+			0 3px 12px rgba(0, 0, 0, 0.6),
+			0 0 0 5px rgba(155, 28, 72, 0.4) !important;
 	}
 
 	/* Buffer fill */
@@ -800,7 +801,7 @@
 	/* ── Large play button — centered, clean ───────────── */
 	:global(.plyr--full-ui.plyr--video .plyr__control--overlaid) {
 		background: rgba(155, 28, 72, 0.9) !important;
-		border: 2px solid rgba(255,255,255,0.15) !important;
+		border: 2px solid rgba(255, 255, 255, 0.15) !important;
 		width: 64px !important;
 		height: 64px !important;
 		border-radius: 50% !important;
@@ -809,13 +810,16 @@
 		align-items: center !important;
 		justify-content: center !important;
 		backdrop-filter: blur(4px);
-		transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease !important;
+		transition:
+			transform 0.18s ease,
+			background 0.18s ease,
+			box-shadow 0.18s ease !important;
 		box-shadow: 0 4px 24px rgba(155, 28, 72, 0.5) !important;
+		z-index: 3 !important; /* Ensure it stays above gesture overlay */
 	}
 
 	:global(.plyr--full-ui.plyr--video .plyr__control--overlaid:hover) {
-		background: #9b1c48 !important;
-		transform: scale(1.1) !important;
+		background: #93113f !important;
 		box-shadow: 0 6px 32px rgba(155, 28, 72, 0.65) !important;
 	}
 
@@ -833,26 +837,29 @@
 	:global(.plyr--video .plyr__controls .plyr__control) {
 		padding: 7px !important;
 		border-radius: 8px !important;
-		transition: background 0.12s, transform 0.1s !important;
-		color: rgba(255,255,255,0.9) !important;
+		transition:
+			background 0.12s,
+			transform 0.1s !important;
+		color: rgba(255, 255, 255, 0.9) !important;
+		margin-bottom: -9px !important;
 	}
 
 	:global(.plyr--video .plyr__controls .plyr__control:hover) {
-		background: rgba(255,255,255,0.12) !important;
+		background: rgba(255, 255, 255, 0.12) !important;
 		color: #fff !important;
 	}
 
 	:global(.plyr--video .plyr__controls .plyr__control:active) {
 		transform: scale(0.88) !important;
-		background: rgba(255,255,255,0.18) !important;
+		background: rgba(255, 255, 255, 0.18) !important;
 	}
 
 	/* Play/pause button in controls — slightly bigger */
-	:global(.plyr--video .plyr__controls [data-plyr="play"]) {
+	:global(.plyr--video .plyr__controls [data-plyr='play']) {
 		padding: 8px !important;
 	}
 
-	:global(.plyr--video .plyr__controls [data-plyr="play"] svg) {
+	:global(.plyr--video .plyr__controls [data-plyr='play'] svg) {
 		width: 20px !important;
 		height: 20px !important;
 	}
@@ -861,7 +868,7 @@
 	:global(.plyr__time) {
 		font-size: 12px !important;
 		font-weight: 600 !important;
-		color: rgba(255,255,255,0.85) !important;
+		color: rgba(255, 255, 255, 0.85) !important;
 		letter-spacing: 0.02em !important;
 		font-variant-numeric: tabular-nums !important;
 	}
@@ -873,7 +880,7 @@
 
 	/* Separator between current/duration */
 	:global(.plyr__time + .plyr__time::before) {
-		color: rgba(255,255,255,0.4) !important;
+		color: rgba(255, 255, 255, 0.4) !important;
 	}
 
 	/* ── Volume ────────────────────────────────────────── */
@@ -887,47 +894,18 @@
 		height: 13px !important;
 	}
 
-	/* ── Settings menu — glass morphism ────────────────── */
-	:global(.plyr__menu__container) {
-		border-radius: 14px !important;
-		overflow: hidden !important;
-		background: rgba(8, 8, 8, 0.95) !important;
-		backdrop-filter: blur(16px) !important;
-		-webkit-backdrop-filter: blur(16px) !important;
-		border: 1px solid rgba(255,255,255,0.1) !important;
-		box-shadow: 0 16px 48px rgba(0,0,0,0.6) !important;
-		min-width: 180px !important;
-	}
-
-	:global(.plyr__menu__container [role='menuitem']) {
-		border-radius: 8px !important;
-		margin: 2px 6px !important;
-		padding: 10px 12px !important;
-		font-size: 13.5px !important;
-		font-weight: 500 !important;
-		transition: background 0.12s !important;
-	}
-
-	:global(.plyr__menu__container [role='menuitem']:hover) {
-		background: rgba(155, 28, 72, 0.18) !important;
-		color: #fff !important;
-	}
-
-	:global(.plyr__menu__container [aria-checked='true']) {
-		color: #9b1c48 !important;
-		font-weight: 700 !important;
-	}
-
 	/* ── Captions ──────────────────────────────────────── */
 	:global(.plyr__captions) {
 		font-size: clamp(13px, 2.5vw, 16px) !important;
 		font-weight: 600 !important;
-		text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.7) !important;
+		text-shadow:
+			0 1px 4px rgba(0, 0, 0, 0.9),
+			0 0 12px rgba(0, 0, 0, 0.7) !important;
 		padding: 0 1rem 3rem !important;
 	}
 
 	:global(.plyr__caption) {
-		background: rgba(0,0,0,0.72) !important;
+		background: rgba(0, 0, 0, 0.72) !important;
 		border-radius: 6px !important;
 		padding: 3px 10px !important;
 		backdrop-filter: blur(4px) !important;
@@ -939,7 +917,7 @@
 		font-weight: 600 !important;
 		border-radius: 8px !important;
 		padding: 5px 10px !important;
-		background: rgba(0,0,0,0.88) !important;
+		background: rgba(0, 0, 0, 0.88) !important;
 		backdrop-filter: blur(6px) !important;
 	}
 
@@ -989,8 +967,8 @@
 		}
 
 		/* Hide pip/airplay on mobile — rarely useful */
-		:global([data-plyr="pip"]),
-		:global([data-plyr="airplay"]) {
+		:global([data-plyr='pip']),
+		:global([data-plyr='airplay']) {
 			display: none !important;
 		}
 
@@ -1027,7 +1005,9 @@
 
 	/* ── Smooth controls show/hide ─────────────────────── */
 	:global(.plyr__controls) {
-		transition: opacity 0.28s ease, transform 0.28s ease !important;
+		transition:
+			opacity 0.28s ease,
+			transform 0.28s ease !important;
 	}
 
 	:global(.plyr--hide-controls .plyr__controls) {
@@ -1037,11 +1017,18 @@
 
 	/* ── Animations ─────────────────────────────────────── */
 	@keyframes vp-spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	@keyframes vp-blink {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.3; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.3;
+		}
 	}
 </style>
