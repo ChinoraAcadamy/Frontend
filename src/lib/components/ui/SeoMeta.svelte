@@ -15,8 +15,8 @@
 		title = 'Chinora Academy - Zamonaviy ta`lim platformasi',
 		description = 'Chinora Academy bilan eng so`nggi bilimlarni o`zlashtiring. Bizning platformamiz orqali bilim va ko`nikmalaringizni keyingi bosqichga olib chiqing.',
 		keywords = 'ta`lim, kurslar, onlayn kurslar, dasturlash, dizayn, akademiya, chinora, o`rganish',
-		image = '/images/og-image.jpeg', // odatiy OG rasmini loyihada static/images/ ichiga qo'shish tavsiya qilinadi
-		url = 'https://chinora.uz',
+		image = '/images/og-image.png',
+		url = 'https://chinoraacademy.uz',
 		type = 'website',
 		robots = 'index, follow'
 	} = $props();
