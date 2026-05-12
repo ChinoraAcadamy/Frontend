@@ -41,7 +41,11 @@
 	let activeTab = $state('uz');
 	let videoFile = $state(null);
 	let uploadProgress = $state(0);
-	let autoDuration = $state(lessonTarget.duration || 0);
+	let autoDuration = $state(0);
+
+	$effect.pre(() => {
+		autoDuration = lessonTarget.duration || 0;
+	});
 
 	function resetForm(form) {
 		form.reset();

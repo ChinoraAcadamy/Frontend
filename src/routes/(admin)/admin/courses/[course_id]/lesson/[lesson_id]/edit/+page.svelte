@@ -9,7 +9,11 @@
     let { data, form } = $props();
 
     let isSubmitting = $state(false);
-    let modulePk = $state(data.parentModulePk);
+    let modulePk = $state(null);
+
+    $effect.pre(() => {
+        modulePk = data.parentModulePk;
+    });
 
     $effect(() => {
         if (form?.success) {

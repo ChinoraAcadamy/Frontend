@@ -21,9 +21,13 @@
 	} = $props();
 
 	// --- Client-side Caching & Filtering Logic ---
-	let activeStatus = $state(filters.status);
+	let activeStatus = $state('all');
 	let isRefreshing = $state(false);
 	let localUpdates = $state(new Map());
+
+	$effect.pre(() => {
+		activeStatus = filters.status || 'all';
+	});
 
 	// Filtered data for the current view
 	let localSubmissions = $derived(

@@ -141,7 +141,7 @@
         border-color: var(--primary);
         background: var(--primary);
         color: white;
-        box-shadow: 0 8px 16px -4px var(--primary/30);
+        box-shadow: 0 8px 16px -4px rgba(155, 28, 72, 0.3);
         transform: translateY(-2px);
     }
 

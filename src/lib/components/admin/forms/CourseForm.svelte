@@ -25,7 +25,11 @@
         onSubmit 
     } = $props();
 
-    let imgPreview = $state(course?.img || null);
+    let imgPreview = $state(null);
+
+    $effect.pre(() => {
+        imgPreview = course?.img || null;
+    });
 
     // Rasm yuklash preview mantiqi
     function handleImageChange(e) {
@@ -199,7 +203,7 @@
         object-fit: cover;
     }
 
-    .upload-icon {
+    :global(.upload-icon) {
         color: var(--text-muted);
         opacity: 0.5;
     }

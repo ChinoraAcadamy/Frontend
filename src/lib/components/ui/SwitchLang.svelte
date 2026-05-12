@@ -217,11 +217,7 @@
 		font-weight: 700;
 	}
 
-	.lp-ls-item-flag {
-		font-size: 16px;
-		line-height: 1;
-		flex-shrink: 0;
-	}
+
 
 	.lp-ls-item-full {
 		flex: 1;

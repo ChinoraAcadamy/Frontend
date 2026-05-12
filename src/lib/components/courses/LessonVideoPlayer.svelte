@@ -440,6 +440,8 @@
 <!-- ── Video Shell ─────────────────────────────────── -->
 <div
 	class="vp-shell"
+	role="region"
+	aria-label="Video Player Shell"
 	bind:this={shellElement}
 	ontouchstart={handleTouchStart}
 	ontouchmove={handleTouchMove}

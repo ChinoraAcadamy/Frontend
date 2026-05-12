@@ -11,7 +11,11 @@
 		onSubmit
 	} = $props();
 
-	let selectedType = $state(assignmentTarget.type?.toLowerCase() || 'file');
+	let selectedType = $state('file');
+
+	$effect.pre(() => {
+		selectedType = assignmentTarget.type?.toLowerCase() || 'file';
+	});
 
 	async function handleEnhancedSubmit(event) {
 		if (onSubmit) {
@@ -219,35 +223,7 @@
 		min-height: 100px;
 	}
 
-	/* File Upload Styles */
-	.file-upload-zone {
-		position: relative;
-		border: 2px dashed var(--border-main);
-		border-radius: 32px;
-		background-color: var(--bg-main);
-		transition: all 0.3s ease;
-		overflow: hidden;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 240px;
-	}
 
-	.file-upload-zone.dragging {
-		border-color: var(--primary);
-		background-color: var(--primary/5);
-	}
-
-	.file-upload-zone:hover:not(.has-file) {
-		border-color: var(--primary);
-		background-color: var(--bg-card);
-	}
-
-	.file-upload-zone.has-file {
-		border-style: solid;
-		border-color: var(--border-main);
-		background: var(--bg-card);
-	}
 
 	.actions {
 		display: flex;

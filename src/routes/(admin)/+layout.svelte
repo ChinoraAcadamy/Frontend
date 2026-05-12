@@ -109,7 +109,7 @@
 			</div>
 		{/if}
 
-		<main class="md:admin-content">
+		<main class="admin-content">
 			{@render children()}
 		</main>
 	</div>

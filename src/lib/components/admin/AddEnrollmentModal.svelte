@@ -47,7 +47,7 @@
 		};
 	});
 
-	console.log(availableCourses);
+
 </script>
 
 {#if isOpen}

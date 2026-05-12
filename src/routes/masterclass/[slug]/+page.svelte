@@ -603,26 +603,9 @@
 		flex-shrink: 0;
 	}
 
-	.logo-img {
-		width: 50px;
-		height: 50px;
-		border-radius: 13px;
-		overflow: hidden;
-		flex-shrink: 0;
-	}
 
-	.logo-img img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-	}
 
-	.logo-img--sm {
-		width: 38px;
-		height: 38px;
-		border-radius: 10px;
-	}
+
 	.logo--sm {
 		gap: 8px;
 	}
@@ -647,17 +630,7 @@
 		color: var(--brand);
 	}
 
-	@media (max-width: 380px) {
-		.logo-img {
-			width: 40px;
-			height: 40px;
-			border-radius: 11px;
-		}
-		.logo-top,
-		.logo-btm {
-			font-size: 12px;
-		}
-	}
+
 
 	/* Nav right */
 	.nav-right {
@@ -667,10 +640,7 @@
 		flex-shrink: 0;
 	}
 
-	.lang-wrap {
-		flex-shrink: 0;
-		overflow: visible;
-	}
+
 
 	.nav-cta {
 		align-items: center;
@@ -1051,25 +1021,9 @@
 	}
 
 	/* Benefits */
-	.benefits-title {
-		font-size: 13px;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--brand);
-		margin-bottom: 1rem;
-		display: flex;
-		align-items: center;
-		gap: 10px;
-	}
 
-	.benefits-title::before {
-		content: '';
-		width: 20px;
-		height: 2px;
-		background: var(--brand);
-		flex-shrink: 0;
-	}
+
+
 
 	.benefit-list {
 		list-style: none;
@@ -1311,13 +1265,7 @@
 		margin-bottom: 1rem;
 	}
 
-	.timer-live {
-		font-size: 1.1rem;
-		font-weight: 800;
-		color: var(--brand);
-		text-align: center;
-		animation: pulse 1.2s ease-in-out infinite;
-	}
+
 
 	.timer-grid {
 		display: grid;
@@ -1398,12 +1346,7 @@
 		margin-top: 6px;
 	}
 
-	.card-note {
-		font-size: 11.5px;
-		color: var(--muted);
-		text-align: center;
-		line-height: 1.55;
-	}
+
 
 	/* Trust */
 	.trust {
@@ -1732,10 +1675,7 @@
 	.msub-btn:active:not(:disabled) {
 		transform: scale(0.98);
 	}
-	.msub-btn:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
+
 
 	.spinner {
 		width: 16px;

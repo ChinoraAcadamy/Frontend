@@ -81,8 +81,13 @@
 	// --- Course Update Logic ---
 	let isSaving = $state(false);
 	// eslint-disable-next-line svelte/prefer-writable-derived
-	let isPublished = $state(course.is_published);
-	let imgPreview = $state(course?.img || null);
+	let isPublished = $state(false);
+	let imgPreview = $state(null);
+
+	$effect.pre(() => {
+		isPublished = course.is_published;
+		imgPreview = course?.img || null;
+	});
 
 	function handleImageChange(e) {
 		const file = e.target.files?.[0];
@@ -107,9 +112,7 @@
 		};
 	};
 
-	$effect(() => {
-		isPublished = course.is_published;
-	});
+
 
 	// Handle initial tab from sessionStorage (to support "Edit" vs "Preview" without URL params)
 	$effect(() => {
@@ -618,6 +621,7 @@
 
 				<button
 					type="button"
+					aria-label="Toggle Publish Status"
 					onclick={() => (isPublished = !isPublished)}
 					class="relative h-7 w-12 cursor-pointer rounded-full transition-colors duration-300 focus:outline-none {isPublished
 						? 'bg-emerald-500'

@@ -228,7 +228,7 @@
 		border-radius: 999px;
 	}
 
-	.gc-done-badge {
+	.completion-badge {
 		position: absolute;
 		bottom: 14px;
 		left: 10px;

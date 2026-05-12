@@ -21,14 +21,19 @@
 
 	let { data, form } = $props();
 
-	let courses = $state(data.student.courses ? [...data.student.courses] : []);
+	let courses = $state([]);
 	let loadingEnrollments = $state([]);
+
+	$effect.pre(() => {
+		courses = data.student.courses ? [...data.student.courses] : [];
+		isActive = data.student.is_active;
+	});
 
 	let isChangePasswordOpen = $state(false);
 	let isAddEnrollmentOpen = $state(false);
 	let editTarget = $state(null);
 	let isDeleting = $state(false);
-	let isActive = $state(data.student.is_active);
+	let isActive = $state(true);
 
 	function openEdit(student) {
 		editTarget = { ...student };

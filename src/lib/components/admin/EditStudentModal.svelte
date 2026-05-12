@@ -58,6 +58,7 @@
 				</div>
 				<button
 					onclick={onClose}
+					aria-label={m.menu_close ? m.menu_close() : 'Yopish'}
 					class="rounded-full border border-main bg-card p-2 text-muted shadow-sm transition-all hover:bg-muted/10 active:scale-90"
 				>
 					<X size={18} strokeWidth={2.5} />
@@ -82,10 +83,11 @@
 
 				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-2">
-						<label class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
+						<label for="edit_fname" class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
 							>{m.profile_first_name ? m.profile_first_name() : 'Ism'}</label
 						>
 						<input
+							id="edit_fname"
 							name="firstName"
 							type="text"
 							bind:value={firstName}
@@ -95,10 +97,11 @@
 					</div>
 
 					<div class="space-y-2">
-						<label class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
+						<label for="edit_lname" class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
 							>{m.profile_last_name ? m.profile_last_name() : 'Familiya'}</label
 						>
 						<input
+							id="edit_lname"
 							name="lastName"
 							type="text"
 							bind:value={lastName}
@@ -109,10 +112,10 @@
 				</div>
 
 				<div class="space-y-2">
-					<label class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
+					<label for="edit_phone" class="ml-1 text-xs font-bold tracking-wide text-muted uppercase"
 						>{m.profile_phone ? m.profile_phone() : 'Telefon raqam'}</label
 					>
-					<PhoneInput name="phoneNumber" bind:value={phoneNumber} placeholder={m.placeholder_phone ? m.placeholder_phone() : '+998 90 123 45 67'} />
+					<PhoneInput id="edit_phone" name="phoneNumber" bind:value={phoneNumber} placeholder={m.placeholder_phone ? m.placeholder_phone() : '+998 90 123 45 67'} />
 				</div>
 
 				<div class="flex gap-3 border-t border-main pt-4">

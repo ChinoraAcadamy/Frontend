@@ -22,7 +22,7 @@
 	} = $props();
 
 	// Title ga har doim loyiha nomini qo'shib qo'yamiz (agar o'zi asosiy title bo'lmasa)
-	const fullTitle = title.includes('Chinora Academy') ? title : `${title} | Chinora Academy`;
+	const fullTitle = $derived(title.includes('Chinora Academy') ? title : `${title} | Chinora Academy`);
 </script>
 
 <svelte:head>

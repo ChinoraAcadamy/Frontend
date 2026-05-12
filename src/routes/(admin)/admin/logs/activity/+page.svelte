@@ -7,10 +7,10 @@
 	let { data } = $props();
 
 	// ==================== STATE ====================
-	let searchValue = $state(data.filters?.search || '');
-	let orderingValue = $state(data.filters?.ordering || '-created_at');
+	let searchValue = $state('');
+	let orderingValue = $state('-created_at');
 
-	$effect(() => {
+	$effect.pre(() => {
 		searchValue = data.filters?.search || '';
 		orderingValue = data.filters?.ordering || '-created_at';
 	});
