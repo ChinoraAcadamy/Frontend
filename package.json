@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"start": "node build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
@@ -39,7 +40,6 @@
 		"vite-plugin-devtools-json": "^1.0.0"
 	},
 	"dependencies": {
-		"@vercel/analytics": "^2.0.1",
 		"device-detector-js": "^3.0.3",
 		"gsap": "^3.14.2",
 		"lucide-svelte": "^0.577.0",
