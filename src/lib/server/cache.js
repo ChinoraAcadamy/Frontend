@@ -5,10 +5,8 @@ const cache = new Map();
 /**
  * Oddiy kesh kalitini yaratish
  */
-export function generateCacheKey(url, options = {}) {
-    const method = options.method || 'GET';
-    const body = options.body ? JSON.stringify(options.body) : '';
-    return `${method}:${url}:${body}`;
+export function generateCacheKey(prefix, id) {
+    return `${prefix}:${id}`;
 }
 
 /**
@@ -37,24 +35,26 @@ export async function getOrSet(key, fetcher, ttl = 300) {
 }
 
 /**
- * Fetch so'rovini kesh bilan bajarish
+ * Loyihada kutilayotgan fetchWithCache funksiyasi.
+ * Bu aslida getOrSet bilan bir xil ishlaydi.
  */
-export async function fetchWithCache(url, options = {}, fetchFn = globalThis.fetch, ttl = 300) {
-    const key = generateCacheKey(url, options);
-    
-    return getOrSet(key, async () => {
-        const response = await fetchFn(url, options);
-        if (!response.ok) {
-            throw new Error(`Fetch failed with status ${response.status}`);
-        }
-        return await response.json();
-    }, ttl);
+export async function fetchWithCache(key, fetcher, ttl = 300) {
+    return getOrSet(key, fetcher, ttl);
 }
 
 /**
  * Keshni tozalash
  */
-export function invalidateCache(key = null) {
-    if (key) cache.delete(key);
-    else cache.clear();
+export function invalidateCache(prefix = null) {
+    if (!prefix) {
+        cache.clear();
+        return;
+    }
+
+    // Agar prefix berilgan bo'lsa, shu prefix bilan boshlanadigan barcha keshni o'chiramiz
+    for (const key of cache.keys()) {
+        if (key.startsWith(prefix)) {
+            cache.delete(key);
+        }
+    }
 }
