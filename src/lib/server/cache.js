@@ -3,10 +3,16 @@
 const cache = new Map();
 
 /**
- * Gets a value from cache or fetches it and stores it.
- * @param {string} key - Unique key for the cache entry
- * @param {Function} fetcher - Async function to fetch the data if not in cache
- * @param {number} ttl - Time to live in seconds (default 300s / 5 min)
+ * Oddiy kesh kalitini yaratish
+ */
+export function generateCacheKey(url, options = {}) {
+    const method = options.method || 'GET';
+    const body = options.body ? JSON.stringify(options.body) : '';
+    return `${method}:${url}:${body}`;
+}
+
+/**
+ * Keshdan olish yoki yangisini saqlash
  */
 export async function getOrSet(key, fetcher, ttl = 300) {
     const now = Date.now();
@@ -25,15 +31,28 @@ export async function getOrSet(key, fetcher, ttl = 300) {
         return data;
     } catch (err) {
         console.error(`Cache fetcher error for key ${key}:`, err);
-        // If fetcher fails and we have expired data, return it as fallback
         if (entry) return entry.data;
         throw err;
     }
 }
 
 /**
- * Clears a specific cache key or the entire cache
- * @param {string|null} key 
+ * Fetch so'rovini kesh bilan bajarish
+ */
+export async function fetchWithCache(url, options = {}, fetchFn = globalThis.fetch, ttl = 300) {
+    const key = generateCacheKey(url, options);
+    
+    return getOrSet(key, async () => {
+        const response = await fetchFn(url, options);
+        if (!response.ok) {
+            throw new Error(`Fetch failed with status ${response.status}`);
+        }
+        return await response.json();
+    }, ttl);
+}
+
+/**
+ * Keshni tozalash
  */
 export function invalidateCache(key = null) {
     if (key) cache.delete(key);
