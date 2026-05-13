@@ -35,7 +35,7 @@ export async function getOrSet(key, fetcher, ttl = 300) {
  * Clears a specific cache key or the entire cache
  * @param {string|null} key 
  */
-export function clear(key = null) {
+export function invalidateCache(key = null) {
     if (key) cache.delete(key);
     else cache.clear();
 }
