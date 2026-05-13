@@ -123,7 +123,7 @@ export const actions = {
         const cookieOptions = {
             path: '/',
             httpOnly: true,
-            sameSite: 'strict',
+            sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production'
         };
 

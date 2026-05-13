@@ -153,10 +153,10 @@
 					use:enhance={() => {
 						loading = true;
 						return async ({ update, result }) => {
-							if (result.type === 'failure' || result.type === 'error') {
+							await update();
+							if (result.type !== 'redirect') {
 								loading = false;
 							}
-							await update();
 						};
 					}}
 					class="form-body"

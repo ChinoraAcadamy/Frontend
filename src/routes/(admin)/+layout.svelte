@@ -109,7 +109,7 @@
 			</div>
 		{/if}
 
-		<main class="admin-content">
+		<main>
 			{@render children()}
 		</main>
 	</div>
@@ -155,17 +155,6 @@
 	@media (max-width: 1023px) {
 		.mobile-bc {
 			display: block;
-		}
-	}
-
-	.admin-content {
-		flex: 1;
-		padding: 1.5rem;
-	}
-
-	@media (max-width: 640px) {
-		.admin-content {
-			padding: 1rem;
 		}
 	}
 </style>

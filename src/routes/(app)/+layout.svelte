@@ -54,7 +54,7 @@
 			</div>
 		{/if}
 
-		<main class={isProfilePage || isCourseListPage ? '' : 'md:admin-content md:p-6'}>
+		<main>
 			{@render children()}
 		</main>
 	</div>

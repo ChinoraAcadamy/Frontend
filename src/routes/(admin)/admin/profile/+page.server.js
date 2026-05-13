@@ -121,7 +121,7 @@ export const actions = {
             cookies.set('user_data', JSON.stringify(fullUserData), {
                 path: '/',
                 httpOnly: false,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: 60 * 20 // 20 minut
             });

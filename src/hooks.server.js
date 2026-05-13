@@ -61,7 +61,7 @@ async function authHandle({ event, resolve }) {
 			event.cookies.set('access_token', validToken, {
 				path: '/',
 				httpOnly: true,
-				sameSite: 'strict',
+				sameSite: 'lax',
 				secure: process.env.NODE_ENV === 'production',
 				maxAge: 60 * 60 * 24 // 1 kun
 			});
@@ -92,7 +92,7 @@ async function authHandle({ event, resolve }) {
 				event.cookies.set('user_data', JSON.stringify(user), {
 					path: '/',
 					httpOnly: false, // frontend o'qishi uchun
-					sameSite: 'strict',
+					sameSite: 'lax',
 					secure: process.env.NODE_ENV === 'production',
 					maxAge: 60 * 20 // 20 minut
 				});

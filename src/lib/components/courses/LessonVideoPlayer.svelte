@@ -67,7 +67,7 @@
 	let showGestureIndicator = $state(false);
 	let gestureTimeout = null;
 
-	const completionThreshold = 0.95;
+	const completionThreshold = 0.90; // Mobil qurilmalar uchun 90% yetarli
 
 	// --- Security Handlers ---
 	function handleKeydown(e) {
@@ -406,7 +406,10 @@
 			};
 
 			player.on('playing', startAutoSave);
-			player.on('pause', stopAutoSave);
+			player.on('pause', () => {
+				stopAutoSave();
+				checkProgress();
+			});
 			player.on('ended', onEnded);
 			player.on('timeupdate', checkProgress);
 
@@ -823,10 +826,6 @@
 	:global(.plyr--full-ui.plyr--video .plyr__control--overlaid:hover) {
 		background: #93113f !important;
 		box-shadow: 0 6px 32px rgba(155, 28, 72, 0.65) !important;
-	}
-
-	:global(.plyr--full-ui.plyr--video .plyr__control--overlaid:active) {
-		transform: scale(0.94) !important;
 	}
 
 	:global(.plyr--full-ui.plyr--video .plyr__control--overlaid svg) {
