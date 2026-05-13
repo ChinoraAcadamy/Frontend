@@ -1,61 +1,54 @@
 // src/routes/+page.server.js
 import { API_URL } from '$env/static/private';
-// import { redirect } from '@sveltejs/kit';
+import { getOrSet } from '$lib/server/cache';
 
 export const load = async ({ fetch, locals }) => {
     const lang = locals.lang || 'uz';
 
-    // Kurslar ro'yxatini darhol olamiz (bu tez va SvelteKit dependency tracking uchun kerak)
-    const fetchCoursesList = async () => {
-        try {
-            const response = await fetch(`${API_URL}/courses/`);
-            if (!response.ok) return [];
-            const data = await response.json();
-            return (data.results ?? []).filter((c) => c.is_published);
-        } catch (err) {
-            console.error('Courses list fetch error:', err);
-            return [];
-        }
-    };
+    const getCoursesData = async () => {
+        return getOrSet(`homepage_courses_${lang}`, async () => {
+            console.log(`[Cache Miss] Fetching courses for lang: ${lang}`);
+            try {
+                // 1. Kurslar ro'yxatini olamiz
+                const response = await fetch(`${API_URL}/courses/`);
+                if (!response.ok) return [];
+                const data = await response.json();
+                const courseList = (data.results ?? []).filter((c) => c.is_published);
 
-    const courseListPromise = fetchCoursesList();
+                if (courseList.length === 0) return [];
 
-    // Modullarni (details) lazy load qilamiz
-    const getCoursesWithDetails = async () => {
-        const courseList = await courseListPromise;
-        if (courseList.length === 0) return [];
-
-        return await Promise.all(
-            courseList.map(async (course) => {
-                try {
-                    // SvelteKit fetch o'rniga global fetch ishlatamiz.
-                    const headers = { 'Accept-Language': lang };
-                    
-                    // 1-urinish: Kurs detallari (modules bilan)
-                    const res = await globalThis.fetch(`${API_URL}/courses/${course.id}/`, { headers });
-                    if (res.ok) {
-                        return await res.json();
-                    }
-
-                    // 2-urinish: Agar detail 500/404 bersa, faqat modullarni o'zini olamiz (curriculum uchun)
-                    const modulesRes = await globalThis.fetch(`${API_URL}/courses/${course.id}/modules/`, { headers });
-                    if (modulesRes.ok) {
-                        const modulesData = await modulesRes.json();
-                        // Backend list yoki results formatida qaytarishi mumkin
-                        course.modules = modulesData.results || modulesData;
+                // 2. Har bir kursning detallarini (modullarini) parallel olamiz
+                return await Promise.all(
+                    courseList.map(async (course) => {
+                        try {
+                            const headers = { 'Accept-Language': lang };
+                            const res = await fetch(`${API_URL}/courses/${course.id}/`, { headers });
+                            if (res.ok) {
+                                return await res.json();
+                            }
+                            // Fallback: faqat modullarni o'zini olish
+                            const modulesRes = await fetch(`${API_URL}/courses/${course.id}/modules/`, { headers });
+                            if (modulesRes.ok) {
+                                const modulesData = await modulesRes.json();
+                                course.modules = modulesData.results || modulesData;
+                            }
+                        } catch (e) {
+                            console.error(`Course ${course.id} detail fetch error:`, e);
+                        }
                         return course;
-                    }
-                } catch (e) {
-                    console.error(`Course ${course.id} detail fetch error:`, e);
-                }
-                return course;
-            })
-        );
+                    })
+                );
+            } catch (err) {
+                console.error('Homepage courses fetch error:', err);
+                return [];
+            }
+        }, 600); // 10 daqiqa kesh
     };
 
     return {
-        courses: getCoursesWithDetails()
+        courses: getCoursesData()
     };
 };
+
 
 

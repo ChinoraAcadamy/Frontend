@@ -1,1 +1,1 @@
-export const ssr = true; 
+export const ssr = false; // Auth sahifalar SPA rejimida ishlaydi

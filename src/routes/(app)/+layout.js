@@ -1,1 +1,1 @@
-export const ssr = true; // App sahifalar SPA rejimida ishlaydi
+export const ssr = false; // App sahifalar SPA rejimida ishlaydi

@@ -1,50 +1,41 @@
 // src/lib/server/cache.js
 
-const memoryCache = new Map();
+const cache = new Map();
 
 /**
- * Caches the result of a fetcher function in memory.
- * 
- * @param {string} key - Unique key for the cache (should include user ID or access token if user-specific).
- * @param {Function} fetcher - Async function that returns the data to be cached.
- * @param {number} ttlSeconds - Time-To-Live in seconds (default: 300 = 5 minutes).
- * @returns {Promise<any>} The data (either from cache or newly fetched).
+ * Gets a value from cache or fetches it and stores it.
+ * @param {string} key - Unique key for the cache entry
+ * @param {Function} fetcher - Async function to fetch the data if not in cache
+ * @param {number} ttl - Time to live in seconds (default 300s / 5 min)
  */
-export async function fetchWithCache(key, fetcher, ttlSeconds = 300) {
-    if (memoryCache.has(key)) {
-        const cached = memoryCache.get(key);
-        if (Date.now() < cached.expiry) {
-            return cached.data;
-        } else {
-            memoryCache.delete(key);
-        }
+export async function getOrSet(key, fetcher, ttl = 300) {
+    const now = Date.now();
+    const entry = cache.get(key);
+
+    if (entry && entry.expiresAt > now) {
+        return entry.data;
     }
-    
+
     try {
         const data = await fetcher();
-        memoryCache.set(key, { data, expiry: Date.now() + ttlSeconds * 1000 });
+        cache.set(key, {
+            data,
+            expiresAt: now + (ttl * 1000)
+        });
         return data;
     } catch (err) {
+        console.error(`Cache fetcher error for key ${key}:`, err);
+        // If fetcher fails and we have expired data, return it as fallback
+        if (entry) return entry.data;
         throw err;
     }
 }
 
 /**
- * Invalidates cache entries matching a specific prefix.
- * 
- * @param {string} keyPrefix - The prefix of keys to remove.
+ * Clears a specific cache key or the entire cache
+ * @param {string|null} key 
  */
-export function invalidateCache(keyPrefix) {
-    for (const key of memoryCache.keys()) {
-        if (key.startsWith(keyPrefix)) {
-            memoryCache.delete(key);
-        }
-    }
-}
-
-/**
- * Generates a consistent cache key based on path, user ID, and URL search parameters.
- */
-export function generateCacheKey(path, userId, searchParams = '') {
-    return `${path}_user_${userId}_${searchParams}`;
+export function clear(key = null) {
+    if (key) cache.delete(key);
+    else cache.clear();
 }
