@@ -35,6 +35,30 @@
 			.filter(Boolean)
 	);
 
+	let lazyTitles = $state({
+		course: '',
+		module: '',
+		lesson: ''
+	});
+
+	$effect(() => {
+		if (page.data.lazy?.courseData) {
+			Promise.resolve(page.data.lazy.courseData).then(data => {
+				if (data?.title) lazyTitles.course = data.title;
+			}).catch(() => {});
+		}
+		if (page.data.lazy?.moduleData) {
+			Promise.resolve(page.data.lazy.moduleData).then(data => {
+				if (data?.title) lazyTitles.module = data.title;
+			}).catch(() => {});
+		}
+		if (page.data.lazy?.lesson) {
+			Promise.resolve(page.data.lazy.lesson).then(data => {
+				if (data?.title) lazyTitles.lesson = data.title;
+			}).catch(() => {});
+		}
+	});
+
 	let items = $derived(
 		segments
 			.map((seg, i) => {
@@ -47,12 +71,12 @@
 				if (isParam) {
 					const paramName = routeSegments[i].slice(1, -1).replace('...', '');
 
-					if ((paramName.includes('lesson') || paramName === 'lesson_id') && page.data.lesson?.title) {
-						label = page.data.lesson.title;
-					} else if ((paramName.includes('module') || paramName === 'module_id') && (page.data.module?.title || page.data.moduleData?.title)) {
-						label = page.data.module?.title || page.data.moduleData?.title;
-					} else if ((paramName === 'id' || paramName.includes('course') || paramName === 'course_id') && page.data.course?.title) {
-						label = page.data.course.title;
+					if ((paramName.includes('lesson') || paramName === 'lesson_id') && (page.data.lesson?.title || lazyTitles.lesson)) {
+						label = page.data.lesson?.title || lazyTitles.lesson;
+					} else if ((paramName.includes('module') || paramName === 'module_id') && (page.data.module?.title || (page.data.moduleData && !page.data.moduleData.then ? page.data.moduleData.title : undefined) || lazyTitles.module)) {
+						label = page.data.module?.title || (page.data.moduleData && !page.data.moduleData.then ? page.data.moduleData.title : undefined) || lazyTitles.module;
+					} else if ((paramName === 'id' || paramName.includes('course') || paramName === 'course_id') && (page.data.course?.title || lazyTitles.course)) {
+						label = page.data.course?.title || lazyTitles.course;
 					} else if (paramName.includes('student') || paramName === 'student_id') {
 						if (page.data.student) {
 							label = `${page.data.student.first_name || ''} ${page.data.student.last_name || ''}`.trim() || page.data.student.username;
@@ -61,14 +85,17 @@
 						label = page.data.title;
 					}
 				} else {
-					if ((seg.toLowerCase() === 'lessons' || seg.toLowerCase() === 'lesson') && (page.data.module?.title || page.data.moduleData?.title)) {
-						label = page.data.module?.title || page.data.moduleData?.title;
+					if (seg.toLowerCase() === 'lessons' || seg.toLowerCase() === 'lesson') {
+						const moduleTitle = page.data.module?.title || (page.data.moduleData && !page.data.moduleData.then ? page.data.moduleData.title : undefined) || lazyTitles.module;
+						if (moduleTitle) {
+							label = moduleTitle;
+						}
 					}
 				}
 
 				return { label, href, isClickable: validRoutePatterns.has(routePattern) };
 			})
-			.filter((item) => item.href !== '/admin')
+			.filter((item, i, arr) => item.href !== '/admin' && (i === arr.length - 1 || item.isClickable))
 	);
 
 	// Dinamik home link (admin vs student)
@@ -86,21 +113,19 @@
 <!-- Desktop: inNavbar holati -->
 {#if inNavbar}
 	<nav class="bc-desktop" aria-label="Breadcrumb">
-		<a href={resolve(/** @type {any} */ (homeHref))} class="bc-home" aria-label="Dashboard">
+		<a href={resolve(/** @type {any} */ (homeHref))} class="bc-home text-muted hover:text-primary transition-colors" aria-label="Dashboard">
 			<Home size={13} strokeWidth={2.5} />
 		</a>
 		{#each items as item, i (item.href)}
-			<span class="bc-sep" aria-hidden="true">
+			<span class="bc-sep text-muted/50" aria-hidden="true">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
 					<path d="m9 18 6-6-6-6"/>
 				</svg>
 			</span>
 			{#if i !== items.length - 1}
-				{#if item.isClickable}
-					<a href={resolve(/** @type {any} */(item.href))} class="bc-link">{item.label}</a>
-				{/if}
+				<a href={resolve(/** @type {any} */(item.href))} class="bc-link text-muted hover:text-primary hover:bg-primary/10 transition-colors">{item.label}</a>
 			{:else}
-				<span class="bc-current" title={item.label}>{item.label}</span>
+				<span class="bc-current text-foreground" title={item.label}>{item.label}</span>
 			{/if}
 		{/each}
 	</nav>
@@ -113,14 +138,14 @@
 			{#if hasMore}
 				{@const backItem = items[items.length - 2]}
 				{#if backItem?.isClickable}
-					<a href={resolve(/** @type {any} */(backItem.href))} class="bc-back-btn" aria-label="Back">
+					<a href={resolve(/** @type {any} */(backItem.href))} class="bc-back-btn text-primary bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Back">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
 							<path d="m15 18-6-6 6-6"/>
 						</svg>
 					</a>
 				{/if}
 			{:else}
-				<a href={resolve(/** @type {any} */(homeHref))} class="bc-back-btn" aria-label="Dashboard">
+				<a href={resolve(/** @type {any} */(homeHref))} class="bc-back-btn text-primary bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Dashboard">
 					<Home size={14} strokeWidth={2.5} />
 				</a>
 			{/if}
@@ -128,8 +153,8 @@
 			<!-- Trail -->
 			<div class="bc-trail">
 				{#if hasMore}
-					<span class="bc-trail-dots" aria-hidden="true">···</span>
-					<span class="bc-trail-sep" aria-hidden="true">
+					<span class="bc-trail-dots text-muted" aria-hidden="true">···</span>
+					<span class="bc-trail-sep text-muted/50" aria-hidden="true">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
 							<path d="m9 18 6-6-6-6"/>
 						</svg>
@@ -138,17 +163,17 @@
 
 				{#each mobileItems as item, i (item.href)}
 					{#if i > 0}
-						<span class="bc-trail-sep" aria-hidden="true">
+						<span class="bc-trail-sep text-muted/50" aria-hidden="true">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
 								<path d="m9 18 6-6-6-6"/>
 							</svg>
 						</span>
 					{/if}
 
-					{#if i !== mobileItems.length - 1 && item.isClickable}
-						<a href={resolve(/** @type {any} */(item.href))} class="bc-trail-link">{item.label}</a>
-					{:else if i === mobileItems.length - 1}
-						<span class="bc-trail-current" title={item.label}>{item.label}</span>
+					{#if i !== mobileItems.length - 1}
+						<a href={resolve(/** @type {any} */(item.href))} class="bc-trail-link text-muted hover:text-primary transition-colors">{item.label}</a>
+					{:else}
+						<span class="bc-trail-current text-foreground" title={item.label}>{item.label}</span>
 					{/if}
 				{/each}
 			</div>
@@ -176,27 +201,21 @@
 	.bc-home {
 		display: flex;
 		align-items: center;
-		color: #94a3b8;
 		padding: 4px;
 		border-radius: 6px;
-		transition: color 0.15s;
 		flex-shrink: 0;
 		text-decoration: none;
 	}
-	.bc-home:hover { color: #9b1c48; }
 
 	.bc-sep {
-		color: #cbd5e1;
 		display: flex;
 		align-items: center;
 		flex-shrink: 0;
-		opacity: 0.6;
 	}
 
 	.bc-link {
 		font-size: 13px;
 		font-weight: 500;
-		color: #64748b;
 		text-decoration: none;
 		padding: 3px 6px;
 		border-radius: 6px;
@@ -204,14 +223,11 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		max-width: 140px;
-		transition: color 0.15s, background 0.15s;
 	}
-	.bc-link:hover { color: #9b1c48; background: rgba(155, 28, 72, 0.05); }
 
 	.bc-current {
 		font-size: 13px;
 		font-weight: 700;
-		color: #1e293b;
 		padding: 3px 6px;
 		white-space: nowrap;
 		overflow: hidden;
@@ -241,14 +257,10 @@
 		width: 32px;
 		height: 32px;
 		border-radius: 10px;
-		background: rgba(155, 28, 72, 0.07);
-		color: #9b1c48;
 		text-decoration: none;
 		flex-shrink: 0;
-		transition: background 0.15s, transform 0.12s;
 		margin-right: 10px;
 	}
-	.bc-back-btn:hover { background: rgba(155, 28, 72, 0.12); }
 	.bc-back-btn:active { transform: scale(0.93); }
 
 	/* Trail */
@@ -264,7 +276,6 @@
 	.bc-trail-dots {
 		font-size: 13px;
 		font-weight: 700;
-		color: #94a3b8;
 		letter-spacing: 0.05em;
 		flex-shrink: 0;
 		line-height: 1;
@@ -273,14 +284,12 @@
 	.bc-trail-sep {
 		display: flex;
 		align-items: center;
-		color: #cbd5e1;
 		flex-shrink: 0;
 	}
 
 	.bc-trail-link {
 		font-size: 13px;
 		font-weight: 500;
-		color: #64748b;
 		text-decoration: none;
 		white-space: nowrap;
 		overflow: hidden;
@@ -289,14 +298,11 @@
 		flex-shrink: 1;
 		padding: 2px 4px;
 		border-radius: 5px;
-		transition: color 0.15s;
 	}
-	.bc-trail-link:hover { color: #9b1c48; }
 
 	.bc-trail-current {
 		font-size: 13px;
 		font-weight: 700;
-		color: #0f172a;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
