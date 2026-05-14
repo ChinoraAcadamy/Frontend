@@ -1,8 +1,8 @@
 <script>
-	import { fade, fly } from 'svelte/transition';
-	import { X, Star, MessageSquare, Send, AlertCircle } from 'lucide-svelte';
+	import Modal from '$lib/components/ui/Modal.svelte';
+	import { Star, MessageSquare, Send, AlertCircle } from 'lucide-svelte';
+	import { fade } from 'svelte/transition';
 	import { enhance } from '$app/forms';
-	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -18,6 +18,7 @@
 	let score = $state(0);
 	let feedback = $state('');
 	let error = $state('');
+	let isSubmitting = $state(false);
 
 	// Update internal state when submission changes
 	$effect(() => {
@@ -25,17 +26,6 @@
 			score = submission.score ?? 0;
 			feedback = submission.feedback ?? '';
 		}
-	});
-
-	// Orqa fonni qulflash (Mobil UX uchun juda muhim)
-	$effect(() => {
-		if (browser) {
-			if (isOpen) document.body.style.overflow = 'hidden';
-			else document.body.style.overflow = '';
-		}
-		return () => {
-			if (browser) document.body.style.overflow = '';
-		};
 	});
 
 	const maxScore = $derived(submission?.max_score || 10);
@@ -51,57 +41,54 @@
 		if (val < 0) score = 0;
 		if (val > maxScore) score = maxScore;
 	}
+
+	const formEnhance = (opts) => {
+		isSubmitting = true;
+		error = '';
+
+		let parentCallback;
+		if (enhanceAction) {
+			parentCallback = enhanceAction(opts);
+		}
+
+		return async (callbackOpts) => {
+			if (parentCallback && typeof parentCallback === 'function') {
+				await parentCallback(callbackOpts);
+			} else {
+				const { result, update } = callbackOpts;
+				if (result.type === 'success' || result.type === 'redirect') {
+					handleClose();
+				} else if (result.type === 'failure') {
+					error = result.data?.error || m.error_occurred?.() || 'Xatolik yuz berdi';
+				}
+				await update();
+			}
+			isSubmitting = false;
+		};
+	};
 </script>
 
-{#if isOpen}
-	<!-- Background Overlay -->
-	<div
-		class="fixed inset-0 z-2000 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm md:items-center md:p-6"
-		transition:fade={{ duration: 300 }}
-		onclick={handleClose}
-		onkeydown={(e) => e.key === 'Escape' && handleClose()}
-		role="presentation"
-		aria-hidden="true"
-	>
-		<!-- Modal Content -->
-		<div
-			class="relative flex max-h-[90vh] w-full max-w-[550px] flex-col overflow-hidden rounded-[32px] bg-surface shadow-2xl outline-none md:rounded-[24px]"
-			transition:fly={{ y: 100, duration: 400, opacity: 1 }}
-			onclick={(e) => e.stopPropagation()}
-			onkeydown={(e) => e.stopPropagation()}
-			role="dialog"
-			aria-modal="true"
-			tabindex="-1"
-			aria-labelledby="modal-title"
-		>
-			<!-- Decorative Header Gradient -->
-			<div
-				class="h-2 shrink-0 bg-primary opacity-80"
-			></div>
+<Modal {isOpen} onClose={handleClose} maxWidth="550px" noPadding={true}>
+	<!-- Decorative Header Gradient -->
+	<div class="h-2 shrink-0 bg-primary opacity-80 rounded-t-[24px]"></div>
 
-			<div class="flex flex-col overflow-hidden">
-				<div class="custom-scrollbar overflow-y-auto p-8 max-md:p-6">
-					<!-- Header -->
-					<div class="mb-8 flex items-center justify-between">
-						<div>
-							<h2
-								id="modal-title"
-								class="mb-1 text-2xl font-extrabold tracking-tight text-foreground"
-							>
-								{m.submission_grade ? m.submission_grade() : 'Baholash'}
-							</h2>
-							<p class="text-[13px] font-bold tracking-wider text-muted uppercase">
-								{submission?.student?.first_name}
-								{submission?.student?.last_name}
-							</p>
-						</div>
-						<button
-							class="flex h-10 w-10 items-center justify-center rounded-full bg-muted/10 text-muted transition-all duration-200 hover:bg-muted/20 hover:text-foreground"
-							onclick={handleClose}
-						>
-							<X size={20} />
-						</button>
-					</div>
+	<div class="flex flex-col overflow-hidden custom-modal-override">
+		<div class="custom-scrollbar overflow-y-auto p-8 max-md:p-6">
+			<!-- Header -->
+			<div class="mb-8 flex items-center justify-between">
+				<div>
+					<h2
+						id="modal-title"
+						class="mb-1 text-2xl font-extrabold tracking-tight text-foreground"
+					>
+						{m.submission_grade ? m.submission_grade() : 'Baholash'}
+					</h2>
+					<p class="text-[13px] font-bold tracking-wider text-muted uppercase">
+						{submission?.student?.first_name}
+						{submission?.student?.last_name}
+					</p>
+				</div>
+			</div>
 
 					<!-- Submission Content Preview -->
 					<div class="mb-8 rounded-2xl border border-border bg-muted/5 p-5">
@@ -164,7 +151,7 @@
 						{/if}
 					</div>
 
-					<form method="POST" action={formAction} use:enhance={enhanceAction} class="space-y-6">
+					<form method="POST" action={formAction} use:enhance={formEnhance} class="space-y-6">
 						<input type="hidden" name="id" value={submission?.id} />
 
 						<!-- Score Input -->
@@ -232,11 +219,10 @@
 						<!-- Submit Button -->
 						<button
 							type="submit"
-							disabled={loading}
+							disabled={loading || isSubmitting}
 							class="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary py-4.5 text-base font-bold text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-hover active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
 						>
-						>
-							{#if loading}
+							{#if loading || isSubmitting}
 								<div
 									class="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
 								></div>
@@ -257,21 +243,24 @@
 					<p class="text-[12px] leading-tight font-bold text-muted">
 						{m.msg_grade_auto_status
 							? m.msg_grade_auto_status()
-							: "Baholashdan so'ng topshiriq holati avtomatik ravishda"}{' '}
+							: "Baholashdan so'ng topshiriq holati avtomatik ravishda"}
 						<span class="text-primary"
 							>"{m.assignment_graded ? m.assignment_graded() : 'Baholandi'}"</span
-						>{' '}
-						{m.msg_grade_auto_status_suffix ? m.msg_grade_auto_status_suffix() : "ga o'zgaradi."}
+						>
+						 {m.msg_grade_auto_status_suffix ? m.msg_grade_auto_status_suffix() : "ga o'zgaradi."}
 					</p>
 				</div>
 			</div>
-		</div>
-	</div>
-{/if}
+</Modal>
 
 <style>
-	:global(body.modal-open) {
-		overflow: hidden;
+	/* Modal's default absolute close button is hidden so our custom header looks clean */
+	:global(.custom-modal-override) {
+		display: flex;
+		flex-direction: column;
+	}
+	:global(.modal-container:has(.custom-modal-override) .close-btn-absolute) {
+		display: none;
 	}
 
 	input[type='number']::-webkit-inner-spin-button,

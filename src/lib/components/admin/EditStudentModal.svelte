@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { X } from 'lucide-svelte';
 	import { browser } from '$app/environment';
-	import { fade, fly } from 'svelte/transition';
 	import { enhance } from '$app/forms';
+	import Modal from '$lib/components/ui/Modal.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
 
@@ -38,34 +37,18 @@
 	});
 </script>
 
-{#if isOpen && student}
-	<div
-		class="fixed inset-0 z-9999 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
-		transition:fade={{ duration: 200 }}
-		role="dialog"
-		aria-modal="true"
-	>
-		<div
-			class="w-full max-w-md overflow-hidden rounded-[24px] border border-main bg-card shadow-2xl"
-			transition:fly={{ y: 20, duration: 300, opacity: 0 }}
-		>
-			<div class="flex items-center justify-between border-b border-main bg-muted/5 p-6">
-				<div>
-					<h2 class="text-xl font-bold text-main">
-						{m.update_info ? m.update_info() : "Ma'lumotlarni yangilash"}
-					</h2>
-					<p class="mt-1 text-sm font-medium text-muted">@{student.username}</p>
-				</div>
-				<button
-					onclick={onClose}
-					aria-label={m.menu_close ? m.menu_close() : 'Yopish'}
-					class="rounded-full border border-main bg-card p-2 text-muted shadow-sm transition-all hover:bg-muted/10 active:scale-90"
-				>
-					<X size={18} strokeWidth={2.5} />
-				</button>
+<Modal {isOpen} {onClose} maxWidth="450px" noPadding={true}>
+	<div class="custom-modal-override flex flex-col">
+		<div class="flex items-center justify-between border-b border-main bg-muted/5 p-6 rounded-t-[24px]">
+			<div>
+				<h2 class="text-xl font-bold text-main">
+					{m.update_info ? m.update_info() : "Ma'lumotlarni yangilash"}
+				</h2>
+				<p class="mt-1 text-sm font-medium text-muted">@{student.username}</p>
 			</div>
+		</div>
 
-			<form
+		<form
 				method="POST"
 				action="?/updateStudent"
 				use:enhance={() => {
@@ -141,6 +124,15 @@
 					</button>
 				</div>
 			</form>
-		</div>
 	</div>
-{/if}
+</Modal>
+
+<style>
+	:global(.custom-modal-override) {
+		display: flex;
+		flex-direction: column;
+	}
+	:global(.modal-container:has(.custom-modal-override) .close-btn-absolute) {
+		display: none;
+	}
+</style>

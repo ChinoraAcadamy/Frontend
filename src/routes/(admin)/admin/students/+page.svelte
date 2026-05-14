@@ -14,10 +14,13 @@
 	import { fly, fade } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { invalidateAll } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
 	import AddStudentModal from '$lib/components/admin/AddStudentModal.svelte';
 	import EditStudentModal from '$lib/components/admin/EditStudentModal.svelte';
+	import Modal from '$lib/components/ui/Modal.svelte';
 
 	let { data, form } = $props();
 
@@ -81,29 +84,55 @@
 
 	// ==================== EFFECTS ====================
 	$effect(() => {
-		if (form?.createSuccess) {
-			showToast(m.admin_students_created ? m.admin_students_created() : 'Student yaratildi!');
-			isAddModalOpen = false;
-		}
-		if (form?.createError) {
-			showToast(form.createError, 'error');
-		}
-		if (form?.updateSuccess) {
-			showToast(m.admin_students_updated ? m.admin_students_updated() : "Ma'lumotlar yangilandi!");
-			editTarget = null;
-		}
-		if (form?.updateError) {
-			showToast(form.updateError, 'error');
-		}
-		if (form?.deleteSuccess) {
-			showToast(m.admin_students_deleted ? m.admin_students_deleted() : "Student o'chirildi!");
-			deleteTarget = null;
-			isDeleting = false;
-		}
-		if (form?.deleteError) {
-			showToast(form.deleteError, 'error');
-			isDeleting = false;
-		}
+		const currentForm = form;
+		if (!currentForm) return;
+
+		untrack(() => {
+			if (currentForm.createSuccess) {
+				showToast(m.admin_students_created ? m.admin_students_created() : 'Student yaratildi!');
+				isAddModalOpen = false;
+				invalidateAll();
+			}
+			if (currentForm.createError) {
+				showToast(currentForm.createError, 'error');
+			}
+			if (currentForm.updateSuccess) {
+				showToast(m.admin_students_updated ? m.admin_students_updated() : "Ma'lumotlar yangilandi!");
+				
+				// Mahalliy (optimistic) UI yangilash
+				if (currentForm.updatedStudent && resolvedData?.students) {
+					const idx = resolvedData.students.findIndex(s => s.id === currentForm.updatedStudent.id);
+					if (idx !== -1) {
+						resolvedData.students[idx] = { 
+							...resolvedData.students[idx], 
+							...currentForm.updatedStudent 
+						};
+					}
+				}
+				
+				editTarget = null;
+				invalidateAll();
+			}
+			if (currentForm.updateError) {
+				showToast(currentForm.updateError, 'error');
+			}
+			if (currentForm.deleteSuccess) {
+				showToast(m.admin_students_deleted ? m.admin_students_deleted() : "Student o'chirildi!");
+				
+				// Mahalliy (optimistic) UI yangilash
+				if (currentForm.deletedStudentId && resolvedData?.students) {
+					resolvedData.students = resolvedData.students.filter(s => s.id !== currentForm.deletedStudentId);
+				}
+				
+				deleteTarget = null;
+				isDeleting = false;
+				invalidateAll();
+			}
+			if (currentForm.deleteError) {
+				showToast(currentForm.deleteError, 'error');
+				isDeleting = false;
+			}
+		});
 	});
 
 	let filteredStudents = $derived.by(() => {
@@ -302,21 +331,23 @@
 										<div
 											class="flex items-center justify-end gap-1.5 opacity-0 transition-opacity group-hover:opacity-100"
 										>
-											<button
-												onclick={() => (editTarget = { ...student })}
-												class="rounded-lg p-2 text-muted transition-all hover:bg-muted/10 hover:text-main active:scale-95"
-												title={m.admin_students_edit ? m.admin_students_edit() : 'Tahrirlash'}
-											>
-												<Edit2 size={18} />
-											</button>
-											<button
-												onclick={() =>
-													(deleteTarget = { id: student.id, name: getFullName(student) })}
-												class="rounded-lg p-2 text-muted transition-all hover:bg-primary/10 hover:text-primary active:scale-95"
-												title={m.admin_students_delete ? m.admin_students_delete() : "O'chirish"}
-											>
-												<Trash2 size={18} />
-											</button>
+											{#if student.is_active}
+												<button
+													onclick={() => (editTarget = { ...student })}
+													class="rounded-lg p-2 text-muted transition-all hover:bg-muted/10 hover:text-main active:scale-95"
+													title={m.admin_students_edit ? m.admin_students_edit() : 'Tahrirlash'}
+												>
+													<Edit2 size={18} />
+												</button>
+												<button
+													onclick={() =>
+														(deleteTarget = { id: student.id, name: getFullName(student) })}
+													class="rounded-lg p-2 text-muted transition-all hover:bg-primary/10 hover:text-primary active:scale-95"
+													title={m.admin_students_delete ? m.admin_students_delete() : "O'chirish"}
+												>
+													<Trash2 size={18} />
+												</button>
+											{/if}
 										</div>
 									</td>
 								</tr>
@@ -389,71 +420,63 @@
 {/if}
 
 {#if deleteTarget}
-	<div
-		class="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
-		transition:fade={{ duration: 150 }}
-	>
-		<div
-			class="w-full max-w-sm rounded-[24px] border border-main bg-card p-6 shadow-2xl"
-			transition:fly={{ y: 20, duration: 300 }}
-		>
-			<div class="mb-5 flex items-center gap-3">
-				<div
-					class="flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-primary/10"
-				>
-					<AlertTriangle size={20} strokeWidth={2.5} class="text-primary" />
-				</div>
-				<h3 class="text-lg leading-tight font-black text-main">
-					{m.admin_students_delete_confirm_title
-						? m.admin_students_delete_confirm_title()
-						: "O'chirishni tasdiqlang"}
-				</h3>
-			</div>
-
-			<p class="mb-8 text-sm leading-relaxed font-medium text-muted">
-				{@html m.admin_students_delete_confirm_desc
-					? m.admin_students_delete_confirm_desc({
-							name: `<strong class="font-black text-main">${deleteTarget.name}</strong>`
-						})
-					: `Haqiqatan ham <strong class="font-black text-main">${deleteTarget.name}</strong> ni o‘chirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.`}
-			</p>
-
-			<form
-				method="POST"
-				action="?/deleteStudent"
-				use:enhance={() => {
-					isDeleting = true;
-					return async ({ update }) => {
-						await update();
-						isDeleting = false;
-					};
-				}}
-				class="flex gap-3"
+	<Modal isOpen={true} onClose={() => (deleteTarget = null)} maxWidth="400px">
+		<div class="mb-5 flex items-center gap-3">
+			<div
+				class="flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-primary/10"
 			>
-				<input type="hidden" name="studentId" value={deleteTarget.id} />
-				<button
-					type="button"
-					onclick={() => (deleteTarget = null)}
-					class="flex-1 rounded-xl bg-muted/10 py-3.5 text-xs font-bold tracking-widest text-muted uppercase transition-colors hover:bg-muted/20 active:scale-95"
-				>
-					{m.admin_students_cancel ? m.admin_students_cancel() : 'Bekor qilish'}
-				</button>
-				<button
-					type="submit"
-					disabled={isDeleting}
-					class="hover:bg-primary-hover flex-1 rounded-xl bg-primary py-3.5 text-xs font-bold tracking-widest text-white uppercase shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50"
-				>
-					{isDeleting
-						? m.admin_students_deleting
-							? m.admin_students_deleting()
-							: 'Kutilmoqda...'
-						: m.admin_students_delete
-							? m.admin_students_delete()
-							: 'O‘chirish'}
-				</button>
-			</form>
+				<AlertTriangle size={20} strokeWidth={2.5} class="text-primary" />
+			</div>
+			<h3 class="text-lg leading-tight font-black text-main">
+				{m.admin_students_delete_confirm_title
+					? m.admin_students_delete_confirm_title()
+					: "O'chirishni tasdiqlang"}
+			</h3>
 		</div>
-	</div>
+
+		<p class="mb-8 text-sm leading-relaxed font-medium text-muted">
+			{@html m.admin_students_delete_confirm_desc
+				? m.admin_students_delete_confirm_desc({
+						name: `<strong class="font-black text-main">${deleteTarget.name}</strong>`
+					})
+				: `Haqiqatan ham <strong class="font-black text-main">${deleteTarget.name}</strong> ni o‘chirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.`}
+		</p>
+
+		<form
+			method="POST"
+			action="?/deleteStudent"
+			use:enhance={() => {
+				isDeleting = true;
+				return async ({ update }) => {
+					await update();
+					isDeleting = false;
+				};
+			}}
+			class="flex gap-3"
+		>
+			<input type="hidden" name="studentId" value={deleteTarget.id} />
+			<button
+				type="button"
+				onclick={() => (deleteTarget = null)}
+				class="flex-1 rounded-xl bg-muted/10 py-3.5 text-xs font-bold tracking-widest text-muted uppercase transition-colors hover:bg-muted/20 active:scale-95"
+			>
+				{m.admin_students_cancel ? m.admin_students_cancel() : 'Bekor qilish'}
+			</button>
+			<button
+				type="submit"
+				disabled={isDeleting}
+				class="hover:bg-primary-hover flex-1 rounded-xl bg-primary py-3.5 text-xs font-bold tracking-widest text-white uppercase shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50"
+			>
+				{isDeleting
+					? m.admin_students_deleting
+						? m.admin_students_deleting()
+						: 'Kutilmoqda...'
+					: m.admin_students_delete
+						? m.admin_students_delete()
+						: 'O‘chirish'}
+			</button>
+		</form>
+	</Modal>
 {/if}
 
 <style>

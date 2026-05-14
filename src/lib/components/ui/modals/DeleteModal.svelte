@@ -1,30 +1,15 @@
 <!-- src/lib/components/ui/modal/DeleteModal.svelte -->
 <script>
-	import { browser } from '$app/environment';
-	let { student, onConfirm, onClose } = $props();
+	import Modal from '$lib/components/ui/Modal.svelte';
 
-	// Orqa fonni qulflash (Mobil UX uchun juda muhim)
-	$effect(() => {
-		if (browser) {
-			document.body.style.overflow = 'hidden';
-		}
-		return () => {
-			if (browser) document.body.style.overflow = '';
-		};
-	});
+	let { student, onConfirm, onClose } = $props();
 </script>
 
-<div
-	class="modal-overlay"
-	role="alertdialog"
-	tabindex="0"
-	onkeydown={(e) => e.key === 'Escape' && onClose()}
-	onclick={onClose}
->
-	<div class="modal delete-modal">
+<Modal isOpen={true} onClose={onClose} maxWidth="420px">
+	<div class="delete-content">
 		<h3 class="text-primary">Ishonchingiz komilmi?</h3>
 		<p>
-			<strong>{student.fullName}</strong>ni butunlay o‘chirib tashlamoqchimisiz?<br />
+			<strong>{student.fullName || student.username}</strong>ni butunlay o‘chirib tashlamoqchimisiz?<br />
 		</p>
 
 		<div class="modal-buttons">
@@ -32,39 +17,22 @@
 			<button class="delete-btn bg-primary" onclick={onConfirm}>Ha, O‘chirish</button>
 		</div>
 	</div>
-</div>
+</Modal>
 
 <style>
 	@reference "tailwindcss";
 
-	.modal-overlay {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.65);
-		backdrop-filter: blur(8px);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 9999999;
-	}
-
-	.delete-modal {
-		background: white;
-		max-width: 420px;
-		padding: 32px;
+	.delete-content {
 		text-align: center;
-		box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
-		@apply rounded-lg;
 	}
 
 	h3 {
-		/* color: #E11D48; */
 		font-size: 22px;
 		margin-bottom: 12px;
 	}
 
 	p {
-		color: #374151;
+		color: var(--text-main, #374151);
 		line-height: 1.5;
 		margin-bottom: 28px;
 	}
@@ -77,20 +45,24 @@
 	.cancel-btn {
 		flex: 1;
 		padding: 14px;
-		background: #f3f4f6;
+		background: var(--bg-input, #f3f4f6);
+		color: var(--text-main, #374151);
 		border: none;
 		font-weight: 600;
 		@apply rounded-md;
+		transition: background 0.2s;
+	}
+	
+	.cancel-btn:hover {
+		background: var(--border-light, #e5e7eb);
 	}
 
 	.delete-btn {
 		flex: 1;
 		padding: 14px;
-		/* background: #E11D48; */
 		color: white;
 		border: none;
 		font-weight: 600;
-
 		@apply rounded-md;
 	}
 </style>

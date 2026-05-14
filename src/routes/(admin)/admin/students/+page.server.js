@@ -3,7 +3,7 @@ import { fail } from '@sveltejs/kit';
 import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ fetch, cookies, url, setHeaders, locals }) => {
+export const load = async ({ fetch, cookies, url, locals }) => {
     const accessToken = cookies.get('access_token');
     const userId = locals.user?.id || 'admin';
     
@@ -12,12 +12,8 @@ export const load = async ({ fetch, cookies, url, setHeaders, locals }) => {
     const ordering = url.searchParams.get('ordering')  ?? '';
     const page     = url.searchParams.get('page')      ?? '1';
 
-    // Admin list sahifasi tezkor ishlashi uchun 10 daqiqalik kesh
-    setHeaders({
-        'cache-control': 'private, max-age=600, s-maxage=600'
-    });
-
-
+	// Server-side kesh (fetchWithCache) mavjud, shuning uchun brauzer keshini o'chirib qo'yamiz.
+	// Aks holda `invalidateAll()` brauzer keshidan eski ma'lumotni olar edi.
     const getStudentsData = async () => {
         const params = new URLSearchParams();
         if (search)   params.set('search',    search);
@@ -117,15 +113,15 @@ export const actions = {
         const accessToken = cookies.get('access_token');
         const data = await request.formData();
 
-        const studentId = data.get('studentId');
+        const studentId = data.get('studentId')?.toString();
         if (!studentId) return fail(400, { updateError: "Student ID topilmadi." });
 
         // Faqat API qabul qiladigan maydonlar: first_name, last_name, phone_number, is_active
         const payload = {};
-        const firstName   = data.get('firstName');
-        const lastName    = data.get('lastName');
-        const phoneNumber = data.get('phoneNumber');
-        const isActive    = data.get('isActive');
+        const firstName   = data.get('firstName')?.toString();
+        const lastName    = data.get('lastName')?.toString();
+        const phoneNumber = data.get('phoneNumber')?.toString();
+        const isActive    = data.get('isActive')?.toString();
 
         if (firstName   !== null) payload.first_name    = firstName;
         if (lastName    !== null) payload.last_name     = lastName;
@@ -148,13 +144,22 @@ export const actions = {
         }
 
         invalidateCache('admin_');
-        return { updateSuccess: true };
+        return { 
+            updateSuccess: true,
+            updatedStudent: {
+                id: parseInt(studentId),
+                ...(firstName !== null && { first_name: firstName }),
+                ...(lastName !== null && { last_name: lastName }),
+                ...(phoneNumber !== null && { phone_number: phoneNumber }),
+                ...(isActive !== null && { is_active: isActive === 'true' })
+            }
+        };
     },
 
     deleteStudent: async ({ request, cookies, fetch }) => {
         const accessToken = cookies.get('access_token');
         const data = await request.formData();
-        const studentId = data.get('studentId');
+        const studentId = data.get('studentId')?.toString();
 
         if (!studentId) return fail(400, { deleteError: "Student ID topilmadi." });
 
@@ -170,6 +175,6 @@ export const actions = {
         }
 
         invalidateCache('admin_');
-        return { deleteSuccess: true };
+        return { deleteSuccess: true, deletedStudentId: parseInt(studentId) };
     }
 };

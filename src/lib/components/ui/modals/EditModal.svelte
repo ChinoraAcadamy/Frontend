@@ -1,36 +1,13 @@
 <!-- src/lib/components/ui/modal/EditModal.svelte -->
 <script>
-	import { browser } from '$app/environment';
 	import PhoneInput from '@/lib/components/ui/PhoneInput.svelte';
-	let { student, onSave, onClose } = $props();
+	import Modal from '$lib/components/ui/Modal.svelte';
 
-	// Orqa fonni qulflash (Mobil UX uchun juda muhim)
-	$effect(() => {
-		if (browser) {
-			document.body.style.overflow = 'hidden';
-		}
-		return () => {
-			if (browser) document.body.style.overflow = '';
-		};
-	});
+	let { student, onSave, onClose } = $props();
 </script>
 
-<div
-	class="modal-overlay"
-	onclick={onClose}
-	role="dialog"
-	aria-modal="true"
-	tabindex="0"
-	onkeydown={(e) => e.key === 'Escape' && onClose()}
->
-	<div
-		class="modal rounded-lg"
-		onclick={(e) => e.stopPropagation()}
-		role="dialog"
-		aria-modal="true"
-		tabindex="0"
-		onkeydown={(e) => e.key === 'Escape' && onClose()}
-	>
+<Modal isOpen={true} onClose={onClose} maxWidth="460px">
+	<div class="edit-content">
 		<h3>Edit Student</h3>
 
 		<div class="form-grid">
@@ -50,32 +27,13 @@
 			>
 		</div>
 	</div>
-</div>
+</Modal>
 
 <style>
 	@reference "tailwindcss";
-	.modal-overlay {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.65);
-		backdrop-filter: blur(8px);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 99999999;
-		animation: fadeIn 0.2s ease;
-	}
 
-	.modal {
-		background: white;
+	.edit-content {
 		width: 100%;
-		max-width: 460px;
-		/* border-radius: 20px; */
-		padding: 32px;
-		box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
-		animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-		@apply rounded-lg;
 	}
 
 	h3 {
@@ -83,7 +41,7 @@
 		font-weight: 700;
 		margin-bottom: 24px;
 		text-align: center;
-		color: #1a0e13;
+		color: var(--text-main, #1a0e13);
 	}
 
 	.form-grid {
@@ -96,17 +54,19 @@
 	input {
 		width: 100%;
 		padding: 14px 16px;
-		border: 1px solid #e5e7eb;
+		border: 1px solid var(--border-main, #e5e7eb);
 		border-radius: 0.5rem;
 		font-size: 15px;
 		outline: none;
+		background: var(--bg-input, #ffffff);
+		color: var(--text-main, #000000);
 		transition: all 0.2s;
 
 		@apply rounded-lg;
 	}
 
 	input:focus {
-		border-color: #ff4d8d;
+		border-color: var(--primary, #ff4d8d);
 		box-shadow: 0 0 0 3px rgba(255, 77, 141, 0.15);
 	}
 
@@ -118,43 +78,17 @@
 	.cancel-btn {
 		flex: 1;
 		padding: 14px;
-		border: 1px solid #e5e7eb;
-		background: white;
-		/* border-radius: 12px; */
+		border: 1px solid var(--border-main, #e5e7eb);
+		background: var(--bg-sidebar, white);
+		color: var(--text-main, #000000);
 		font-weight: 600;
 		cursor: pointer;
+		transition: background 0.2s;
 
 		@apply rounded-lg;
 	}
 
-	.save-btn {
-		flex: 1;
-		padding: 14px;
-		background: #ff4d8d;
-		color: white;
-		border: none;
-		/* border-radius: 12px; */
-		font-weight: 600;
-		cursor: pointer;
-	}
-
-	@keyframes modalPop {
-		from {
-			transform: scale(0.8);
-			opacity: 0;
-		}
-		to {
-			transform: scale(1);
-			opacity: 1;
-		}
-	}
-
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
+	.cancel-btn:hover {
+		background: var(--border-light, #f3f4f6);
 	}
 </style>
