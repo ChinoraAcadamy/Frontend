@@ -23,17 +23,16 @@
 
 	let courses = $state([]);
 	let loadingEnrollments = $state([]);
-
-	$effect.pre(() => {
-		courses = data.student.courses ? [...data.student.courses] : [];
-		isActive = data.student.is_active;
-	});
-
 	let isChangePasswordOpen = $state(false);
 	let isAddEnrollmentOpen = $state(false);
 	let editTarget = $state(null);
 	let isDeleting = $state(false);
 	let isActive = $state(true);
+
+	$effect.pre(() => {
+		courses = data.student.courses ? [...data.student.courses] : [];
+		isActive = data.student.is_active;
+	});
 
 	function openEdit(student) {
 		editTarget = { ...student };
@@ -314,9 +313,7 @@
 						</div>
 					{/each}
 				{:else}
-					<div
-						class="rounded-2xl border-2 border-dashed border-main py-10 text-center text-muted"
-					>
+					<div class="rounded-2xl border-2 border-dashed border-main py-10 text-center text-muted">
 						{m.admin_student_no_courses()}
 					</div>
 				{/if}
