@@ -1,6 +1,5 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import { resolve } from '$app/paths';
     import { Lock, CheckCircle2, List, ChevronDown, PlayCircle } from 'lucide-svelte';
     import * as m from '$lib/paraglide/messages.js';
     import { getLocale } from '@/lib/paraglide/runtime';
@@ -77,7 +76,7 @@
                                         </div>
                                     {:else}
                                         <a
-                                            href={resolve(isAdmin ? `/admin/courses/${$page.params.course_id}/lesson/${l.id}?module_id=${module.id}` : `/kurslarim/${$page.params.id}/lessons/${l.id}?module_id=${module.id}`)}
+                                            href={isAdmin ? `/admin/courses/${$page.params.course_id}/lesson/${l.id}?module_id=${module.id}` : `/kurslarim/${$page.params.id}/lessons/${l.id}?module_id=${module.id}`}
                                             class="group flex items-center justify-between gap-3 rounded-2xl p-3 transition-colors {l.id.toString() === $page.params.lesson_id ? 'bg-primary/10 shadow-sm ring-1 shadow-primary/20 ring-primary/20' : 'hover:bg-muted/5'}"
                                         >
                                             <div class="flex min-w-0 items-start gap-3">

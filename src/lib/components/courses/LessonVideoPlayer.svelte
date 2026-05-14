@@ -321,7 +321,9 @@
 							screen.orientation.lock('portrait').catch(() => {});
 						}
 					}
-				} catch (e) {}
+				} catch (e) {
+					console.log('error video player')
+				}
 			});
 
 			player.on('exitfullscreen', () => {
@@ -330,15 +332,23 @@
 					if (screen.orientation && screen.orientation.unlock) {
 						screen.orientation.unlock();
 					}
-				} catch (e) {}
+				} catch (e) {
+					console.log('error video player')
+				}
 			});
 		}
 	});
 
 	$effect(() => {
+		if (lesson.is_completed) {
+			isVideoFinished = true;
+		}
+		
 		if (player && lesson.id && lastLoadedLessonId !== lesson.id) {
 			lastLoadedLessonId = lesson.id;
-			isVideoFinished = lesson.is_completed || false;
+			if (!lesson.is_completed) {
+				isVideoFinished = false;
+			}
 
 			const storageKey = getProgressKey(lesson.id);
 			const saved = localStorage.getItem(storageKey);

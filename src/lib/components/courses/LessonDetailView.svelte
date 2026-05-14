@@ -2,7 +2,6 @@
 	import { toast } from 'svelte-sonner';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { resolve } from '$app/paths';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale } from '@/lib/paraglide/runtime';
 	
@@ -66,7 +65,7 @@
 				const url = `/kurslarim/${$page.params.id}/lessons/${resolvedNextLesson.id}?module_id=${resolvedNextLesson.moduleId || $page.url.searchParams.get('module_id')}`;
 				/** @type {any} */
 				const route = url;
-				goto(resolve(route));
+				goto(route);
 			}
 		} catch (e) {
 			console.error('Lesson completion error:', e);

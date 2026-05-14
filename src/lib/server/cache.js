@@ -5,8 +5,8 @@ const cache = new Map();
 /**
  * Oddiy kesh kalitini yaratish
  */
-export function generateCacheKey(prefix, id) {
-    return `${prefix}:${id}`;
+export function generateCacheKey(prefix, ...ids) {
+    return [prefix, ...ids].filter(Boolean).join(':');
 }
 
 /**

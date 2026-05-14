@@ -337,7 +337,6 @@
 				<p class="modal-desc">{m.login_device_limit_desc()}</p>
 
 				<div class="device-list">
-				{console.log(form)}
 					{#each form?.['devices'] || [] as device (device.session_id)}
 						<div class="device-card" class:device-current={device.is_current}>
 							<div class="device-info">

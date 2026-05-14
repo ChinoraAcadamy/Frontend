@@ -37,7 +37,25 @@ export async function load({ params, cookies, url, locals }) {
         };
 
         // Dars va CourseData (nextLesson uchun) keshlanadi
-        const lessonDataPromise = fetchWithCache(generateCacheKey('student_lesson_detail', user?.id, params.lesson_id), fetchLessonData);
+        const lessonDataPromise = (async () => {
+            const rawLesson = await fetchWithCache(generateCacheKey('student_lesson_detail', user?.id, params.lesson_id), fetchLessonData);
+            
+            // Fetch module data to get accurate is_completed status
+            const fetchModuleData = async () => {
+                const res = await globalThis.fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/`, { headers });
+                if (!res.ok) return null;
+                return res.json();
+            };
+            const moduleData = await fetchWithCache(generateCacheKey('student_module_detail', user?.id, moduleId), fetchModuleData);
+            
+            if (moduleData && moduleData.lessons) {
+                const moduleLesson = moduleData.lessons.find(l => l.id.toString() === params.lesson_id.toString());
+                if (moduleLesson && moduleLesson.is_completed) {
+                    rawLesson.is_completed = true;
+                }
+            }
+            return rawLesson;
+        })();
         
         const nextLessonPromise = (async () => {
             const courseData = await fetchWithCache(generateCacheKey('student_course_base', user?.id, params.id), fetchCourseDataForNextLesson);
@@ -57,8 +75,8 @@ export async function load({ params, cookies, url, locals }) {
         })();
 
         return {
-            lesson: await lessonDataPromise,
             lazy: {
+                lesson: lessonDataPromise,
                 nextLesson: nextLessonPromise
             }
         };

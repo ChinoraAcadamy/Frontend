@@ -62,7 +62,7 @@ async function authHandle({ event, resolve }) {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'lax',
-				secure: process.env.NODE_ENV === 'production',
+				secure: event.url.protocol === 'https:',
 				maxAge: 60 * 60 * 24 // 1 kun
 			});
 		}
@@ -93,7 +93,7 @@ async function authHandle({ event, resolve }) {
 					path: '/',
 					httpOnly: false, // frontend o'qishi uchun
 					sameSite: 'lax',
-					secure: process.env.NODE_ENV === 'production',
+					secure: event.url.protocol === 'https:',
 					maxAge: 60 * 20 // 20 minut
 				});
 			} else if (profileRes.status === 401) {

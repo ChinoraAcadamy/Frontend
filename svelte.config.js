@@ -6,6 +6,9 @@ const config = {
 		adapter: adapter({ out: 'build' }),
 		alias: {
 			'@': './src'
+		},
+		csrf: {
+			checkOrigin: false
 		}
 	}
 };

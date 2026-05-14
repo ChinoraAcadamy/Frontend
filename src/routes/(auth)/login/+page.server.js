@@ -21,7 +21,7 @@ export const load = async ({ locals }) => {
 };
 
 export const actions = {
-    login: async ({ request, cookies, fetch }) => {
+    login: async ({ request, cookies, fetch, url }) => {
         const formData = await request.formData();
         const username = formData.get('username');
         const password = formData.get('password');
@@ -124,7 +124,7 @@ export const actions = {
             path: '/',
             httpOnly: true,
             sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production'
+            secure: url.protocol === 'https:'
         };
 
         // Access token — qisqa muddatli (1 kun)
