@@ -17,6 +17,7 @@
 	import PhoneInput from '$lib/components/ui/PhoneInput.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { resolve } from '$app/paths';
+	import { SvelteDate } from 'svelte/reactivity';
 
 	let { data } = $props();
 	const mc = $derived(data.masterclass);
@@ -29,15 +30,15 @@
 	let mounted = $state(false);
 
 	const nextTargetDate = () => {
-		const now = new Date();
+		const now = new SvelteDate();
 		const hour = mc.countdown_hour ?? 20;
 		const minute = mc.countdown_minute ?? 30;
-		if (!mc.countdown_days) return new Date();
+		if (!mc.countdown_days) return new SvelteDate();
 		const parts = mc.countdown_days.split(',').map((p) => p.trim());
 		const isNumeric = parts.every((p) => !isNaN(parseInt(p)) && p.length <= 2);
 		if (!isNumeric) {
-			let t = new Date(mc.countdown_days);
-			if (isNaN(t.getTime())) t = new Date(`${mc.countdown_days}, ${now.getFullYear()}`);
+			let t = new SvelteDate(mc.countdown_days);
+			if (isNaN(t.getTime())) t = new SvelteDate(`${mc.countdown_days}, ${now.getFullYear()}`);
 			if (!isNaN(t.getTime())) {
 				t.setHours(hour, minute, 0, 0);
 				return t;
@@ -47,12 +48,12 @@
 		const year = mc.countdown_year || now.getFullYear();
 		const month = mc.countdown_month ? mc.countdown_month - 1 : now.getMonth();
 		for (const d of days) {
-			const t = new Date(year, month, d, hour, minute, 0);
+			const t = new SvelteDate(year, month, d, hour, minute, 0);
 			if (t.getTime() > now.getTime()) return t;
 		}
 		if (mc.countdown_month)
-			return new Date(year, month, days[days.length - 1] || 1, hour, minute, 0);
-		return new Date(year, month + 1, days[0] || 1, hour, minute, 0);
+			return new SvelteDate(year, month, days[days.length - 1] || 1, hour, minute, 0);
+		return new SvelteDate(year, month + 1, days[0] || 1, hour, minute, 0);
 	};
 
 	let target = $derived(nextTargetDate());
@@ -447,7 +448,7 @@
 						<h2 class="modal-title" id="modal-title">{m.success_title()}</h2>
 						<p class="modal-sub">{m.success_sub()}</p>
 						<a
-							href={mc.telegram_invite_link || 'https://t.me/+ZlMsl6Ool8k4Zjdi'}
+							href={resolve(mc.telegram_invite_link || 'https://t.me/+ZlMsl6Ool8k4Zjdi')}
 							target="_blank"
 							rel="noopener noreferrer"
 							class="tg-btn"

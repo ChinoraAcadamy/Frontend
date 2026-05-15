@@ -60,6 +60,10 @@ export async function GET({ request, url, fetch: eventFetch, locals }) {
         });
     } catch (err) {
         console.error("Video proxy error:", err);
+        // Agar xato allaqachon SvelteKit error() bo'lsa, uni o'zini qaytaramiz (masalan 404)
+        if (err && err.status) {
+            throw err;
+        }
         throw error(500, 'Internal Server Error');
     }
 }
