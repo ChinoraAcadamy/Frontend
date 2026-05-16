@@ -42,6 +42,7 @@
 	"dependencies": {
 		"device-detector-js": "^3.0.3",
 		"gsap": "^3.14.2",
+		"hls.js": "^1.6.16",
 		"lucide-svelte": "^0.577.0",
 		"plyr": "^3.8.4",
 		"svelte-sonner": "^1.1.0"

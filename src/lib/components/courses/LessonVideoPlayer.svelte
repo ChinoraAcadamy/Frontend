@@ -7,6 +7,7 @@
 	import { page } from '$app/stores';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale } from '@/lib/paraglide/runtime';
+	import Hls from 'hls.js';
 	import 'plyr/dist/plyr.css';
 
 	let { lesson, isVideoFinished = $bindable(false) } = $props();
@@ -21,6 +22,9 @@
 	const userIdent = $derived(
 		$page.data.user?.username || $page.data.user?.phone_number || 'Chinora Student'
 	);
+
+	const hlsStatus = $derived(lesson.hls_status || 'ready');
+	const isVideoReady = $derived(hlsStatus === 'ready');
 
 	const videoSources = $derived.by(() => {
 		if (lesson.video_qualities?.length > 0) {
@@ -51,6 +55,7 @@
 	// --- Video Player State ---
 	let videoElement = $state(null);
 	let player = $state(null);
+	let hlsInstance = $state(null);
 	let playerReady = $state(false);
 	let lastLoadedLessonId = $state(null);
 
@@ -265,78 +270,11 @@
 	}
 
 	// --- Lifecycle & Effects ---
-	onMount(async () => {
+	onMount(() => {
 		document.addEventListener('keydown', handleKeydown);
 		document.addEventListener('visibilitychange', handleVisibility);
 		window.addEventListener('blur', () => player?.pause());
 		watermarkInterval = setInterval(moveWatermark, 10000);
-
-		if (videoElement) {
-			const PlyrModule = await import('plyr');
-			const Plyr = PlyrModule.default;
-
-			player = new Plyr(videoElement, {
-				controls: [
-					'play-large',
-					'play',
-					'progress',
-					'current-time',
-					'duration',
-					'mute',
-					'volume',
-					'captions',
-					'settings',
-					'pip',
-					'airplay',
-					'fullscreen'
-				],
-				settings: lesson.video_qualities?.length > 0 ? ['quality', 'speed'] : ['speed'],
-				quality: {
-					default: 720,
-					options:
-						lesson.video_qualities?.length > 0 ? lesson.video_qualities.map((q) => q.size) : [720],
-					forced: true
-				},
-				captions: { active: true, update: true, language: 'uz' },
-				speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] },
-				keyboard: { focused: true, global: false },
-				clickToPlay: false, // Disable default play on video click
-				fullscreen: { enabled: true, fallback: true, iosNative: false, container: '.vp-shell' }
-			});
-
-			player.on('ready', () => {
-				playerReady = true;
-				document.documentElement.style.setProperty('--plyr-color-main', '#9b1c48');
-			});
-
-			player.on('enterfullscreen', () => {
-				if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
-				try {
-					const videoWidth = player.media?.videoWidth || 0;
-					const videoHeight = player.media?.videoHeight || 0;
-					if (screen.orientation && screen.orientation.lock) {
-						if (videoWidth > videoHeight) {
-							screen.orientation.lock('landscape').catch(() => {});
-						} else {
-							screen.orientation.lock('portrait').catch(() => {});
-						}
-					}
-				} catch (e) {
-					console.log('error video player')
-				}
-			});
-
-			player.on('exitfullscreen', () => {
-				if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
-				try {
-					if (screen.orientation && screen.orientation.unlock) {
-						screen.orientation.unlock();
-					}
-				} catch (e) {
-					console.log('error video player')
-				}
-			});
-		}
 	});
 
 	$effect(() => {
@@ -344,95 +282,199 @@
 			isVideoFinished = true;
 		}
 		
-		if (player && lesson.id && lastLoadedLessonId !== lesson.id) {
+		if (videoElement && isVideoReady && lesson.id && lastLoadedLessonId !== lesson.id) {
 			lastLoadedLessonId = lesson.id;
 			if (!lesson.is_completed) {
 				isVideoFinished = false;
 			}
 
-			const storageKey = getProgressKey(lesson.id);
-			const saved = localStorage.getItem(storageKey);
-
-			let isRestored = false;
-			let expectedTime = 0;
-
-			if (saved && !isNaN(Number(saved))) {
-				expectedTime = parseFloat(saved);
-			} else {
-				isRestored = true;
+			// Clean up previous instances
+			if (player) {
+				player.destroy();
+				player = null;
+				playerReady = false;
+			}
+			if (hlsInstance) {
+				hlsInstance.destroy();
+				hlsInstance = null;
 			}
 
-			player.source = {
-				type: 'video',
-				title: lesson.title,
-				sources: videoSources,
-				poster: lesson.image,
-				tracks: videoTracks
-			};
+			const initPlayback = async () => {
+				const PlyrModule = await import('plyr');
+				const Plyr = PlyrModule.default;
 
-			const checkProgress = () => {
-				if (player.duration > 0 && player.currentTime / player.duration >= completionThreshold) {
-					isVideoFinished = true;
-				}
-			};
+				const url = getProxiedUrl(lesson.video_url);
+				const isHls = url && url.includes('.m3u8');
 
-			const resumePlayback = () => {
-				if (!isRestored && expectedTime > 2) {
-					if (player.duration > 0 || player.media?.duration > 0) {
-						player.currentTime = expectedTime;
+				let defaultOptions = {
+					controls: [
+						'play-large', 'play', 'progress', 'current-time', 'duration',
+						'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'
+					],
+					settings: ['quality', 'speed'],
+					captions: { active: true, update: true, language: 'uz' },
+					speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] },
+					keyboard: { focused: true, global: false },
+					clickToPlay: false,
+					fullscreen: { enabled: true, fallback: true, iosNative: false, container: '.vp-shell' }
+				};
+
+				const setupPlayer = (options) => {
+					if (!videoElement) return; // Might have unmounted
+					player = new Plyr(videoElement, options);
+
+					player.on('ready', () => {
+						playerReady = true;
+						document.documentElement.style.setProperty('--plyr-color-main', '#9b1c48');
+					});
+
+					player.on('enterfullscreen', () => {
+						if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
+						try {
+							const videoWidth = player.media?.videoWidth || 0;
+							const videoHeight = player.media?.videoHeight || 0;
+							if (screen.orientation && screen.orientation.lock) {
+								if (videoWidth > videoHeight) {
+									screen.orientation.lock('landscape').catch(() => {});
+								} else {
+									screen.orientation.lock('portrait').catch(() => {});
+								}
+							}
+						} catch (e) {
+							console.log('error video player')
+						}
+					});
+
+					player.on('exitfullscreen', () => {
+						if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
+						try {
+							if (screen.orientation && screen.orientation.unlock) {
+								screen.orientation.unlock();
+							}
+						} catch (e) {
+							console.log('error video player')
+						}
+					});
+
+					const storageKey = getProgressKey(lesson.id);
+					const saved = localStorage.getItem(storageKey);
+					let isRestored = false;
+					let expectedTime = 0;
+
+					if (saved && !isNaN(Number(saved))) {
+						expectedTime = parseFloat(saved);
+					} else {
 						isRestored = true;
+					}
+
+					const checkProgress = () => {
+						if (player.duration > 0 && player.currentTime / player.duration >= completionThreshold) {
+							isVideoFinished = true;
+						}
+					};
+
+					const resumePlayback = () => {
+						if (!isRestored && expectedTime > 2) {
+							if (player.duration > 0 || player.media?.duration > 0) {
+								player.currentTime = expectedTime;
+								isRestored = true;
+								checkProgress();
+							}
+						} else {
+							isRestored = true;
+						}
+					};
+
+					player.on('loadedmetadata', resumePlayback);
+					player.on('canplay', resumePlayback);
+					player.on('playing', resumePlayback);
+
+					let saveInterval;
+					const startAutoSave = () => {
+						if (saveInterval) clearInterval(saveInterval);
+						saveInterval = setInterval(() => {
+							if (isRestored && player.currentTime > 0) {
+								localStorage.setItem(storageKey, player.currentTime.toString());
+							}
+						}, 4000);
+					};
+
+					const stopAutoSave = () => {
+						if (saveInterval) clearInterval(saveInterval);
+						if (isRestored && player.currentTime > 0) {
+							localStorage.setItem(storageKey, player.currentTime.toString());
+						}
+					};
+
+					const onEnded = () => {
+						isVideoFinished = true;
+						stopAutoSave();
+					};
+
+					player.on('playing', startAutoSave);
+					player.on('pause', () => {
+						stopAutoSave();
 						checkProgress();
+					});
+					player.on('ended', onEnded);
+					player.on('timeupdate', checkProgress);
+				};
+
+				if (isHls) {
+					if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+						videoElement.src = url;
+						videoElement.poster = lesson.image;
+						setupPlayer(defaultOptions);
+					} else if (Hls.isSupported()) {
+						hlsInstance = new Hls();
+						hlsInstance.loadSource(url);
+						hlsInstance.attachMedia(videoElement);
+						
+						hlsInstance.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+							const availableQualities = hlsInstance.levels.map((l) => l.height);
+							availableQualities.unshift(0); // Auto
+
+							defaultOptions.quality = {
+								default: 0,
+								options: availableQualities,
+								forced: true,
+								onChange: (e) => {
+									if (e === 0) {
+										hlsInstance.currentLevel = -1; // Auto
+									} else {
+										const newLevel = hlsInstance.levels.findIndex((l) => l.height === e);
+										if (newLevel !== -1) {
+											hlsInstance.currentLevel = newLevel;
+										}
+									}
+								}
+							};
+							defaultOptions.i18n = { qualityLabel: { 0: 'Auto' } };
+
+							videoElement.poster = lesson.image;
+							setupPlayer(defaultOptions);
+						});
 					}
 				} else {
-					isRestored = true;
+					// Fallback MP4
+					defaultOptions.quality = {
+						default: 720,
+						options: lesson.video_qualities?.length > 0 ? lesson.video_qualities.map((q) => q.size) : [720],
+						forced: true
+					};
+					setupPlayer(defaultOptions);
+					
+					player.source = {
+						type: 'video',
+						title: lesson.title,
+						sources: videoSources,
+						poster: lesson.image,
+						tracks: videoTracks
+					};
 				}
 			};
 
-			player.on('loadedmetadata', resumePlayback);
-			player.on('canplay', resumePlayback);
-			player.on('playing', resumePlayback);
-
-			let saveInterval;
-
-			const startAutoSave = () => {
-				if (saveInterval) clearInterval(saveInterval);
-				saveInterval = setInterval(() => {
-					if (isRestored && player.currentTime > 0) {
-						localStorage.setItem(storageKey, player.currentTime.toString());
-					}
-				}, 4000);
-			};
-
-			const stopAutoSave = () => {
-				if (saveInterval) clearInterval(saveInterval);
-				if (isRestored && player.currentTime > 0) {
-					localStorage.setItem(storageKey, player.currentTime.toString());
-				}
-			};
-
-			const onEnded = () => {
-				isVideoFinished = true;
-				stopAutoSave();
-			};
-
-			player.on('playing', startAutoSave);
-			player.on('pause', () => {
-				stopAutoSave();
-				checkProgress();
-			});
-			player.on('ended', onEnded);
-			player.on('timeupdate', checkProgress);
-
-			return () => {
-				stopAutoSave();
-				player.off('loadedmetadata', resumePlayback);
-				player.off('canplay', resumePlayback);
-				player.off('playing', resumePlayback);
-				player.off('playing', startAutoSave);
-				player.off('pause', stopAutoSave);
-				player.off('ended', onEnded);
-				player.off('timeupdate', checkProgress);
-			};
+			initPlayback();
 		}
 	});
 
@@ -444,6 +486,7 @@
 		}
 		if (watermarkInterval) clearInterval(watermarkInterval);
 		if (securityLoop) clearInterval(securityLoop);
+		if (hlsInstance) hlsInstance.destroy();
 		player?.destroy();
 	});
 </script>
@@ -461,16 +504,30 @@
 	ontouchend={handleTouchEnd}
 >
 	<!-- ── Skeleton loader ─────────────────────────────── -->
-	{#if !playerReady}
+	{#if !playerReady && isVideoReady}
 		<div class="vp-skeleton" transition:fade={{ duration: 200 }}>
 			<div class="vp-skeleton-spinner"></div>
+		</div>
+	{/if}
+
+	<!-- ── Status overlay ──────────────────────────────── -->
+	{#if !isVideoReady}
+		<div class="vp-status-overlay" transition:fade={{ duration: 200 }}>
+			{#if hlsStatus === 'uploading' || hlsStatus === 'processing'}
+				<div class="vp-skeleton-spinner"></div>
+				<p class="vp-status-text">{hlsStatus === 'uploading' ? 'Video serverga yuklanmoqda...' : "Video qayta ishlanmoqda (HLS formatiga o'tkazilmoqda)..."}</p>
+			{:else if hlsStatus === 'failed'}
+				<p class="vp-status-text text-red-400">Videoni yuklashda xatolik yuz berdi.</p>
+			{:else}
+				<p class="vp-status-text">Video hali yuklanmagan.</p>
+			{/if}
 		</div>
 	{/if}
 
 	<!-- ── Video element ───────────────────────────────── -->
 	<video
 		bind:this={videoElement}
-		class="vp-video {playerReady ? 'vp-video--ready' : ''}"
+		class="vp-video {playerReady && isVideoReady ? 'vp-video--ready' : ''}"
 		playsinline
 		crossorigin="anonymous"
 	>
@@ -557,6 +614,29 @@
 		border: 3px solid rgba(155, 28, 72, 0.2);
 		border-top-color: #9b1c48;
 		animation: vp-spin 0.7s linear infinite;
+	}
+
+	/* ── Status overlay ────────────────────────────────── */
+	.vp-status-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 35;
+		background: #0d0d0d;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 16px;
+		color: rgba(255, 255, 255, 0.7);
+		text-align: center;
+		padding: 24px;
+		border-radius: inherit;
+	}
+
+	.vp-status-text {
+		font-size: 15px;
+		font-weight: 500;
+		line-height: 1.5;
 	}
 
 	/* ── Video ─────────────────────────────────────────── */
