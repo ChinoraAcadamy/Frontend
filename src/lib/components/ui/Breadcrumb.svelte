@@ -93,9 +93,21 @@
 					}
 				}
 
-				return { label, href, isClickable: validRoutePatterns.has(routePattern) };
+				let isClickable = validRoutePatterns.has(routePattern);
+
+				// Qattiq tekshiruv: Hech qanday standalone content bo'lmagan, faqat layout vazifasini bajaradigan intermediate route'larni bosib bo'lmaydigan qilamiz.
+				if (
+					routePattern === '/admin/courses/[course_id]/lesson' ||
+					routePattern === '/admin/courses/[id]/lesson' ||
+					routePattern.endsWith('/lesson') ||
+					routePattern.endsWith('/lessons')
+				) {
+					isClickable = false;
+				}
+
+				return { label, href, isClickable };
 			})
-			.filter((item, i, arr) => item.href !== '/admin' && (i === arr.length - 1 || item.isClickable))
+			.filter((item) => item.href !== '/admin')
 	);
 
 	// Dinamik home link (admin vs student)
@@ -108,6 +120,14 @@
 	// Mobile: faqat oxirgi 2 elementni ko'rsatish
 	let mobileItems = $derived(items.slice(-2));
 	let hasMore = $derived(items.length > 2);
+
+	// Mobile: eng yaqin bossa bo'ladigan ota-sahifaga orqaga qaytish tugmasi
+	let nearestBackItem = $derived(
+		items
+			.slice(0, -1)
+			.reverse()
+			.find((item) => item.isClickable)
+	);
 </script>
 
 <!-- Desktop: inNavbar holati -->
@@ -122,8 +142,10 @@
 					<path d="m9 18 6-6-6-6"/>
 				</svg>
 			</span>
-			{#if i !== items.length - 1}
+			{#if i !== items.length - 1 && item.isClickable}
 				<a href={resolve(/** @type {any} */(item.href))} class="bc-link text-muted hover:text-primary hover:bg-primary/10 transition-colors">{item.label}</a>
+			{:else if i !== items.length - 1}
+				<span class="bc-link text-muted/50 cursor-default select-none" title={item.label}>{item.label}</span>
 			{:else}
 				<span class="bc-current text-foreground" title={item.label}>{item.label}</span>
 			{/if}
@@ -135,15 +157,12 @@
 	<nav class="bc-mobile" aria-label="Breadcrumb">
 		<div class="bc-mobile-inner">
 			<!-- Agar oldin ko'proq element bo'lsa, orqaga o'tish uchun -->
-			{#if hasMore}
-				{@const backItem = items[items.length - 2]}
-				{#if backItem?.isClickable}
-					<a href={resolve(/** @type {any} */(backItem.href))} class="bc-back-btn text-primary bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Back">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-							<path d="m15 18-6-6 6-6"/>
-						</svg>
-					</a>
-				{/if}
+			{#if nearestBackItem}
+				<a href={resolve(/** @type {any} */(nearestBackItem.href))} class="bc-back-btn text-primary bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Back">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+						<path d="m15 18-6-6 6-6"/>
+					</svg>
+				</a>
 			{:else}
 				<a href={resolve(/** @type {any} */(homeHref))} class="bc-back-btn text-primary bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Dashboard">
 					<Home size={14} strokeWidth={2.5} />
@@ -170,8 +189,10 @@
 						</span>
 					{/if}
 
-					{#if i !== mobileItems.length - 1}
+					{#if i !== mobileItems.length - 1 && item.isClickable}
 						<a href={resolve(/** @type {any} */(item.href))} class="bc-trail-link text-muted hover:text-primary transition-colors">{item.label}</a>
+					{:else if i !== mobileItems.length - 1}
+						<span class="bc-trail-link text-muted/50 cursor-default select-none" title={item.label}>{item.label}</span>
 					{:else}
 						<span class="bc-trail-current text-foreground" title={item.label}>{item.label}</span>
 					{/if}

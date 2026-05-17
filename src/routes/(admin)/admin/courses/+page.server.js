@@ -8,11 +8,6 @@ export const load = async ({ fetch, cookies, setHeaders, locals }) => {
     if (!accessToken) throw error(401, 'Avtorizatsiya talab qilinadi');
     const userId = locals.user?.id || 'admin';
 
-    // Optimizatsiya: 10 daqiqalik kesh (Keshlanadi, lekin o'chirishlar reactiv ishlaydi)
-    setHeaders({
-        'cache-control': 'private, max-age=600'
-    });
-
 
 
     const getCourses = async () => {

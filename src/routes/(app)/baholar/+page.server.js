@@ -2,11 +2,6 @@ import { getSubmissions } from '@/lib/server/submissions.js';
 import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 export const load = async (event) => {
-    // Optimizatsiya: 1 daqiqalik kesh
-    event.setHeaders({
-        'cache-control': 'private, max-age=60'
-    });
-
     const { url, locals } = event;
     const user = locals.user;
 

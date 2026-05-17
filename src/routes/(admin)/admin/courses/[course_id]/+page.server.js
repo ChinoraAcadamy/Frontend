@@ -24,7 +24,7 @@ export const actions = {
             return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });
         }
 
-        invalidateCache('admin_');
+        invalidateCache();
         throw redirect(303, `/admin/courses?deleted_course=${params.course_id}`);
     },
 
@@ -89,7 +89,7 @@ export const actions = {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }
 
-        invalidateCache('admin_');
+        invalidateCache();
         return { success: true };
     },
 
@@ -111,7 +111,7 @@ export const actions = {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }
         
-        invalidateCache('admin_');
+        invalidateCache();
         return { success: true };
     },
 
@@ -145,7 +145,7 @@ export const actions = {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }
 
-        invalidateCache('admin_');
+        invalidateCache();
         return { success: true };
     },
 
@@ -168,7 +168,7 @@ export const actions = {
             return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
         }
 
-        invalidateCache('admin_');
+        invalidateCache();
         return { success: true };
     }
 };

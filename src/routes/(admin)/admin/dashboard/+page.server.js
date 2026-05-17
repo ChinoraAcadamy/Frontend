@@ -5,10 +5,6 @@ import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 /** @type {import('./$types').PageServerLoad} */
 export const load = async (event) => {
     const { cookies, fetch, setHeaders, locals } = event;
-    // 10 daqiqa kesh (600 soniya)
-    setHeaders({
-        'cache-control': 'private, max-age=600'
-    });
 
     const accessToken = cookies.get('access_token');
     const headers = { 'Authorization': `Bearer ${accessToken}` };

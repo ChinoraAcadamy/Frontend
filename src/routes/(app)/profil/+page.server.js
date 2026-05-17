@@ -6,12 +6,7 @@ import { translateServerMessage } from '$lib/utils/server-messages.js';
 import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
-export const load = async ({ cookies, fetch, setHeaders, locals }) => {
-    // Cache the profile page securely for this user for 60 seconds
-    setHeaders({
-        'Cache-Control': 'private, max-age=60'
-    });
-
+export const load = async ({ cookies, fetch, locals }) => {
     const token = cookies.get('access_token');
     const user = locals.user;
 

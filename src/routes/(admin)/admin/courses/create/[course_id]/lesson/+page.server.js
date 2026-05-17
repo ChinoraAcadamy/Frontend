@@ -1,5 +1,6 @@
 import { API_URL } from '$env/static/private';
 import { fail, redirect } from '@sveltejs/kit';
+import { invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ parent, params, cookies }) => {
     const { modules } = await parent();
@@ -73,6 +74,7 @@ export const actions = {
 
             const result = await response.json();
 
+            invalidateCache();
             return { success: true, lesson: result };
         } catch (err) {
             console.log(err);

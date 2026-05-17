@@ -3,11 +3,6 @@ import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load(event) {
-    // Kesh va Performance optimizatsiyasi (10 daqiqa)
-    event.setHeaders({
-        'cache-control': 'private, max-age=600'
-    });
-
     const user = event.locals.user;
 
     return {

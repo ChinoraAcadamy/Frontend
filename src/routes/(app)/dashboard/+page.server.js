@@ -5,11 +5,6 @@ import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load(event) {
-    // 10 daqiqa kesh
-    event.setHeaders({
-        'cache-control': 'private, max-age=600'
-    });
-
     /** @type {any} */
     const user = event.locals.user;
     

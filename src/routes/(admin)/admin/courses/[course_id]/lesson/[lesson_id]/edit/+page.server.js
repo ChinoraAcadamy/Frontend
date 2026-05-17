@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
+import { invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ fetch, cookies, params }) => {
     const accessToken = cookies.get('access_token');
@@ -72,6 +73,7 @@ export const actions = {
                 });
             }
 
+            invalidateCache();
             return { success: true };
         } catch (err) {
             console.log(err);
