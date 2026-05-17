@@ -7,6 +7,7 @@
 	import AdminCourseDetailView from '$lib/components/admin/AdminCourseDetailView.svelte';
 	import ModuleEditModal from '$lib/components/admin/ModuleEditModal.svelte';
 	import ActionMenu from '$lib/components/admin/ActionMenu.svelte';
+	import Modal from '$lib/components/ui/Modal.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
@@ -32,26 +33,12 @@
 		isEditModuleModalOpen = true;
 	}
 
-	// O'chirish formasi yuborilishidan oldin tasdiq so'rash
-	function handleDelete(msg) {
-		return async ({ cancel }) => {
-			const confirmed = confirm(msg || m.admin_confirm_continue());
+	let isDeleteModalOpen = $state(false);
+	let deleteTarget = $state({ type: '', id: null, title: '', moduleId: null });
 
-			if (!confirmed) {
-				cancel(); // Formani yuborishni to'xtatish
-				return;
-			}
-
-			isDeleting = true;
-
-			return async ({ update, result }) => {
-				isDeleting = false;
-				if (result.type === 'failure') {
-					alert(result.data?.error || m.error_occurred());
-				}
-				await update();
-			};
-		};
+	function confirmDelete(type, id, title, moduleId = null) {
+		deleteTarget = { type, id, title, moduleId };
+		isDeleteModalOpen = true;
 	}
 </script>
 
@@ -60,6 +47,68 @@
 	moduleTarget={editModuleTarget}
 	coursePk={$page.params.course_id}
 />
+
+<Modal isOpen={isDeleteModalOpen} onClose={() => isDeleteModalOpen = false} title={m.admin_danger_zone_delete_btn ? m.admin_danger_zone_delete_btn() : "Tasdiqlash"} maxWidth="440px">
+	<div class="flex flex-col items-center text-center p-2">
+		<div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 mb-4 animate-pulse">
+			<AlertTriangle size={32} />
+		</div>
+		
+		<h3 class="text-xl font-extrabold text-foreground mb-2">Ishonchingiz komilmi?</h3>
+		
+		<p class="text-sm text-muted-foreground leading-relaxed mb-6">
+			{#if deleteTarget.type === 'module'}
+				Modul <strong>"{deleteTarget.title}"</strong> va uning barcha darslari butunlay o'chib ketadi.
+			{:else if deleteTarget.type === 'lesson'}
+				Dars <strong>"{deleteTarget.title}"</strong> butunlay o'chib ketadi.
+			{:else}
+				Kurs <strong>"{deleteTarget.title}"</strong> butunlay o'chib ketadi.
+			{/if}
+			<br />
+			<span class="text-red-500 font-semibold mt-1 block">Bu amalni ortga qaytarib bo'lmaydi!</span>
+		</p>
+
+		<form
+			method="POST"
+			action={deleteTarget.type === 'module' ? '?/deleteModule' : deleteTarget.type === 'lesson' ? '?/deleteLesson' : '?/deleteCourse'}
+			use:enhance={() => {
+				isDeleting = true;
+				return async ({ result, update }) => {
+					isDeleting = false;
+					isDeleteModalOpen = false;
+					if (result.type === 'failure') {
+						alert(result.data?.error || m.error_occurred());
+					}
+					await update();
+				};
+			}}
+			class="flex gap-3 w-full"
+		>
+			{#if deleteTarget.type === 'module'}
+				<input type="hidden" name="module_id" value={deleteTarget.id} />
+			{:else if deleteTarget.type === 'lesson'}
+				<input type="hidden" name="module_id" value={deleteTarget.moduleId} />
+				<input type="hidden" name="lesson_id" value={deleteTarget.id} />
+			{/if}
+
+			<button 
+				type="button" 
+				class="flex-1 py-3 px-4 rounded-xl border border-border bg-surface text-foreground font-bold hover:bg-muted transition-all active:scale-[0.98]" 
+				onclick={() => isDeleteModalOpen = false} 
+				disabled={isDeleting}
+			>
+				Yo'q, Bekor qilish
+			</button>
+			<button 
+				type="submit" 
+				class="flex-1 py-3 px-4 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 shadow-md shadow-red-600/10 transition-all active:scale-[0.98]"
+				disabled={isDeleting}
+			>
+				{isDeleting ? "O'chirilmoqda..." : "Ha, O'chirish"}
+			</button>
+		</form>
+	</div>
+</Modal>
 
 <AdminCourseDetailView course={data.course} modules={data.modules}>
 	{#snippet adminModuleActions(mod)}
@@ -121,20 +170,15 @@
 				</div>
 
 				<div class="p-6">
-					<form
-						method="POST"
-						action="?/deleteCourse"
-						use:enhance={handleDelete(m.admin_danger_zone_confirm())}
+					<button
+						type="button"
+						onclick={() => confirmDelete('course', data.course.id, data.course.title)}
+						disabled={isDeleting}
+						class="flex w-full items-center justify-center gap-3 rounded-2xl bg-red-500 py-4 text-base font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-600 active:scale-[0.98] disabled:opacity-50"
 					>
-						<button
-							type="submit"
-							disabled={isDeleting}
-							class="flex w-full items-center justify-center gap-3 rounded-2xl bg-red-500 py-4 text-base font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-600 active:scale-[0.98] disabled:opacity-50"
-						>
-							<Trash2 size={20} />
-							{isDeleting ? m.admin_danger_zone_deleting() : m.admin_danger_zone_delete_btn()}
-						</button>
-					</form>
+						<Trash2 size={20} />
+						{isDeleting ? m.admin_danger_zone_deleting() : m.admin_danger_zone_delete_btn()}
+					</button>
 				</div>
 			</div>
 		{/if}
@@ -150,18 +194,14 @@
 {/snippet}
 
 {#snippet renderModuleDeleteAction(mod)}
-	<form
-		method="POST"
-		action="?/deleteModule"
-		use:enhance={handleDelete(m.admin_module_delete_confirm())}
-		class="w-full lg:w-auto"
+	<button
+		type="button"
+		onclick={() => confirmDelete('module', mod.id, mod.title)}
+		class="action-menu-item w-full lg:w-auto text-left"
 	>
-		<input type="hidden" name="module_id" value={mod.id} />
-		<button type="submit" class="action-menu-item">
-			<Trash2 size={18} />
-			<span>{m.admin_students_delete()}</span>
-		</button>
-	</form>
+		<Trash2 size={18} />
+		<span>{m.admin_students_delete ? m.admin_students_delete() : 'O\'chirish'}</span>
+	</button>
 {/snippet}
 
 {#snippet renderLessonViewAction(lesson, mod)}
@@ -201,17 +241,12 @@
 {/snippet}
 
 {#snippet renderLessonDeleteAction(lesson, mod)}
-	<form
-		method="POST"
-		action="?/deleteLesson"
-		use:enhance={handleDelete(m.admin_lesson_delete_confirm())}
-		class="w-full lg:w-auto"
+	<button
+		type="button"
+		onclick={() => confirmDelete('lesson', lesson.id, lesson.title, mod.id)}
+		class="action-menu-item w-full lg:w-auto text-left"
 	>
-		<input type="hidden" name="module_id" value={mod.id} />
-		<input type="hidden" name="lesson_id" value={lesson.id} />
-		<button type="submit" class="action-menu-item">
-			<Trash2 size={18} />
-			<span>{m.admin_students_delete()}</span>
-		</button>
-	</form>
+		<Trash2 size={18} />
+		<span>{m.admin_students_delete ? m.admin_students_delete() : 'O\'chirish'}</span>
+	</button>
 {/snippet}

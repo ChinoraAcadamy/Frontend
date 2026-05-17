@@ -9,18 +9,23 @@ export const load = async ({ parent }) => {
 };
 
 export const actions = {
-    deleteCourse: async ({ params, cookies, fetch }) => {
+    deleteCourse: async ({ params, cookies }) => {
         const accessToken = cookies.get('access_token');
         if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
         try {
-            const response = await fetch(`${API_URL}/courses/${params.course_id}/`, {
+            const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
 
-            if (!response.ok) return fail(400, { error: "Kursni o'chirishda xatolik yuz berdi." });
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                console.error("Backend error deleting course:", errData);
+                return fail(400, { error: errData.detail || "Kursni o'chirishda xatolik yuz berdi." });
+            }
         } catch (err) {
+            console.error("Fetch error deleting course:", err);
             return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });
         }
 
@@ -93,7 +98,7 @@ export const actions = {
         return { success: true };
     },
 
-    deleteModule: async ({ request, params, cookies, fetch }) => {
+    deleteModule: async ({ request, params, cookies }) => {
         const accessToken = cookies.get('access_token');
         if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
@@ -101,14 +106,19 @@ export const actions = {
         const moduleId = formData.get('module_id');
 
         try {
-            const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/`, {
+            const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
 
-            if (!response.ok) return fail(400, { error: "Modulni o'chirishda xatolik yuz berdi." });
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                console.error("Backend error deleting module:", errData);
+                return fail(400, { error: errData.detail || "Modulni o'chirishda xatolik yuz berdi." });
+            }
         } catch (err) {
-            return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
+            console.error("Fetch error deleting module:", err);
+            return fail(500, { error: `Server bilan ulanishda xatolik | ${err.message}` });
         }
         
         invalidateCache();
@@ -149,7 +159,7 @@ export const actions = {
         return { success: true };
     },
 
-    deleteLesson: async ({ request, params, cookies, fetch }) => {
+    deleteLesson: async ({ request, params, cookies }) => {
         const accessToken = cookies.get('access_token');
         if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
@@ -158,14 +168,19 @@ export const actions = {
         const lessonId = formData.get('lesson_id');
 
         try {
-            const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/lessons/${lessonId}/`, {
+            const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/lessons/${lessonId}/`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
 
-            if (!response.ok) return fail(400, { error: "Darsni o'chirishda xatolik yuz berdi." });
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                console.error("Backend error deleting lesson:", errData);
+                return fail(400, { error: errData.detail || "Darsni o'chirishda xatolik yuz berdi." });
+            }
         } catch (err) {
-            return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
+            console.error("Fetch error deleting lesson:", err);
+            return fail(500, { error: `Server bilan ulanishda xatolik | ${err.message}` });
         }
 
         invalidateCache();
