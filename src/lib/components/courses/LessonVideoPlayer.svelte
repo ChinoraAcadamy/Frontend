@@ -470,7 +470,9 @@
 				};
 
 				if (isHls) {
-					if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+					const useNativeHls = videoElement.canPlayType('application/vnd.apple.mpegurl') && !Hls.isSupported();
+					
+					if (useNativeHls) {
 						setupPlayer(defaultOptions);
 						player.source = {
 							type: 'video',
