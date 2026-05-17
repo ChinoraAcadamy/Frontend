@@ -76,7 +76,9 @@
 					class="relative h-48 w-full shrink-0 overflow-hidden rounded-2xl bg-muted/10 sm:h-24 sm:w-36"
 				>
 					<img
-						src={course.img || course.img_file || course.image ||
+						src={course.img ||
+							course.img_file ||
+							course.image ||
 							`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
 						alt="Course cover"
 						class="absolute inset-0 h-full w-full object-cover"
@@ -110,21 +112,15 @@
 				<h3 class="mb-4 text-lg font-bold text-foreground">{m.course_progress()}</h3>
 				<div class="space-y-3">
 					<div class="flex items-center justify-between text-sm">
-						<span class="font-medium text-muted"
-							>{m.lessons_total()}</span
-						>
+						<span class="font-medium text-muted">{m.lessons_total()}</span>
 						<span class="font-bold text-foreground">{course.lessons_count || 0}</span>
 					</div>
 					<div class="flex items-center justify-between text-sm">
-						<span class="font-medium text-muted"
-							>{m.lessons_watched()}</span
-						>
+						<span class="font-medium text-muted">{m.lessons_watched()}</span>
 						<span class="font-bold text-foreground">{course.completed_lessons || 0}</span>
 					</div>
 					<div class="flex items-center justify-between text-sm">
-						<span class="font-medium text-muted"
-							>{m.lessons_remaining()}</span
-						>
+						<span class="font-medium text-muted">{m.lessons_remaining()}</span>
 						<span class="font-bold text-foreground"
 							>{course.lessons_count - course.completed_lessons || 0}</span
 						>
@@ -135,7 +131,7 @@
 
 		<!-- Modules & Lessons -->
 		<div class="space-y-4">
-			{#each modules as mod (mod.title)}
+			{#each modules as mod (mod.id)}
 				<ModuleAccordion title={mod.title}>
 					{#snippet adminActions()}
 						{#if adminModuleActions}

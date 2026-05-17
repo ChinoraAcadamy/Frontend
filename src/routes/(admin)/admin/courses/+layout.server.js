@@ -12,26 +12,27 @@ export const load = async ({ params, cookies }) => {
     };
 
     try {
+        const timestamp = Date.now();
         const [resUz, resRu, resListUz, resListRu] = await Promise.all([
-            globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
+            globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
                 headers: {
                     ...headers,
                     'Accept-Language': 'uz'
                 }
             }),
-            globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
+            globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
                 headers: {
                     ...headers,
                     'Accept-Language': 'ru'
                 }
             }),
-            globalThis.fetch(`${API_URL}/courses/`, {
+            globalThis.fetch(`${API_URL}/courses/?_cb=${timestamp}`, {
                 headers: {
                     ...headers,
                     'Accept-Language': 'uz'
                 }
             }),
-            globalThis.fetch(`${API_URL}/courses/`, {
+            globalThis.fetch(`${API_URL}/courses/?_cb=${timestamp}`, {
                 headers: {
                     ...headers,
                     'Accept-Language': 'ru'

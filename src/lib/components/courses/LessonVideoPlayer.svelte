@@ -76,6 +76,7 @@
 	let gestureIcon = $state(null);
 	let showGestureIndicator = $state(false);
 	let gestureTimeout = null;
+	let saveInterval = null;
 
 	const completionThreshold = 0.90; // Mobil qurilmalar uchun 90% yetarli
 
@@ -438,11 +439,10 @@
 					player.on('canplay', resumePlayback);
 					player.on('playing', resumePlayback);
 
-					let saveInterval;
 					const startAutoSave = () => {
 						if (saveInterval) clearInterval(saveInterval);
 						saveInterval = setInterval(() => {
-							if (isRestored && player.currentTime > 0) {
+							if (isRestored && player && player.media && player.currentTime > 0) {
 								localStorage.setItem(storageKey, player.currentTime.toString());
 							}
 						}, 4000);
@@ -450,7 +450,7 @@
 
 					const stopAutoSave = () => {
 						if (saveInterval) clearInterval(saveInterval);
-						if (isRestored && player.currentTime > 0) {
+						if (isRestored && player && player.media && player.currentTime > 0) {
 							localStorage.setItem(storageKey, player.currentTime.toString());
 						}
 					};
@@ -548,6 +548,7 @@
 		}
 		if (watermarkInterval) clearInterval(watermarkInterval);
 		if (securityLoop) clearInterval(securityLoop);
+		if (saveInterval) clearInterval(saveInterval);
 		if (hlsInstance) hlsInstance.destroy();
 		player?.destroy();
 	});

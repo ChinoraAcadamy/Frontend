@@ -7,7 +7,7 @@ export const load = async ({ parent, params, cookies }) => {
     const accessToken = cookies.get('access_token');
     
     try {
-        const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
+        const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${Date.now()}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
