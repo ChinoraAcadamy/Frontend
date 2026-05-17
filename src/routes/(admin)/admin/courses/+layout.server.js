@@ -17,13 +17,13 @@ export const load = async ({ fetch, params, cookies }) => {
 
     try {
         const [resUz, resRu] = await Promise.all([
-            fetch(`${API_URL}/courses/${params.course_id}/`, {
+            globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
                 headers: {
                     ...headers,
                     'Accept-Language': 'uz'
                 }
             }),
-            fetch(`${API_URL}/courses/${params.course_id}/`, {
+            globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
                 headers: {
                     ...headers,
                     'Accept-Language': 'ru'
@@ -34,6 +34,14 @@ export const load = async ({ fetch, params, cookies }) => {
         if (!resUz.ok) throw error(404, 'Kurs topilmadi');
         const courseUz = await resUz.json();
         
+        // Diagnostik log: raw JSON'ni yozib olamiz
+        try {
+            const fs = await import('node:fs');
+            fs.writeFileSync('debug_course.json', JSON.stringify(courseUz, null, 2));
+        } catch (e) {
+            console.error('Failed to write debug log:', e);
+        }
+
         let courseRu = {};
         if (resRu.ok) {
             try {
