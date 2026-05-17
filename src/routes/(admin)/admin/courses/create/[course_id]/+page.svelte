@@ -26,6 +26,10 @@
             } else if (result.type === 'failure') {
                 alert(result.data?.error || "Xatolik yuz berdi");
                 await update();
+            } else if (result.type === 'error') {
+                alert(result.error?.message || "Serverda xatolik yuz berdi");
+            } else {
+                alert("Noma'lum xatolik yuz berdi");
             }
         };
     }

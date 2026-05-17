@@ -24,19 +24,30 @@ export const actions = {
         }
 
         try {
-            const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/`, {
+            const url = `${API_URL}/courses/${params.course_id}/modules/`;
+            console.log('Sending POST to:', url, 'Payload:', modulePayload);
+            const response = await fetch(url, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(modulePayload)
             });
 
-            if (!response.ok) return fail(400, { error: "Modulni saqlashda xatolik yuz berdi." });
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                console.error("Backend error creating module:", errData);
+                let errMsg = errData.detail || "Modulni saqlashda xatolik yuz berdi.";
+                if (typeof errData === 'object' && !errData.detail) {
+                    errMsg = Object.entries(errData)
+                        .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(' ') : v}`)
+                        .join(' | ');
+                }
+                return fail(400, { error: errMsg });
+            }
 
             const result = await response.json();
-            // console.log('Yaratilgan modul:', result);
-
             return { success: true, module: result };
         } catch (err) {
+            console.error("Fetch error creating module:", err);
             return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });
         }
     }
