@@ -1,5 +1,4 @@
 import { API_URL } from '$env/static/private';
-import { getLocale } from '@/lib/paraglide/runtime';
 import { enrichCoursesList } from './courseService.js';
 
 export async function getMyCourses({ cookies, url, fetch = globalThis.fetch }) {
@@ -32,7 +31,7 @@ export async function getMyCourses({ cookies, url, fetch = globalThis.fetch }) {
         }
 
         const data = await res.json();
-        let courses = data.results || [];
+        let courses = Array.isArray(data) ? data : (data.results || []);
 
         // Progressni parallel yuklaymiz. 
         // MUHIM: SvelteKit warning bermasligi uchun background qismida global fetch ishlatamiz.
@@ -40,9 +39,9 @@ export async function getMyCourses({ cookies, url, fetch = globalThis.fetch }) {
 
         return {
             courses,
-            totalCount: data.count || 0,
-            next: data.next,
-            previous: data.previous,
+            totalCount: Array.isArray(data) ? data.length : (data.count || 0),
+            next: data.next || null,
+            previous: data.previous || null,
             search
         };
     } catch (err) {

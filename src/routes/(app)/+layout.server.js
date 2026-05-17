@@ -34,11 +34,12 @@ export async function load({ locals, cookies, url, fetch, parent }) {
         }
 
         const data = await res.json();
+        const courses = Array.isArray(data) ? data : (data.results || []);
         return {
-            courses: data.results || [],
-            totalCount: data.count || 0,
-            next: data.next,
-            previous: data.previous,
+            courses,
+            totalCount: Array.isArray(data) ? data.length : (data.count || 0),
+            next: data.next || null,
+            previous: data.previous || null,
             search
         };
     } catch (err) {

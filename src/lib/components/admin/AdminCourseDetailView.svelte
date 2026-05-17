@@ -125,6 +125,15 @@
 			sessionStorage.removeItem('admin_course_detail_tab');
 		}
 	});
+
+	function formatDuration(seconds: number | string | undefined) {
+		if (!seconds) return 0;
+		const secs = Number(seconds);
+		if (isNaN(secs)) return seconds;
+		const mins = secs / 60;
+		if (mins % 1 === 0) return mins;
+		return Number(mins.toFixed(1));
+	}
 </script>
 
 <div class="min-h-screen bg-background pb-20 font-sans lg:pb-10">
@@ -355,7 +364,7 @@
 													{lesson.title}
 												</h4>
 												<span class="text-xs font-semibold text-muted capitalize"
-													>{lesson.duration || 0} {m.min_label()} • {m.text_video_lesson()}</span
+													>{formatDuration(lesson.duration)} {m.min_label()} • {m.text_video_lesson()}</span
 												>
 											</div>
 										</div>

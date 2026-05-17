@@ -5,6 +5,15 @@
 
 	/** @type {{ index: string | number, title: string, duration?: string | number, status?: 'completed' | 'active' | 'locked' | 'available', href?: string, adminActions?: import('svelte').Snippet }} */
 	let { index, title, duration, status = 'available', href, adminActions = undefined } = $props();
+
+	function formatDuration(val) {
+		if (!val) return '';
+		const secs = Number(val);
+		if (isNaN(secs)) return val;
+		const mins = secs / 60;
+		const formattedMins = mins % 1 === 0 ? mins : Number(mins.toFixed(1));
+		return `${formattedMins} ${m.min_label ? m.min_label() : 'Minut'}`;
+	}
 </script>
 
 <div
@@ -45,7 +54,7 @@
 							? 'text-muted/60'
 							: 'text-muted'}"
 					>
-						{duration}
+						{formatDuration(duration)}
 					</span>
 				{/if}
 
