@@ -13,7 +13,7 @@ export const load = async ({ params, cookies }) => {
 
     try {
         const timestamp = Date.now();
-        const [resUz, resRu, resListUz, resListRu] = await Promise.all([
+        const [resUz, resRu, resListUz, resListRu, resModules] = await Promise.all([
             globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
                 headers: {
                     ...headers,
@@ -36,6 +36,12 @@ export const load = async ({ params, cookies }) => {
                 headers: {
                     ...headers,
                     'Accept-Language': 'ru'
+                }
+            }),
+            globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/?_cb=${timestamp}`, {
+                headers: {
+                    ...headers,
+                    'Accept-Language': 'uz'
                 }
             })
         ]);
@@ -72,6 +78,16 @@ export const load = async ({ params, cookies }) => {
             }
         }
 
+        let modulesList = [];
+        if (resModules && resModules.ok) {
+            try {
+                const data = await resModules.json();
+                modulesList = Array.isArray(data) ? data : (data.results || []);
+            } catch (e) {
+                console.error('Failed to parse modules list:', e);
+            }
+        }
+
         const courseListUz = listUz.find(c => Number(c.id) === Number(params.course_id)) || {};
         const courseListRu = listRu.find(c => Number(c.id) === Number(params.course_id)) || {};
 
@@ -90,7 +106,7 @@ export const load = async ({ params, cookies }) => {
             level: courseListUz.level ?? courseUz.level ?? courseRu.level ?? ''
         };
 
-        return { course, modules: course.modules ?? [] };
+        return { course, modules: modulesList };
     } catch (err) {
         console.error('Modulelarni olishda xatolik: ', err);
         throw error(500, 'Server bilan ulanishda xatolik yuz berdi');

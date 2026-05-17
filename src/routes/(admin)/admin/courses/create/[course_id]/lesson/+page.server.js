@@ -5,25 +5,25 @@ import { invalidateCache } from '@/lib/server/cache.js';
 export const load = async ({ parent, params, cookies }) => {
     await parent();
     const accessToken = cookies.get('access_token');
-    
+
     try {
-        const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${Date.now()}`, {
+        const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/?_cb=${Date.now()}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
         });
-        
+
         if (!response.ok) {
             throw redirect(303, `/admin/courses/create/${params.course_id}`);
         }
-        
-        const course = await response.json();
-        const modules = course.modules || [];
-        
+
+        const data = await response.json();
+        const modules = Array.isArray(data) ? data : (data.results || []);
+
         if (modules.length === 0) {
             throw redirect(303, `/admin/courses/create/${params.course_id}`);
         }
-        
+
         return {
             modules,
             accessToken,
@@ -31,6 +31,9 @@ export const load = async ({ parent, params, cookies }) => {
             courseId: params.course_id
         };
     } catch (e) {
+        if (e && e.status && e.location) {
+            throw e;
+        }
         console.error("Failed to load fresh modules in lesson step:", e);
         throw redirect(303, `/admin/courses/create/${params.course_id}`);
     }
