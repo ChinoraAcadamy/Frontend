@@ -10,11 +10,11 @@
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
-	const { data } = $props();
+	let { data } = $props();
 
 	// Admin tekshiruvi
 	const isAdmin = $derived(data.user?.role === 'admin');
-	const checkNotEmptyModule = $derived(data.modules.length);
+	const checkNotEmptyModule = $derived(data.modules?.length ?? 0);
 
 	let isDeleting = $state(false);
 
