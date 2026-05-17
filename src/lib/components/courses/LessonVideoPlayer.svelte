@@ -69,6 +69,7 @@
 	let watermarkInterval = $state(null);
 	let securityLocked = $state(false);
 	let securityViolationCount = $state(0);
+	let isScreenBlurred = $state(false);
 
 	// --- Gesture Indicators State ---
 	let gestureText = $state('');
@@ -303,11 +304,25 @@
 		lastTapTime = currentTime;
 	}
 
+	function handleWindowBlur() {
+		isScreenBlurred = true;
+		if (player && player.playing) {
+			player.pause();
+		}
+	}
+
+	function handleWindowFocus() {
+		setTimeout(() => {
+			isScreenBlurred = false;
+		}, 300);
+	}
+
 	// --- Lifecycle & Effects ---
 	onMount(() => {
 		document.addEventListener('keydown', handleKeydown);
 		document.addEventListener('visibilitychange', handleVisibility);
-		window.addEventListener('blur', () => player?.pause());
+		window.addEventListener('blur', handleWindowBlur);
+		window.addEventListener('focus', handleWindowFocus);
 		watermarkInterval = setInterval(moveWatermark, 10000);
 	});
 
@@ -456,9 +471,19 @@
 
 				if (isHls) {
 					if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-						videoElement.src = url;
-						videoElement.poster = lesson.image;
 						setupPlayer(defaultOptions);
+						player.source = {
+							type: 'video',
+							title: lesson.title,
+							sources: [
+								{
+									src: url,
+									type: 'application/x-mpegURL'
+								}
+							],
+							poster: lesson.image,
+							tracks: videoTracks
+						};
 					} else if (Hls.isSupported()) {
 						hlsInstance = new Hls();
 						hlsInstance.loadSource(url);
@@ -516,7 +541,8 @@
 		if (typeof document !== 'undefined') {
 			document.removeEventListener('keydown', handleKeydown);
 			document.removeEventListener('visibilitychange', handleVisibility);
-			window.removeEventListener('blur', () => player?.pause());
+			window.removeEventListener('blur', handleWindowBlur);
+			window.removeEventListener('focus', handleWindowFocus);
 		}
 		if (watermarkInterval) clearInterval(watermarkInterval);
 		if (securityLoop) clearInterval(securityLoop);
@@ -561,14 +587,31 @@
 	<!-- ── Video element ───────────────────────────────── -->
 	<video
 		bind:this={videoElement}
-		class="vp-video {playerReady && isVideoReady ? 'vp-video--ready' : ''}"
+		class="vp-video {playerReady && isVideoReady ? 'vp-video--ready' : ''} {isScreenBlurred ? 'is-blurred' : ''}"
 		playsinline
+		webkit-playsinline
+		preload="auto"
 		crossorigin="anonymous"
 	>
 		{m.video_not_supported
 			? m.video_not_supported()
 			: "Brauzeringiz videoni qo'llab-quvvatlamaydi."}
 	</video>
+
+	<!-- ── Screen Blur Shroud (Anti-Screenshot) ────────── -->
+	{#if isScreenBlurred}
+		<div class="vp-blur-shroud" transition:fade={{ duration: 150 }}>
+			<div class="vp-blur-shroud-content">
+				<Lock size={36} class="text-[#9b1c48] animate-pulse" />
+				<span class="text-xs font-black tracking-widest text-[#9b1c48] uppercase">
+					CHINORA PROTECTION
+				</span>
+				<p class="text-[13px] font-bold text-white/80 mt-1">
+					Tizim xavfsizligi faol. Ekran yozib olish va skrinshotlar taqiqlanadi!
+				</p>
+			</div>
+		</div>
+	{/if}
 
 	<!-- ── Gesture indicator bubble ───────────────────── -->
 	{#if showGestureIndicator}
@@ -1155,5 +1198,35 @@
 		50% {
 			opacity: 0.3;
 		}
+	}
+
+	/* ── Anti-Screenshot & Screen Recording Protection ── */
+	.vp-blur-shroud {
+		position: absolute;
+		inset: 0;
+		z-index: 100;
+		background: rgba(13, 13, 13, 0.95);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		padding: 24px;
+		border-radius: inherit;
+	}
+
+	.vp-blur-shroud-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		max-width: 280px;
+	}
+
+	.vp-video.is-blurred {
+		filter: brightness(0) !important;
+		opacity: 0 !important;
+		display: none !important;
 	}
 </style>
