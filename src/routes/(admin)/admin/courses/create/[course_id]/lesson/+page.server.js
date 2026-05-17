@@ -3,17 +3,37 @@ import { fail, redirect } from '@sveltejs/kit';
 import { invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ parent, params, cookies }) => {
-    const { modules } = await parent();
-
-    if (!modules || modules.length === 0) {
+    await parent();
+    const accessToken = cookies.get('access_token');
+    
+    try {
+        const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw redirect(303, `/admin/courses/create/${params.course_id}`);
+        }
+        
+        const course = await response.json();
+        const modules = course.modules || [];
+        
+        if (modules.length === 0) {
+            throw redirect(303, `/admin/courses/create/${params.course_id}`);
+        }
+        
+        return {
+            modules,
+            accessToken,
+            apiUrl: API_URL,
+            courseId: params.course_id
+        };
+    } catch (e) {
+        console.error("Failed to load fresh modules in lesson step:", e);
         throw redirect(303, `/admin/courses/create/${params.course_id}`);
     }
-    return {
-        modules,
-        accessToken: cookies.get('access_token'),
-        apiUrl: API_URL,
-        courseId: params.course_id
-    };
 };
 
 export const actions = {

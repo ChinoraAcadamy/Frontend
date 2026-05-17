@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
     import { CheckCircle2 } from 'lucide-svelte';
@@ -17,6 +17,7 @@
         return async ({ result, update }) => {
             isSubmitting = false;
             if (result.type === 'success') {
+                await invalidateAll();
                 const currentPath = page.url.pathname;
                 
                 // Oxiriga /lesson qo'shamiz
