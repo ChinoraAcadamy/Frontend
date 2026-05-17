@@ -127,7 +127,7 @@ export const actions = {
             title_ru: formData.get('title_ru'),
             description_uz: formData.get('description_uz') || '',
             description_ru: formData.get('description_ru') || '',
-            order: Number(formData.get('order_index')) || 0
+            order_index: Number(formData.get('order_index')) || 0
         };
 
         try {
