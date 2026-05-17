@@ -51,7 +51,12 @@ export async function GET({ request, url, fetch: eventFetch, locals }) {
         newHeaders.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         newHeaders.set('Pragma', 'no-cache');
         newHeaders.set('Expires', '0');
-        newHeaders.set('Content-Type', 'video/mp4');
+        const contentType = response.headers.get('content-type');
+        if (contentType) {
+            newHeaders.set('Content-Type', contentType);
+        } else {
+            newHeaders.set('Content-Type', 'video/mp4');
+        }
 
         return new Response(response.body, {
             status: response.status,

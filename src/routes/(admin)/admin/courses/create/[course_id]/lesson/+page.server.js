@@ -26,9 +26,14 @@ export const actions = {
 
         const formData = await request.formData();
 
-        const video = formData.get('video_url');
+        const video = formData.get('video_file');
         if (video instanceof File && video.size === 0) {
-            formData.delete('video_url');
+            formData.delete('video_file');
+        }
+
+        const img = formData.get('image_file');
+        if (img instanceof File && img.size === 0) {
+            formData.delete('image_file');
         }
 
         try {

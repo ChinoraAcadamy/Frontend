@@ -40,12 +40,25 @@
 	// UI State
 	let activeTab = $state('uz');
 	let videoFile = $state(null);
+	let imgPreview = $state(null);
 	let uploadProgress = $state(0);
 	let autoDuration = $derived(lessonTarget.duration || 0);
+
+	$effect.pre(() => {
+		imgPreview = lessonTarget?.image || null;
+	});
+
+	function handleImageChange(e) {
+		const file = e.target.files?.[0];
+		if (file) {
+			imgPreview = URL.createObjectURL(file);
+		}
+	}
 
 	function resetForm(form) {
 		form.reset();
 		videoFile = null;
+		imgPreview = null;
 		uploadProgress = 0;
 		autoDuration = 0;
 		modulePk = null;
@@ -66,7 +79,14 @@
 
 		const formData = new FormData(form);
 		if (videoFile) {
-			formData.set('video_url', videoFile);
+			formData.set('video_file', videoFile);
+		} else {
+			formData.delete('video_file');
+		}
+
+		const imgFile = formData.get('image_file');
+		if (imgFile instanceof File && imgFile.size === 0) {
+			formData.delete('image_file');
 		}
 
 		const xhr = new XMLHttpRequest();
@@ -267,13 +287,71 @@
 			title={m.section_media_duration ? m.section_media_duration() : 'Video va Davomiylik'}
 			icon={Video}
 		>
-			<VideoUploadZone
-				bind:videoFile
-				bind:uploadProgress
-				bind:autoDuration
-				{isSubmitting}
-				currentVideoUrl={lessonTarget.video_url}
-			/>
+			<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+				<div class="flex flex-col gap-3">
+					<span class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase">
+						Dars videosi
+					</span>
+					<VideoUploadZone
+						bind:videoFile
+						bind:uploadProgress
+						bind:autoDuration
+						{isSubmitting}
+						currentVideoUrl={lessonTarget.video_url}
+					/>
+				</div>
+
+				<div class="flex flex-col gap-3">
+					<label for="les_image" class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase cursor-pointer">
+						Dars muqovasi (Rasm)
+					</label>
+					<div
+						class="relative flex min-h-[160px] flex-col items-center justify-center overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-primary/30
+							   {imgPreview ? 'p-0 border-none' : 'cursor-pointer p-6'}
+							   {isSubmitting ? 'pointer-events-none opacity-80' : ''}"
+					>
+						<input
+							type="file"
+							id="les_image"
+							name="image_file"
+							accept="image/*"
+							class="hidden"
+							onchange={handleImageChange}
+						/>
+
+						{#if imgPreview}
+							<div class="relative w-full h-full min-h-[160px] group overflow-hidden rounded-lg">
+								<img src={imgPreview} alt="Lesson cover" class="w-full h-full max-h-[160px] min-h-[160px] object-cover" />
+								<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+									<label
+										for="les_image"
+										class="cursor-pointer rounded-lg bg-white px-4 py-2 text-xs font-bold text-slate-800 transition-all hover:scale-105"
+									>
+										O'zgartirish
+									</label>
+								</div>
+							</div>
+						{:else}
+							<label
+								for="les_image"
+								class="flex w-full cursor-pointer flex-col items-center justify-center text-center"
+							>
+								<div class="mb-3 text-muted/30">
+									<svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+								</div>
+								<span class="mb-1 block text-sm font-bold text-foreground">
+									Rasm yuklash
+								</span>
+								<span class="text-[10px] font-medium text-muted">
+									PNG, JPG, WEBP (Maks: 5MB)
+								</span>
+							</label>
+						{/if}
+					</div>
+				</div>
+			</div>
 
 			<div class="mt-4 flex flex-col gap-1.5">
 				<label

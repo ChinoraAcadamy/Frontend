@@ -76,7 +76,7 @@
 					class="relative h-48 w-full shrink-0 overflow-hidden rounded-2xl bg-muted/10 sm:h-24 sm:w-36"
 				>
 					<img
-						src={course.img ||
+						src={course.img || course.img_file || course.image ||
 							`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
 						alt="Course cover"
 						class="absolute inset-0 h-full w-full object-cover"

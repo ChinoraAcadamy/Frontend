@@ -22,9 +22,9 @@ export const actions = {
         const formData = await request.formData();
 
         // Agar foydalanuvchi yangi rasm tanlamagan bo'lsa (bo'sh fayl kelsa)
-        const img = formData.get('img');
-        if (img instanceof File && img.size === 0) {
-            formData.delete('img');
+        const imgFile = formData.get('img_file');
+        if (imgFile instanceof File && imgFile.size === 0) {
+            formData.delete('img_file');
         }
 
         const headers = {

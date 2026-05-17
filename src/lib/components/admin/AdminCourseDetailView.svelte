@@ -86,7 +86,7 @@
 
 	$effect.pre(() => {
 		isPublished = course.is_published;
-		imgPreview = course?.img || null;
+		imgPreview = course?.img || course?.img_file || course?.image || null;
 	});
 
 	function handleImageChange(e) {
@@ -166,7 +166,7 @@
 					class="relative h-24 w-40 shrink-0 overflow-hidden rounded-2xl bg-muted/10 shadow-inner"
 				>
 					<img
-						src={course.img ||
+						src={course.img || course.img_file || course.image ||
 							`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
 						alt="Course"
 						class="absolute inset-0 h-full w-full object-cover"
@@ -556,8 +556,8 @@
 			>
 				<input
 					type="file"
-					id="img"
-					name="img"
+					id="img_file"
+					name="img_file"
 					accept="image/*"
 					class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
 					onchange={handleImageChange}

@@ -13,9 +13,9 @@ export const actions = {
 
         // Agar foydalanuvchi rasm tanlamagan bo'lsa (bo'sh fayl kelsa), 
         // backend xato bermasligi uchun uni o'chirib tashlaymiz
-        const img = formData.get('img');
-        if (img instanceof File && img.size === 0) {
-            formData.delete('img');
+        const imgFile = formData.get('img_file');
+        if (imgFile instanceof File && imgFile.size === 0) {
+            formData.delete('img_file');
         }
 
         // MUHIM: 'Content-Type' ni qo'lda yozmaymiz! 

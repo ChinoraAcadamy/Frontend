@@ -42,7 +42,7 @@
 				url.searchParams.delete('search');
 			}
 			url.searchParams.set('page', '1');
-			goto(resolve(url.toString()), { keepFocus: true, noScroll: true });
+			goto(resolve(/** @type {any} */ (url)), { keepFocus: true, noScroll: true });
 		}, 400);
 	}
 
@@ -57,7 +57,7 @@
 		const url = new URL($page.url);
 		url.searchParams.delete('search');
 		url.searchParams.set('page', '1');
-		goto(resolve(url.toString()), { keepFocus: true, noScroll: true });
+		goto(resolve(/** @type {any} */ (url)), { keepFocus: true, noScroll: true });
 	}
 </script>
 
@@ -196,7 +196,7 @@
 										: m.course_free
 											? m.course_free()
 											: 'Bepul'}
-									image={course.img}
+									image={course.img || course.img_file || course.image}
 									progress={course.progress}
 									price={course.price}
 									lessons={course.total_lessons}
@@ -219,7 +219,7 @@
 								<CourseListRow
 									id={course.id}
 									title={course.title}
-									image={course.img}
+									image={course.img || course.img_file || course.image}
 									progress={course.progress}
 									price={course.price}
 									lessons={course.total_lessons}

@@ -16,6 +16,7 @@
      * @property {string} [old_price]
      * @property {boolean} [is_published]
      * @property {string} [img]
+     * @property {string} [img_file]
      */
 
     let { 
@@ -28,7 +29,7 @@
     let imgPreview = $state(null);
 
     $effect.pre(() => {
-        imgPreview = course?.img || null;
+        imgPreview = course?.img || course?.img_file || course?.image || null;
     });
 
     // Rasm yuklash preview mantiqi
@@ -96,9 +97,9 @@
         </div>
 
         <div class="form-group full-width">
-            <label for="img">{m.label_course_image ? m.label_course_image() : 'Kurs muqovasi'}</label>
+            <label for="img_file">{m.label_course_image ? m.label_course_image() : 'Kurs muqovasi'}</label>
             <label class="file-upload {imgPreview ? 'has-image' : ''}">
-                <input type="file" id="img" name="img" accept="image/*" class="hidden" onchange={handleImageChange}>
+                <input type="file" id="img_file" name="img_file" accept="image/*" class="hidden" onchange={handleImageChange}>
                 {#if imgPreview}
                     <img src={imgPreview} alt="Preview" class="preview-img">
                 {:else}

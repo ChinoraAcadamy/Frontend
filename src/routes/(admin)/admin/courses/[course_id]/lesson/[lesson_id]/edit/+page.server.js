@@ -42,28 +42,27 @@ export const actions = {
         if (!accessToken) throw redirect(303, "/login");
 
         const headers = {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Bearer ${accessToken}`
         };
 
         const formData = await request.formData();
         const moduleId = formData.get('module_pk');
 
-        const lessonPayload = {
-            title_uz: formData.get('title_uz'),
-            title_ru: formData.get('title_ru'),
-            description_uz: formData.get('description_uz') || '',
-            description_ru: formData.get('description_ru') || '',
-            duration: Number(formData.get('duration')) || 0,
-            order_index: Number(formData.get('order_index')) || 0,
-            video_url: formData.get('video_url') || null
+        const video = formData.get('video_file');
+        if (video instanceof File && video.size === 0) {
+            formData.delete('video_file');
         }
-        
+
+        const img = formData.get('image_file');
+        if (img instanceof File && img.size === 0) {
+            formData.delete('image_file');
+        }
+
         try {
             const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/lessons/${params.lesson_id}/`, {
                 method: 'PATCH',
                 headers,
-                body: JSON.stringify(lessonPayload)
+                body: formData
             });
 
             if (!response.ok) {

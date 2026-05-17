@@ -190,7 +190,7 @@
 								modules={course.modules_count}
 								status={course.is_published ? 'published' : 'draft'}
 								link={course.id}
-								image={course.img}
+								image={course.img || course.img_file || course.image}
 							/>
 						</div>
 					{/each}
@@ -205,7 +205,7 @@
 								modules={course.modules_count}
 								status={course.is_published ? 'published' : 'draft'}
 								link={course.id}
-								image={course.img}
+								image={course.img || course.img_file || course.image}
 							/>
 						</div>
 					{/each}

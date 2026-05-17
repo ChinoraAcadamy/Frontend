@@ -80,7 +80,7 @@
 									title={course.title}
 									progress={course.progress}
 									lessons={course.lessons}
-									image={course.img}
+									image={course.img || course.img_file || course.image}
 									is_blocked={true}
 								/>
 							</div>
@@ -91,7 +91,7 @@
 										title={course.title}
 										progress={course.progress}
 										lessons={course.lessons}
-										image={course.img}
+										image={course.img || course.img_file || course.image}
 										is_blocked={false}
 									/>
 								</a>

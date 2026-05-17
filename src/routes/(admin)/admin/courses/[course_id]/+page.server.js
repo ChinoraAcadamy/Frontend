@@ -36,7 +36,7 @@ export const actions = {
         const cleanFormData = new FormData();
 
 		for (const [key, value] of rawFormData.entries()) {
-			if (key === 'img') {
+			if (key === 'img_file' || key === 'img') {
 				// Rasm yuborilganini tekshirish (agar bo'sh bo'lsa yoki fayl bo'lmasa e'tibor bermaydi, joriy rasm o'zgarmas qoladi)
 				if (value instanceof File && value.size > 0) {
 					let fileName = value.name;
@@ -48,7 +48,7 @@ export const actions = {
 						fileName = `${baseName}.${extension}`;
 					}
 					const renamedFile = new File([value], fileName, { type: value.type });
-					cleanFormData.append(key, renamedFile);
+					cleanFormData.append('img_file', renamedFile);
 				}
 			} else if (['duration', 'price', 'old_price'].includes(key)) {
 				// Raqamli maydonlar bo'sh qolsa ularni ignore qilamiz, 0 bo'lsa yuboramiz

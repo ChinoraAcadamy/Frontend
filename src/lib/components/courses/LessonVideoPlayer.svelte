@@ -8,13 +8,17 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale } from '@/lib/paraglide/runtime';
 	import Hls from 'hls.js';
+	import { invalidateAll } from '$app/navigation';
 	import 'plyr/dist/plyr.css';
 
 	let { lesson, isVideoFinished = $bindable(false) } = $props();
 
 	// --- Helpers ---
-	const getProxiedUrl = (url) =>
-		url?.startsWith('http') ? `/api/video?url=${encodeURIComponent(url)}` : url || '';
+	const getProxiedUrl = (url) => {
+		if (!url) return '';
+		if (url.includes('.m3u8')) return url; // HLS streams are requested directly by Hls.js / iOS Player
+		return url.startsWith('http') ? `/api/video?url=${encodeURIComponent(url)}` : url;
+	};
 
 	const getProgressKey = (id) => `chinora_video_progress_${id}`;
 
@@ -131,6 +135,36 @@
 	}
 
 	let securityLoop;
+	let pollingInterval = null;
+
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+		
+		const status = lesson.hls_status;
+		if (status === 'uploading' || status === 'processing') {
+			if (!pollingInterval) {
+				pollingInterval = setInterval(async () => {
+					try {
+						await invalidateAll();
+					} catch (e) {
+						console.error('HLS polling error:', e);
+					}
+				}, 5000);
+			}
+		} else {
+			if (pollingInterval) {
+				clearInterval(pollingInterval);
+				pollingInterval = null;
+			}
+		}
+
+		return () => {
+			if (pollingInterval) {
+				clearInterval(pollingInterval);
+				pollingInterval = null;
+			}
+		};
+	});
 
 	$effect(() => {
 		if (typeof window === 'undefined') return;
