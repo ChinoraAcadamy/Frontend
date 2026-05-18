@@ -33,7 +33,17 @@ export const load = async ({ params, cookies, locals }) => {
                         const lessonsRes = await globalThis.fetch(`${API_URL}/courses/${course.id}/modules/${mod.id}/`, { headers });
                         if (lessonsRes.ok) {
                             const moduleData = await lessonsRes.json();
-                            mod.lessons = moduleData.lessons || [];
+                            let lessons = moduleData.lessons || [];
+                            lessons = lessons.map((lesson, index, arr) => {
+                                if (index > 0) {
+                                    const prevLesson = arr[index - 1];
+                                    if (prevLesson && prevLesson.is_completed) {
+                                        lesson.can_access = true;
+                                    }
+                                }
+                                return lesson;
+                            });
+                            mod.lessons = lessons;
                         } else {
                             mod.lessons = [];
                         }

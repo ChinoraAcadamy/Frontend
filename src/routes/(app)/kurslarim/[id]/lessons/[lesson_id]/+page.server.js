@@ -44,7 +44,19 @@ export async function load({ params, cookies, url, locals }) {
             const fetchModuleData = async () => {
                 const res = await globalThis.fetch(`${API_URL}/courses/${params.id}/modules/${moduleId}/`, { headers });
                 if (!res.ok) return null;
-                return res.json();
+                const data = await res.json();
+                if (data && data.lessons) {
+                    data.lessons = data.lessons.map((lesson, index, arr) => {
+                        if (index > 0) {
+                            const prevLesson = arr[index - 1];
+                            if (prevLesson && prevLesson.is_completed) {
+                                lesson.can_access = true;
+                            }
+                        }
+                        return lesson;
+                    });
+                }
+                return data;
             };
             const moduleData = await fetchWithCache(generateCacheKey('student_module_detail', user?.id, moduleId), fetchModuleData);
             

@@ -31,7 +31,7 @@
 		isSubmittingComplete = true;
 		try {
 			// Video davomiyligi backenddan keladi, u sekundlarda bo'ladi. Uni butun songa yaxlitlaymiz.
-			const watchedSeconds = Math.round(Number(lesson?.duration) || 0);
+			const watchedSeconds = Math.floor(Number(lesson?.duration) || 0);
 
 			const res = await fetch('/api/progress/complete', {
 				method: 'POST',

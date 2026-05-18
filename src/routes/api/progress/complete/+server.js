@@ -24,9 +24,8 @@ export async function POST({ request, cookies }) {
     }
 
     try {
-        const finalSeconds = Math.round(Number(watched_seconds) || 0);
-        // if watched seconds lesser than 60, send 60
-        const secondsToSend = finalSeconds < 60 ? 60 : finalSeconds;
+        const finalSeconds = Math.floor(Number(watched_seconds) || 0);
+        const secondsToSend = finalSeconds;
         console.log(`Sending complete lesson request for ${lesson_id} with watched_seconds: ${secondsToSend}`);
         const response = await fetch(`${API_URL}/progress/lessons/${lesson_id}/complete/`, {
             method: 'POST',
