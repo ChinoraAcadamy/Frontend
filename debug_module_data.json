@@ -1,0 +1,17 @@
+{
+  "id": 20,
+  "title": "Another demo",
+  "order_index": 1,
+  "created_at": "2026-05-17T16:58:06.303147Z",
+  "lessons_count": 1,
+  "lessons": [
+    {
+      "id": 12,
+      "title": "Chok andozalarning asosiy qiyinchiliklarini yoritib bering",
+      "duration": 81.301,
+      "order_index": 1,
+      "is_completed": false,
+      "can_access": true
+    }
+  ]
+}

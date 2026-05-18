@@ -26,14 +26,14 @@ export const load = async ({ params, cookies, locals }) => {
             // Progressni biriktirish (global fetch ishlatadi)
             course = await enrichCourseWithProgress(accessToken, course, globalThis.fetch, lang);
 
-            // Fetch accurate lessons mapping
+            // Fetch accurate lessons mapping from individual module details to get correct student progress
             if (course.modules && course.modules.length > 0) {
                 const modulesPromises = course.modules.map(async (mod) => {
                     try {
-                        const lessonsRes = await globalThis.fetch(`${API_URL}/courses/${course.id}/modules/${mod.id}/lessons/`, { headers });
+                        const lessonsRes = await globalThis.fetch(`${API_URL}/courses/${course.id}/modules/${mod.id}/`, { headers });
                         if (lessonsRes.ok) {
-                            const lessonsData = await lessonsRes.json();
-                            mod.lessons = lessonsData.results || lessonsData;
+                            const moduleData = await lessonsRes.json();
+                            mod.lessons = moduleData.lessons || [];
                         } else {
                             mod.lessons = [];
                         }

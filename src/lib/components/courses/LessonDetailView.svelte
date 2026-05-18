@@ -8,6 +8,7 @@
 	import LessonVideoPlayer from './LessonVideoPlayer.svelte';
 	import LessonInfo from './LessonInfo.svelte';
 	import LessonAssignments from './LessonAssignments.svelte';
+	import { resolve } from '$app/paths';
 
 	let { lesson, nextLesson = null } = $props();
 
@@ -29,8 +30,8 @@
 		if (!lesson?.id) return;
 		isSubmittingComplete = true;
 		try {
-			// Video davomiyligi backenddan keladi, o'rtacha 90% deb baholaymiz
-			const watchedSeconds = (lesson?.duration || 0) * 60;
+			// Video davomiyligi backenddan keladi, u sekundlarda bo'ladi. Uni butun songa yaxlitlaymiz.
+			const watchedSeconds = Math.round(Number(lesson?.duration) || 0);
 
 			const res = await fetch('/api/progress/complete', {
 				method: 'POST',
@@ -65,7 +66,7 @@
 				const url = `/kurslarim/${$page.params.id}/lessons/${resolvedNextLesson.id}?module_id=${resolvedNextLesson.moduleId || $page.url.searchParams.get('module_id')}`;
 				/** @type {any} */
 				const route = url;
-				goto(route);
+				goto(resolve(route));
 			}
 		} catch (e) {
 			console.error('Lesson completion error:', e);

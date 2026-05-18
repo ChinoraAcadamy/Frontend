@@ -3,10 +3,21 @@
     import { Lock, CheckCircle2, List, ChevronDown, PlayCircle } from 'lucide-svelte';
     import * as m from '$lib/paraglide/messages.js';
     import { getLocale } from '@/lib/paraglide/runtime';
+	import { resolve } from '$app/paths';
 
     let { data, children } = $props();
 
     let showMobileSidebar = $state(false);
+
+    function formatDuration(val) {
+        if (!val) return '0 ' + (getLocale() === 'uz' ? 'daqiqa' : 'минут');
+        const secs = Number(val);
+        if (isNaN(secs)) return val;
+        const mins = secs / 60;
+        const formattedMins = mins % 1 === 0 ? mins : Number(mins.toFixed(1));
+        const unit = getLocale() === 'uz' ? 'daqiqa' : 'минут';
+        return `${formattedMins} ${unit}`;
+    }
 </script>
 
 <div class="mx-auto max-w-7xl px-4 py-6 text-slate-800 sm:px-6 lg:px-8">
@@ -69,14 +80,14 @@
                                                 <div class="mt-0.5 shrink-0"><Lock size={18} class="text-muted" /></div>
                                                 <div class="flex min-w-0 flex-col">
                                                     <span class="line-clamp-2 text-sm font-bold text-muted">{l.title}</span>
-                                                    <span class="mt-0.5 text-xs font-semibold text-muted">{l.duration || 0} {m.assignment_type_text ? (getLocale() === 'uz' ? 'daqiqa' : 'минут') : 'min'}</span>
+                                                    <span class="mt-0.5 text-xs font-semibold text-muted">{formatDuration(l.duration)}</span>
                                                 </div>
                                             </div>
                                             <div class="shrink-0 pl-2"><div class="h-2 w-2 rounded-full bg-muted/20"></div></div>
                                         </div>
                                     {:else}
                                         <a
-                                            href={isAdmin ? `/admin/courses/${$page.params.course_id}/lesson/${l.id}?module_id=${module.id}` : `/kurslarim/${$page.params.id}/lessons/${l.id}?module_id=${module.id}`}
+                                            href={resolve(isAdmin ? `/admin/courses/${$page.params.course_id}/lesson/${l.id}?module_id=${module.id}` : `/kurslarim/${$page.params.id}/lessons/${l.id}?module_id=${module.id}`)}
                                             class="group flex items-center justify-between gap-3 rounded-2xl p-3 transition-colors {l.id.toString() === $page.params.lesson_id ? 'bg-primary/10 shadow-sm ring-1 shadow-primary/20 ring-primary/20' : 'hover:bg-muted/5'}"
                                         >
                                             <div class="flex min-w-0 items-start gap-3">
@@ -89,7 +100,7 @@
                                                 </div>
                                                 <div class="flex min-w-0 flex-col">
                                                     <span class="line-clamp-2 text-sm font-bold {l.id.toString() === $page.params.lesson_id ? 'text-primary' : 'text-muted'}">{l.title}</span>
-                                                    <span class="mt-0.5 text-xs font-semibold text-muted">{l.duration || 0} {m.assignment_type_text ? (getLocale() === 'uz' ? 'daqiqa' : 'минут') : 'min'}</span>
+                                                    <span class="mt-0.5 text-xs font-semibold text-muted">{formatDuration(l.duration)}</span>
                                                 </div>
                                             </div>
                                             <div class="shrink-0 pl-2">

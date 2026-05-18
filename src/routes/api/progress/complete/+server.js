@@ -24,15 +24,17 @@ export async function POST({ request, cookies }) {
     }
 
     try {
-        console.log(`Sending complete lesson request for ${lesson_id} with watched_seconds: ${watched_seconds}`);
+        const finalSeconds = Math.round(Number(watched_seconds) || 0);
+        // if watched seconds lesser than 60, send 60
+        const secondsToSend = finalSeconds < 60 ? 60 : finalSeconds;
+        console.log(`Sending complete lesson request for ${lesson_id} with watched_seconds: ${secondsToSend}`);
         const response = await fetch(`${API_URL}/progress/lessons/${lesson_id}/complete/`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            // if watched seconds lesser than 60, send 60
-            body: JSON.stringify({ watched_seconds: watched_seconds < 60 ? 60 : watched_seconds })
+            body: JSON.stringify({ watched_seconds: secondsToSend })
         });
 
         if (!response.ok) {
