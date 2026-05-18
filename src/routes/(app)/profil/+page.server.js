@@ -75,7 +75,7 @@ export const actions = {
                 return { success: false, error: translateServerMessage(errData, m) || (m.profile_device_logout_error ? m.profile_device_logout_error() : "Xatolik yuz berdi") };
             }
 
-            invalidateCache('student_');
+            invalidateCache();
 
             return {
                 success: true,
@@ -132,7 +132,7 @@ export const actions = {
                 maxAge: 60 * 20 // 20 minut
             });
 
-            invalidateCache('student_');
+            invalidateCache();
 
             return { success: true, profile: fullUserData };
         } catch (err) {

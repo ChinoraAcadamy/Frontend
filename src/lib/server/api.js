@@ -9,7 +9,13 @@ export async function getRanking({ cookies, fetch = globalThis.fetch }) {
 			headers: { 'Authorization': `Bearer ${accessToken}` }
 		});
 
-		if (!firstRes.ok) return [];
+		if (!firstRes.ok) {
+			console.error("[getRanking] API error response status:", firstRes.status);
+			return {
+				results: [],
+				count: 0
+			};
+		}
 		const firstData = await firstRes.json();
 		
 		const results = firstData.results || firstData || [];
@@ -17,7 +23,10 @@ export async function getRanking({ cookies, fetch = globalThis.fetch }) {
 		
 		// If there are no more pages, return immediately
 		if (!firstData.next || results.length >= count) {
-			return results;
+			return {
+				results,
+				count
+			};
 		}
 
 		// 2. Calculate remaining pages (Backend default is 20)

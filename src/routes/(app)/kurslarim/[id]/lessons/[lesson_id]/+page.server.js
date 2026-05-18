@@ -124,8 +124,8 @@ export const actions = {
 
             const result = await res.json();
             
-            // Xotirani tozalash: yangi baho qo'shildi, dars progressi o'zgarishi mumkin
-            invalidateCache('student_');
+            // Keshni tozalaymiz (yangi baho qo'shildi, dars progressi va reyting o'zgarishi mumkin)
+            invalidateCache();
             
             return { success: true, result };
         } catch (err) {

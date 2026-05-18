@@ -46,8 +46,8 @@ export async function POST({ request, cookies }) {
         const data = await response.json();
         console.log('Lesson completed successfully:', data);
 
-        // O'quvchi keshini tozalaymiz (Progress o'zgardi, sidebar va dashboard yangilanishi kerak)
-        invalidateCache('student_');
+        // Keshni tozalaymiz (Progress o'zgardi, sidebar va barcha reytinglar yangilanishi kerak)
+        invalidateCache();
 
         return json({ success: true, data });
     } catch (err) {

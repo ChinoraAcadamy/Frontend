@@ -57,7 +57,7 @@ export const load = async (event) => {
         // Bular promise ko'rinishida qaytadi (streaming), keshdan esa tezda resolve bo'ladi
         lazy: {
             stats: fetchWithCache(generateCacheKey('admin_stats', userId), fetchStats),
-            ranking: fetchWithCache(generateCacheKey('admin_ranking', userId), () => getRanking(event).then(d => d.results)),
+            ranking: fetchWithCache(generateCacheKey('admin_ranking', userId), () => getRanking(event).then(d => d?.results || [])),
             newStudents: fetchWithCache(generateCacheKey('admin_new_students', userId), fetchNewStudents),
             activityLogs: fetchWithCache(generateCacheKey('admin_activity_logs_short', userId), getActivityLogs)
         }

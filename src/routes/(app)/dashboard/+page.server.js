@@ -11,9 +11,10 @@ export async function load(event) {
     // Create a promise for rank info to be streamed
     const rankInfoPromise = async () => {
         const rankingData = await getRanking(event);
-        const myRank = await getMyRank({ ranking: rankingData.results, myId: user?.id });
+        const results = rankingData?.results || [];
+        const myRank = await getMyRank({ ranking: results, myId: user?.id });
         return {
-            ranking: rankingData.results,
+            ranking: results,
             myRank
         };
     };
