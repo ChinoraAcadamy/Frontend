@@ -53,7 +53,15 @@ export const load = async ({ cookies, fetch, url, setHeaders, locals }) => {
             }
 
             const data = await res.json();
-
+            if (data && data.results) {
+                data.results = data.results.map(sub => {
+                    if (sub.file && !sub.file.startsWith('http')) {
+                        sub.file = `${API_URL}${sub.file.startsWith('/') ? '' : '/'}${sub.file}`;
+                    }
+                    return sub;
+                });
+            }
+            
             // Diagnostika uchun loglar (faqat results bo'sh bo'lganda yoki muammo bo'lganda)
             if (!data.results || data.results.length === 0) {
                 console.log(`[admin-submissions] Ma'lumot topilmadi. URL: ${apiUrl.toString()}`);

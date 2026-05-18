@@ -273,7 +273,7 @@
 							"{sub.text_answer}"
 						</p>
 					{:else if sub.assignment_type === 'link'}
-						<a href={resolve(ensureUrl(sub.text_answer))} target="_blank" class="flex items-center gap-2 text-sm font-bold text-primary hover:underline underline-offset-4 decoration-2">
+						<a href={ensureUrl(sub.text_answer)} target="_blank" class="flex items-center gap-2 text-sm font-bold text-primary hover:underline underline-offset-4 decoration-2">
 							<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
 							{m.open_link ? m.open_link() : "Havolani ochish"}
 						</a>
@@ -305,7 +305,7 @@
 					<div class="flex flex-row items-center gap-2">
 						{#if sub.file}
 							<a
-								href={resolve(ensureUrl(sub.file))}
+								href={ensureUrl(sub.file)}
 								download={sub.file.split('/').pop()}
 								target="_blank"
 								rel="noopener noreferrer"

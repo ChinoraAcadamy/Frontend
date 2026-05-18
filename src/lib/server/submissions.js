@@ -42,7 +42,16 @@ export async function getSubmissions(event, { search = '', ordering = '', page =
             return { results: [], count: 0, next: null, previous: null };
         }
 
-        return await res.json();
+        const data = await res.json();
+        if (data && data.results) {
+            data.results = data.results.map(sub => {
+                if (sub.file && !sub.file.startsWith('http')) {
+                    sub.file = `${API_URL}${sub.file.startsWith('/') ? '' : '/'}${sub.file}`;
+                }
+                return sub;
+            });
+        }
+        return data;
     } catch (err) {
         console.error('[submissionService] Fetch error:', err);
         return { results: [], count: 0, next: null, previous: null };
