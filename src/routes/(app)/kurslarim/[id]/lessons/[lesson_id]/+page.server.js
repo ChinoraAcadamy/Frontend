@@ -38,6 +38,7 @@ export async function load({ params, cookies, url, locals }) {
 
         // Dars va CourseData (nextLesson uchun) keshlanadi
         const lessonDataPromise = (async () => {
+            await Promise.resolve(); // Defer to let SvelteKit serialize & attach error listeners
             const rawLesson = await fetchWithCache(generateCacheKey('student_lesson_detail', user?.id, params.lesson_id), fetchLessonData);
             
             // Fetch module data to get accurate is_completed status
@@ -70,6 +71,7 @@ export async function load({ params, cookies, url, locals }) {
         })();
         
         const nextLessonPromise = (async () => {
+            await Promise.resolve(); // Defer to let SvelteKit serialize & attach error listeners
             const courseData = await fetchWithCache(generateCacheKey('student_course_base', user?.id, params.id), fetchCourseDataForNextLesson);
             if (!courseData) return null;
             const modules = courseData.modules || [];

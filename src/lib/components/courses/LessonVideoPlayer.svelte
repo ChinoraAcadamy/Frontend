@@ -15,7 +15,7 @@
 
 	// --- Helpers ---
 	const getProxiedUrl = (url) => {
-		if (!url) return '';
+		if (!url || url === 'null' || url === 'undefined') return '';
 		if (url.includes('.m3u8')) return url; // HLS streams are requested directly by Hls.js / iOS Player
 		return url.startsWith('http') ? `/api/video?url=${encodeURIComponent(url)}` : url;
 	};
@@ -354,6 +354,7 @@
 				const Plyr = PlyrModule.default;
 
 				const url = getProxiedUrl(lesson.video_url);
+				if (!url) return;
 				const isHls = url && url.includes('.m3u8');
 
 				let defaultOptions = {
