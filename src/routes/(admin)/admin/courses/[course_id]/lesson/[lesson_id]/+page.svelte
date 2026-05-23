@@ -4,4 +4,6 @@
 	let { data } = $props();
 </script>
 
-<LessonDetailView lesson={data.lesson} nextLesson={data.nextLesson} />
+{#key data.lesson.id}
+	<LessonDetailView lesson={data.lesson} nextLesson={data.nextLesson} />
+{/key}

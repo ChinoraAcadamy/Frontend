@@ -183,8 +183,9 @@
 						type="number"
 						id="les_order"
 						name="order_index"
-						class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-primary"
-						value={lessonTarget.order_index ?? 1}
+						disabled
+						class="w-full cursor-not-allowed rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-muted disabled:opacity-60"
+						value={modules.find((m) => m.id === modulePk)?.lessons_count + 1}
 					/>
 				</div>
 			</div>
@@ -302,12 +303,15 @@
 				</div>
 
 				<div class="flex flex-col gap-3">
-					<label for="les_image" class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase cursor-pointer">
+					<label
+						for="les_image"
+						class="cursor-pointer pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
+					>
 						Dars muqovasi (Rasm)
 					</label>
 					<div
 						class="relative flex min-h-[160px] flex-col items-center justify-center overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-primary/30
-							   {imgPreview ? 'p-0 border-none' : 'cursor-pointer p-6'}
+							   {imgPreview ? 'border-none p-0' : 'cursor-pointer p-6'}
 							   {isSubmitting ? 'pointer-events-none opacity-80' : ''}"
 					>
 						<input
@@ -320,9 +324,15 @@
 						/>
 
 						{#if imgPreview}
-							<div class="relative w-full h-full min-h-[160px] group overflow-hidden rounded-lg">
-								<img src={imgPreview} alt="Lesson cover" class="w-full h-full max-h-[160px] min-h-[160px] object-cover" />
-								<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+							<div class="group relative h-full min-h-[160px] w-full overflow-hidden rounded-lg">
+								<img
+									src={imgPreview}
+									alt="Lesson cover"
+									class="h-full max-h-[160px] min-h-[160px] w-full object-cover"
+								/>
+								<div
+									class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
+								>
 									<label
 										for="les_image"
 										class="cursor-pointer rounded-lg bg-white px-4 py-2 text-xs font-bold text-slate-800 transition-all hover:scale-105"
@@ -338,15 +348,16 @@
 							>
 								<div class="mb-3 text-muted/30">
 									<svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+										/>
 									</svg>
 								</div>
-								<span class="mb-1 block text-sm font-bold text-foreground">
-									Rasm yuklash
-								</span>
-								<span class="text-[10px] font-medium text-muted">
-									PNG, JPG, WEBP (Maks: 5MB)
-								</span>
+								<span class="mb-1 block text-sm font-bold text-foreground"> Rasm yuklash </span>
+								<span class="text-[10px] font-medium text-muted"> PNG, JPG, WEBP (Maks: 5MB) </span>
 							</label>
 						{/if}
 					</div>

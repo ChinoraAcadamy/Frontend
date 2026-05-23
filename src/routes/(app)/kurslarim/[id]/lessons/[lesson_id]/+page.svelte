@@ -25,7 +25,9 @@
 		<Loader2 class="h-8 w-8 animate-spin text-primary" />
 	</div>
 {:then lesson}
-	<LessonDetailView {lesson} nextLesson={data.lazy.nextLesson} />
+	{#key lesson.id}
+		<LessonDetailView {lesson} nextLesson={data.lazy.nextLesson} />
+	{/key}
 {:catch error}
 	<div class="flex min-h-[50vh] items-center justify-center">
 		<p class="text-muted">{error.message || 'Xatolik yuz berdi'}</p>

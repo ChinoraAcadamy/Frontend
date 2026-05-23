@@ -68,7 +68,7 @@
 				const url = `/kurslarim/${$page.params.id}/lessons/${resolvedNextLesson.id}?module_id=${resolvedNextLesson.moduleId || $page.url.searchParams.get('module_id')}`;
 				/** @type {any} */
 				const route = url;
-				await goto(resolve(route));
+				await goto(resolve(route), { replaceState: true });
 			}
 		} catch (e) {
 			console.error('Lesson completion error:', e);

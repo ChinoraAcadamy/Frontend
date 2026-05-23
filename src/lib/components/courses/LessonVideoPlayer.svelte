@@ -538,6 +538,34 @@
 
 			initPlayback();
 		}
+
+		return () => {
+			if (player) {
+				try {
+					player.destroy();
+				} catch (e) {
+					console.error('Error destroying Plyr instance:', e);
+				}
+				player = null;
+			}
+			if (hlsInstance) {
+				try {
+					hlsInstance.destroy();
+				} catch (e) {
+					console.error('Error destroying HLS instance:', e);
+				}
+				hlsInstance = null;
+			}
+			if (videoElement) {
+				try {
+					videoElement.pause();
+					videoElement.removeAttribute('src');
+					videoElement.load();
+				} catch (e) {
+					console.error('Error pausing and resetting video element:', e);
+				}
+			}
+		};
 	});
 
 	onDestroy(() => {
@@ -550,8 +578,26 @@
 		if (watermarkInterval) clearInterval(watermarkInterval);
 		if (securityLoop) clearInterval(securityLoop);
 		if (saveInterval) clearInterval(saveInterval);
-		if (hlsInstance) hlsInstance.destroy();
-		player?.destroy();
+
+		if (player) {
+			try {
+				player.destroy();
+			} catch (e) {}
+			player = null;
+		}
+		if (hlsInstance) {
+			try {
+				hlsInstance.destroy();
+			} catch (e) {}
+			hlsInstance = null;
+		}
+		if (videoElement) {
+			try {
+				videoElement.pause();
+				videoElement.removeAttribute('src');
+				videoElement.load();
+			} catch (e) {}
+		}
 	});
 </script>
 
@@ -606,8 +652,8 @@
 	{#if isScreenBlurred}
 		<div class="vp-blur-shroud" transition:fade={{ duration: 150 }}>
 			<div class="vp-blur-shroud-content">
-				<Lock size={36} class="text-[#9b1c48] animate-pulse" />
-				<span class="text-xs font-black tracking-widest text-[#9b1c48] uppercase">
+				<Lock size={36} class="text-primary animate-pulse" />
+				<span class="text-xs font-black tracking-widest text-primary uppercase">
 					CHINORA PROTECTION
 				</span>
 				<p class="text-[13px] font-bold text-white/80 mt-1">
