@@ -5,11 +5,12 @@
 	let { student, onConfirm, onClose } = $props();
 </script>
 
-<Modal isOpen={true} onClose={onClose} maxWidth="420px">
+<Modal isOpen={true} {onClose} maxWidth="420px">
 	<div class="delete-content">
 		<h3 class="text-primary">Ishonchingiz komilmi?</h3>
 		<p>
-			<strong>{student.fullName || student.username}</strong>ni butunlay o‘chirib tashlamoqchimisiz?<br />
+			<strong>{student.fullName || student.username}</strong>ni butunlay o‘chirib tashlamoqchimisiz?<br
+			/>
 		</p>
 
 		<div class="modal-buttons">
@@ -52,7 +53,7 @@
 		@apply rounded-md;
 		transition: background 0.2s;
 	}
-	
+
 	.cancel-btn:hover {
 		background: var(--border-light, #e5e7eb);
 	}

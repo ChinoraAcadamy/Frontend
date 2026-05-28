@@ -6,7 +6,7 @@
 	let { student, onSave, onClose } = $props();
 </script>
 
-<Modal isOpen={true} onClose={onClose} maxWidth="460px">
+<Modal isOpen={true} {onClose} maxWidth="460px">
 	<div class="edit-content">
 		<h3>Edit Student</h3>
 

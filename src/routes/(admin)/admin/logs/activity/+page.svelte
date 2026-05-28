@@ -196,7 +196,7 @@
 </script>
 
 {#snippet tableSkeleton()}
-	<div class="border-main bg-card animate-pulse space-y-3 rounded-xl border p-6">
+	<div class="animate-pulse space-y-3 rounded-xl border border-main bg-card p-6">
 		<div class="h-10 w-full rounded-lg bg-muted/10"></div>
 		{#each Array(8) as _, i (i)}
 			<div class="mt-2 h-14 w-full rounded-lg bg-muted/5"></div>
@@ -204,18 +204,18 @@
 	</div>
 {/snippet}
 
-<div class="bg-main min-h-screen p-4 font-sans sm:p-6 lg:p-8">
+<div class="min-h-screen bg-main p-4 font-sans sm:p-6 lg:p-8">
 	<div class="mx-auto max-w-7xl">
 		<div class="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
 			<div>
-				<h1 class="text-main flex items-center gap-2 text-2xl font-semibold">
+				<h1 class="flex items-center gap-2 text-2xl font-semibold text-main">
 					<Activity class="text-primary" />
 					{m.admin_logs_activity_title ? m.admin_logs_activity_title() : 'Tizim faoliyati'}
 				</h1>
 				{#await data.lazy.activityData then resolvedData}
 					<p class="mt-1 text-sm text-muted">
 						{m.admin_students_total ? m.admin_students_total() : 'Jami'}
-						<span class="text-main font-medium">{resolvedData.count}</span>
+						<span class="font-medium text-main">{resolvedData.count}</span>
 						{m.admin_logs_activity_count_suffix ? m.admin_logs_activity_count_suffix() : 'ta yozuv'}
 					</p>
 				{/await}
@@ -232,14 +232,14 @@
 						? m.admin_logs_activity_search()
 						: 'Foydalanuvchi, harakat yoki obyektni izlash...'}
 					bind:value={searchValue}
-					class="border-main bg-card text-main h-10 w-full rounded-lg border pr-4 pl-10 text-sm transition-colors outline-none placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+					class="h-10 w-full rounded-lg border border-main bg-card pr-4 pl-10 text-sm text-main transition-colors outline-none placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
 				/>
 			</div>
 			<select
 				name="ordering"
 				bind:value={orderingValue}
 				onchange={(e) => /** @type {HTMLSelectElement} */ (e.target).form?.submit()}
-				class="border-main bg-card text-main h-10 rounded-lg border px-4 text-sm transition-colors outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+				class="h-10 rounded-lg border border-main bg-card px-4 text-sm text-main transition-colors outline-none focus:border-primary focus:ring-1 focus:ring-primary"
 			>
 				<option value="-created_at"
 					>{m.admin_logs_activity_newest
@@ -263,10 +263,10 @@
 			{@const logs = resolvedData.results || []}
 			{@const totalPages = Math.ceil(resolvedData.count / itemsPerPage)}
 
-			<div class="border-main bg-card overflow-hidden rounded-xl border shadow-sm">
+			<div class="overflow-hidden rounded-xl border border-main bg-card shadow-sm">
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[1000px] text-left text-sm">
-						<thead class="border-main border-b bg-muted/5">
+						<thead class="border-b border-main bg-muted/5">
 							<tr>
 								<th class="admin-table"
 									>{m.admin_logs_activity_col_user
@@ -296,12 +296,12 @@
 								>
 							</tr>
 						</thead>
-						<tbody class="divide-main/5 divide-y">
+						<tbody class="divide-y divide-main/5">
 							{#each logs as log (log.id)}
 								{@const config = getActionConfig(log.action)}
 								<tr class="group transition-colors hover:bg-muted/5">
 									<td class="px-6 py-4">
-										<div class="text-main font-medium">
+										<div class="font-medium text-main">
 											{log.user_name}
 										</div>
 										{#if log.user?.role}
@@ -353,9 +353,13 @@
 				</div>
 
 				{#if totalPages > 1}
-					<div class="border-main bg-card flex items-center justify-between border-t px-6 py-4">
+					<div class="flex items-center justify-between border-t border-main bg-card px-6 py-4">
 						<a
-							href={resolve(/** @type {any} */ (`/admin/logs/activity?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`))}
+							href={resolve(
+								/** @type {any} */ (
+									`/admin/logs/activity?page=${Math.max(1, currentPage - 1)}&search=${searchValue}&ordering=${orderingValue}`
+								)
+							)}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 {currentPage ===
 							1
 								? 'pointer-events-none opacity-40'
@@ -371,7 +375,11 @@
 							>
 						</div>
 						<a
-							href={resolve(/** @type {any} */ (`/admin/logs/activity?page=${Math.min(totalPages, currentPage + 1)}&search=${searchValue}&ordering=${orderingValue}`))}
+							href={resolve(
+								/** @type {any} */ (
+									`/admin/logs/activity?page=${Math.min(totalPages, currentPage + 1)}&search=${searchValue}&ordering=${orderingValue}`
+								)
+							)}
 							class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-muted/10 {currentPage ===
 							totalPages
 								? 'pointer-events-none opacity-40'

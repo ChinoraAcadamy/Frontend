@@ -43,19 +43,25 @@
 
 	$effect(() => {
 		if (page.data.lazy?.courseData) {
-			Promise.resolve(page.data.lazy.courseData).then(data => {
-				if (data?.title) lazyTitles.course = data.title;
-			}).catch(() => {});
+			Promise.resolve(page.data.lazy.courseData)
+				.then((data) => {
+					if (data?.title) lazyTitles.course = data.title;
+				})
+				.catch(() => {});
 		}
 		if (page.data.lazy?.moduleData) {
-			Promise.resolve(page.data.lazy.moduleData).then(data => {
-				if (data?.title) lazyTitles.module = data.title;
-			}).catch(() => {});
+			Promise.resolve(page.data.lazy.moduleData)
+				.then((data) => {
+					if (data?.title) lazyTitles.module = data.title;
+				})
+				.catch(() => {});
 		}
 		if (page.data.lazy?.lesson) {
-			Promise.resolve(page.data.lazy.lesson).then(data => {
-				if (data?.title) lazyTitles.lesson = data.title;
-			}).catch(() => {});
+			Promise.resolve(page.data.lazy.lesson)
+				.then((data) => {
+					if (data?.title) lazyTitles.lesson = data.title;
+				})
+				.catch(() => {});
 		}
 	});
 
@@ -71,22 +77,47 @@
 				if (isParam) {
 					const paramName = routeSegments[i].slice(1, -1).replace('...', '');
 
-					if ((paramName.includes('lesson') || paramName === 'lesson_id') && (page.data.lesson?.title || lazyTitles.lesson)) {
+					if (
+						(paramName.includes('lesson') || paramName === 'lesson_id') &&
+						(page.data.lesson?.title || lazyTitles.lesson)
+					) {
 						label = page.data.lesson?.title || lazyTitles.lesson;
-					} else if ((paramName.includes('module') || paramName === 'module_id') && (page.data.module?.title || (page.data.moduleData && !page.data.moduleData.then ? page.data.moduleData.title : undefined) || lazyTitles.module)) {
-						label = page.data.module?.title || (page.data.moduleData && !page.data.moduleData.then ? page.data.moduleData.title : undefined) || lazyTitles.module;
-					} else if ((paramName === 'id' || paramName.includes('course') || paramName === 'course_id') && (page.data.course?.title || lazyTitles.course)) {
+					} else if (
+						(paramName.includes('module') || paramName === 'module_id') &&
+						(page.data.module?.title ||
+							(page.data.moduleData && !page.data.moduleData.then
+								? page.data.moduleData.title
+								: undefined) ||
+							lazyTitles.module)
+					) {
+						label =
+							page.data.module?.title ||
+							(page.data.moduleData && !page.data.moduleData.then
+								? page.data.moduleData.title
+								: undefined) ||
+							lazyTitles.module;
+					} else if (
+						(paramName === 'id' || paramName.includes('course') || paramName === 'course_id') &&
+						(page.data.course?.title || lazyTitles.course)
+					) {
 						label = page.data.course?.title || lazyTitles.course;
 					} else if (paramName.includes('student') || paramName === 'student_id') {
 						if (page.data.student) {
-							label = `${page.data.student.first_name || ''} ${page.data.student.last_name || ''}`.trim() || page.data.student.username;
+							label =
+								`${page.data.student.first_name || ''} ${page.data.student.last_name || ''}`.trim() ||
+								page.data.student.username;
 						}
 					} else if (i === segments.length - 1 && page.data.title) {
 						label = page.data.title;
 					}
 				} else {
 					if (seg.toLowerCase() === 'lessons' || seg.toLowerCase() === 'lesson') {
-						const moduleTitle = page.data.module?.title || (page.data.moduleData && !page.data.moduleData.then ? page.data.moduleData.title : undefined) || lazyTitles.module;
+						const moduleTitle =
+							page.data.module?.title ||
+							(page.data.moduleData && !page.data.moduleData.then
+								? page.data.moduleData.title
+								: undefined) ||
+							lazyTitles.module;
 						if (moduleTitle) {
 							label = moduleTitle;
 						}
@@ -133,38 +164,74 @@
 <!-- Desktop: inNavbar holati -->
 {#if inNavbar}
 	<nav class="bc-desktop" aria-label="Breadcrumb">
-		<a href={resolve(/** @type {any} */ (homeHref))} class="bc-home text-muted hover:text-primary transition-colors" aria-label="Dashboard">
+		<a
+			href={resolve(/** @type {any} */ (homeHref))}
+			class="bc-home text-muted transition-colors hover:text-primary"
+			aria-label="Dashboard"
+		>
 			<Home size={13} strokeWidth={2.5} />
 		</a>
 		{#each items as item, i (item.href)}
 			<span class="bc-sep text-muted/50" aria-hidden="true">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
-					<path d="m9 18 6-6-6-6"/>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					width="10"
+					height="10"
+				>
+					<path d="m9 18 6-6-6-6" />
 				</svg>
 			</span>
 			{#if i !== items.length - 1 && item.isClickable}
-				<a href={resolve(/** @type {any} */(item.href))} class="bc-link text-muted hover:text-primary hover:bg-primary/10 transition-colors">{item.label}</a>
+				<a
+					href={resolve(/** @type {any} */ (item.href))}
+					class="bc-link text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+					>{item.label}</a
+				>
 			{:else if i !== items.length - 1}
-				<span class="bc-link text-muted/50 cursor-default select-none" title={item.label}>{item.label}</span>
+				<span class="bc-link cursor-default text-muted/50 select-none" title={item.label}
+					>{item.label}</span
+				>
 			{:else}
 				<span class="bc-current text-foreground" title={item.label}>{item.label}</span>
 			{/if}
 		{/each}
 	</nav>
 
-<!-- Mobile: sticky bar holati -->
+	<!-- Mobile: sticky bar holati -->
 {:else}
 	<nav class="bc-mobile" aria-label="Breadcrumb">
 		<div class="bc-mobile-inner">
 			<!-- Agar oldin ko'proq element bo'lsa, orqaga o'tish uchun -->
 			{#if nearestBackItem}
-				<a href={resolve(/** @type {any} */(nearestBackItem.href))} class="bc-back-btn text-primary bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Back">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-						<path d="m15 18-6-6 6-6"/>
+				<a
+					href={resolve(/** @type {any} */ (nearestBackItem.href))}
+					class="bc-back-btn bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+					aria-label="Back"
+				>
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						width="14"
+						height="14"
+					>
+						<path d="m15 18-6-6 6-6" />
 					</svg>
 				</a>
 			{:else}
-				<a href={resolve(/** @type {any} */(homeHref))} class="bc-back-btn text-primary bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Dashboard">
+				<a
+					href={resolve(/** @type {any} */ (homeHref))}
+					class="bc-back-btn bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+					aria-label="Dashboard"
+				>
 					<Home size={14} strokeWidth={2.5} />
 				</a>
 			{/if}
@@ -174,8 +241,17 @@
 				{#if hasMore}
 					<span class="bc-trail-dots text-muted" aria-hidden="true">···</span>
 					<span class="bc-trail-sep text-muted/50" aria-hidden="true">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
-							<path d="m9 18 6-6-6-6"/>
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							width="10"
+							height="10"
+						>
+							<path d="m9 18 6-6-6-6" />
 						</svg>
 					</span>
 				{/if}
@@ -183,16 +259,30 @@
 				{#each mobileItems as item, i (item.href)}
 					{#if i > 0}
 						<span class="bc-trail-sep text-muted/50" aria-hidden="true">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10">
-								<path d="m9 18 6-6-6-6"/>
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								width="10"
+								height="10"
+							>
+								<path d="m9 18 6-6-6-6" />
 							</svg>
 						</span>
 					{/if}
 
 					{#if i !== mobileItems.length - 1 && item.isClickable}
-						<a href={resolve(/** @type {any} */(item.href))} class="bc-trail-link text-muted hover:text-primary transition-colors">{item.label}</a>
+						<a
+							href={resolve(/** @type {any} */ (item.href))}
+							class="bc-trail-link text-muted transition-colors hover:text-primary">{item.label}</a
+						>
 					{:else if i !== mobileItems.length - 1}
-						<span class="bc-trail-link text-muted/50 cursor-default select-none" title={item.label}>{item.label}</span>
+						<span class="bc-trail-link cursor-default text-muted/50 select-none" title={item.label}
+							>{item.label}</span
+						>
 					{:else}
 						<span class="bc-trail-current text-foreground" title={item.label}>{item.label}</span>
 					{/if}
@@ -282,7 +372,9 @@
 		flex-shrink: 0;
 		margin-right: 10px;
 	}
-	.bc-back-btn:active { transform: scale(0.93); }
+	.bc-back-btn:active {
+		transform: scale(0.93);
+	}
 
 	/* Trail */
 	.bc-trail {

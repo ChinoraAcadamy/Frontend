@@ -4,13 +4,13 @@
 	import { cubicOut } from 'svelte/easing';
 	import { X } from 'lucide-svelte';
 
-	let { 
-		isOpen = false, 
-		onClose, 
-		title = '', 
+	let {
+		isOpen = false,
+		onClose,
+		title = '',
 		maxWidth = '420px',
 		noPadding = false,
-		children 
+		children
 	} = $props();
 
 	// Orqa fonni qulflash (Mobil UX uchun muhim)
@@ -29,17 +29,17 @@
 
 {#if isOpen}
 	<!-- Overlay/Backdrop -->
-	<div 
-		class="modal-backdrop" 
-		transition:fade={{ duration: 200 }} 
-		onclick={onClose} 
+	<div
+		class="modal-backdrop"
+		transition:fade={{ duration: 200 }}
+		onclick={onClose}
 		aria-hidden="true"
 	></div>
 
 	<!-- Modal Container -->
-	<div 
-		class="modal-container" 
-		transition:fly={{ y: 30, duration: 300, easing: cubicOut }} 
+	<div
+		class="modal-container"
+		transition:fly={{ y: 30, duration: 300, easing: cubicOut }}
 		role="dialog"
 		aria-label={title || 'Modal'}
 		style="--max-w: {maxWidth}"
@@ -58,7 +58,7 @@
 			</button>
 		{/if}
 
-		<div class="modal-body" style="{noPadding ? 'padding: 0;' : ''}">
+		<div class="modal-body" style={noPadding ? 'padding: 0;' : ''}>
 			{@render children()}
 		</div>
 	</div>

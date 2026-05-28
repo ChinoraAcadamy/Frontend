@@ -2,12 +2,12 @@
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ locals, parent }) => {
-    await parent(); // global layout'ning load'ini chaqiramiz, shunda locals to'ldiriladi
-    if (!locals.isAuthenticated) redirect(302, '/login');
+	await parent(); // global layout'ning load'ini chaqiramiz, shunda locals to'ldiriladi
+	if (!locals.isAuthenticated) redirect(302, '/login');
 
-    if (locals.user?.role !== 'admin' && locals.user?.role !== 'superadmin') {
-        redirect(302, '/dashboard'); // student sahifasiga
-    }
+	if (locals.user?.role !== 'admin' && locals.user?.role !== 'superadmin') {
+		redirect(302, '/dashboard'); // student sahifasiga
+	}
 
-    return { user: locals.user };
+	return { user: locals.user };
 };

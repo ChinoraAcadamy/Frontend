@@ -7,7 +7,6 @@
 
 <div class="mx-auto max-w-7xl px-6 pt-8 pb-12 md:px-8 md:py-8 md:pb-10">
 	{#await data.streamed.submissionsData}
-
 		<!-- Loading holatida Skelet ko'rsatamiz -->
 		<div class="mb-8">
 			<div

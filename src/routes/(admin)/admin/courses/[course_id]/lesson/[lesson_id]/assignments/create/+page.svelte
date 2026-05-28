@@ -15,8 +15,6 @@
 		modulePk = data.moduleId;
 	});
 
-
-
 	$effect(() => {
 		if (form?.success) {
 			toast.success(m.success_saved ? m.success_saved() : "Topshiriq muvaffaqiyatli qo'shildi!");

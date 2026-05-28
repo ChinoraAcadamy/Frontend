@@ -12,7 +12,7 @@
 	class="theme-toggle"
 	onclick={toggleTheme}
 	aria-label="Mavzuni o'zgartirish"
-	title={$theme === 'dark' ? 'Yorug\' rejim' : 'Tungi rejim'}
+	title={$theme === 'dark' ? "Yorug' rejim" : 'Tungi rejim'}
 >
 	<div class="icon-container">
 		{#if $theme === 'dark'}

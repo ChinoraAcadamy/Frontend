@@ -14,9 +14,16 @@
 	// if lesson is created, make toast message and clear all inputs
 	$effect(() => {
 		if (form?.success) {
-			toast.success(m.msg_lesson_created ? m.msg_lesson_created({ title: form.lesson.title_uz }) : `${form.lesson.title_uz} darsi muvaffaqiyatli yaratildi!`, {
-				description: m.label_duration_param ? m.label_duration_param({ minutes: form.lesson.duration }) : `Davomiyligi: ${form.lesson.duration} minut`
-			});
+			toast.success(
+				m.msg_lesson_created
+					? m.msg_lesson_created({ title: form.lesson.title_uz })
+					: `${form.lesson.title_uz} darsi muvaffaqiyatli yaratildi!`,
+				{
+					description: m.label_duration_param
+						? m.label_duration_param({ minutes: form.lesson.duration })
+						: `Davomiyligi: ${form.lesson.duration} minut`
+				}
+			);
 			// Formani tozalash
 			modulePk = null;
 		} else if (form?.error) {
@@ -36,37 +43,49 @@
 <div class="page-container">
 	<div class="header">
 		<h1 class="title">
-			<b class="text-primary">{data.course.title}</b> 
-			{m.text_create_lesson_for ? m.text_create_lesson_for({ course: '' }).replace(': ', '').trim() : "kursi uchun yangi dars qo'shish"}
+			<b class="text-primary">{data.course.title}</b>
+			{m.text_create_lesson_for
+				? m.text_create_lesson_for({ course: '' }).replace(': ', '').trim()
+				: "kursi uchun yangi dars qo'shish"}
 		</h1>
-		<p class="subtitle">{m.admin_course_create_subtitle ? m.admin_course_create_subtitle() : "Platformaga yangi o'quv dasturini kiritish paneli"}</p>
+		<p class="subtitle">
+			{m.admin_course_create_subtitle
+				? m.admin_course_create_subtitle()
+				: "Platformaga yangi o'quv dasturini kiritish paneli"}
+		</p>
 	</div>
 
 	<div class="progress-tracker">
 		<div class="step active">
 			<div class="step-circle"><CheckCircle2 size={18} /></div>
-			<span class="step-label">{m.admin_course_create_step_course ? m.admin_course_create_step_course() : "Kurs"}</span>
+			<span class="step-label"
+				>{m.admin_course_create_step_course ? m.admin_course_create_step_course() : 'Kurs'}</span
+			>
 		</div>
 		<div class="step-line active-line"></div>
 		<div class="step active">
 			<div class="step-circle"><CheckCircle2 size={18} /></div>
-			<span class="step-label">{m.admin_course_create_step_module ? m.admin_course_create_step_module() : "Modul"}</span>
+			<span class="step-label"
+				>{m.admin_course_create_step_module ? m.admin_course_create_step_module() : 'Modul'}</span
+			>
 		</div>
 		<div class="step-line active-line"></div>
 		<div class="step active">
 			<div class="step-circle"><CheckCircle2 size={18} /></div>
-			<span class="step-label">{m.admin_course_create_step_lesson ? m.admin_course_create_step_lesson() : "Dars"}</span>
+			<span class="step-label"
+				>{m.admin_course_create_step_lesson ? m.admin_course_create_step_lesson() : 'Dars'}</span
+			>
 		</div>
 	</div>
 
 	<div class="form-card">
-		<LessonForm 
-			action="?/createLesson" 
-			modules={data.modules} 
+		<LessonForm
+			action="?/createLesson"
+			modules={data.modules}
 			apiContext={{ apiUrl: data.apiUrl, accessToken: data.accessToken, courseId: data.courseId }}
-			bind:modulePk={modulePk} 
-			bind:isSubmitting={isSubmitting} 
-			onSubmit={handleSubmit} 
+			bind:modulePk
+			bind:isSubmitting
+			onSubmit={handleSubmit}
 		/>
 	</div>
 </div>

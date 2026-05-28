@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { deserialize, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
-	import { CheckCircle2, Save, Video } from 'lucide-svelte';
+	import { CheckCircle2, Save, Video, Sparkles } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { fade } from 'svelte/transition';
 	import * as m from '$lib/paraglide/messages.js';
@@ -40,9 +40,30 @@
 	// UI State
 	let activeTab = $state('uz');
 	let videoFile = $state(null);
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let imgPreview = $state(null);
 	let uploadProgress = $state(0);
-	let autoDuration = $derived(lessonTarget.duration || 0);
+
+	// Svelte 5 Form state variables
+	// svelte-ignore state_referenced_locally
+	let titleUz = $state(lessonTarget.title_uz || lessonTarget.title || '');
+	// svelte-ignore state_referenced_locally
+	let titleRu = $state(lessonTarget.title_ru || lessonTarget.title || '');
+	// svelte-ignore state_referenced_locally
+	let descriptionUz = $state(lessonTarget.description_uz || lessonTarget.description || '');
+	// svelte-ignore state_referenced_locally
+	let descriptionRu = $state(lessonTarget.description_ru || lessonTarget.description || '');
+	// svelte-ignore state_referenced_locally
+	let autoDuration = $state(lessonTarget.duration || 0);
+
+	// AI Creator tab states
+	let creatorTab = $state('manual'); // 'manual' | 'ai'
+	let aiInputText = $state('');
+	let isParsingAi = $state(false);
+
+	// AI Translating states
+	let isTranslatingTitle = $state(false);
+	let isTranslatingDesc = $state(false);
 
 	$effect.pre(() => {
 		imgPreview = lessonTarget?.image || null;
@@ -62,6 +83,86 @@
 		uploadProgress = 0;
 		autoDuration = 0;
 		modulePk = null;
+		titleUz = '';
+		titleRu = '';
+		descriptionUz = '';
+		descriptionRu = '';
+		aiInputText = '';
+	}
+
+	// AI Parsing function
+	async function handleAiParse() {
+		if (!aiInputText || aiInputText.trim() === '') {
+			toast.error("Maydon bo'sh! Iltimos, avval dars ma'lumotlarini matn shaklida yozing.");
+			return;
+		}
+
+		isParsingAi = true;
+		try {
+			const res = await fetch('/api/lessons/parse', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ text: aiInputText })
+			});
+
+			const data = await res.json();
+			if (!res.ok) {
+				toast.error(data.error || 'AI tahlilda xatolik yuz berdi');
+				return;
+			}
+
+			// Fill state variables
+			titleUz = data.title_uz || '';
+			titleRu = data.title_ru || '';
+			descriptionUz = data.description_uz || '';
+			descriptionRu = data.description_ru || '';
+			if (data.duration) {
+				autoDuration = data.duration;
+			}
+
+			toast.success("Dars ma'lumotlari AI yordamida to'ldirildi va rus tiliga tarjima qilindi! ✨");
+			// Switch back to fields form tab
+			creatorTab = 'manual';
+		} catch (err) {
+			console.error(err);
+			toast.error("AI tahlil xizmati bilan bog'lanib bo'lmadi");
+		} finally {
+			isParsingAi = false;
+		}
+	}
+
+	// AI translation handler
+	async function handleTranslate(sourceText, targetKey) {
+		if (!sourceText || sourceText.trim() === '') {
+			toast.error("O'zbekcha maydon bo'sh! Avval uni to'ldiring.");
+			return;
+		}
+
+		if (targetKey === 'title') isTranslatingTitle = true;
+		if (targetKey === 'desc') isTranslatingDesc = true;
+
+		try {
+			const res = await fetch('/api/translate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ text: sourceText })
+			});
+
+			const data = await res.json();
+			if (data.translation) {
+				if (targetKey === 'title') titleRu = data.translation;
+				if (targetKey === 'desc') descriptionRu = data.translation;
+				toast.success('Tarjima muvaffaqiyatli bajarildi! ✨');
+			} else {
+				toast.error(data.error || 'Tarjimada xatolik yuz berdi');
+			}
+		} catch (err) {
+			console.error(err);
+			toast.error("Tarjima xizmati bilan bog'lanib bo'lmadi");
+		} finally {
+			if (targetKey === 'title') isTranslatingTitle = false;
+			if (targetKey === 'desc') isTranslatingDesc = false;
+		}
 	}
 
 	async function handleCustomSubmit(e) {
@@ -164,7 +265,62 @@
 	enctype="multipart/form-data"
 	class="mx-auto w-full max-w-[900px] font-sans"
 >
-	<div class="flex flex-col gap-5">
+	<!-- Creator Type Tab Panel (AI and Manual) -->
+	<div class="creator-tabs">
+		<button
+			type="button"
+			class="creator-tab {creatorTab === 'manual' ? 'active' : ''}"
+			onclick={() => (creatorTab = 'manual')}
+		>
+			✍️ Standart Forma
+		</button>
+		<button
+			type="button"
+			class="creator-tab {creatorTab === 'ai' ? 'active' : ''}"
+			onclick={() => (creatorTab = 'ai')}
+		>
+			⚡️ Tezkor AI Yaratuvchi
+		</button>
+	</div>
+
+	<!-- AI Parsing Textarea block -->
+	{#if creatorTab === 'ai'}
+		<div class="ai-creator-container" in:fade={{ duration: 150 }}>
+			<div class="ai-header">
+				<div class="ai-sparkle-circle">
+					<Sparkles size={20} class="text-primary" />
+				</div>
+				<div>
+					<h3 class="ai-title">⚡️ Tezkor AI Dars Yaratuvchi</h3>
+					<p class="ai-subtitle">
+						Dars ma'lumotlarini matn shaklida yozing, AI avtomatik parsing qiladi, davomiylikni
+						o'qiydi va rus tiliga o'giradi.
+					</p>
+				</div>
+			</div>
+
+			<textarea
+				class="ai-textarea"
+				bind:value={aiInputText}
+				placeholder="Matn kiriting, masalan:&#10;Dars nomi: TailwindCSS utility sinflari&#10;Davomiyligi: 25.5 daqiqa&#10;Tavsif: Ushbu darsda biz TailwindCSS frameworkining asosiy sinflari bilan amaliy tanishamiz."
+				rows="6"
+			></textarea>
+
+			<div class="mt-4 flex justify-end">
+				<button type="button" class="ai-parse-btn" onclick={handleAiParse} disabled={isParsingAi}>
+					{#if isParsingAi}
+						<div class="spinner"></div>
+						<span>AI tahlil qilmoqda...</span>
+					{:else}
+						<Sparkles size={14} />
+						<span>AI yordamida to'ldirish</span>
+					{/if}
+				</button>
+			</div>
+		</div>
+	{/if}
+
+	<div class="flex flex-col gap-5 {creatorTab !== 'manual' ? 'hidden' : ''}">
 		<!-- Section: General Info -->
 		<FormSection
 			title={m.section_general_info ? m.section_general_info() : "Umumiy ma'lumotlar"}
@@ -220,7 +376,7 @@
 								: 'Masalan: Kirish qismi'}
 							class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-primary"
 							required
-							value={lessonTarget.title_uz || lessonTarget.title || ''}
+							bind:value={titleUz}
 						/>
 					</div>
 					<div class="flex flex-col gap-1.5">
@@ -237,19 +393,36 @@
 							placeholder={m.placeholder_lesson_desc_uz
 								? m.placeholder_lesson_desc_uz()
 								: "Dars haqida qisqacha ma'lumot..."}
-							>{lessonTarget.description_uz || lessonTarget.description || ''}</textarea
-						>
+							bind:value={descriptionUz}
+						></textarea>
 					</div>
 				</div>
 
 				<!-- RU Content -->
 				<div class="space-y-4 {activeTab !== 'ru' ? 'hidden' : ''}" in:fade={{ duration: 150 }}>
 					<div class="flex flex-col gap-1.5">
-						<label
-							for="les_title_ru"
-							class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
-							>{m.label_lesson_title_ru ? m.label_lesson_title_ru() : 'Название урока (RU)'}</label
-						>
+						<div class="label-container flex w-full items-center justify-between">
+							<label
+								for="les_title_ru"
+								class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
+								>{m.label_lesson_title_ru
+									? m.label_lesson_title_ru()
+									: 'Название урока (RU)'}</label
+							>
+							<button
+								type="button"
+								class="ai-translate-btn"
+								onclick={() => handleTranslate(titleUz, 'title')}
+								disabled={isTranslatingTitle}
+							>
+								{#if isTranslatingTitle}
+									<div class="spinner spinner-white"></div>
+								{:else}
+									<Sparkles size={11} />
+									<span>AI Tarjima</span>
+								{/if}
+							</button>
+						</div>
 						<input
 							type="text"
 							id="les_title_ru"
@@ -259,15 +432,30 @@
 								: 'Например: Введение'}
 							class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-primary"
 							required
-							value={lessonTarget.title_ru || lessonTarget.title || ''}
+							bind:value={titleRu}
 						/>
 					</div>
 					<div class="flex flex-col gap-1.5">
-						<label
-							for="les_desc_ru"
-							class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
-							>{m.label_lesson_desc_ru ? m.label_lesson_desc_ru() : 'Описание (RU)'}</label
-						>
+						<div class="label-container flex w-full items-center justify-between">
+							<label
+								for="les_desc_ru"
+								class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
+								>{m.label_lesson_desc_ru ? m.label_lesson_desc_ru() : 'Описание (RU)'}</label
+							>
+							<button
+								type="button"
+								class="ai-translate-btn"
+								onclick={() => handleTranslate(descriptionUz, 'desc')}
+								disabled={isTranslatingDesc}
+							>
+								{#if isTranslatingDesc}
+									<div class="spinner spinner-white"></div>
+								{:else}
+									<Sparkles size={11} />
+									<span>AI Tarjima</span>
+								{/if}
+							</button>
+						</div>
 						<textarea
 							id="les_desc_ru"
 							name="description_ru"
@@ -276,8 +464,8 @@
 							placeholder={m.placeholder_lesson_desc_ru
 								? m.placeholder_lesson_desc_ru()
 								: 'Краткое описание урока...'}
-							>{lessonTarget.description_ru || lessonTarget.description || ''}</textarea
-						>
+							bind:value={descriptionRu}
+						></textarea>
 					</div>
 				</div>
 			</div>
@@ -421,4 +609,178 @@
 </form>
 
 <style>
+	/* AI Creator Tabs */
+	.creator-tabs {
+		display: flex;
+		background: var(--bg-surface);
+		border: 1px solid var(--border-main);
+		padding: 4px;
+		border-radius: 18px;
+		margin-bottom: 20px;
+		gap: 4px;
+	}
+
+	.creator-tab {
+		flex: 1;
+		text-align: center;
+		padding: 10px 16px;
+		font-size: 13px;
+		font-weight: 800;
+		color: var(--text-muted);
+		border-radius: 14px;
+		cursor: pointer;
+		border: none;
+		background: transparent;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		font-family: inherit;
+	}
+
+	.creator-tab.active {
+		background: var(--primary);
+		color: white;
+		box-shadow: 0 4px 12px rgba(155, 28, 72, 0.2);
+	}
+
+	/* AI Creator Section */
+	.ai-creator-container {
+		background: var(--bg-card);
+		border: 1px solid rgba(155, 28, 72, 0.2);
+		border-radius: 28px;
+		padding: 24px;
+		box-shadow: 0 10px 30px -10px rgba(155, 28, 72, 0.08);
+		margin-bottom: 20px;
+	}
+
+	.ai-header {
+		display: flex;
+		gap: 16px;
+		align-items: center;
+		margin-bottom: 20px;
+	}
+
+	.ai-sparkle-circle {
+		width: 44px;
+		height: 44px;
+		border-radius: 14px;
+		background: linear-gradient(135deg, rgba(155, 28, 72, 0.1) 0%, rgba(244, 63, 94, 0.1) 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(155, 28, 72, 0.2);
+	}
+
+	.ai-title {
+		font-size: 16px;
+		font-weight: 900;
+		color: var(--text-main);
+		margin: 0 0 2px 0;
+	}
+
+	.ai-subtitle {
+		font-size: 12px;
+		font-weight: 500;
+		color: var(--text-muted);
+		margin: 0;
+	}
+
+	.ai-textarea {
+		width: 100%;
+		border: 1.5px solid var(--border-main);
+		background: var(--bg-surface);
+		border-radius: 18px;
+		padding: 16px;
+		font-size: 13.5px;
+		color: var(--text-main);
+		resize: vertical;
+		outline: none;
+		font-family: inherit;
+		transition: border-color 0.2s ease;
+	}
+
+	.ai-textarea:focus {
+		border-color: var(--primary);
+	}
+
+	.ai-parse-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background: var(--primary);
+		color: white;
+		border: none;
+		padding: 12px 24px;
+		border-radius: 16px;
+		font-size: 13px;
+		font-weight: 800;
+		cursor: pointer;
+		box-shadow: 0 8px 16px -4px rgba(155, 28, 72, 0.3);
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		font-family: inherit;
+	}
+
+	.ai-parse-btn:hover:not(:disabled) {
+		background: var(--primary-hover);
+		transform: translateY(-1.5px);
+		box-shadow: 0 10px 20px -4px rgba(155, 28, 72, 0.4);
+	}
+
+	.ai-parse-btn:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+
+	/* AI Translation inside Fields */
+	.label-container {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		margin-bottom: 2px;
+	}
+
+	.ai-translate-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		background: linear-gradient(135deg, rgba(155, 28, 72, 0.08) 0%, rgba(244, 63, 94, 0.08) 100%);
+		border: 1px solid rgba(155, 28, 72, 0.2);
+		color: var(--primary);
+		padding: 4px 10px;
+		border-radius: 10px;
+		font-size: 10.5px;
+		font-weight: 700;
+		cursor: pointer;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		font-family: inherit;
+	}
+
+	.ai-translate-btn:hover:not(:disabled) {
+		background: linear-gradient(135deg, rgba(155, 28, 72, 0.16) 0%, rgba(244, 63, 94, 0.16) 100%);
+		transform: translateY(-1px);
+	}
+
+	.ai-translate-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.spinner {
+		width: 11px;
+		height: 11px;
+		border: 2px solid var(--primary);
+		border-top-color: transparent;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+
+	.spinner-white {
+		border-color: var(--primary);
+		border-top-color: transparent;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 </style>

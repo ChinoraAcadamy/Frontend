@@ -54,21 +54,28 @@
 	const parseUserAgent = (name) => {
 		if (!name) return m.profile_device_unknown();
 		const lower = name.toLowerCase();
-		if (lower.includes('pc (') || lower.includes('windows') || lower.includes('macintosh') || lower.includes('linux')) return 'Desktop';
 		if (
-			lower.includes('iphone') || 
-			lower.includes('android') || 
-			lower.includes('mobile') || 
-			lower.includes('tablet') || 
-			lower.includes('samsung') || 
-			lower.includes('pixel') || 
-			lower.includes('xiaomi') || 
-			lower.includes('redmi') || 
-			lower.includes('oppo') || 
-			lower.includes('vivo') || 
-			lower.includes('huawei') || 
+			lower.includes('pc (') ||
+			lower.includes('windows') ||
+			lower.includes('macintosh') ||
+			lower.includes('linux')
+		)
+			return 'Desktop';
+		if (
+			lower.includes('iphone') ||
+			lower.includes('android') ||
+			lower.includes('mobile') ||
+			lower.includes('tablet') ||
+			lower.includes('samsung') ||
+			lower.includes('pixel') ||
+			lower.includes('xiaomi') ||
+			lower.includes('redmi') ||
+			lower.includes('oppo') ||
+			lower.includes('vivo') ||
+			lower.includes('huawei') ||
 			lower.includes('realme')
-		) return 'Mobile';
+		)
+			return 'Mobile';
 		return 'Device';
 	};
 

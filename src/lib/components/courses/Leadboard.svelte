@@ -74,7 +74,7 @@
 
 	.leaderboard-row.me {
 		background: #fff0f5;
-		border: 2px solid #FF4D8D;
+		border: 2px solid #ff4d8d;
 	}
 
 	.rank {

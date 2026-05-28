@@ -217,8 +217,6 @@
 		font-weight: 700;
 	}
 
-
-
 	.lp-ls-item-full {
 		flex: 1;
 	}

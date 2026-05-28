@@ -518,7 +518,12 @@
 
 	.skel-thumb {
 		aspect-ratio: 16/9;
-		background: linear-gradient(90deg, var(--bg-main) 25%, var(--border-main) 50%, var(--bg-main) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--bg-main) 25%,
+			var(--border-main) 50%,
+			var(--bg-main) 75%
+		);
 		background-size: 600px 100%;
 		animation: shimmer 1.5s infinite;
 	}
@@ -533,7 +538,12 @@
 	.skel-line {
 		height: 11px;
 		border-radius: 6px;
-		background: linear-gradient(90deg, var(--bg-main) 25%, var(--border-main) 50%, var(--bg-main) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--bg-main) 25%,
+			var(--border-main) 50%,
+			var(--bg-main) 75%
+		);
 		background-size: 600px 100%;
 		animation: shimmer 1.5s infinite;
 	}
@@ -575,7 +585,12 @@
 		height: 60px;
 		border-radius: 10px;
 		flex-shrink: 0;
-		background: linear-gradient(90deg, var(--bg-main) 25%, var(--border-main) 50%, var(--bg-main) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--bg-main) 25%,
+			var(--border-main) 50%,
+			var(--bg-main) 75%
+		);
 		background-size: 600px 100%;
 		animation: shimmer 1.5s infinite;
 	}
@@ -592,7 +607,12 @@
 		height: 36px;
 		border-radius: 10px;
 		flex-shrink: 0;
-		background: linear-gradient(90deg, var(--bg-main) 25%, var(--border-main) 50%, var(--bg-main) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--bg-main) 25%,
+			var(--border-main) 50%,
+			var(--bg-main) 75%
+		);
 		background-size: 600px 100%;
 		animation: shimmer 1.5s infinite;
 	}

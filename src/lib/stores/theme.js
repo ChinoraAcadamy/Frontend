@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
 // Default to 'light' or system preference
-const initialTheme = browser ? (localStorage.getItem('theme') || 'light') : 'light';
+const initialTheme = browser ? localStorage.getItem('theme') || 'light' : 'light';
 
 export const theme = writable(initialTheme);
 

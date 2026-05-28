@@ -48,15 +48,22 @@
 	coursePk={$page.params.course_id}
 />
 
-<Modal isOpen={isDeleteModalOpen} onClose={() => isDeleteModalOpen = false} title={m.admin_danger_zone_delete_btn ? m.admin_danger_zone_delete_btn() : "Tasdiqlash"} maxWidth="440px">
-	<div class="flex flex-col items-center text-center p-2">
-		<div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 mb-4 animate-pulse">
+<Modal
+	isOpen={isDeleteModalOpen}
+	onClose={() => (isDeleteModalOpen = false)}
+	title={m.admin_danger_zone_delete_btn ? m.admin_danger_zone_delete_btn() : 'Tasdiqlash'}
+	maxWidth="440px"
+>
+	<div class="flex flex-col items-center p-2 text-center">
+		<div
+			class="mb-4 flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-red-100 text-red-600"
+		>
 			<AlertTriangle size={32} />
 		</div>
-		
-		<h3 class="text-xl font-extrabold text-foreground mb-2">Ishonchingiz komilmi?</h3>
-		
-		<p class="text-sm text-muted-foreground leading-relaxed mb-6">
+
+		<h3 class="mb-2 text-xl font-extrabold text-foreground">Ishonchingiz komilmi?</h3>
+
+		<p class="text-muted-foreground mb-6 text-sm leading-relaxed">
 			{#if deleteTarget.type === 'module'}
 				Modul <strong>"{deleteTarget.title}"</strong> va uning barcha darslari butunlay o'chib ketadi.
 			{:else if deleteTarget.type === 'lesson'}
@@ -65,12 +72,16 @@
 				Kurs <strong>"{deleteTarget.title}"</strong> butunlay o'chib ketadi.
 			{/if}
 			<br />
-			<span class="text-red-500 font-semibold mt-1 block">Bu amalni ortga qaytarib bo'lmaydi!</span>
+			<span class="mt-1 block font-semibold text-red-500">Bu amalni ortga qaytarib bo'lmaydi!</span>
 		</p>
 
 		<form
 			method="POST"
-			action={deleteTarget.type === 'module' ? '?/deleteModule' : deleteTarget.type === 'lesson' ? '?/deleteLesson' : '?/deleteCourse'}
+			action={deleteTarget.type === 'module'
+				? '?/deleteModule'
+				: deleteTarget.type === 'lesson'
+					? '?/deleteLesson'
+					: '?/deleteCourse'}
 			use:enhance={() => {
 				isDeleting = true;
 				return async ({ result, update }) => {
@@ -82,7 +93,7 @@
 					await update();
 				};
 			}}
-			class="flex gap-3 w-full"
+			class="flex w-full gap-3"
 		>
 			{#if deleteTarget.type === 'module'}
 				<input type="hidden" name="module_id" value={deleteTarget.id} />
@@ -91,17 +102,17 @@
 				<input type="hidden" name="lesson_id" value={deleteTarget.id} />
 			{/if}
 
-			<button 
-				type="button" 
-				class="flex-1 py-3 px-4 rounded-xl border border-border bg-surface text-foreground font-bold hover:bg-muted transition-all active:scale-[0.98]" 
-				onclick={() => isDeleteModalOpen = false} 
+			<button
+				type="button"
+				class="flex-1 rounded-xl border border-border bg-surface px-4 py-3 font-bold text-foreground transition-all hover:bg-muted active:scale-[0.98]"
+				onclick={() => (isDeleteModalOpen = false)}
 				disabled={isDeleting}
 			>
 				Yo'q, Bekor qilish
 			</button>
-			<button 
-				type="submit" 
-				class="flex-1 py-3 px-4 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 shadow-md shadow-red-600/10 transition-all active:scale-[0.98]"
+			<button
+				type="submit"
+				class="flex-1 rounded-xl bg-red-600 px-4 py-3 font-bold text-white shadow-md shadow-red-600/10 transition-all hover:bg-red-700 active:scale-[0.98]"
 				disabled={isDeleting}
 			>
 				{isDeleting ? "O'chirilmoqda..." : "Ha, O'chirish"}
@@ -137,7 +148,7 @@
 				<a
 					href={resolve(`/admin/courses/create/${$page.params.course_id}`)}
 					title={m.admin_add_module()}
-					class="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-hover active:scale-95"
+					class="hover:bg-primary-hover flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-white shadow-sm transition-all active:scale-95"
 				>
 					<Plus size={18} strokeWidth={3} />
 					<span class="sm:inline">{m.admin_module_label()}</span>
@@ -158,7 +169,9 @@
 
 	{#snippet adminFooterActions()}
 		{#if isAdmin}
-			<div class="mt-4 overflow-hidden rounded-[32px] border border-red-500/20 bg-surface shadow-sm">
+			<div
+				class="mt-4 overflow-hidden rounded-[32px] border border-red-500/20 bg-surface shadow-sm"
+			>
 				<div class="border-b border-red-500/10 bg-red-500/5 p-6">
 					<h3 class="flex items-center gap-2 text-lg font-black text-red-500">
 						<AlertTriangle size={22} />
@@ -197,10 +210,10 @@
 	<button
 		type="button"
 		onclick={() => confirmDelete('module', mod.id, mod.title)}
-		class="action-menu-item w-full lg:w-auto text-left"
+		class="action-menu-item w-full text-left lg:w-auto"
 	>
 		<Trash2 size={18} />
-		<span>{m.admin_students_delete ? m.admin_students_delete() : 'O\'chirish'}</span>
+		<span>{m.admin_students_delete ? m.admin_students_delete() : "O'chirish"}</span>
 	</button>
 {/snippet}
 
@@ -244,9 +257,9 @@
 	<button
 		type="button"
 		onclick={() => confirmDelete('lesson', lesson.id, lesson.title, mod.id)}
-		class="action-menu-item w-full lg:w-auto text-left"
+		class="action-menu-item w-full text-left lg:w-auto"
 	>
 		<Trash2 size={18} />
-		<span>{m.admin_students_delete ? m.admin_students_delete() : 'O\'chirish'}</span>
+		<span>{m.admin_students_delete ? m.admin_students_delete() : "O'chirish"}</span>
 	</button>
 {/snippet}

@@ -109,7 +109,7 @@
 			display: none; /* Yozuvni yashirish */
 		}
 		:global(.action-menu-item:hover) {
-			background-color: var(--muted-bg, rgba(0,0,0,0.05)); /* Fallback to light hover */
+			background-color: var(--muted-bg, rgba(0, 0, 0, 0.05)); /* Fallback to light hover */
 		}
 	}
 </style>

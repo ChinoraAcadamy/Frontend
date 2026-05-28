@@ -10,18 +10,18 @@
 			totalRevenue: 326000
 		},
 		topStudents = [
-			{ rank: 1, name: "Anne Smith", score: 60, color: "#FF4D8D" },
-			{ rank: 2, name: "Lavid Smith", score: 80, color: "#10B981" },
-			{ rank: 3, name: "Maron Shamrad", score: 76, color: "#F59E0B" },
-			{ rank: 4, name: "Maria Hankin", score: 80, color: "#EF4444" },
-			{ rank: 5, name: "Jelan Smith", score: 76, color: "#6B7280" }
+			{ rank: 1, name: 'Anne Smith', score: 60, color: '#FF4D8D' },
+			{ rank: 2, name: 'Lavid Smith', score: 80, color: '#10B981' },
+			{ rank: 3, name: 'Maron Shamrad', score: 76, color: '#F59E0B' },
+			{ rank: 4, name: 'Maria Hankin', score: 80, color: '#EF4444' },
+			{ rank: 5, name: 'Jelan Smith', score: 76, color: '#6B7280' }
 		],
 		recentSubmissions = [
-			{ title: "Client Submission 1", date: "February 21, 2022", status: "Pending" },
-			{ title: "Graded Submission 2", date: "August 13, 2022", status: "Success" },
-			{ title: "Recent Submission 3", date: "April 28, 2022", status: "Warning" },
-			{ title: "Graded Submission 4", date: "August 27, 2022", status: "Danger" },
-			{ title: "Recent Submission 5", date: "January 13, 2022", status: "Pending" }
+			{ title: 'Client Submission 1', date: 'February 21, 2022', status: 'Pending' },
+			{ title: 'Graded Submission 2', date: 'August 13, 2022', status: 'Success' },
+			{ title: 'Recent Submission 3', date: 'April 28, 2022', status: 'Warning' },
+			{ title: 'Graded Submission 4', date: 'August 27, 2022', status: 'Danger' },
+			{ title: 'Recent Submission 5', date: 'January 13, 2022', status: 'Pending' }
 		]
 	} = $props();
 
@@ -29,7 +29,7 @@
 		Pending: { bg: '#FFF7E6', text: '#D97706', label: 'Pending' },
 		Success: { bg: '#ECFDF5', text: '#059669', label: 'Success' },
 		Warning: { bg: '#FFF7E6', text: '#D97706', label: 'Warning' },
-		Danger:  { bg: '#FFF1F2', text: '#E11D48', label: 'Danger' }
+		Danger: { bg: '#FFF1F2', text: '#E11D48', label: 'Danger' }
 	};
 </script>
 
@@ -110,7 +110,10 @@
 							<td class="score">{student.score}</td>
 							<td>
 								<div class="progress-bar">
-									<div class="progress-fill" style="width: {student.score}%; background:{student.color}"></div>
+									<div
+										class="progress-fill"
+										style="width: {student.score}%; background:{student.color}"
+									></div>
 								</div>
 							</td>
 						</tr>
@@ -131,9 +134,10 @@
 							<p class="sub-title">{sub.title}</p>
 							<p class="sub-date">{sub.date}</p>
 						</div>
-						<span 
+						<span
 							class="status-badge"
-							style="background:{statusStyles[sub.status].bg}; color:{statusStyles[sub.status].text}"
+							style="background:{statusStyles[sub.status].bg}; color:{statusStyles[sub.status]
+								.text}"
 						>
 							{statusStyles[sub.status].label}
 						</span>
@@ -180,7 +184,7 @@
 
 	.stat-card:hover {
 		transform: translateY(-4px);
-		box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
 	}
 
 	.stat-icon {
@@ -247,19 +251,41 @@
 		border-top: 1px solid #f5f5f5;
 	}
 
-	.rank { color: #9ca3af; font-weight: 600; width: 40px; }
-	.name { display: flex; align-items: center; gap: 12px; font-weight: 500; }
-	.avatar {
-		width: 32px; height: 32px; border-radius: 50%; color: white;
-		display: flex; align-items: center; justify-content: center;
-		font-weight: 700; font-size: 13px;
+	.rank {
+		color: #9ca3af;
+		font-weight: 600;
+		width: 40px;
 	}
-	.score { font-weight: 700; color: #1a0e13; }
+	.name {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		font-weight: 500;
+	}
+	.avatar {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 700;
+		font-size: 13px;
+	}
+	.score {
+		font-weight: 700;
+		color: #1a0e13;
+	}
 	.progress-bar {
-		height: 6px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;
+		height: 6px;
+		background: #f3f4f6;
+		border-radius: 9999px;
+		overflow: hidden;
 	}
 	.progress-fill {
-		height: 100%; border-radius: 9999px;
+		height: 100%;
+		border-radius: 9999px;
 	}
 
 	/* Submissions */
@@ -277,8 +303,14 @@
 		border-bottom: 1px solid #f5f5f5;
 	}
 
-	.sub-title { font-weight: 600; font-size: 14.5px; }
-	.sub-date { font-size: 12.5px; color: #9ca3af; }
+	.sub-title {
+		font-weight: 600;
+		font-size: 14.5px;
+	}
+	.sub-date {
+		font-size: 12.5px;
+		color: #9ca3af;
+	}
 
 	.status-badge {
 		padding: 5px 14px;
@@ -289,12 +321,20 @@
 
 	/* Responsive */
 	@media (max-width: 1024px) {
-		.bottom-row { grid-template-columns: 1fr; }
-		.stats-grid { grid-template-columns: repeat(2, 1fr); }
+		.bottom-row {
+			grid-template-columns: 1fr;
+		}
+		.stats-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
 	}
 
 	@media (max-width: 640px) {
-		.dash-main { padding: 20px; }
-		.stats-grid { grid-template-columns: 1fr; }
+		.dash-main {
+			padding: 20px;
+		}
+		.stats-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 </style>

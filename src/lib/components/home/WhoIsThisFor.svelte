@@ -1,7 +1,7 @@
 <!-- src/lib/components/WhoIsThisFor.svelte -->
 <script>
 	import { onMount, onDestroy } from 'svelte';
-    import * as m from '$lib/paraglide/messages.js';
+	import * as m from '$lib/paraglide/messages.js';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import { Users, Heart, PenTool, SwatchBook, Scissors, Banknote } from 'lucide-svelte';
@@ -79,11 +79,11 @@
 <section
 	bind:this={section}
 	id="who-for"
-	class="bg-background relative overflow-hidden py-32 lg:py-24"
+	class="relative overflow-hidden bg-background py-32 lg:py-24"
 >
 	<div class="container mx-auto px-6 text-center">
 		<h2
-			class="text-foreground font-tarsk gradient-text mb-4 text-3xl font-bold md:mb-6 md:text-4xl"
+			class="font-tarsk gradient-text mb-4 text-3xl font-bold text-foreground md:mb-6 md:text-4xl"
 		>
 			{@html m.who_for_title()}
 		</h2>
@@ -98,22 +98,22 @@
 		<div bind:this={scrollContainer} class="flex gap-6 px-6 will-change-transform">
 			{#each targetAudience as item (item.title)}
 				<div
-					class="luxury-card group min-w-[300px] max-w-xs shrink-0 cursor-pointer p-4 transition-all duration-300 hover:bg-muted"
+					class="luxury-card group max-w-xs min-w-[300px] shrink-0 cursor-pointer p-4 transition-all duration-300 hover:bg-muted"
 				>
 					<div class="flex h-full flex-col justify-between pb-2">
 						<div class="space-y-4">
 							<div
-								class="bg-primary/10 mt-4 ml-4 flex h-10 w-10 items-center justify-center rounded-full"
+								class="mt-4 ml-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10"
 							>
-								<svelte:component this={item.icon} class="text-primary h-6 w-6" />
+								<svelte:component this={item.icon} class="h-6 w-6 text-primary" />
 							</div>
 							<div class="pl-4">
-								<h3 class="text-foreground font-tarsk text-xl leading-tight font-bold">
+								<h3 class="font-tarsk text-xl leading-tight font-bold text-foreground">
 									{item.title}
 								</h3>
 							</div>
 						</div>
-						<div class="pb-0 pl-4 mt-4">
+						<div class="mt-4 pb-0 pl-4">
 							<p class="text-muted-foreground text-base leading-relaxed">
 								{item.description}
 							</p>
@@ -121,7 +121,6 @@
 					</div>
 				</div>
 			{/each}
-
 		</div>
 	</div>
 

@@ -1,50 +1,45 @@
 <!-- +page.svelte yoki app/routes/+page.svelte -->
 
 <script>
-	import Navbar from "@/lib/components/layout/Navbar.svelte";
-	import HeroSection from "$lib/components/home/HeroSection.svelte";
+	import Navbar from '@/lib/components/layout/Navbar.svelte';
+	import HeroSection from '$lib/components/home/HeroSection.svelte';
 
-  // Komponentlarni import qilamiz
-  import WhoIsThisFor from '$lib/components/home/WhoIsThisFor.svelte';
-	import AboutInstruction from "$lib/components/home/AboutInstruction.svelte";
-  import CourseContent from "$lib/components/home/CourseContent.svelte"
-  import PricingSection from "$lib/components/home/PricingSection.svelte";
-	import Faq from "$lib/components/home/Faq.svelte";
-  import Footer from "$lib/components/layout/Footer.svelte";
-  import SeoMeta from "@/lib/components/ui/SeoMeta.svelte";
+	// Komponentlarni import qilamiz
+	import WhoIsThisFor from '$lib/components/home/WhoIsThisFor.svelte';
+	import AboutInstruction from '$lib/components/home/AboutInstruction.svelte';
+	import CourseContent from '$lib/components/home/CourseContent.svelte';
+	import PricingSection from '$lib/components/home/PricingSection.svelte';
+	import Faq from '$lib/components/home/Faq.svelte';
+	import Footer from '$lib/components/layout/Footer.svelte';
+	import SeoMeta from '@/lib/components/ui/SeoMeta.svelte';
 
-  export let data; // +page.server.js dan keladi
-
+	export let data; // +page.server.js dan keladi
 </script>
 
-<SeoMeta 
-    title="Chinora Academy - Sifatli va zamonaviy ta'lim platformasi" 
-    description="Dasturlash, zamonaviy kasblar va tikuvchilik sirlarini Chinora Academy bilan birga o'rganing. Onlayn kurslar orqali mutaxassisga aylaning."
-    keywords="dasturlash, tikuvchilik, bichish, onlayn kurslar, ta'lim, chinora academy, modern kasblar"
+<SeoMeta
+	title="Chinora Academy - Sifatli va zamonaviy ta'lim platformasi"
+	description="Dasturlash, zamonaviy kasblar va tikuvchilik sirlarini Chinora Academy bilan birga o'rganing. Onlayn kurslar orqali mutaxassisga aylaning."
+	keywords="dasturlash, tikuvchilik, bichish, onlayn kurslar, ta'lim, chinora academy, modern kasblar"
 />
 
 <div class="min-h-screen">
-  
-  <Navbar />
-  
-  <HeroSection />
+	<Navbar />
 
-  <div class="overflow-hidden">
-    <WhoIsThisFor />
-  </div>
+	<HeroSection />
 
-  <AboutInstruction />
+	<div class="overflow-hidden">
+		<WhoIsThisFor />
+	</div>
 
-  <CourseContent courses={data.courses} />
+	<AboutInstruction />
 
-  <PricingSection courses={data.courses} />
+	<CourseContent courses={data.courses} />
 
+	<PricingSection courses={data.courses} />
 
-  <Faq />
+	<Faq />
 
-  <Footer />
-
-
+	<Footer />
 </div>
 
 <!-- 

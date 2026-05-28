@@ -39,14 +39,14 @@
 	});
 </script>
 
-<div class="bg-main min-h-screen pb-20 font-sans md:pb-10">
+<div class="min-h-screen bg-main pb-20 font-sans md:pb-10">
 	<main class="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
 		<div class="mb-8" in:fade={{ duration: 400 }}>
 			<div class="mb-2 flex items-center gap-3">
 				<div class="rounded-xl bg-primary/10 p-2 text-primary">
 					<div class="flex h-6 w-6"><UserPlus size={24} /></div>
 				</div>
-				<h2 class="text-main text-xl font-extrabold">
+				<h2 class="text-xl font-extrabold text-main">
 					{m.admin_admin_create_subtitle
 						? m.admin_admin_create_subtitle()
 						: "Ma'lumotlarni kiriting"}
@@ -74,10 +74,10 @@
 			<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 				<!-- Personal Info Card -->
 				<div
-					class="border-main bg-card col-span-1 space-y-5 rounded-[32px] border p-6 shadow-sm transition-all hover:shadow-md"
+					class="col-span-1 space-y-5 rounded-[32px] border border-main bg-card p-6 shadow-sm transition-all hover:shadow-md"
 					in:fly={{ y: 20, duration: 400, delay: 100 }}
 				>
-					<div class="border-main/50 mb-4 flex items-center gap-2 border-b pb-3">
+					<div class="mb-4 flex items-center gap-2 border-b border-main/50 pb-3">
 						<div class="text-primary">
 							<User size={18} />
 						</div>
@@ -113,10 +113,10 @@
 
 				<!-- Account Config Card -->
 				<div
-					class="border-main bg-card col-span-1 space-y-5 rounded-[32px] border p-6 shadow-sm transition-all hover:shadow-md"
+					class="col-span-1 space-y-5 rounded-[32px] border border-main bg-card p-6 shadow-sm transition-all hover:shadow-md"
 					in:fly={{ y: 20, duration: 400, delay: 200 }}
 				>
-					<div class="border-main/50 mb-4 flex items-center gap-2 border-b pb-3">
+					<div class="mb-4 flex items-center gap-2 border-b border-main/50 pb-3">
 						<div class="text-primary">
 							<ShieldCheck size={18} />
 						</div>
@@ -150,7 +150,7 @@
 						placeholder="••••••••"
 					/>
 
-					<div class="border-main rounded-2xl border bg-muted/5 p-4">
+					<div class="rounded-2xl border border-main bg-muted/5 p-4">
 						<p class="text-xs leading-relaxed font-medium text-muted">
 							{m.admin_admin_create_hint
 								? m.admin_admin_create_hint()
@@ -167,7 +167,7 @@
 			>
 				<a
 					href={resolve('/admin/dashboard')}
-					class="border-main bg-card inline-flex h-12 items-center justify-center rounded-2xl border px-8 text-sm font-bold text-muted transition-all hover:bg-muted/5 active:scale-95"
+					class="inline-flex h-12 items-center justify-center rounded-2xl border border-main bg-card px-8 text-sm font-bold text-muted transition-all hover:bg-muted/5 active:scale-95"
 				>
 					{m.admin_btn_cancel ? m.admin_btn_cancel() : 'Bekor qilish'}
 				</a>

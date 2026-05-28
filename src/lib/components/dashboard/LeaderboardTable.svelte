@@ -152,9 +152,7 @@
 							</td>
 							<td class="px-2 py-3.5 text-right">
 								<div class="inline-flex flex-col items-end">
-									<span
-										class="text-base font-black text-main leading-none"
-									>
+									<span class="text-base leading-none font-black text-main">
 										{user.total_score || 0}
 									</span>
 									<span class="mt-1 text-[10px] font-black tracking-widest text-primary uppercase"

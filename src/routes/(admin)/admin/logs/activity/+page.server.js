@@ -4,59 +4,59 @@ import { fetchWithCache, generateCacheKey } from '@/lib/server/cache.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ cookies, fetch, url, setHeaders, locals }) => {
-    const accessToken = cookies.get('access_token');
-    if (!accessToken) throw redirect(303, '/login');
-    const userId = locals.user?.id || 'admin';
+	const accessToken = cookies.get('access_token');
+	if (!accessToken) throw redirect(303, '/login');
+	const userId = locals.user?.id || 'admin';
 
-    // 5 daqiqalik yengil kesh loglar uchun qulay
-    setHeaders({
-        'cache-control': 'private, max-age=300'
-    });
+	// 5 daqiqalik yengil kesh loglar uchun qulay
+	setHeaders({
+		'cache-control': 'private, max-age=300'
+	});
 
-    const search = url.searchParams.get('search') ?? '';
-    const ordering = url.searchParams.get('ordering') ?? '-created_at';
-    const page = url.searchParams.get('page') ?? '1';
-    
-    // Qidiruv parametrlari
-    const params = new URLSearchParams();
-    if (search) params.set('search', search);
-    if (ordering) params.set('ordering', ordering);
-    if (page) params.set('page', page);
+	const search = url.searchParams.get('search') ?? '';
+	const ordering = url.searchParams.get('ordering') ?? '-created_at';
+	const page = url.searchParams.get('page') ?? '1';
 
-    const apiUrl = new URL(`${API_URL}/logs/activity/`);
-    if (params.toString()) {
-        apiUrl.search = params.toString();
-    }
+	// Qidiruv parametrlari
+	const params = new URLSearchParams();
+	if (search) params.set('search', search);
+	if (ordering) params.set('ordering', ordering);
+	if (page) params.set('page', page);
 
-    const getActivityLogs = async () => {
-        try {
-            const res = await fetch(apiUrl.toString(), {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+	const apiUrl = new URL(`${API_URL}/logs/activity/`);
+	if (params.toString()) {
+		apiUrl.search = params.toString();
+	}
 
-            if (!res.ok) {
-                console.error(`[Admin Activity Logs] Backend xatosi: ${res.status}`);
-                return { results: [], count: 0, next: null, previous: null };
-            }
+	const getActivityLogs = async () => {
+		try {
+			const res = await fetch(apiUrl.toString(), {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json'
+				}
+			});
 
-            const data = await res.json();
-            return data;
-        } catch (err) {
-            console.error('[Admin Activity Logs] Fetch xatosi:', err);
-            return { results: [], count: 0, next: null, previous: null };
-        }
-    };
+			if (!res.ok) {
+				console.error(`[Admin Activity Logs] Backend xatosi: ${res.status}`);
+				return { results: [], count: 0, next: null, previous: null };
+			}
 
-    const cacheKey = generateCacheKey('admin_activity_logs', userId, params.toString());
+			const data = await res.json();
+			return data;
+		} catch (err) {
+			console.error('[Admin Activity Logs] Fetch xatosi:', err);
+			return { results: [], count: 0, next: null, previous: null };
+		}
+	};
 
-    return {
-        lazy: {
-            activityData: fetchWithCache(cacheKey, getActivityLogs)
-        },
-        filters: { search, ordering },
-        currentPage: parseInt(page)
-    };
+	const cacheKey = generateCacheKey('admin_activity_logs', userId, params.toString());
+
+	return {
+		lazy: {
+			activityData: fetchWithCache(cacheKey, getActivityLogs)
+		},
+		filters: { search, ordering },
+		currentPage: parseInt(page)
+	};
 };

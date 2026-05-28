@@ -6,13 +6,15 @@
 	let pageTitle = $state('Dars - Chinora Academy');
 
 	$effect(() => {
-		data.lazy.lesson.then((lesson) => {
-			if (lesson?.title) {
-				pageTitle = lesson.title;
-			}
-		}).catch(() => {
-			pageTitle = 'Xatolik - Chinora Academy';
-		});
+		data.lazy.lesson
+			.then((lesson) => {
+				if (lesson?.title) {
+					pageTitle = lesson.title;
+				}
+			})
+			.catch(() => {
+				pageTitle = 'Xatolik - Chinora Academy';
+			});
 	});
 </script>
 

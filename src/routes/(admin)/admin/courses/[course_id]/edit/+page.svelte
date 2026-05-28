@@ -37,7 +37,7 @@
 		<CourseForm
 			action="?/updateCourse"
 			course={data.course}
-			bind:isSubmitting={isSubmitting}
+			bind:isSubmitting
 			onSubmit={handleSubmit}
 		/>
 	</div>

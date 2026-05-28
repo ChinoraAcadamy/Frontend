@@ -78,7 +78,7 @@
 	let gestureTimeout = null;
 	let saveInterval = null;
 
-	const completionThreshold = 0.90; // Mobil qurilmalar uchun 90% yetarli
+	const completionThreshold = 0.9; // Mobil qurilmalar uchun 90% yetarli
 
 	// --- Security Handlers ---
 	function handleKeydown(e) {
@@ -141,7 +141,7 @@
 
 	$effect(() => {
 		if (typeof window === 'undefined') return;
-		
+
 		const status = lesson.hls_status;
 		if (status === 'uploading' || status === 'processing') {
 			if (!pollingInterval) {
@@ -331,7 +331,7 @@
 		if (lesson.is_completed) {
 			isVideoFinished = true;
 		}
-		
+
 		if (videoElement && isVideoReady && lesson.id && lastLoadedLessonId !== lesson.id) {
 			lastLoadedLessonId = lesson.id;
 			if (!lesson.is_completed) {
@@ -359,8 +359,18 @@
 
 				let defaultOptions = {
 					controls: [
-						'play-large', 'play', 'progress', 'current-time', 'duration',
-						'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'
+						'play-large',
+						'play',
+						'progress',
+						'current-time',
+						'duration',
+						'mute',
+						'volume',
+						'captions',
+						'settings',
+						'pip',
+						'airplay',
+						'fullscreen'
 					],
 					settings: ['quality', 'speed'],
 					captions: { active: true, update: true, language: 'uz' },
@@ -392,7 +402,7 @@
 								}
 							}
 						} catch (e) {
-							console.log('error video player')
+							console.log('error video player');
 						}
 					});
 
@@ -403,7 +413,7 @@
 								screen.orientation.unlock();
 							}
 						} catch (e) {
-							console.log('error video player')
+							console.log('error video player');
 						}
 					});
 
@@ -419,7 +429,10 @@
 					}
 
 					const checkProgress = () => {
-						if (player.duration > 0 && player.currentTime / player.duration >= completionThreshold) {
+						if (
+							player.duration > 0 &&
+							player.currentTime / player.duration >= completionThreshold
+						) {
 							isVideoFinished = true;
 						}
 					};
@@ -471,8 +484,9 @@
 				};
 
 				if (isHls) {
-					const useNativeHls = videoElement.canPlayType('application/vnd.apple.mpegurl') && !Hls.isSupported();
-					
+					const useNativeHls =
+						videoElement.canPlayType('application/vnd.apple.mpegurl') && !Hls.isSupported();
+
 					if (useNativeHls) {
 						setupPlayer(defaultOptions);
 						player.source = {
@@ -491,7 +505,7 @@
 						hlsInstance = new Hls();
 						hlsInstance.loadSource(url);
 						hlsInstance.attachMedia(videoElement);
-						
+
 						hlsInstance.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
 							const availableQualities = hlsInstance.levels.map((l) => l.height);
 							availableQualities.unshift(0); // Auto
@@ -521,11 +535,14 @@
 					// Fallback MP4
 					defaultOptions.quality = {
 						default: 720,
-						options: lesson.video_qualities?.length > 0 ? lesson.video_qualities.map((q) => q.size) : [720],
+						options:
+							lesson.video_qualities?.length > 0
+								? lesson.video_qualities.map((q) => q.size)
+								: [720],
 						forced: true
 					};
 					setupPlayer(defaultOptions);
-					
+
 					player.source = {
 						type: 'video',
 						title: lesson.title,
@@ -625,7 +642,11 @@
 		<div class="vp-status-overlay" transition:fade={{ duration: 200 }}>
 			{#if hlsStatus === 'uploading' || hlsStatus === 'processing'}
 				<div class="vp-skeleton-spinner"></div>
-				<p class="vp-status-text">{hlsStatus === 'uploading' ? 'Video serverga yuklanmoqda...' : "Video qayta ishlanmoqda (HLS formatiga o'tkazilmoqda)..."}</p>
+				<p class="vp-status-text">
+					{hlsStatus === 'uploading'
+						? 'Video serverga yuklanmoqda...'
+						: "Video qayta ishlanmoqda (HLS formatiga o'tkazilmoqda)..."}
+				</p>
 			{:else if hlsStatus === 'failed'}
 				<p class="vp-status-text text-red-400">Videoni yuklashda xatolik yuz berdi.</p>
 			{:else}
@@ -637,7 +658,9 @@
 	<!-- ── Video element ───────────────────────────────── -->
 	<video
 		bind:this={videoElement}
-		class="vp-video {playerReady && isVideoReady ? 'vp-video--ready' : ''} {isScreenBlurred ? 'is-blurred' : ''}"
+		class="vp-video {playerReady && isVideoReady ? 'vp-video--ready' : ''} {isScreenBlurred
+			? 'is-blurred'
+			: ''}"
 		playsinline
 		webkit-playsinline
 		preload="auto"
@@ -652,11 +675,11 @@
 	{#if isScreenBlurred}
 		<div class="vp-blur-shroud" transition:fade={{ duration: 150 }}>
 			<div class="vp-blur-shroud-content">
-				<Lock size={36} class="text-primary animate-pulse" />
+				<Lock size={36} class="animate-pulse text-primary" />
 				<span class="text-xs font-black tracking-widest text-primary uppercase">
 					CHINORA PROTECTION
 				</span>
-				<p class="text-[13px] font-bold text-white/80 mt-1">
+				<p class="mt-1 text-[13px] font-bold text-white/80">
 					Tizim xavfsizligi faol. Ekran yozib olish va skrinshotlar taqiqlanadi!
 				</p>
 			</div>

@@ -82,6 +82,7 @@
 	let isSaving = $state(false);
 	// eslint-disable-next-line svelte/prefer-writable-derived
 	let isPublished = $state(false);
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let imgPreview = $state(null);
 
 	$effect.pre(() => {
@@ -112,8 +113,6 @@
 		};
 	};
 
-
-
 	// Handle initial tab from sessionStorage (to support "Edit" vs "Preview" without URL params)
 	$effect(() => {
 		const storedTab = sessionStorage.getItem('admin_course_detail_tab');
@@ -126,7 +125,7 @@
 		}
 	});
 
-	function formatDuration(seconds: number | string | undefined) {
+	function formatDuration(seconds) {
 		if (!seconds) return 0;
 		const secs = Number(seconds);
 		if (isNaN(secs)) return seconds;
@@ -175,7 +174,9 @@
 					class="relative h-24 w-40 shrink-0 overflow-hidden rounded-2xl bg-muted/10 shadow-inner"
 				>
 					<img
-						src={course.img || course.img_file || course.image ||
+						src={course.img ||
+							course.img_file ||
+							course.image ||
 							`https://placehold.co/600x400?text=${encodeURIComponent(course.title)}`}
 						alt="Course"
 						class="absolute inset-0 h-full w-full object-cover"
@@ -364,7 +365,8 @@
 													{lesson.title}
 												</h4>
 												<span class="text-xs font-semibold text-muted capitalize"
-													>{formatDuration(lesson.duration)} {m.min_label()} • {m.text_video_lesson()}</span
+													>{formatDuration(lesson.duration)}
+													{m.min_label()} • {m.text_video_lesson()}</span
 												>
 											</div>
 										</div>

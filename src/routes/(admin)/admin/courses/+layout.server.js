@@ -2,113 +2,113 @@ import { API_URL } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 
 export const load = async ({ params, cookies }) => {
-    const accessToken = cookies.get('access_token');
-    if (!accessToken) throw redirect(303, '/login');
-    
-    if (!params.course_id) return;
+	const accessToken = cookies.get('access_token');
+	if (!accessToken) throw redirect(303, '/login');
 
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`
-    };
+	if (!params.course_id) return;
 
-    try {
-        const timestamp = Date.now();
-        const [resUz, resRu, resListUz, resListRu, resModules] = await Promise.all([
-            globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
-                headers: {
-                    ...headers,
-                    'Accept-Language': 'uz'
-                }
-            }),
-            globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
-                headers: {
-                    ...headers,
-                    'Accept-Language': 'ru'
-                }
-            }),
-            globalThis.fetch(`${API_URL}/courses/?_cb=${timestamp}`, {
-                headers: {
-                    ...headers,
-                    'Accept-Language': 'uz'
-                }
-            }),
-            globalThis.fetch(`${API_URL}/courses/?_cb=${timestamp}`, {
-                headers: {
-                    ...headers,
-                    'Accept-Language': 'ru'
-                }
-            }),
-            globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/?_cb=${timestamp}`, {
-                headers: {
-                    ...headers,
-                    'Accept-Language': 'uz'
-                }
-            })
-        ]);
+	const headers = {
+		Authorization: `Bearer ${accessToken}`
+	};
 
-        if (!resUz.ok) throw error(404, 'Kurs topilmadi');
-        const courseUz = await resUz.json();
+	try {
+		const timestamp = Date.now();
+		const [resUz, resRu, resListUz, resListRu, resModules] = await Promise.all([
+			globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
+				headers: {
+					...headers,
+					'Accept-Language': 'uz'
+				}
+			}),
+			globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
+				headers: {
+					...headers,
+					'Accept-Language': 'ru'
+				}
+			}),
+			globalThis.fetch(`${API_URL}/courses/?_cb=${timestamp}`, {
+				headers: {
+					...headers,
+					'Accept-Language': 'uz'
+				}
+			}),
+			globalThis.fetch(`${API_URL}/courses/?_cb=${timestamp}`, {
+				headers: {
+					...headers,
+					'Accept-Language': 'ru'
+				}
+			}),
+			globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/?_cb=${timestamp}`, {
+				headers: {
+					...headers,
+					'Accept-Language': 'uz'
+				}
+			})
+		]);
 
-        let courseRu = {};
-        if (resRu.ok) {
-            try {
-                courseRu = await resRu.json();
-            } catch (e) {
-                console.error('Failed to parse Russian course details:', e);
-            }
-        }
+		if (!resUz.ok) throw error(404, 'Kurs topilmadi');
+		const courseUz = await resUz.json();
 
-        let listUz = [];
-        if (resListUz.ok) {
-            try {
-                const data = await resListUz.json();
-                listUz = Array.isArray(data) ? data : (data.results || []);
-            } catch (e) {
-                console.error('Failed to parse Uzbek courses list:', e);
-            }
-        }
+		let courseRu = {};
+		if (resRu.ok) {
+			try {
+				courseRu = await resRu.json();
+			} catch (e) {
+				console.error('Failed to parse Russian course details:', e);
+			}
+		}
 
-        let listRu = [];
-        if (resListRu.ok) {
-            try {
-                const data = await resListRu.json();
-                listRu = Array.isArray(data) ? data : (data.results || []);
-            } catch (e) {
-                console.error('Failed to parse Russian courses list:', e);
-            }
-        }
+		let listUz = [];
+		if (resListUz.ok) {
+			try {
+				const data = await resListUz.json();
+				listUz = Array.isArray(data) ? data : data.results || [];
+			} catch (e) {
+				console.error('Failed to parse Uzbek courses list:', e);
+			}
+		}
 
-        let modulesList = [];
-        if (resModules && resModules.ok) {
-            try {
-                const data = await resModules.json();
-                modulesList = Array.isArray(data) ? data : (data.results || []);
-            } catch (e) {
-                console.error('Failed to parse modules list:', e);
-            }
-        }
+		let listRu = [];
+		if (resListRu.ok) {
+			try {
+				const data = await resListRu.json();
+				listRu = Array.isArray(data) ? data : data.results || [];
+			} catch (e) {
+				console.error('Failed to parse Russian courses list:', e);
+			}
+		}
 
-        const courseListUz = listUz.find(c => Number(c.id) === Number(params.course_id)) || {};
-        const courseListRu = listRu.find(c => Number(c.id) === Number(params.course_id)) || {};
+		let modulesList = [];
+		if (resModules && resModules.ok) {
+			try {
+				const data = await resModules.json();
+				modulesList = Array.isArray(data) ? data : data.results || [];
+			} catch (e) {
+				console.error('Failed to parse modules list:', e);
+			}
+		}
 
-        // Barcha ma'lumotlarni birlashtiramiz va tahrirlash oynasiga to'liq uzatamiz
-        const course = {
-            ...courseUz,
-            title_uz: courseUz.title || '',
-            description_uz: courseUz.description || '',
-            level_uz: courseListUz.level || courseUz.level || '',
-            
-            title_ru: courseRu.title || '',
-            description_ru: courseRu.description || '',
-            level_ru: courseListRu.level || courseRu.level || '',
-            
-            duration: courseListUz.duration ?? courseUz.duration ?? courseRu.duration ?? 0,
-            level: courseListUz.level ?? courseUz.level ?? courseRu.level ?? ''
-        };
+		const courseListUz = listUz.find((c) => Number(c.id) === Number(params.course_id)) || {};
+		const courseListRu = listRu.find((c) => Number(c.id) === Number(params.course_id)) || {};
 
-        return { course, modules: modulesList };
-    } catch (err) {
-        console.error('Modulelarni olishda xatolik: ', err);
-        throw error(500, 'Server bilan ulanishda xatolik yuz berdi');
-    }
-}
+		// Barcha ma'lumotlarni birlashtiramiz va tahrirlash oynasiga to'liq uzatamiz
+		const course = {
+			...courseUz,
+			title_uz: courseUz.title || '',
+			description_uz: courseUz.description || '',
+			level_uz: courseListUz.level || courseUz.level || '',
+
+			title_ru: courseRu.title || '',
+			description_ru: courseRu.description || '',
+			level_ru: courseListRu.level || courseRu.level || '',
+
+			duration: courseListUz.duration ?? courseUz.duration ?? courseRu.duration ?? 0,
+			level: courseListUz.level ?? courseUz.level ?? courseRu.level ?? ''
+		};
+
+		return { course, modules: modulesList };
+	} catch (err) {
+		console.error('Modulelarni olishda xatolik: ', err);
+		throw error(500, 'Server bilan ulanishda xatolik yuz berdi');
+	}
+};

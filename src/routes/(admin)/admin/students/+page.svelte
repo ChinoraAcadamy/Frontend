@@ -97,19 +97,23 @@
 				showToast(currentForm.createError, 'error');
 			}
 			if (currentForm.updateSuccess) {
-				showToast(m.admin_students_updated ? m.admin_students_updated() : "Ma'lumotlar yangilandi!");
-				
+				showToast(
+					m.admin_students_updated ? m.admin_students_updated() : "Ma'lumotlar yangilandi!"
+				);
+
 				// Mahalliy (optimistic) UI yangilash
 				if (currentForm.updatedStudent && resolvedData?.students) {
-					const idx = resolvedData.students.findIndex(s => s.id === currentForm.updatedStudent.id);
+					const idx = resolvedData.students.findIndex(
+						(s) => s.id === currentForm.updatedStudent.id
+					);
 					if (idx !== -1) {
-						resolvedData.students[idx] = { 
-							...resolvedData.students[idx], 
-							...currentForm.updatedStudent 
+						resolvedData.students[idx] = {
+							...resolvedData.students[idx],
+							...currentForm.updatedStudent
 						};
 					}
 				}
-				
+
 				editTarget = null;
 				invalidateAll();
 			}
@@ -118,12 +122,14 @@
 			}
 			if (currentForm.deleteSuccess) {
 				showToast(m.admin_students_deleted ? m.admin_students_deleted() : "Student o'chirildi!");
-				
+
 				// Mahalliy (optimistic) UI yangilash
 				if (currentForm.deletedStudentId && resolvedData?.students) {
-					resolvedData.students = resolvedData.students.filter(s => s.id !== currentForm.deletedStudentId);
+					resolvedData.students = resolvedData.students.filter(
+						(s) => s.id !== currentForm.deletedStudentId
+					);
 				}
-				
+
 				deleteTarget = null;
 				isDeleting = false;
 				invalidateAll();

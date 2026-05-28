@@ -83,7 +83,7 @@ async function authHandle({ event, resolve }) {
 		// Kuki yo'q bo'lsa yoki token yangilangan bo'lsa (yoki 20 minut o'tgan bo'lsa kuki o'zi o'chadi)
 		if (!user || isExpired) {
 			const profileRes = await fetch(`${API_URL}/auth/profile/`, {
-				headers: { 'Authorization': `Bearer ${validToken}` }
+				headers: { Authorization: `Bearer ${validToken}` }
 			});
 
 			if (profileRes.ok) {
@@ -106,7 +106,6 @@ async function authHandle({ event, resolve }) {
 
 		event.locals.isAuthenticated = !!user;
 		event.locals.user = user;
-
 	} catch {
 		console.error('[auth hook] Xatolik');
 		event.locals.isAuthenticated = !!event.cookies.get('access_token');

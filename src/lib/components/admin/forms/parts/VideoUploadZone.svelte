@@ -70,7 +70,8 @@
 					<Video size={20} />
 				</div>
 				<div class="min-w-0 flex-1">
-					<span class="mb-1 block truncate text-sm font-bold text-foreground">{videoFile.name}</span>
+					<span class="mb-1 block truncate text-sm font-bold text-foreground">{videoFile.name}</span
+					>
 					<div class="flex gap-2">
 						<span class="text-[10px] font-bold tracking-tight text-muted uppercase">
 							{(videoFile.size / (1024 * 1024)).toFixed(1)} MB
@@ -89,7 +90,7 @@
 						autoDuration = 0;
 					}}
 					disabled={isSubmitting}
-					title={m.admin_students_delete ? m.admin_students_delete() : 'O\'chirish'}
+					title={m.admin_students_delete ? m.admin_students_delete() : "O'chirish"}
 				>
 					<X size={14} />
 				</button>
@@ -108,15 +109,21 @@
 					<span class="mb-0.5 block text-[10px] font-black tracking-widest text-muted uppercase">
 						{m.label_current_video ? m.label_current_video() : 'Mavjud video'}
 					</span>
-					<a href={resolve(currentVideoUrl)} target="_blank" class="block truncate text-sm font-bold text-primary hover:underline">
+					<a
+						href={resolve(currentVideoUrl)}
+						target="_blank"
+						class="block truncate text-sm font-bold text-primary hover:underline"
+					>
 						{currentVideoUrl.split('/').pop()}
 					</a>
 				</div>
 				<label
 					for="les_video"
-					class="flex h-8 items-center justify-center rounded border border-border bg-surface px-3 text-[11px] font-bold text-muted transition-colors hover:border-primary/30 hover:text-primary cursor-pointer disabled:opacity-50 {isSubmitting ? 'pointer-events-none' : ''}"
+					class="flex h-8 cursor-pointer items-center justify-center rounded border border-border bg-surface px-3 text-[11px] font-bold text-muted transition-colors hover:border-primary/30 hover:text-primary disabled:opacity-50 {isSubmitting
+						? 'pointer-events-none'
+						: ''}"
 				>
-					{m.btn_replace_video ? m.btn_replace_video() : 'O\'zgartirish'}
+					{m.btn_replace_video ? m.btn_replace_video() : "O'zgartirish"}
 				</label>
 			</div>
 		{:else}
@@ -172,7 +179,9 @@
 				!
 			</div>
 			<p class="text-[11px] font-medium text-muted italic">
-				{m.text_duration_auto_hint ? m.text_duration_auto_hint() : 'Video davomiyligi avtomatik hisoblanadi'}
+				{m.text_duration_auto_hint
+					? m.text_duration_auto_hint()
+					: 'Video davomiyligi avtomatik hisoblanadi'}
 			</p>
 		</div>
 	{/if}

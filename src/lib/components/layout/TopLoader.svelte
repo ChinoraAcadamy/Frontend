@@ -87,12 +87,7 @@
 		z-index: 9999;
 		pointer-events: none;
 
-		background: linear-gradient(
-			90deg,
-			#9b1c48 0%,
-			#d63a6e 50%,
-			#ff6b9d 100%
-		);
+		background: linear-gradient(90deg, #9b1c48 0%, #d63a6e 50%, #ff6b9d 100%);
 
 		/* Opacity transition */
 		opacity: 0;
@@ -133,16 +128,25 @@
 			90deg,
 			transparent 0%,
 			rgba(255, 255, 255, 0.45) 60%,
-			rgba(255, 255, 255, 0.0) 100%
+			rgba(255, 255, 255, 0) 100%
 		);
 		animation: shimmer-move 1.6s ease-in-out infinite;
 		pointer-events: none;
 	}
 
 	@keyframes shimmer-move {
-		0%   { opacity: 0.4; transform: scaleX(0.7); }
-		50%  { opacity: 1;   transform: scaleX(1); }
-		100% { opacity: 0.4; transform: scaleX(0.7); }
+		0% {
+			opacity: 0.4;
+			transform: scaleX(0.7);
+		}
+		50% {
+			opacity: 1;
+			transform: scaleX(1);
+		}
+		100% {
+			opacity: 0.4;
+			transform: scaleX(0.7);
+		}
 	}
 
 	/* Orb — glowing dot at the leading edge */

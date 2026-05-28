@@ -3,138 +3,134 @@ import { API_URL } from '$env/static/private';
 import { fetchWithCache, generateCacheKey, invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ fetch, cookies, locals }) => {
-    const accessToken = cookies.get('access_token');
-    const userId = locals.user?.id || 'admin';
-    
-    // Lazy loading: profile ma'lumotlarini promise ko'rinishida qaytaramiz
-    // Bu sahifaning qobig'ini (shell) tezroq yuklanishini ta'minlaydi
-    const fetchProfile = async () => {
-        if (!accessToken) return null;
-        try {
-            const response = await fetch(`${API_URL}/auth/profile/`, {
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
-            if (response.ok) {
-                return await response.json();
-            }
-            return null;
-        } catch (err) {
-            console.error('[Admin Profile Load] Error:', err);
-            return null;
-        }
-    };
+	const accessToken = cookies.get('access_token');
+	const userId = locals.user?.id || 'admin';
 
-    const fetchDevices = async () => {
-        if (!accessToken) return [];
-        try {
-            const response = await fetch(`${API_URL}/auth/devices/`, {
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                return data.results || [];
-            }
-            return [];
-        } catch (err) {
-            console.error('[Admin Devices Load] Error:', err);
-            return [];
-        }
-    };
+	// Lazy loading: profile ma'lumotlarini promise ko'rinishida qaytaramiz
+	// Bu sahifaning qobig'ini (shell) tezroq yuklanishini ta'minlaydi
+	const fetchProfile = async () => {
+		if (!accessToken) return null;
+		try {
+			const response = await fetch(`${API_URL}/auth/profile/`, {
+				headers: { Authorization: `Bearer ${accessToken}` }
+			});
+			if (response.ok) {
+				return await response.json();
+			}
+			return null;
+		} catch (err) {
+			console.error('[Admin Profile Load] Error:', err);
+			return null;
+		}
+	};
 
-    return {
-        lazy: {
-            profile: fetchWithCache(generateCacheKey('admin_profile', userId), fetchProfile, 60),
-            devices: fetchWithCache(generateCacheKey('admin_devices', userId), fetchDevices, 60)
-        }
-    };
+	const fetchDevices = async () => {
+		if (!accessToken) return [];
+		try {
+			const response = await fetch(`${API_URL}/auth/devices/`, {
+				headers: { Authorization: `Bearer ${accessToken}` }
+			});
+			if (response.ok) {
+				const data = await response.json();
+				return data.results || [];
+			}
+			return [];
+		} catch (err) {
+			console.error('[Admin Devices Load] Error:', err);
+			return [];
+		}
+	};
+
+	return {
+		lazy: {
+			profile: fetchWithCache(generateCacheKey('admin_profile', userId), fetchProfile, 60),
+			devices: fetchWithCache(generateCacheKey('admin_devices', userId), fetchDevices, 60)
+		}
+	};
 };
 
 export const actions = {
-    logoutDevice: async ({ request, fetch, cookies }) => {
-        const accessToken = cookies.get('access_token');
-        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+	logoutDevice: async ({ request, fetch, cookies }) => {
+		const accessToken = cookies.get('access_token');
+		if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
-        const formData = await request.formData();
-        const sessionId = formData.get('session_id');
+		const formData = await request.formData();
+		const sessionId = formData.get('session_id');
 
-        try {
-            const response = await fetch(`${API_URL}/auth/logout-device/`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ session_id: sessionId })
-            });
+		try {
+			const response = await fetch(`${API_URL}/auth/logout-device/`, {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ session_id: sessionId })
+			});
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                return fail(400, { error: errData.detail || "Qurilmani o'chirishda xatolik yuz berdi." });
-            }
+			if (!response.ok) {
+				const errData = await response.json().catch(() => ({}));
+				return fail(400, { error: errData.detail || "Qurilmani o'chirishda xatolik yuz berdi." });
+			}
 
-            invalidateCache('admin_');
-            return { success: true, message: "Qurilma muvaffaqiyatli o'chirildi" };
-        } catch (err) {
-            console.error('[Admin Device Logout] Error:', err);
-            return fail(500, { error: "Server bilan ulanishda xatolik." });
-        }
-    },
-    updateProfile: async ({ request, fetch, cookies }) => {
-        const accessToken = cookies.get('access_token');
-        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+			invalidateCache('admin_');
+			return { success: true, message: "Qurilma muvaffaqiyatli o'chirildi" };
+		} catch (err) {
+			console.error('[Admin Device Logout] Error:', err);
+			return fail(500, { error: 'Server bilan ulanishda xatolik.' });
+		}
+	},
+	updateProfile: async ({ request, fetch, cookies }) => {
+		const accessToken = cookies.get('access_token');
+		if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
-        const formData = await request.formData();
-        const payload = {
-            first_name: formData.get('first_name'),
-            last_name: formData.get('last_name'),
-            phone_number: formData.get('phone_number')
-        };
+		const formData = await request.formData();
+		const payload = {
+			first_name: formData.get('first_name'),
+			last_name: formData.get('last_name'),
+			phone_number: formData.get('phone_number')
+		};
 
-        const headers = {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        };
+		const headers = {
+			Authorization: `Bearer ${accessToken}`,
+			'Content-Type': 'application/json'
+		};
 
-        try {
-            const response = await fetch(`${API_URL}/auth/profile/`, {
-                method: 'PATCH',
-                headers,
-                body: JSON.stringify(payload)
-            });
+		try {
+			const response = await fetch(`${API_URL}/auth/profile/`, {
+				method: 'PATCH',
+				headers,
+				body: JSON.stringify(payload)
+			});
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                return fail(400, { error: errData.detail || "Profilni saqlashda xatolik yuz berdi." });
-            }
-            
-            const updatedUser = await response.json();
+			if (!response.ok) {
+				const errData = await response.json().catch(() => ({}));
+				return fail(400, { error: errData.detail || 'Profilni saqlashda xatolik yuz berdi.' });
+			}
 
-            // ✅ Yangi: Profilni to'liq qaytadan yuklaymiz (fresh fetch)
-            // Bu sessionda role va boshqa ma'lumotlarni yo'qotib qo'ymaslik uchun muhim
-            const profileRes = await fetch(`${API_URL}/auth/profile/`, {
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
-            
-            const fullUserData = profileRes.ok ? await profileRes.json() : updatedUser;
+			const updatedUser = await response.json();
 
-            // ✅ user_data kuki-ni to'liq ma'lumot bilan yangilaymiz, shunda header/sidebar ham o'zgaradi
-            cookies.set('user_data', JSON.stringify(fullUserData), {
-                path: '/',
-                httpOnly: false,
-                sameSite: 'lax',
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 60 * 20 // 20 minut
-            });
+			// ✅ Yangi: Profilni to'liq qaytadan yuklaymiz (fresh fetch)
+			// Bu sessionda role va boshqa ma'lumotlarni yo'qotib qo'ymaslik uchun muhim
+			const profileRes = await fetch(`${API_URL}/auth/profile/`, {
+				headers: { Authorization: `Bearer ${accessToken}` }
+			});
 
-            invalidateCache('admin_');
-            return { success: true, user: fullUserData };
+			const fullUserData = profileRes.ok ? await profileRes.json() : updatedUser;
 
-        } catch (err) {
+			// ✅ user_data kuki-ni to'liq ma'lumot bilan yangilaymiz, shunda header/sidebar ham o'zgaradi
+			cookies.set('user_data', JSON.stringify(fullUserData), {
+				path: '/',
+				httpOnly: false,
+				sameSite: 'lax',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 20 // 20 minut
+			});
 
-            console.error(err);
-            return fail(500, { error: "Server bilan ulanishda xatolik." });
-        }
-    }
+			invalidateCache('admin_');
+			return { success: true, user: fullUserData };
+		} catch (err) {
+			console.error(err);
+			return fail(500, { error: 'Server bilan ulanishda xatolik.' });
+		}
+	}
 };
-
-

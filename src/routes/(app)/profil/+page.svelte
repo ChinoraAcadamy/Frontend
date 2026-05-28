@@ -66,21 +66,28 @@
 	const parseUserAgent = (name) => {
 		if (!name) return m.profile_device_unknown?.() ?? 'Unknown';
 		const lower = name.toLowerCase();
-		if (lower.includes('pc (') || lower.includes('windows') || lower.includes('macintosh') || lower.includes('linux')) return 'Desktop';
 		if (
-			lower.includes('iphone') || 
-			lower.includes('android') || 
-			lower.includes('mobile') || 
-			lower.includes('tablet') || 
-			lower.includes('samsung') || 
-			lower.includes('pixel') || 
-			lower.includes('xiaomi') || 
-			lower.includes('redmi') || 
-			lower.includes('oppo') || 
-			lower.includes('vivo') || 
-			lower.includes('huawei') || 
+			lower.includes('pc (') ||
+			lower.includes('windows') ||
+			lower.includes('macintosh') ||
+			lower.includes('linux')
+		)
+			return 'Desktop';
+		if (
+			lower.includes('iphone') ||
+			lower.includes('android') ||
+			lower.includes('mobile') ||
+			lower.includes('tablet') ||
+			lower.includes('samsung') ||
+			lower.includes('pixel') ||
+			lower.includes('xiaomi') ||
+			lower.includes('redmi') ||
+			lower.includes('oppo') ||
+			lower.includes('vivo') ||
+			lower.includes('huawei') ||
 			lower.includes('realme')
-		) return 'Mobile';
+		)
+			return 'Mobile';
 		return 'Device';
 	};
 
@@ -330,7 +337,7 @@
 								class="device-card {device.is_current ? 'device-card--current' : ''}"
 								in:scale={{ duration: 200, start: 0.97, easing: cubicOut }}
 							>
-							{console.log(device)}
+								{console.log(device)}
 								<div class="device-left">
 									<div
 										class="device-icon-wrap {device.is_current ? 'device-icon-wrap--active' : ''}"
@@ -1106,5 +1113,4 @@
 		font-size: 0.85rem;
 		font-weight: 500;
 	}
-
 </style>

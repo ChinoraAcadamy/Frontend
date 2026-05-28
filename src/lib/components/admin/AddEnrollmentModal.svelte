@@ -46,8 +46,6 @@
 			if (browser) document.body.style.overflow = '';
 		};
 	});
-
-
 </script>
 
 {#if isOpen}

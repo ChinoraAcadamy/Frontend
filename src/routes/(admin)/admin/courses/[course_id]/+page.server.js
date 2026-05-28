@@ -1,44 +1,44 @@
-import { API_URL } from "$env/static/private";
-import { fail, redirect } from "@sveltejs/kit";
+import { API_URL } from '$env/static/private';
+import { fail, redirect } from '@sveltejs/kit';
 import { invalidateCache } from '@/lib/server/cache.js';
 
 export const load = async ({ parent }) => {
-    const { modules } = await parent();
+	const { modules } = await parent();
 
-    return { modules };
+	return { modules };
 };
 
 export const actions = {
-    deleteCourse: async ({ params, cookies }) => {
-        const accessToken = cookies.get('access_token');
-        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+	deleteCourse: async ({ params, cookies }) => {
+		const accessToken = cookies.get('access_token');
+		if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
-        try {
-            const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
+		try {
+			const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/`, {
+				method: 'DELETE',
+				headers: { Authorization: `Bearer ${accessToken}` }
+			});
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                console.error("Backend error deleting course:", errData);
-                return fail(400, { error: errData.detail || "Kursni o'chirishda xatolik yuz berdi." });
-            }
-        } catch (err) {
-            console.error("Fetch error deleting course:", err);
-            return fail(500, { error: err.message || "Server bilan ulanishda xatolik." });
-        }
+			if (!response.ok) {
+				const errData = await response.json().catch(() => ({}));
+				console.error('Backend error deleting course:', errData);
+				return fail(400, { error: errData.detail || "Kursni o'chirishda xatolik yuz berdi." });
+			}
+		} catch (err) {
+			console.error('Fetch error deleting course:', err);
+			return fail(500, { error: err.message || 'Server bilan ulanishda xatolik.' });
+		}
 
-        invalidateCache();
-        throw redirect(303, `/admin/courses?deleted_course=${params.course_id}`);
-    },
+		invalidateCache();
+		throw redirect(303, `/admin/courses?deleted_course=${params.course_id}`);
+	},
 
-    updateCourse: async ({ request, params, cookies, fetch }) => {
-        const accessToken = cookies.get('access_token');
-        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+	updateCourse: async ({ request, params, cookies, fetch }) => {
+		const accessToken = cookies.get('access_token');
+		if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
-        const rawFormData = await request.formData();
-        const cleanFormData = new FormData();
+		const rawFormData = await request.formData();
+		const cleanFormData = new FormData();
 
 		for (const [key, value] of rawFormData.entries()) {
 			if (key === 'img_file' || key === 'img') {
@@ -71,7 +71,7 @@ export const actions = {
 			const response = await fetch(`${API_URL}/courses/${params.course_id}/`, {
 				method: 'PATCH',
 				headers: {
-					'Authorization': `Bearer ${accessToken}`
+					Authorization: `Bearer ${accessToken}`
 					// 'Content-Type' yo'q qilinadi, chunki formData avtomat qo'shadi (multipart/form-data; boundary=...)
 				},
 				body: cleanFormData
@@ -79,111 +79,117 @@ export const actions = {
 
 			if (!response.ok) {
 				const errorData = await response.json().catch(() => ({}));
-				let errorMessage = errorData.detail || "Kursni yangilashda xatolik yuz berdi.";
-				
+				let errorMessage = errorData.detail || 'Kursni yangilashda xatolik yuz berdi.';
+
 				// Agar field-specific xatoliklar bo'lsa, ularni birlashtiramiz
 				if (typeof errorData === 'object' && !errorData.detail) {
 					errorMessage = Object.entries(errorData)
 						.map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(' ') : v}`)
 						.join(' | ');
 				}
-				
+
 				return fail(400, { error: errorMessage });
 			}
-        } catch (err) {
-            return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
-        }
+		} catch (err) {
+			return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
+		}
 
-        invalidateCache();
-        return { success: true };
-    },
+		invalidateCache();
+		return { success: true };
+	},
 
-    deleteModule: async ({ request, params, cookies }) => {
-        const accessToken = cookies.get('access_token');
-        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+	deleteModule: async ({ request, params, cookies }) => {
+		const accessToken = cookies.get('access_token');
+		if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
-        const formData = await request.formData();
-        const moduleId = formData.get('module_id');
+		const formData = await request.formData();
+		const moduleId = formData.get('module_id');
 
-        try {
-            const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
+		try {
+			const response = await globalThis.fetch(
+				`${API_URL}/courses/${params.course_id}/modules/${moduleId}/`,
+				{
+					method: 'DELETE',
+					headers: { Authorization: `Bearer ${accessToken}` }
+				}
+			);
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                console.error("Backend error deleting module:", errData);
-                return fail(400, { error: errData.detail || "Modulni o'chirishda xatolik yuz berdi." });
-            }
-        } catch (err) {
-            console.error("Fetch error deleting module:", err);
-            return fail(500, { error: `Server bilan ulanishda xatolik | ${err.message}` });
-        }
-        
-        invalidateCache();
-        return { success: true };
-    },
+			if (!response.ok) {
+				const errData = await response.json().catch(() => ({}));
+				console.error('Backend error deleting module:', errData);
+				return fail(400, { error: errData.detail || "Modulni o'chirishda xatolik yuz berdi." });
+			}
+		} catch (err) {
+			console.error('Fetch error deleting module:', err);
+			return fail(500, { error: `Server bilan ulanishda xatolik | ${err.message}` });
+		}
 
-    editModule: async ({ request, params, cookies, fetch }) => {
-        const accessToken = cookies.get('access_token');
-        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+		invalidateCache();
+		return { success: true };
+	},
 
-        const formData = await request.formData();
-        const moduleId = formData.get('module_pk');
-        
-        const modulePayload = {
-            title_uz: formData.get('title_uz'),
-            title_ru: formData.get('title_ru'),
-            description_uz: formData.get('description_uz') || '',
-            description_ru: formData.get('description_ru') || '',
-            order_index: Number(formData.get('order_index')) || 0
-        };
+	editModule: async ({ request, params, cookies, fetch }) => {
+		const accessToken = cookies.get('access_token');
+		if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
-        try {
-            const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(modulePayload)
-            });
+		const formData = await request.formData();
+		const moduleId = formData.get('module_pk');
 
-            if (!response.ok) return fail(400, { error: "Modulni tahrirlashda xatolik yuz berdi." });
-        } catch (err) {
-            return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
-        }
+		const modulePayload = {
+			title_uz: formData.get('title_uz'),
+			title_ru: formData.get('title_ru'),
+			description_uz: formData.get('description_uz') || '',
+			description_ru: formData.get('description_ru') || '',
+			order_index: Number(formData.get('order_index')) || 0
+		};
 
-        invalidateCache();
-        return { success: true };
-    },
+		try {
+			const response = await fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/`, {
+				method: 'PATCH',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(modulePayload)
+			});
 
-    deleteLesson: async ({ request, params, cookies }) => {
-        const accessToken = cookies.get('access_token');
-        if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
+			if (!response.ok) return fail(400, { error: 'Modulni tahrirlashda xatolik yuz berdi.' });
+		} catch (err) {
+			return fail(500, { error: `Server bilan ulanishda xatolik | ${err}` });
+		}
 
-        const formData = await request.formData();
-        const moduleId = formData.get('module_id');
-        const lessonId = formData.get('lesson_id');
+		invalidateCache();
+		return { success: true };
+	},
 
-        try {
-            const response = await globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/${moduleId}/lessons/${lessonId}/`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
+	deleteLesson: async ({ request, params, cookies }) => {
+		const accessToken = cookies.get('access_token');
+		if (!accessToken) return fail(401, { error: 'Avtorizatsiya talab qilinadi' });
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                console.error("Backend error deleting lesson:", errData);
-                return fail(400, { error: errData.detail || "Darsni o'chirishda xatolik yuz berdi." });
-            }
-        } catch (err) {
-            console.error("Fetch error deleting lesson:", err);
-            return fail(500, { error: `Server bilan ulanishda xatolik | ${err.message}` });
-        }
+		const formData = await request.formData();
+		const moduleId = formData.get('module_id');
+		const lessonId = formData.get('lesson_id');
 
-        invalidateCache();
-        return { success: true };
-    }
+		try {
+			const response = await globalThis.fetch(
+				`${API_URL}/courses/${params.course_id}/modules/${moduleId}/lessons/${lessonId}/`,
+				{
+					method: 'DELETE',
+					headers: { Authorization: `Bearer ${accessToken}` }
+				}
+			);
+
+			if (!response.ok) {
+				const errData = await response.json().catch(() => ({}));
+				console.error('Backend error deleting lesson:', errData);
+				return fail(400, { error: errData.detail || "Darsni o'chirishda xatolik yuz berdi." });
+			}
+		} catch (err) {
+			console.error('Fetch error deleting lesson:', err);
+			return fail(500, { error: `Server bilan ulanishda xatolik | ${err.message}` });
+		}
+
+		invalidateCache();
+		return { success: true };
+	}
 };

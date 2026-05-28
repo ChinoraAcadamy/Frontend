@@ -13,7 +13,10 @@ export const load = async ({ fetch, cookies, locals }) => {
 		return res.results || [];
 	};
 
-	const results = await fetchWithCache(generateCacheKey('admin_masterclasses', userId), getMasterclasses);
+	const results = await fetchWithCache(
+		generateCacheKey('admin_masterclasses', userId),
+		getMasterclasses
+	);
 
 	return {
 		masterclasses: results,
@@ -52,7 +55,7 @@ export const actions = {
 
 			// Construct FormData for the API call to support file upload
 			const apiFormData = new FormData();
-			
+
 			// Main fields
 			apiFormData.append('is_active', String(lpData.is_active));
 			apiFormData.append('title_line1', lpData.title_line1);
@@ -70,9 +73,20 @@ export const actions = {
 			apiFormData.append('is_free', String(lpData.is_free));
 			apiFormData.append('countdown_hour', String(lpData.countdown_hour || 0));
 			apiFormData.append('countdown_minute', String(lpData.countdown_minute || 0));
-			apiFormData.append('countdown_month', String(lpData.countdown_month || (new Date().getMonth() + 1)));
-			apiFormData.append('countdown_year', String(lpData.countdown_year || new Date().getFullYear()));
-			apiFormData.append('countdown_days', Array.isArray(lpData.countdown_days) ? lpData.countdown_days.join(', ') : String(lpData.countdown_days || ''));
+			apiFormData.append(
+				'countdown_month',
+				String(lpData.countdown_month || new Date().getMonth() + 1)
+			);
+			apiFormData.append(
+				'countdown_year',
+				String(lpData.countdown_year || new Date().getFullYear())
+			);
+			apiFormData.append(
+				'countdown_days',
+				Array.isArray(lpData.countdown_days)
+					? lpData.countdown_days.join(', ')
+					: String(lpData.countdown_days || '')
+			);
 			apiFormData.append('instructor_name', lpData.instructor_name || '');
 			apiFormData.append('instructor_title', lpData.instructor_role || '');
 			apiFormData.append('instructor_bio', lpData.instructor_bio || '');
@@ -82,12 +96,12 @@ export const actions = {
 			apiFormData.append('telegram_invite_link', lpData.telegram_link || '');
 			apiFormData.append('eyebrow_badge', lpData.eyebrow_text || '');
 			apiFormData.append('slug', lpData.slug || 'masterclass-' + Date.now());
-			
+
 			// Stats
 			apiFormData.append('stat_students', lpData.stat_students || '5000+');
 			apiFormData.append('stat_experience', lpData.stat_experience || '10 yil');
 			apiFormData.append('stat_practical', lpData.stat_practical || '100%');
-			
+
 			// Benefits - Flattened for multipart/form-data compatibility
 			benefits.forEach((benefit, index) => {
 				apiFormData.append(`benefits[${index}]order`, String(benefit.order));
@@ -102,7 +116,12 @@ export const actions = {
 			let response;
 			if (lpData.id) {
 				// Update
-				response = await masterclassService.updateMasterclass(lpData.slug, apiFormData, fetch, accessToken);
+				response = await masterclassService.updateMasterclass(
+					lpData.slug,
+					apiFormData,
+					fetch,
+					accessToken
+				);
 			} else {
 				// Create
 				response = await masterclassService.createMasterclass(apiFormData, fetch, accessToken);
@@ -111,7 +130,7 @@ export const actions = {
 			if (!response.ok) {
 				const errData = await response.json();
 				console.error('API Error:', errData);
-				return { success: false, error: errData.detail || "Saqlashda xatolik yuz berdi" };
+				return { success: false, error: errData.detail || 'Saqlashda xatolik yuz berdi' };
 			}
 
 			invalidateCache('admin_');

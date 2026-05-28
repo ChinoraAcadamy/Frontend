@@ -25,39 +25,40 @@
 	}
 </script>
 
-<section id="faq" class="py-24 bg-background">
-
+<section id="faq" class="bg-background py-24">
 	<div class="container mx-auto px-6">
 		<!-- Title -->
 		<div class="mb-16 text-center">
-			<h2 class="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+			<h2 class="mb-6 text-4xl font-bold text-foreground md:text-5xl">
 				{@html m.faq_title()}
 			</h2>
-			<p class="text-lg text-muted-foreground max-w-3xl mx-auto">
+			<p class="text-muted-foreground mx-auto max-w-3xl text-lg">
 				{m.faq_subtitle()}
 			</p>
 		</div>
 
 		<!-- FAQ Accordion -->
-		<div class="max-w-4xl mx-auto space-y-4">
+		<div class="mx-auto max-w-4xl space-y-4">
 			{#each faqs as faq, index (faq.question)}
 				<div class="overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
 					<!-- Trigger -->
 					<button
 						on:click={() => toggle(`faq-${index}`)}
-						class="flex w-full items-center justify-between px-8 py-6 text-left font-semibold text-foreground text-lg hover:bg-muted/50 transition-colors"
+						class="flex w-full items-center justify-between px-8 py-6 text-left text-lg font-semibold text-foreground transition-colors hover:bg-muted/50"
 					>
 						<span>{faq.question}</span>
-						
-						<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300
-									{openItem === `faq-${index}` ? 'rotate-45 bg-primary text-white' : ''}">
+
+						<div
+							class="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300
+									{openItem === `faq-${index}` ? 'rotate-45 bg-primary text-white' : ''}"
+						>
 							<Plus class="h-5 w-5" />
 						</div>
 					</button>
 
 					<!-- Content -->
 					{#if openItem === `faq-${index}`}
-						<div class="px-8 pb-8 border-t pt-2 text-base leading-relaxed text-muted-foreground">
+						<div class="text-muted-foreground border-t px-8 pt-2 pb-8 text-base leading-relaxed">
 							{faq.answer}
 						</div>
 					{/if}
@@ -68,13 +69,12 @@
 		<!-- Payment & Contact Section -->
 		<div class="mt-20">
 			<div class="mx-auto max-w-4xl text-center">
-				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-					
+				<div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
 					<!-- To‘lov usullari -->
 					<div class="flex flex-col items-center">
-						<div class="flex items-center gap-3 text-primary mb-3">
+						<div class="mb-3 flex items-center gap-3 text-primary">
 							<CreditCard class="h-6 w-6" />
-							<span class="font-semibold text-lg">{m.faq_payment_methods()}</span>
+							<span class="text-lg font-semibold">{m.faq_payment_methods()}</span>
 						</div>
 						<p class="text-muted-foreground">
 							{m.faq_payment_list()}
@@ -82,30 +82,26 @@
 					</div>
 
 					<!-- Telefon -->
-					<a
-						href="tel:+998338055505"
-						class="flex flex-col items-center group"
-					>
-						<div class="flex items-center gap-3 text-primary mb-3">
+					<a href="tel:+998338055505" class="group flex flex-col items-center">
+						<div class="mb-3 flex items-center gap-3 text-primary">
 							<Phone class="h-6 w-6" />
-							<span class="font-semibold text-lg group-hover:underline">+998 33 805 55 05</span>
+							<span class="text-lg font-semibold group-hover:underline">+998 33 805 55 05</span>
 						</div>
-						<p class="text-sm text-muted-foreground">{m.faq_contact()}</p>
+						<p class="text-muted-foreground text-sm">{m.faq_contact()}</p>
 					</a>
 
 					<!-- Telegram -->
 					<a
 						href="https://t.me/chinora_academy"
 						target="_blank"
-						class="flex flex-col items-center group"
+						class="group flex flex-col items-center"
 					>
-						<div class="flex items-center gap-3 text-primary mb-3">
+						<div class="mb-3 flex items-center gap-3 text-primary">
 							<Send class="h-6 w-6" />
-							<span class="font-semibold text-lg group-hover:underline">@chinora_academy</span>
+							<span class="text-lg font-semibold group-hover:underline">@chinora_academy</span>
 						</div>
-						<p class="text-sm text-muted-foreground">{m.faq_telegram()}</p>
+						<p class="text-muted-foreground text-sm">{m.faq_telegram()}</p>
 					</a>
-
 				</div>
 			</div>
 		</div>

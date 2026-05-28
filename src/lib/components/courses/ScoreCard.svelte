@@ -17,7 +17,7 @@
 
 <style>
 	.score-card {
-		background: linear-gradient(135deg, #FF4D8D, #C43C66);
+		background: linear-gradient(135deg, #ff4d8d, #c43c66);
 		color: white;
 		border-radius: 16px;
 		padding: 24px;
@@ -30,7 +30,7 @@
 
 	.progress-bar {
 		height: 8px;
-		background: rgba(255,255,255,0.3);
+		background: rgba(255, 255, 255, 0.3);
 		border-radius: 9999px;
 		margin-top: 16px;
 		overflow: hidden;

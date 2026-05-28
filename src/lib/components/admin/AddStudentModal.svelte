@@ -303,7 +303,7 @@
 					<button
 						type="submit"
 						disabled={isSubmitting}
-						class="flex w-full items-center justify-center rounded-xl bg-primary py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover active:scale-[0.98] disabled:opacity-70 sm:w-auto sm:min-w-[160px]"
+						class="hover:bg-primary-hover flex w-full items-center justify-center rounded-xl bg-primary py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-70 sm:w-auto sm:min-w-[160px]"
 					>
 						{isSubmitting
 							? m.btn_creating

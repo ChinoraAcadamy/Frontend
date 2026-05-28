@@ -19,8 +19,8 @@
 <div
 	class="group relative flex items-center justify-between rounded-2xl transition-all duration-300
     {status === 'active'
-		? 'bg-linear-to-r scale-[1.01] from-primary to-primary-hover text-white shadow-lg shadow-primary/20'
-		: 'text-foreground hover:bg-muted/10 border border-transparent hover:border-border'}"
+		? 'to-primary-hover scale-[1.01] bg-linear-to-r from-primary text-white shadow-lg shadow-primary/20'
+		: 'border border-transparent text-foreground hover:border-border hover:bg-muted/10'}"
 >
 	{#if href}
 		<a
@@ -30,11 +30,11 @@
 		></a>
 	{/if}
 
-	<div class="pointer-events-none z-20 flex w-full items-center justify-between p-3 sm:px-5 sm:py-3.5">
+	<div
+		class="pointer-events-none z-20 flex w-full items-center justify-between p-3 sm:px-5 sm:py-3.5"
+	>
 		<div class="flex items-center gap-4 sm:gap-6">
-			<span
-				class="text-sm font-medium {status === 'active' ? 'text-rose-100' : 'text-muted'}"
-			>
+			<span class="text-sm font-medium {status === 'active' ? 'text-rose-100' : 'text-muted'}">
 				{index}
 			</span>
 			<span class="line-clamp-1 text-sm font-semibold sm:text-base">{title}</span>
@@ -68,7 +68,9 @@
 			{/if}
 
 			{#if adminActions}
-				<div class="pointer-events-auto relative z-30 flex items-center gap-2 border-l border-slate-200 pl-4">
+				<div
+					class="pointer-events-auto relative z-30 flex items-center gap-2 border-l border-slate-200 pl-4"
+				>
 					{@render adminActions()}
 				</div>
 			{/if}

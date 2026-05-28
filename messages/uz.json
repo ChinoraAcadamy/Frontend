@@ -874,7 +874,7 @@
 	"label_current_video": "Mavjud video",
 	"btn_replace_video": "O'zgartirish",
 	"msg_lesson_updated": "Dars muvaffaqiyatli tahrirlandi!",
-		"admin_courses_count": "{count} курсов",
+	"admin_courses_count": "{count} курсов",
 	"meta_title": "Bepul Masterklass | Chinora Academy",
 	"meta_description": "3 kunda professional tikuvchilik sirlarini o'rganing. Bepul masterklass Ibodullayeva Chinora bilan.",
 	"og_title": "Bepul Masterklass — Chinora Academy",
@@ -1014,5 +1014,3 @@
 	"admin_mc_status_pending": "Kutilmoqda",
 	"admin_mc_export": "Ro'yxatni CSV yuklab olish →"
 }
-
-

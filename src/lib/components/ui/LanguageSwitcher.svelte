@@ -44,8 +44,8 @@
 
 	{#if isOpen}
 		<!-- Backdrop for closing -->
-		<div 
-			class="fixed inset-0 z-40 bg-transparent" 
+		<div
+			class="fixed inset-0 z-40 bg-transparent"
 			onclick={() => (isOpen = false)}
 			aria-hidden="true"
 		></div>
@@ -180,6 +180,4 @@
 	.switcher-label {
 		line-height: 1;
 	}
-
-
 </style>

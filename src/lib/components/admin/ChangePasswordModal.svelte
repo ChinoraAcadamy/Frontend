@@ -39,9 +39,12 @@
 		return async ({ result, update }) => {
 			loading = false;
 			if (result.type === 'failure') {
-				errorMessage = result.data?.error || (m.error_occurred ? m.error_occurred() : 'Xatolik yuz berdi.');
+				errorMessage =
+					result.data?.error || (m.error_occurred ? m.error_occurred() : 'Xatolik yuz berdi.');
 			} else if (result.type === 'success') {
-				successMessage = result.data?.message || (m.msg_password_changed ? m.msg_password_changed() : "Muvaffaqiyatli o'zgartirildi.");
+				successMessage =
+					result.data?.message ||
+					(m.msg_password_changed ? m.msg_password_changed() : "Muvaffaqiyatli o'zgartirildi.");
 				// 1.5 soniyadan keyin modalni avtomatik yopish
 				setTimeout(() => {
 					onClose();
@@ -113,7 +116,9 @@
 							required
 							minlength="8"
 							class="w-full rounded-xl border border-main bg-muted/5 px-4 py-2.5 text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary"
-							placeholder={m.placeholder_min_length ? m.placeholder_min_length() : 'Kamida 8 ta belgi'}
+							placeholder={m.placeholder_min_length
+								? m.placeholder_min_length()
+								: 'Kamida 8 ta belgi'}
 						/>
 					</div>
 
@@ -128,7 +133,9 @@
 							required
 							minlength="1"
 							class="w-full rounded-xl border border-main bg-muted/5 px-4 py-2.5 text-main transition-all outline-none focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary"
-							placeholder={m.placeholder_password_confirm ? m.placeholder_password_confirm() : 'Parolni qayta kiriting'}
+							placeholder={m.placeholder_password_confirm
+								? m.placeholder_password_confirm()
+								: 'Parolni qayta kiriting'}
 						/>
 					</div>
 				</div>
@@ -145,7 +152,7 @@
 					<button
 						type="submit"
 						disabled={loading}
-						class="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/20 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-70"
+						class="hover:bg-primary-hover flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/20 transition-all active:scale-95 disabled:opacity-70"
 					>
 						{#if loading}
 							<Loader2 size={16} class="animate-spin" />

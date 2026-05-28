@@ -5,12 +5,12 @@ import { API_URL } from '$env/static/private';
  * @param {string} accessToken
  */
 export async function getMasterclasses(fetch, accessToken) {
-    const headers = {};
-    if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-    
-    const res = await fetch(`${API_URL}/masterclasses/`, { headers });
-    if (!res.ok) return { results: [], count: 0 };
-    return await res.json();
+	const headers = {};
+	if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
+	const res = await fetch(`${API_URL}/masterclasses/`, { headers });
+	if (!res.ok) return { results: [], count: 0 };
+	return await res.json();
 }
 
 /**
@@ -19,12 +19,12 @@ export async function getMasterclasses(fetch, accessToken) {
  * @param {string} [accessToken]
  */
 export async function getMasterclass(slug, fetch, accessToken) {
-    const headers = {};
-    if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+	const headers = {};
+	if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-    const res = await fetch(`${API_URL}/masterclasses/${slug}/`, { headers });
-    if (!res.ok) return null;
-    return await res.json();
+	const res = await fetch(`${API_URL}/masterclasses/${slug}/`, { headers });
+	if (!res.ok) return null;
+	return await res.json();
 }
 
 /**
@@ -33,20 +33,20 @@ export async function getMasterclass(slug, fetch, accessToken) {
  * @param {string} accessToken
  */
 export async function createMasterclass(data, fetch, accessToken) {
-    const headers = {};
-    if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-    
-    const isFormData = data instanceof FormData;
-    if (!isFormData) {
-        headers['Content-Type'] = 'application/json';
-    }
+	const headers = {};
+	if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-    const res = await fetch(`${API_URL}/masterclasses/`, {
-        method: 'POST',
-        headers,
-        body: isFormData ? data : JSON.stringify(data)
-    });
-    return res;
+	const isFormData = data instanceof FormData;
+	if (!isFormData) {
+		headers['Content-Type'] = 'application/json';
+	}
+
+	const res = await fetch(`${API_URL}/masterclasses/`, {
+		method: 'POST',
+		headers,
+		body: isFormData ? data : JSON.stringify(data)
+	});
+	return res;
 }
 
 /**
@@ -56,20 +56,20 @@ export async function createMasterclass(data, fetch, accessToken) {
  * @param {string} accessToken
  */
 export async function updateMasterclass(slug, data, fetch, accessToken) {
-    const headers = {};
-    if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+	const headers = {};
+	if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-    const isFormData = data instanceof FormData;
-    if (!isFormData) {
-        headers['Content-Type'] = 'application/json';
-    }
+	const isFormData = data instanceof FormData;
+	if (!isFormData) {
+		headers['Content-Type'] = 'application/json';
+	}
 
-    const res = await fetch(`${API_URL}/masterclasses/${slug}/`, {
-        method: 'PATCH',
-        headers,
-        body: isFormData ? data : JSON.stringify(data)
-    });
-    return res;
+	const res = await fetch(`${API_URL}/masterclasses/${slug}/`, {
+		method: 'PATCH',
+		headers,
+		body: isFormData ? data : JSON.stringify(data)
+	});
+	return res;
 }
 
 /**
@@ -78,11 +78,11 @@ export async function updateMasterclass(slug, data, fetch, accessToken) {
  * @param {string} accessToken
  */
 export async function deleteMasterclass(slug, fetch, accessToken) {
-    const res = await fetch(`${API_URL}/masterclasses/${slug}/`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    return res;
+	const res = await fetch(`${API_URL}/masterclasses/${slug}/`, {
+		method: 'DELETE',
+		headers: {
+			Authorization: `Bearer ${accessToken}`
+		}
+	});
+	return res;
 }

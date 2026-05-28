@@ -10,7 +10,7 @@
 					<Icon size={18} />
 				</div>
 			{/if}
-			<span class="text-base font-bold text-foreground tracking-tight">{title}</span>
+			<span class="text-base font-bold tracking-tight text-foreground">{title}</span>
 		</div>
 		{#if extra}
 			{@render extra()}

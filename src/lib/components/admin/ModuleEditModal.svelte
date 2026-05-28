@@ -19,7 +19,12 @@
 	}
 </script>
 
-<Modal {isOpen} onClose={closeModal} title={m.modal_edit_module_title ? m.modal_edit_module_title() : 'Modulni tahrirlash'} maxWidth="480px">
+<Modal
+	{isOpen}
+	onClose={closeModal}
+	title={m.modal_edit_module_title ? m.modal_edit_module_title() : 'Modulni tahrirlash'}
+	maxWidth="480px"
+>
 	<ModuleForm
 		action="?/editModule"
 		{moduleTarget}

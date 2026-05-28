@@ -604,9 +604,6 @@
 		flex-shrink: 0;
 	}
 
-
-
-
 	.logo--sm {
 		gap: 8px;
 	}
@@ -631,8 +628,6 @@
 		color: var(--brand);
 	}
 
-
-
 	/* Nav right */
 	.nav-right {
 		display: flex;
@@ -640,8 +635,6 @@
 		gap: 10px;
 		flex-shrink: 0;
 	}
-
-
 
 	.nav-cta {
 		align-items: center;
@@ -1023,9 +1016,6 @@
 
 	/* Benefits */
 
-
-
-
 	.benefit-list {
 		list-style: none;
 		display: flex;
@@ -1266,8 +1256,6 @@
 		margin-bottom: 1rem;
 	}
 
-
-
 	.timer-grid {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
@@ -1346,8 +1334,6 @@
 		color: var(--muted);
 		margin-top: 6px;
 	}
-
-
 
 	/* Trust */
 	.trust {
@@ -1676,7 +1662,6 @@
 	.msub-btn:active:not(:disabled) {
 		transform: scale(0.98);
 	}
-
 
 	.spinner {
 		width: 16px;

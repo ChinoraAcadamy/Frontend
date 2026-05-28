@@ -1,24 +1,26 @@
 <script>
-    /* eslint-disable no-unused-vars */
-    import { fly } from 'svelte/transition';
-    let { count = 4 } = $props();
+	/* eslint-disable no-unused-vars */
+	import { fly } from 'svelte/transition';
+	let { count = 4 } = $props();
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
-    {#each Array(count) as _, i (i)}
-        <div class="bg-surface border border-border rounded-[20px] p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] min-h-35 flex flex-col justify-between"
-            transition:fly={{ y: 20, duration: 400, delay: i * 40 }}>
-            <div class="flex items-start justify-between gap-4 mb-5">
-                <div class="flex-1">
-                    <div class="h-5 bg-muted/10 rounded-md w-3/4 mb-2 animate-pulse"></div>
-                    <div class="h-4 bg-muted/5 rounded-md w-1/2 animate-pulse"></div>
-                </div>
-                <div class="h-7 w-20 bg-muted/10 rounded-full animate-pulse"></div>
-            </div>
-            <div class="flex items-center justify-between pt-4 border-t border-dashed border-border">
-                <div class="h-4 bg-muted/5 rounded-md w-1/3 animate-pulse"></div>
-                <div class="h-9.5 w-9.5 bg-muted/10 rounded-[10px] animate-pulse"></div>
-            </div>
-        </div>
-    {/each}
+<div class="grid w-full grid-cols-1 gap-5 md:grid-cols-2">
+	{#each Array(count) as _, i (i)}
+		<div
+			class="flex min-h-35 flex-col justify-between rounded-[20px] border border-border bg-surface p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]"
+			transition:fly={{ y: 20, duration: 400, delay: i * 40 }}
+		>
+			<div class="mb-5 flex items-start justify-between gap-4">
+				<div class="flex-1">
+					<div class="mb-2 h-5 w-3/4 animate-pulse rounded-md bg-muted/10"></div>
+					<div class="h-4 w-1/2 animate-pulse rounded-md bg-muted/5"></div>
+				</div>
+				<div class="h-7 w-20 animate-pulse rounded-full bg-muted/10"></div>
+			</div>
+			<div class="flex items-center justify-between border-t border-dashed border-border pt-4">
+				<div class="h-4 w-1/3 animate-pulse rounded-md bg-muted/5"></div>
+				<div class="h-9.5 w-9.5 animate-pulse rounded-[10px] bg-muted/10"></div>
+			</div>
+		</div>
+	{/each}
 </div>
