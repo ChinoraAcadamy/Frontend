@@ -26,9 +26,9 @@
 	}
 
 	const calculateDuration = (course) => {
-		const moduleCount = course.modules?.length || course.modules_count || 0;
-		if (moduleCount === 0) return '—';
-		return `${moduleCount} ${m.weeks_label()}`;
+		const duration = course.duration || 0;
+		if (duration === 0) return '—';
+		return `${duration} ${m.unit_hour()}`;
 	};
 </script>
 
