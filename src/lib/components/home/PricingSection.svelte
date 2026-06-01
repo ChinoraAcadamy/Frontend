@@ -56,8 +56,10 @@
 		}
 	];
 
-	// Narxni formatlash
+	// Narxni formatlash — agar narx kiritilmagan bo'lsa null qaytaradi
 	function formatPrice(price) {
+		if (price === null || price === undefined || price === '' || isNaN(parseFloat(price)))
+			return null;
 		const num = Math.round(parseFloat(price));
 		const locale = getLocale() === 'ru' ? 'ru-RU' : 'uz-UZ';
 		const currency = getLocale() === 'ru' ? ' сум' : " so'm";
@@ -222,7 +224,7 @@
 								<h3 class="mb-4 text-2xl font-black tracking-tight">{plan.title}</h3>
 
 								<div class="mb-6 space-y-1">
-									{#if plan.old_price}
+									{#if plan.old_price && formatPrice(plan.old_price)}
 										<div
 											class="text-sm font-bold line-through opacity-60 {plan.popular
 												? 'text-white'
@@ -231,21 +233,35 @@
 											{formatPrice(plan.old_price)}
 										</div>
 									{/if}
-									<div
-										class="text-4xl font-black tracking-tighter md:text-5xl {plan.popular
-											? 'text-white'
-											: 'text-slate-900'}"
-									>
-										{formatPrice(plan.price)}
-									</div>
-									<div
-										class="mt-2 text-[11px] font-black tracking-widest uppercase {plan.popular
-											? 'text-white/80'
-											: 'text-slate-400'}"
-									>
-										{plan.duration}
-										{m.weeks_label ? m.weeks_label() : 'hafta'} davomida
-									</div>
+									{#if plan.price && formatPrice(plan.price)}
+										<div
+											class="text-4xl font-black tracking-tighter md:text-5xl {plan.popular
+												? 'text-white'
+												: 'text-slate-900'}"
+										>
+											{formatPrice(plan.price)}
+										</div>
+									{:else}
+										<div
+											class="text-2xl font-black tracking-tighter {plan.popular
+												? 'text-white/80'
+												: 'text-slate-500'}"
+										>
+											{m.pricing_contact_for_price
+												? m.pricing_contact_for_price()
+												: "Narx uchun bog'laning"}
+										</div>
+									{/if}
+									{#if plan.duration && plan.duration > 0}
+										<div
+											class="mt-2 text-[11px] font-black tracking-widest uppercase {plan.popular
+												? 'text-white/80'
+												: 'text-slate-400'}"
+										>
+											{plan.duration}
+											{m.weeks_label ? m.weeks_label() : 'hafta'} davomida
+										</div>
+									{/if}
 								</div>
 							</div>
 
@@ -373,7 +389,7 @@
 					<a
 						href="https://t.me/chinora_academy"
 						target="_blank"
-						class="font-semibold text-[#9b1c48] hover:underline"
+						class="font-semibold text-primary hover:underline"
 					>
 						{m.modal_tg_link()}
 					</a>
@@ -382,7 +398,7 @@
 
 				<button
 					onclick={handleCloseModal}
-					class="flex w-full items-center justify-center rounded-xl bg-[#9b1c48] py-4 text-xl font-medium text-white transition-all hover:bg-[#80163a] active:scale-[0.98]"
+					class="flex w-full items-center justify-center rounded-xl bg-primary py-4 text-xl font-medium text-white transition-all hover:bg-[#80163a] active:scale-[0.98]"
 				>
 					{m.modal_close()}
 				</button>

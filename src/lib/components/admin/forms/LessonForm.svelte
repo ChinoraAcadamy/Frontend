@@ -40,8 +40,8 @@
 	// UI State
 	let activeTab = $state('uz');
 	let videoFile = $state(null);
-	// eslint-disable-next-line svelte/prefer-writable-derived
-	let imgPreview = $state(null);
+	let localImgPreview = $state(null);
+	let imgPreview = $derived(localImgPreview ?? (lessonTarget?.image || null));
 	let uploadProgress = $state(0);
 
 	// Svelte 5 Form state variables
@@ -56,30 +56,21 @@
 	// svelte-ignore state_referenced_locally
 	let autoDuration = $state(lessonTarget.duration || 0);
 
-	// AI Creator tab states
-	let creatorTab = $state('manual'); // 'manual' | 'ai'
-	let aiInputText = $state('');
-	let isParsingAi = $state(false);
-
 	// AI Translating states
 	let isTranslatingTitle = $state(false);
 	let isTranslatingDesc = $state(false);
 
-	$effect.pre(() => {
-		imgPreview = lessonTarget?.image || null;
-	});
-
 	function handleImageChange(e) {
 		const file = e.target.files?.[0];
 		if (file) {
-			imgPreview = URL.createObjectURL(file);
+			localImgPreview = URL.createObjectURL(file);
 		}
 	}
 
 	function resetForm(form) {
 		form.reset();
 		videoFile = null;
-		imgPreview = null;
+		localImgPreview = null;
 		uploadProgress = 0;
 		autoDuration = 0;
 		modulePk = null;
@@ -87,48 +78,6 @@
 		titleRu = '';
 		descriptionUz = '';
 		descriptionRu = '';
-		aiInputText = '';
-	}
-
-	// AI Parsing function
-	async function handleAiParse() {
-		if (!aiInputText || aiInputText.trim() === '') {
-			toast.error("Maydon bo'sh! Iltimos, avval dars ma'lumotlarini matn shaklida yozing.");
-			return;
-		}
-
-		isParsingAi = true;
-		try {
-			const res = await fetch('/api/lessons/parse', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text: aiInputText })
-			});
-
-			const data = await res.json();
-			if (!res.ok) {
-				toast.error(data.error || 'AI tahlilda xatolik yuz berdi');
-				return;
-			}
-
-			// Fill state variables
-			titleUz = data.title_uz || '';
-			titleRu = data.title_ru || '';
-			descriptionUz = data.description_uz || '';
-			descriptionRu = data.description_ru || '';
-			if (data.duration) {
-				autoDuration = data.duration;
-			}
-
-			toast.success("Dars ma'lumotlari AI yordamida to'ldirildi va rus tiliga tarjima qilindi! ✨");
-			// Switch back to fields form tab
-			creatorTab = 'manual';
-		} catch (err) {
-			console.error(err);
-			toast.error("AI tahlil xizmati bilan bog'lanib bo'lmadi");
-		} finally {
-			isParsingAi = false;
-		}
 	}
 
 	// AI translation handler
@@ -265,62 +214,7 @@
 	enctype="multipart/form-data"
 	class="mx-auto w-full max-w-[900px] font-sans"
 >
-	<!-- Creator Type Tab Panel (AI and Manual) -->
-	<div class="creator-tabs">
-		<button
-			type="button"
-			class="creator-tab {creatorTab === 'manual' ? 'active' : ''}"
-			onclick={() => (creatorTab = 'manual')}
-		>
-			✍️ Standart Forma
-		</button>
-		<button
-			type="button"
-			class="creator-tab {creatorTab === 'ai' ? 'active' : ''}"
-			onclick={() => (creatorTab = 'ai')}
-		>
-			⚡️ Tezkor AI Yaratuvchi
-		</button>
-	</div>
-
-	<!-- AI Parsing Textarea block -->
-	{#if creatorTab === 'ai'}
-		<div class="ai-creator-container" in:fade={{ duration: 150 }}>
-			<div class="ai-header">
-				<div class="ai-sparkle-circle">
-					<Sparkles size={20} class="text-primary" />
-				</div>
-				<div>
-					<h3 class="ai-title">⚡️ Tezkor AI Dars Yaratuvchi</h3>
-					<p class="ai-subtitle">
-						Dars ma'lumotlarini matn shaklida yozing, AI avtomatik parsing qiladi, davomiylikni
-						o'qiydi va rus tiliga o'giradi.
-					</p>
-				</div>
-			</div>
-
-			<textarea
-				class="ai-textarea"
-				bind:value={aiInputText}
-				placeholder="Matn kiriting, masalan:&#10;Dars nomi: TailwindCSS utility sinflari&#10;Davomiyligi: 25.5 daqiqa&#10;Tavsif: Ushbu darsda biz TailwindCSS frameworkining asosiy sinflari bilan amaliy tanishamiz."
-				rows="6"
-			></textarea>
-
-			<div class="mt-4 flex justify-end">
-				<button type="button" class="ai-parse-btn" onclick={handleAiParse} disabled={isParsingAi}>
-					{#if isParsingAi}
-						<div class="spinner"></div>
-						<span>AI tahlil qilmoqda...</span>
-					{:else}
-						<Sparkles size={14} />
-						<span>AI yordamida to'ldirish</span>
-					{/if}
-				</button>
-			</div>
-		</div>
-	{/if}
-
-	<div class="flex flex-col gap-5 {creatorTab !== 'manual' ? 'hidden' : ''}">
+	<div class="flex flex-col gap-5">
 		<!-- Section: General Info -->
 		<FormSection
 			title={m.section_general_info ? m.section_general_info() : "Umumiy ma'lumotlar"}
@@ -609,126 +503,6 @@
 </form>
 
 <style>
-	/* AI Creator Tabs */
-	.creator-tabs {
-		display: flex;
-		background: var(--bg-surface);
-		border: 1px solid var(--border-main);
-		padding: 4px;
-		border-radius: 18px;
-		margin-bottom: 20px;
-		gap: 4px;
-	}
-
-	.creator-tab {
-		flex: 1;
-		text-align: center;
-		padding: 10px 16px;
-		font-size: 13px;
-		font-weight: 800;
-		color: var(--text-muted);
-		border-radius: 14px;
-		cursor: pointer;
-		border: none;
-		background: transparent;
-		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-		font-family: inherit;
-	}
-
-	.creator-tab.active {
-		background: var(--primary);
-		color: white;
-		box-shadow: 0 4px 12px rgba(155, 28, 72, 0.2);
-	}
-
-	/* AI Creator Section */
-	.ai-creator-container {
-		background: var(--bg-card);
-		border: 1px solid rgba(155, 28, 72, 0.2);
-		border-radius: 28px;
-		padding: 24px;
-		box-shadow: 0 10px 30px -10px rgba(155, 28, 72, 0.08);
-		margin-bottom: 20px;
-	}
-
-	.ai-header {
-		display: flex;
-		gap: 16px;
-		align-items: center;
-		margin-bottom: 20px;
-	}
-
-	.ai-sparkle-circle {
-		width: 44px;
-		height: 44px;
-		border-radius: 14px;
-		background: linear-gradient(135deg, rgba(155, 28, 72, 0.1) 0%, rgba(244, 63, 94, 0.1) 100%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid rgba(155, 28, 72, 0.2);
-	}
-
-	.ai-title {
-		font-size: 16px;
-		font-weight: 900;
-		color: var(--text-main);
-		margin: 0 0 2px 0;
-	}
-
-	.ai-subtitle {
-		font-size: 12px;
-		font-weight: 500;
-		color: var(--text-muted);
-		margin: 0;
-	}
-
-	.ai-textarea {
-		width: 100%;
-		border: 1.5px solid var(--border-main);
-		background: var(--bg-surface);
-		border-radius: 18px;
-		padding: 16px;
-		font-size: 13.5px;
-		color: var(--text-main);
-		resize: vertical;
-		outline: none;
-		font-family: inherit;
-		transition: border-color 0.2s ease;
-	}
-
-	.ai-textarea:focus {
-		border-color: var(--primary);
-	}
-
-	.ai-parse-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		background: var(--primary);
-		color: white;
-		border: none;
-		padding: 12px 24px;
-		border-radius: 16px;
-		font-size: 13px;
-		font-weight: 800;
-		cursor: pointer;
-		box-shadow: 0 8px 16px -4px rgba(155, 28, 72, 0.3);
-		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-		font-family: inherit;
-	}
-
-	.ai-parse-btn:hover:not(:disabled) {
-		background: var(--primary-hover);
-		transform: translateY(-1.5px);
-		box-shadow: 0 10px 20px -4px rgba(155, 28, 72, 0.4);
-	}
-
-	.ai-parse-btn:disabled {
-		opacity: 0.7;
-		cursor: not-allowed;
-	}
-
 	/* AI Translation inside Fields */
 	.label-container {
 		display: flex;

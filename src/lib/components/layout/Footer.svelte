@@ -173,31 +173,30 @@
 	<div class="subfooter">
 		<div class="subfooter-inner">
 			<p class="copyright">{m.footer_copyright({ year: new Date().getFullYear() })}</p>
-			<div class="dev-credit">
-				<Heart size={12} strokeWidth={2.5} class="dev-heart" aria-hidden="true" />
-				<span>{m.footer_developed()}</span>
-
-				<div class="dev-list">
+			<div class="dev-team-badge">
+				<span class="dev-team-intro">
+					<Heart size={12} strokeWidth={2.5} class="dev-heart-pulse" aria-hidden="true" />
+					<span>{m.footer_developed()}</span>
+				</span>
+				<div class="dev-team-links">
 					<a
 						href="https://t.me/corefold"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="dev-item"
+						class="dev-profile-link"
 					>
-						<span class="dev-name">Laziz</span>
-						<span class="dev-role">Frontend</span>
+						<span class="dev-role-tag fe-tag">Frontend</span>
+						<span class="dev-profile-name">Laziz</span>
 					</a>
-
-					<span class="dev-divider">•</span>
-
+					<span class="dev-link-separator" aria-hidden="true"></span>
 					<a
 						href="https://t.me/maxmudov_1117"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="dev-item"
+						class="dev-profile-link"
 					>
-						<span class="dev-name">Bekmurod</span>
-						<span class="dev-role">Backend</span>
+						<span class="dev-role-tag be-tag">Backend</span>
+						<span class="dev-profile-name">Bekmurod</span>
 					</a>
 				</div>
 			</div>
@@ -461,73 +460,158 @@
 		color: var(--muted);
 	}
 
-	/* ── Subfooter Dev Credits ───────────────────────────── */
-	.dev-credit {
-		display: flex;
+	/* ── Modern Developer Credits ───────────────────────────── */
+	.dev-team-badge {
+		display: inline-flex;
 		align-items: center;
 		flex-wrap: wrap;
 		justify-content: center;
-		gap: 6px;
+		gap: 12px;
+		background: rgba(155, 28, 72, 0.03);
+		border: 1px solid rgba(155, 28, 72, 0.08);
+		padding: 4px 12px 4px 8px;
+		border-radius: 100px;
 		font-size: 12px;
-		color: var(--muted);
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
-	:global(.dev-heart) {
+	.dev-team-badge:hover {
+		background: rgba(155, 28, 72, 0.06);
+		border-color: rgba(155, 28, 72, 0.15);
+		box-shadow: 0 4px 20px -5px rgba(155, 28, 72, 0.1);
+	}
+
+	.dev-team-intro {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		color: var(--ink-soft);
+		font-weight: 500;
+		opacity: 0.85;
+	}
+
+	:global(.dev-heart-pulse) {
 		color: var(--brand);
 		flex-shrink: 0;
+		animation: devHeartbeat 2.5s infinite ease-in-out;
 	}
 
-	.dev-list {
+	@keyframes devHeartbeat {
+		0%, 100% { transform: scale(1); }
+		25% { transform: scale(1.15); }
+		40% { transform: scale(1); }
+		55% { transform: scale(1.15); }
+		70% { transform: scale(1); }
+	}
+
+	.dev-team-links {
 		display: flex;
 		align-items: center;
-		flex-wrap: wrap;
 		gap: 8px;
-		margin-left: 2px;
 	}
 
-	.dev-item {
+	.dev-profile-link {
 		display: flex;
 		align-items: center;
-		gap: 5px;
+		gap: 6px;
 		text-decoration: none;
-		transition: transform 0.2s ease;
-	}
-
-	.dev-item:hover {
-		transform: translateY(-1px);
-	}
-
-	.dev-name {
-		font-weight: 700;
-		color: var(--brand);
-		transition: opacity 0.2s ease;
-	}
-
-	.dev-role {
-		font-size: 9.5px;
+		color: var(--ink);
 		font-weight: 600;
+		padding: 2px 6px;
+		border-radius: 6px;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.dev-role-tag {
+		font-size: 9px;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		background: var(--brand-mid);
-		color: var(--brand);
-		padding: 3px 6px;
-		border-radius: 5px;
+		letter-spacing: 0.05em;
+		padding: 2px 5px;
+		border-radius: 4px;
 		transition: all 0.2s ease;
 	}
 
-	/* Hover effects */
-	.dev-item:hover .dev-name {
-		opacity: 0.75;
+	.fe-tag {
+		background: rgba(155, 28, 72, 0.06);
+		color: var(--brand);
+		border: 1px solid rgba(155, 28, 72, 0.15);
 	}
 
-	.dev-item:hover .dev-role {
+	.be-tag {
+		background: rgba(90, 58, 66, 0.06);
+		color: var(--ink-soft);
+		border: 1px solid rgba(90, 58, 66, 0.15);
+	}
+
+	.dev-profile-name {
+		position: relative;
+		font-size: 11.5px;
+		color: var(--ink);
+	}
+
+	.dev-profile-name::after {
+		content: '';
+		position: absolute;
+		bottom: -1px;
+		left: 0;
+		width: 100%;
+		height: 1.5px;
+		background: currentColor;
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform 0.25s ease-out;
+		opacity: 0.8;
+	}
+
+	.dev-profile-link:hover {
+		transform: translateY(-0.5px);
+	}
+
+	.dev-profile-link:hover .dev-profile-name::after {
+		transform: scaleX(1);
+		transform-origin: left;
+	}
+
+	.dev-profile-link:hover .fe-tag {
 		background: var(--brand);
 		color: var(--white);
+		border-color: var(--brand);
 	}
 
-	.dev-divider {
-		color: var(--brand-mid);
-		font-size: 14px;
-		line-height: 1;
+	.dev-profile-link:hover .be-tag {
+		background: var(--ink-soft);
+		color: var(--white);
+		border-color: var(--ink-soft);
+	}
+
+	.dev-link-separator {
+		width: 1px;
+		height: 12px;
+		background: rgba(155, 28, 72, 0.15);
+		display: inline-block;
+	}
+
+	/* Responsive layout for very small screens */
+	@media (max-width: 480px) {
+		.dev-team-badge {
+			flex-direction: column;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 16px;
+			border-radius: 16px;
+			width: 100%;
+			max-width: 320px;
+		}
+
+		.dev-link-separator {
+			display: none;
+		}
+
+		.dev-team-links {
+			width: 100%;
+			justify-content: center;
+			gap: 12px;
+		}
 	}
 </style>

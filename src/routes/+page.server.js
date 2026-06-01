@@ -26,7 +26,8 @@ export const load = async ({ fetch, locals }) => {
 								const headers = { 'Accept-Language': lang };
 								const res = await fetch(`${API_URL}/courses/${course.id}/`, { headers });
 								if (res.ok) {
-									return await res.json();
+									const detail = await res.json();
+									return { ...course, ...detail };
 								}
 								// Fallback: faqat modullarni o'zini olish
 								const modulesRes = await fetch(`${API_URL}/courses/${course.id}/modules/`, {

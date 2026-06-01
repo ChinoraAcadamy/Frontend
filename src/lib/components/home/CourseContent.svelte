@@ -45,6 +45,8 @@
 
 		{#await courses}
 			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+				{console.log(courses)}
+
 				{#each Array(3) as _, i (i)}
 					<div
 						class="relative flex h-[480px] flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm"

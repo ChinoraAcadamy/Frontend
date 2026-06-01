@@ -38,7 +38,7 @@
 	<div class="mx-2 flex flex-col gap-3 sm:mx-0">
 		{#if !isVideoFinished}
 			<div
-				class="flex items-center gap-3.5 rounded-2xl border border-amber-500/15 bg-amber-500/[0.04] p-4 text-[13px] font-semibold text-amber-800 dark:text-amber-300"
+				class="flex items-center gap-3.5 rounded-2xl border border-amber-500/15 bg-amber-500/4 p-4 text-[13px] font-semibold text-amber-800 dark:text-amber-300"
 				transition:slide
 			>
 				<div

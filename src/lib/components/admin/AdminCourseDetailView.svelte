@@ -80,20 +80,20 @@
 
 	// --- Course Update Logic ---
 	let isSaving = $state(false);
-	// eslint-disable-next-line svelte/prefer-writable-derived
-	let isPublished = $state(false);
-	// eslint-disable-next-line svelte/prefer-writable-derived
-	let imgPreview = $state(null);
+	let localIsPublished = $state(null);
+	let isPublished = $derived.by(() => {
+		return localIsPublished !== null ? localIsPublished : course.is_published;
+	});
 
-	$effect.pre(() => {
-		isPublished = course.is_published;
-		imgPreview = course?.img || course?.img_file || course?.image || null;
+	let localImgPreview = $state(null);
+	let imgPreview = $derived.by(() => {
+		return localImgPreview !== null ? localImgPreview : (course?.img || course?.img_file || course?.image || null);
 	});
 
 	function handleImageChange(e) {
 		const file = e.target.files?.[0];
 		if (file && file.type.startsWith('image/')) {
-			imgPreview = URL.createObjectURL(file);
+			localImgPreview = URL.createObjectURL(file);
 		}
 	}
 
@@ -105,6 +105,8 @@
 				toast.success(
 					m.msg_course_updated ? m.msg_course_updated() : 'Kurs muvaffaqiyatli yangilandi'
 				);
+				localIsPublished = null;
+				localImgPreview = null;
 			} else if (result.type === 'failure') {
 				toast.error(result.data?.error || m.error_occurred());
 			}
@@ -633,7 +635,7 @@
 				<button
 					type="button"
 					aria-label="Toggle Publish Status"
-					onclick={() => (isPublished = !isPublished)}
+					onclick={() => (localIsPublished = !isPublished)}
 					class="relative h-7 w-12 cursor-pointer rounded-full transition-colors duration-300 focus:outline-none {isPublished
 						? 'bg-emerald-500'
 						: 'bg-muted/20'}"

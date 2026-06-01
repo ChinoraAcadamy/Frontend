@@ -27,8 +27,8 @@
 		onSubmit
 	} = $props();
 
-	// eslint-disable-next-line svelte/prefer-writable-derived
-	let imgPreview = $state(null);
+	let localImgPreview = $state(null);
+	let imgPreview = $derived(localImgPreview ?? (course?.img || course?.img_file || course?.image || null));
 
 	// Maydonlar uchun Svelte 5 state'lar (AI tarjima to'ldirishi uchun)
 	// svelte-ignore state_referenced_locally
@@ -49,15 +49,11 @@
 	let isTranslatingLevel = $state(false);
 	let isTranslatingDesc = $state(false);
 
-	$effect.pre(() => {
-		imgPreview = course?.img || course?.img_file || course?.image || null;
-	});
-
 	// Rasm yuklash preview mantiqi
 	function handleImageChange(e) {
 		const file = e.target.files?.[0];
 		if (file) {
-			imgPreview = URL.createObjectURL(file);
+			localImgPreview = URL.createObjectURL(file);
 		}
 	}
 
