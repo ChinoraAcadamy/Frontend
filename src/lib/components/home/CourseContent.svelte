@@ -45,7 +45,6 @@
 
 		{#await courses}
 			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-				{console.log(courses)}
 
 				{#each Array(3) as _, i (i)}
 					<div
