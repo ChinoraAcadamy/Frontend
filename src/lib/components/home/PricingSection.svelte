@@ -259,7 +259,7 @@
 												: 'text-slate-400'}"
 										>
 											{plan.duration}
-											{m.weeks_label ? m.weeks_label() : 'hafta'} davomida
+											{m.min_label()}
 										</div>
 									{/if}
 								</div>

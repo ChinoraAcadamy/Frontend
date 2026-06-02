@@ -233,9 +233,9 @@
 						type="number"
 						id="les_order"
 						name="order_index"
-						disabled
-						class="w-full cursor-not-allowed rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-muted disabled:opacity-60"
-						value={modules.find((m) => m.id === modulePk)?.lessons_count + 1}
+						disabled={!lessonTarget}
+						class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-muted disabled:cursor-not-allowed disabled:opacity-60"
+						value={modules.find((m) => m.id === modulePk)?.lessons_count}
 					/>
 				</div>
 			</div>

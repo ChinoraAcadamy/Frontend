@@ -337,7 +337,6 @@
 								class="device-card {device.is_current ? 'device-card--current' : ''}"
 								in:scale={{ duration: 200, start: 0.97, easing: cubicOut }}
 							>
-								{console.log(device)}
 								<div class="device-left">
 									<div
 										class="device-icon-wrap {device.is_current ? 'device-icon-wrap--active' : ''}"

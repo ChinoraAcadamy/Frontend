@@ -2,7 +2,7 @@
 	/* eslint-disable no-unused-vars */
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { Lock, Volume2, FastForward, Rewind } from 'lucide-svelte';
+	import { Lock, Volume2, FastForward, Rewind, RotateCw } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import * as m from '$lib/paraglide/messages.js';
@@ -70,6 +70,32 @@
 	let securityLocked = $state(false);
 	let securityViolationCount = $state(0);
 	let isScreenBlurred = $state(false);
+	let blurTimeout = null;
+
+	// Rotation state
+	let videoRotation = $state(0);
+	let rotateScale = $state(1);
+
+	$effect(() => {
+		if (videoRotation % 180 !== 0 && shellElement) {
+			const resizeObserver = new ResizeObserver((entries) => {
+				for (let entry of entries) {
+					const { width, height } = entry.contentRect;
+					if (width > 0 && height > 0) {
+						rotateScale = Math.min(width / height, height / width);
+					}
+				}
+			});
+			resizeObserver.observe(shellElement);
+			return () => resizeObserver.disconnect();
+		} else {
+			rotateScale = 1;
+		}
+	});
+
+	function handleRotateVideo() {
+		videoRotation = (videoRotation + 90) % 360;
+	}
 
 	// --- Gesture Indicators State ---
 	let gestureText = $state('');
@@ -88,6 +114,26 @@
 		const isCtrlShift = (e.ctrlKey || e.metaKey) && e.shiftKey;
 		const isCtrl = e.ctrlKey || e.metaKey;
 		const isF12 = e.keyCode === 123;
+		const isPrintScreen = e.key === 'PrintScreen' || e.keyCode === 44;
+		const isCtrlP = isCtrl && (e.key === 'p' || e.key === 'P' || e.keyCode === 80);
+		const isSnippingTool = (e.metaKey && e.shiftKey && (e.key === 's' || e.key === 'S')) || 
+							   (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')); // Mac screenshot
+
+		if (isPrintScreen || isCtrlP || isSnippingTool) {
+			e.preventDefault();
+			document.body.style.filter = 'blur(30px)';
+			setTimeout(() => {
+				document.body.style.filter = '';
+			}, 1000);
+			try {
+				navigator.clipboard.writeText("Screenshot taqiqlangan! Chinora Academy himoyasi faol.");
+			} catch (err) {
+				void(err);
+			}
+			toast.error('Screenshot va nusxa olish qatʼiyan man etiladi!');
+			registerViolation();
+			return false;
+		}
 
 		if (
 			isF12 ||
@@ -96,9 +142,6 @@
 		) {
 			e.preventDefault();
 			registerViolation();
-			if (e.keyCode === 44) {
-				toast.error(m.video_not_supported ? 'Screenshot taqiqlangan!' : 'Screenshot prohibited!');
-			}
 			return false;
 		}
 	}
@@ -177,7 +220,15 @@
 	});
 
 	function handleVisibility() {
-		if (document.hidden && player?.playing) player.pause();
+		if (document.hidden) {
+			isScreenBlurred = true;
+			if (player?.playing) player.pause();
+		} else {
+			// Kichik kechikish bilan blur'ni olib tashlaymiz
+			setTimeout(() => {
+				isScreenBlurred = false;
+			}, 300);
+		}
 	}
 
 	function moveWatermark() {
@@ -599,13 +650,17 @@
 		if (player) {
 			try {
 				player.destroy();
-			} catch (e) {}
+			} catch (e) {
+				void(e);
+			}
 			player = null;
 		}
 		if (hlsInstance) {
 			try {
 				hlsInstance.destroy();
-			} catch (e) {}
+			} catch (e) {
+				void(e);
+			}
 			hlsInstance = null;
 		}
 		if (videoElement) {
@@ -613,7 +668,9 @@
 				videoElement.pause();
 				videoElement.removeAttribute('src');
 				videoElement.load();
-			} catch (e) {}
+			} catch (e) {
+				void(e);
+			}
 		}
 	});
 </script>
@@ -665,11 +722,22 @@
 		webkit-playsinline
 		preload="auto"
 		crossorigin="anonymous"
+		style="transform: translateZ(0) rotate({videoRotation}deg) scale({rotateScale});"
 	>
 		{m.video_not_supported
 			? m.video_not_supported()
 			: "Brauzeringiz videoni qo'llab-quvvatlamaydi."}
 	</video>
+
+	<!-- ── Rotate Video Button ─────────────────────────── -->
+	<button
+		class="vp-rotate-btn"
+		onclick={handleRotateVideo}
+		title="Videoni aylantirish"
+		aria-label="Videoni aylantirish"
+	>
+		<RotateCw size={22} />
+	</button>
 
 	<!-- ── Screen Blur Shroud (Anti-Screenshot) ────────── -->
 	{#if isScreenBlurred}
@@ -730,6 +798,9 @@
 	.vp-shell {
 		position: relative;
 		width: 100%;
+		max-width: calc(80vh * 16 / 9); /* Limit height on large screens */
+		margin: 0 auto;
+		overflow: hidden;
 		aspect-ratio: 16 / 9;
 		background: #000;
 		border-radius: 16px;
@@ -744,6 +815,8 @@
 	:global(.plyr--fullscreen-active) .vp-shell,
 	:global(.plyr--fullscreen) .vp-shell {
 		border-radius: 0;
+		max-width: none;
+		max-height: none;
 	}
 
 	/* ── Skeleton ──────────────────────────────────────── */
@@ -794,12 +867,44 @@
 		width: 100%;
 		height: 100%;
 		opacity: 0;
-		transition: opacity 0.3s ease;
+		transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+		transform-origin: center;
 		display: block;
 	}
 
 	.vp-video--ready {
 		opacity: 1;
+	}
+
+	/* ── Rotate Button ─────────────────────────────────── */
+	.vp-rotate-btn {
+		position: absolute;
+		top: 16px;
+		right: 16px;
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: rgba(0, 0, 0, 0.4);
+		color: rgba(255, 255, 255, 0.9);
+		border: none;
+		cursor: pointer;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		transition: all 0.2s ease;
+	}
+
+	.vp-rotate-btn:hover {
+		background: rgba(0, 0, 0, 0.6);
+		color: #fff;
+		transform: scale(1.05);
+	}
+
+	.vp-rotate-btn:active {
+		transform: scale(0.95);
 	}
 
 	/* ── Gesture bubble ────────────────────────────────── */

@@ -168,14 +168,6 @@
 							<Plus size={14} />
 							{m.admin_courses_btn_add?.() ?? "Kurs qo'shish"}
 						</a>
-						<a
-							href={resolve('/admin/courses/create-spa')}
-							class="acp-empty-btn"
-							style="background: var(--primary);"
-						>
-							<Plus size={14} />
-							Tezkor (SPA)
-						</a>
 					</div>
 				{/if}
 			</div>

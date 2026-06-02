@@ -22,7 +22,6 @@
 	let editModuleTarget = $state(null);
 
 	function openModuleEdit(mod) {
-		console.log(mod);
 		editModuleTarget = {
 			pk: mod.id,
 			title_uz: mod.title_uz || '',

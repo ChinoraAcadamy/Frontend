@@ -199,8 +199,6 @@ export const actions = {
 			headers: HEADERS(accessToken)
 		});
 
-		console.log(await res.json());
-
 		if (!res.ok) {
 			return fail(res.status, { enrollError: 'Blokdan chiqarishda xatolik' });
 		}

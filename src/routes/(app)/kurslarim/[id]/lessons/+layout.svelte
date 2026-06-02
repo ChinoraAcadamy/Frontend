@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { Lock, CheckCircle2, List, ChevronDown, PlayCircle } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
-	import { getLocale } from '@/lib/paraglide/runtime';
 	import { resolve } from '$app/paths';
 
 	let { data, children } = $props();
