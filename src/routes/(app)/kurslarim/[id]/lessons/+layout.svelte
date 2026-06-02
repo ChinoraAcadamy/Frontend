@@ -10,13 +10,16 @@
 	let showMobileSidebar = $state(false);
 
 	function formatDuration(val) {
-		if (!val) return '0 ' + (getLocale() === 'uz' ? 'daqiqa' : 'минут');
-		const secs = Number(val);
-		if (isNaN(secs)) return val;
-		const mins = secs / 60;
-		const formattedMins = mins % 1 === 0 ? mins : Number(mins.toFixed(1));
-		const unit = getLocale() === 'uz' ? 'daqiqa' : 'минут';
-		return `${formattedMins} ${unit}`;
+		if (!val) return '';
+		const secs = Math.round(Number(val));
+		if (isNaN(secs) || secs <= 0) return '';
+		const h = Math.floor(secs / 3600);
+		const min = Math.floor((secs % 3600) / 60);
+		const sec = secs % 60;
+		if (h > 0) {
+			return `~${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+		}
+		return `~${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 	}
 </script>
 
@@ -105,7 +108,8 @@
 												<div class="flex min-w-0 flex-col">
 													<span class="line-clamp-2 text-sm font-bold text-muted">{l.title}</span>
 													<span class="mt-0.5 text-xs font-semibold text-muted"
-														>{formatDuration(l.duration)}</span
+														>{formatDuration(l.duration) }
+														{m.min_label()}</span
 													>
 												</div>
 											</div>
@@ -144,7 +148,7 @@
 															: 'text-muted'}">{l.title}</span
 													>
 													<span class="mt-0.5 text-xs font-semibold text-muted"
-														>{formatDuration(l.duration)}</span
+														>{formatDuration(l.duration)} {m.min_label()}</span
 													>
 												</div>
 											</div>

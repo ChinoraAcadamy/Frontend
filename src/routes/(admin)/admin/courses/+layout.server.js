@@ -13,36 +13,24 @@ export const load = async ({ params, cookies }) => {
 
 	try {
 		const timestamp = Date.now();
-		const [resUz, resRu, resListUz, resListRu, resModules] = await Promise.all([
+		const [resUz, resRu, resListUz, resListRu, resModules, resModulesRu] = await Promise.all([
 			globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
-				headers: {
-					...headers,
-					'Accept-Language': 'uz'
-				}
+				headers: { ...headers, 'Accept-Language': 'uz' }
 			}),
 			globalThis.fetch(`${API_URL}/courses/${params.course_id}/?_cb=${timestamp}`, {
-				headers: {
-					...headers,
-					'Accept-Language': 'ru'
-				}
+				headers: { ...headers, 'Accept-Language': 'ru' }
 			}),
 			globalThis.fetch(`${API_URL}/courses/?_cb=${timestamp}`, {
-				headers: {
-					...headers,
-					'Accept-Language': 'uz'
-				}
+				headers: { ...headers, 'Accept-Language': 'uz' }
 			}),
 			globalThis.fetch(`${API_URL}/courses/?_cb=${timestamp}`, {
-				headers: {
-					...headers,
-					'Accept-Language': 'ru'
-				}
+				headers: { ...headers, 'Accept-Language': 'ru' }
 			}),
 			globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/?_cb=${timestamp}`, {
-				headers: {
-					...headers,
-					'Accept-Language': 'uz'
-				}
+				headers: { ...headers, 'Accept-Language': 'uz' }
+			}),
+			globalThis.fetch(`${API_URL}/courses/${params.course_id}/modules/?_cb=${timestamp}`, {
+				headers: { ...headers, 'Accept-Language': 'ru' }
 			})
 		]);
 
@@ -88,6 +76,16 @@ export const load = async ({ params, cookies }) => {
 			}
 		}
 
+		let modulesListRu = [];
+		if (resModulesRu && resModulesRu.ok) {
+			try {
+				const data = await resModulesRu.json();
+				modulesListRu = Array.isArray(data) ? data : data.results || [];
+			} catch (e) {
+				console.error('Failed to parse Russian modules list:', e);
+			}
+		}
+
 		const courseListUz = listUz.find((c) => Number(c.id) === Number(params.course_id)) || {};
 		const courseListRu = listRu.find((c) => Number(c.id) === Number(params.course_id)) || {};
 
@@ -106,7 +104,19 @@ export const load = async ({ params, cookies }) => {
 			level: courseListUz.level ?? courseUz.level ?? courseRu.level ?? ''
 		};
 
-		return { course, modules: modulesList };
+		// Modullar: Accept-Language bilan olingan title va description
+		const combinedModules = modulesList.map((modUz) => {
+			const modRu = modulesListRu.find((m) => m.id === modUz.id) || {};
+			return {
+				...modUz,
+				title_uz: modUz.title || '',
+				description_uz: modUz.description || '',
+				title_ru: modRu.title || '',
+				description_ru: modRu.description || ''
+			};
+		});
+
+		return { course, modules: combinedModules };
 	} catch (err) {
 		console.error('Modulelarni olishda xatolik: ', err);
 		throw error(500, 'Server bilan ulanishda xatolik yuz berdi');

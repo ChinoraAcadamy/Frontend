@@ -265,27 +265,15 @@
 								</div>
 							</div>
 
-							<!-- Features -->
+							<!-- Description -->
 							<div class="flex flex-1 flex-col space-y-4 p-8 pt-0">
-								{#if plan.features && plan.features.length > 0}
-									<div class="flex-1 space-y-4">
-										{#each plan.features as feature (feature)}
-											<div class="flex items-start gap-4">
-												<CheckCircle
-													class="mt-0.5 h-5 w-5 shrink-0 {plan.popular
-														? 'text-white'
-														: 'text-primary'}"
-													strokeWidth={2.5}
-												/>
-												<span
-													class="text-[14px] leading-tight font-medium {plan.popular
-														? 'text-white/90'
-														: 'text-slate-600'}"
-												>
-													{feature}
-												</span>
-											</div>
-										{/each}
+								{#if plan.description}
+									<div
+										class="flex-1 text-[14.5px] leading-relaxed font-medium whitespace-pre-line {plan.popular
+											? 'text-white/90'
+											: 'text-slate-600'}"
+									>
+										{plan.description}
 									</div>
 								{/if}
 

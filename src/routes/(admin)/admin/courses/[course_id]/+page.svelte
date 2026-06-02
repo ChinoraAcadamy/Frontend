@@ -22,13 +22,14 @@
 	let editModuleTarget = $state(null);
 
 	function openModuleEdit(mod) {
+		console.log(mod);
 		editModuleTarget = {
 			pk: mod.id,
-			title_uz: mod.title,
-			title_ru: mod.title,
+			title_uz: mod.title_uz || '',
+			title_ru: mod.title_ru || '',
 			description_uz: mod.description_uz || '',
 			description_ru: mod.description_ru || '',
-			order_index: mod.order || 1
+			order_index: mod.order_index ?? mod.order ?? 1
 		};
 		isEditModuleModalOpen = true;
 	}

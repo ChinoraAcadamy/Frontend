@@ -87,7 +87,9 @@
 
 	let localImgPreview = $state(null);
 	let imgPreview = $derived.by(() => {
-		return localImgPreview !== null ? localImgPreview : (course?.img || course?.img_file || course?.image || null);
+		return localImgPreview !== null
+			? localImgPreview
+			: course?.img || course?.img_file || course?.image || null;
 	});
 
 	function handleImageChange(e) {
@@ -127,13 +129,17 @@
 		}
 	});
 
-	function formatDuration(seconds) {
-		if (!seconds) return 0;
-		const secs = Number(seconds);
-		if (isNaN(secs)) return seconds;
-		const mins = secs / 60;
-		if (mins % 1 === 0) return mins;
-		return Number(mins.toFixed(1));
+	function formatDuration(val) {
+		if (!val) return '';
+		const secs = Math.round(Number(val));
+		if (isNaN(secs) || secs <= 0) return '';
+		const h = Math.floor(secs / 3600);
+		const min = Math.floor((secs % 3600) / 60);
+		const sec = secs % 60;
+		if (h > 0) {
+			return `~${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+		}
+		return `~${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 	}
 </script>
 

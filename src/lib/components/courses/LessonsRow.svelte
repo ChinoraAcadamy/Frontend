@@ -8,11 +8,15 @@
 
 	function formatDuration(val) {
 		if (!val) return '';
-		const secs = Number(val);
-		if (isNaN(secs)) return val;
-		const mins = secs / 60;
-		const formattedMins = mins % 1 === 0 ? mins : Number(mins.toFixed(1));
-		return `${formattedMins} ${m.min_label ? m.min_label() : 'Minut'}`;
+		const secs = Math.round(Number(val));
+		if (isNaN(secs) || secs <= 0) return '';
+		const h = Math.floor(secs / 3600);
+		const min = Math.floor((secs % 3600) / 60);
+		const sec = secs % 60;
+		if (h > 0) {
+			return `~${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+		}
+		return `~${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 	}
 </script>
 

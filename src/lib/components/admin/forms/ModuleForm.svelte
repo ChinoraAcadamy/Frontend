@@ -81,9 +81,11 @@
 
 	<div class="grid-form">
 		<div class="form-group">
-			<label for="mod_title_uz"
-				>{m.label_module_title_uz ? m.label_module_title_uz() : 'Modul nomi (UZ)'}</label
-			>
+			<div class="label-container">
+				<label for="mod_title_uz"
+					>{m.label_module_title_uz ? m.label_module_title_uz() : 'Modul nomi (UZ)'}</label
+				>
+			</div>
 			<input
 				type="text"
 				id="mod_title_uz"
@@ -125,9 +127,11 @@
 		</div>
 
 		<div class="form-group full-width">
-			<label for="mod_desc_uz"
-				>{m.label_module_desc_uz ? m.label_module_desc_uz() : "Modul ta'rifi (UZ)"}</label
-			>
+			<div class="label-container">
+				<label for="mod_desc_uz"
+					>{m.label_module_desc_uz ? m.label_module_desc_uz() : "Modul ta'rifi (UZ)"}</label
+				>
+			</div>
 			<textarea
 				id="mod_desc_uz"
 				name="description_uz"
