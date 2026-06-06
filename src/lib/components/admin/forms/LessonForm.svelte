@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { deserialize, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { CheckCircle2, Save, Video, Sparkles } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { fade } from 'svelte/transition';
@@ -229,13 +230,22 @@
 						class="pl-0.5 text-[12px] font-bold tracking-wider text-muted uppercase"
 						>{m.label_order_index ? m.label_order_index() : 'Tartib raqami'}</label
 					>
+					{#if !$page.url.searchParams.has('module_id')}
+						<input
+							type="hidden"
+							name="order_index"
+							value={(modules.find((m) => m.id === modulePk)?.lessons_count ?? 0) + 1}
+						/>
+					{/if}
 					<input
 						type="number"
 						id="les_order"
-						name="order_index"
-						disabled={!lessonTarget}
+						name={$page.url.searchParams.has('module_id') ? 'order_index' : '_order_display'}
+						disabled={!$page.url.searchParams.has('module_id')}
 						class="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors outline-none focus:border-muted disabled:cursor-not-allowed disabled:opacity-60"
-						value={modules.find((m) => m.id === modulePk)?.lessons_count}
+						value={$page.url.searchParams.has('module_id')
+							? lessonTarget.order_index
+							: (modules.find((m) => m.id === modulePk)?.lessons_count ?? 0) + 1}
 					/>
 				</div>
 			</div>
