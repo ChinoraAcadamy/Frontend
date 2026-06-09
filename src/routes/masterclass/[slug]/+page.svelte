@@ -109,19 +109,21 @@
 		isLoading = true;
 		
 		try {
-			const text = `🔥 Yangi Masterklass Registratsiyasi!\n👤 Ismi: ${name}\n📞 Telefon: ${phone}\n📘 Masterklass: ${mc.title_line1} ${mc.title_line2}`;
-			await fetch('https://api.telegram.org/bot6176575449:AAHX7eDxWUZrH1NjCpLD0Ij-f9eJUq6p_FA/sendMessage', {
+			const formData = new FormData();
+			formData.append('name', name);
+			formData.append('phone', phone);
+			formData.append('mc_title', `${mc.title_line1} ${mc.title_line2}`);
+
+			const response = await fetch('?/register', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					chat_id: '1622899126',
-					text: text
-				})
+				body: formData
 			});
+
+			if (!response.ok) {
+				console.error('Registration failed:', response.statusText);
+			}
 		} catch (err) {
-			console.error('Telegram notification failed:', err);
+			console.error('Registration action request failed:', err);
 		}
 
 		isLoading = false;

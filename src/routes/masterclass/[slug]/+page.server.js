@@ -2,6 +2,9 @@ import { error } from '@sveltejs/kit';
 import * as masterclassService from '$lib/server/masterclassService';
 import { getOrSet } from '$lib/server/cache';
 
+const TELEGRAM_BOT_TOKEN = '6176575449:AAHX7eDxWUZrH1NjCpLD0Ij-f9eJUq6p_FA';
+const TELEGRAM_CHAT_ID = '1622899126';
+
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ params, fetch }) => {
 	const { slug } = params;
@@ -42,3 +45,46 @@ export const load = async ({ params, fetch }) => {
 		memberCount
 	};
 };
+
+/** @type {import('./$types').Actions} */
+export const actions = {
+	register: async ({ request, fetch }) => {
+		const formData = await request.formData();
+		const name = formData.get('name')?.toString().trim() ?? '';
+		const phone = formData.get('phone')?.toString().trim() ?? '';
+		const mcTitle = formData.get('mc_title')?.toString() ?? '';
+
+		if (!name || phone.length < 9) {
+			return { success: false, error: "Ma'lumotlar to'liq emas" };
+		}
+
+		// Send Telegram notification from the server (no CSP restrictions server-side)
+		try {
+			const text =
+				`🔥 Yangi Masterklass Registratsiyasi!\n` +
+				`👤 Ismi: ${name}\n` +
+				`📞 Telefon: ${phone}\n` +
+				`📘 Masterklass: ${mcTitle}`;
+
+			const res = await fetch(
+				`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+				{
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text })
+				}
+			);
+
+			if (!res.ok) {
+				const errBody = await res.text();
+				console.error('[Telegram] sendMessage failed:', res.status, errBody);
+			}
+		} catch (err) {
+			// Don't fail the registration if Telegram is unreachable
+			console.error('[Telegram] sendMessage error:', err);
+		}
+
+		return { success: true };
+	}
+};
+
