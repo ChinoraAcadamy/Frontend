@@ -95,6 +95,7 @@ export const actions = {
 			apiFormData.append('why_description', lpData.why_desc || '');
 			apiFormData.append('telegram_invite_link', lpData.telegram_link || '');
 			apiFormData.append('eyebrow_badge', lpData.eyebrow_text || '');
+			apiFormData.append('target_code', lpData.target_code || '');
 			apiFormData.append('slug', lpData.slug || 'masterclass-' + Date.now());
 
 			// Stats

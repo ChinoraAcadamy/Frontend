@@ -27,6 +27,7 @@
 	import { resolve } from '$app/paths';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale } from '$lib/paraglide/runtime.js';
+	import { SvelteDate } from 'svelte/reactivity';
 
 	let { data, form: serverForm } = $props();
 
@@ -83,7 +84,128 @@
 		// CTA
 		telegram_link: data?.lp?.telegram_invite_link ?? 'https://t.me/+ZlMsl6Ool8k4Zjdi',
 		eyebrow_text: data?.lp?.eyebrow_badge ?? 'Eksklyuziv masterklass',
-		benefits_title: data?.lp?.benefits_section_title ?? "Masterklassda nimalarni o'rganasiz?"
+		benefits_title: data?.lp?.benefits_section_title ?? "Masterklassda nimalarni o'rganasiz?",
+		target_code: data?.lp?.target_code ?? ''
+	});
+
+	const monthsUz = [
+		'Yanvar',
+		'Fevral',
+		'Mart',
+		'Aprel',
+		'May',
+		'Iyun',
+		'Iyul',
+		'Avgust',
+		'Sentyabr',
+		'Oktyabr',
+		'Noyabr',
+		'Dekabr'
+	];
+
+	function getInitialStartAndDuration(mc) {
+		if (!mc) return { startDate: '', duration: 1 };
+
+		const daysStr = mc.countdown_days || '';
+		const parts = daysStr
+			.split(',')
+			.map((p) => p.trim())
+			.filter(Boolean);
+
+		// Check if parts are full dates YYYY-MM-DD
+		if (parts.length > 0 && parts.every((p) => /^\d{4}-\d{2}-\d{2}$/.test(p))) {
+			return {
+				startDate: parts[0],
+				duration: parts.length
+			};
+		}
+
+		// Fallback for legacy format (like "28, 29, 30")
+		if (parts.length > 0) {
+			const firstDay = parseInt(parts[0]);
+			if (!isNaN(firstDay)) {
+				const y = mc.countdown_year || new Date().getFullYear();
+				const m = mc.countdown_month || new Date().getMonth() + 1;
+				const pad = (n) => String(n).padStart(2, '0');
+				return {
+					startDate: `${y}-${pad(m)}-${pad(firstDay)}`,
+					duration: parts.length
+				};
+			}
+		}
+
+		return { startDate: '', duration: 1 };
+	}
+
+	function formatEventDates(startDateStr, dur) {
+		if (!startDateStr || !dur || dur <= 0) return '';
+		const dates = [];
+		const start = new SvelteDate(startDateStr);
+		for (let i = 0; i < dur; i++) {
+			const d = new SvelteDate(start);
+			d.setDate(start.getDate() + i);
+			dates.push(d);
+		}
+		// Group by month
+		const groups = [];
+		let currentGroup = null;
+		for (const date of dates) {
+			const mNum = date.getMonth();
+			const mName = monthsUz[mNum];
+			const day = date.getDate();
+			if (!currentGroup || currentGroup.month !== mNum) {
+				currentGroup = { month: mNum, monthName: mName, days: [] };
+				groups.push(currentGroup);
+			}
+			currentGroup.days.push(day);
+		}
+
+		return groups
+			.map((g) => {
+				const daysStr = g.days.join('–');
+				return `${daysStr} ${g.monthName}`;
+			})
+			.join(' – ');
+	}
+
+	// svelte-ignore state_referenced_locally
+	let { startDate: initStartDate, duration: initDuration } = getInitialStartAndDuration(data?.lp);
+	let startDate = $state(initStartDate);
+	let duration = $state(initDuration);
+
+	$effect(() => {
+		if (startDate && duration > 0) {
+			const dates = [];
+			const start = new Date(startDate);
+			for (let i = 0; i < duration; i++) {
+				const d = new SvelteDate(start);
+				d.setDate(start.getDate() + i);
+				dates.push(d);
+			}
+
+			const pad = (n) => String(n).padStart(2, '0');
+			lp.countdown_days = dates
+				.map((d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`)
+				.join(', ');
+
+			lp.event_days = formatEventDates(startDate, duration);
+
+			const parts = startDate.split('-');
+			if (parts.length >= 2) {
+				lp.countdown_year = parseInt(parts[0]);
+				lp.countdown_month = parseInt(parts[1]);
+			}
+		}
+	});
+
+	$effect(() => {
+		if (lp.event_time) {
+			const parts = lp.event_time.split(':');
+			if (parts.length >= 2) {
+				lp.countdown_hour = parseInt(parts[0]) || 0;
+				lp.countdown_minute = parseInt(parts[1]) || 0;
+			}
+		}
 	});
 
 	// svelte-ignore state_referenced_locally
@@ -224,11 +346,16 @@
 			benefits_title: mc.benefits_section_title,
 			stat_students: mc.stat_students ?? '5000+',
 			stat_experience: mc.stat_experience ?? '10 yil',
-			stat_practical: mc.stat_practical ?? '100%'
+			stat_practical: mc.stat_practical ?? '100%',
+			target_code: mc.target_code ?? ''
 		};
 		benefits = mc.benefits?.map((b) => b.text) ?? [];
 		photoFile = null;
 		photoPreview = null;
+
+		const { startDate: sD, duration: dU } = getInitialStartAndDuration(mc);
+		startDate = sD;
+		duration = dU;
 	}
 
 	function createNew() {
@@ -265,9 +392,12 @@
 			benefits_title: '',
 			stat_students: '0',
 			stat_experience: '0',
-			stat_practical: '0'
+			stat_practical: '0',
+			target_code: ''
 		};
 		benefits = [];
+		startDate = '';
+		duration = 1;
 	}
 
 	const sections = [
@@ -496,12 +626,33 @@
 						<h3 class="mp-card-title">{m.admin_mc_schedule_title()}</h3>
 						<div class="mp-grid-2">
 							<div class="mp-field">
-								<label class="mp-label" for="event_days">{m.admin_mc_dates_label()}</label>
+								<label class="mp-label" for="start_date">Boshlanish sanasi</label>
 								<input
-									id="event_days"
+									id="start_date"
 									class="mp-input"
-									bind:value={lp.event_days}
-									placeholder={m.admin_mc_dates_label()}
+									type="date"
+									bind:value={startDate}
+									required
+								/>
+							</div>
+							<div class="mp-field">
+								<label class="mp-label" for="duration">Davomiyligi (kun)</label>
+								<input
+									id="duration"
+									class="mp-input"
+									type="number"
+									bind:value={duration}
+									min={1}
+									required
+								/>
+							</div>
+							<div class="mp-field" style="grid-column: span 2;">
+								<label class="mp-label" for="event_days_preview">Ko'rsatiladigan sanalar matni (Avtomatik)</label>
+								<input
+									id="event_days_preview"
+									class="mp-input"
+									value={lp.event_days}
+									disabled
 								/>
 							</div>
 							<div class="mp-field">
@@ -533,71 +684,6 @@
 							<input id="is_free" type="checkbox" bind:checked={lp.is_free} class="mp-checkbox" />
 							<span class="mp-checkbox-label">{m.admin_mc_free_label()}</span>
 						</label>
-					</div>
-
-					<!-- Countdown -->
-					<div class="mp-card">
-						<h3 class="mp-card-title">{m.admin_mc_countdown_title()}</h3>
-						<div class="mp-countdown-hint">
-							<Clock size={14} />
-							<span>{m.admin_mc_countdown_hint()}</span>
-						</div>
-						<div class="mp-grid-3">
-							<div class="mp-field">
-								<label class="mp-label" for="countdown_year">Yil</label>
-								<input
-									id="countdown_year"
-									class="mp-input"
-									type="number"
-									bind:value={lp.countdown_year}
-									min={2024}
-								/>
-							</div>
-							<div class="mp-field">
-								<label class="mp-label" for="countdown_month">Oy</label>
-								<select id="countdown_month" class="mp-input" bind:value={lp.countdown_month}>
-									{#each Array.from({ length: 12 }, (_, i) => i + 1) as mNum (mNum)}
-										<option value={mNum}>
-											{new Date(2024, mNum - 1).toLocaleString('uz', { month: 'long' })}
-										</option>
-									{/each}
-								</select>
-							</div>
-							<div class="mp-field">
-								<label class="mp-label" for="countdown_days">{m.admin_mc_days_list()}</label>
-								<input
-									id="countdown_days"
-									class="mp-input"
-									bind:value={lp.countdown_days}
-									placeholder="28, 29, 30"
-								/>
-							</div>
-						</div>
-
-						<div class="mp-grid-2" style="margin-top: 0.75rem;">
-							<div class="mp-field">
-								<label class="mp-label" for="countdown_hour">{m.admin_mc_hour()}</label>
-								<input
-									id="countdown_hour"
-									class="mp-input"
-									type="number"
-									bind:value={lp.countdown_hour}
-									min={0}
-									max={23}
-								/>
-							</div>
-							<div class="mp-field">
-								<label class="mp-label" for="countdown_minute">{m.admin_mc_minute()}</label>
-								<input
-									id="countdown_minute"
-									class="mp-input"
-									type="number"
-									bind:value={lp.countdown_minute}
-									min={0}
-									max={59}
-								/>
-							</div>
-						</div>
 					</div>
 
 					<!-- Seats -->
@@ -656,6 +742,22 @@
 								bind:value={lp.telegram_link}
 								placeholder="https://t.me/+..."
 							/>
+						</div>
+					</div>
+
+					<!-- Target Code -->
+					<div class="mp-card">
+						<h3 class="mp-card-title">Marketing & Ads (Instagram Ads)</h3>
+						<div class="mp-field">
+							<label class="mp-label" for="target_code">Instagram Ads Target Code (HTML/JS)</label>
+							<textarea
+								id="target_code"
+								class="mp-textarea"
+								bind:value={lp.target_code}
+								rows={4}
+								placeholder="Masalan: Instagram ads yoki Facebook Pixel kodi"
+							></textarea>
+							<span class="mp-hint">Ushbu kod masterclass sahifasining html head qismiga joylashtiriladi.</span>
 						</div>
 					</div>
 				</div>
@@ -1446,18 +1548,6 @@
 		white-space: nowrap;
 	}
 
-	/* Countdown hint */
-	.mp-countdown-hint {
-		display: flex;
-		align-items: center;
-		gap: 7px;
-		font-size: 12.5px;
-		color: var(--text-muted, #a09890);
-		background: var(--bg-main, #f5f4f1);
-		border-radius: 9px;
-		padding: 9px 13px;
-		margin-bottom: 1rem;
-	}
 
 	/* ── Title preview ──────────────────────────────────── */
 	.mp-preview-title {
